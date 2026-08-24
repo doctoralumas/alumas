@@ -12,6 +12,7 @@ Production DNS değişikliği yalnız release GO kararı sonrasında yapılmalı
 
 ## TLS NO-GO koşulları
 - Sertifika host adıyla eşleşmiyor.
+
 - HTTPS yönlendirmesi yok.
 - `/api/readiness` HTTPS üzerinden 200 dönmüyor.
 - HSTS/CSP security check başarısız.
