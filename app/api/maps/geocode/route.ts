@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {currentUser} from "@/lib/auth";import {geocodeAddress} from "@/lib/maps";
+export async function POST(req:Request){const u=await currentUser();if(!u)return NextResponse.json({error:'Giriş gerekli'},{status:401});const b=await req.json();const point=await geocodeAddress(String(b.query||''));if(!point)return NextResponse.json({error:'Konum bulunamadı veya MAPBOX_ACCESS_TOKEN tanımlı değil'},{status:404});return NextResponse.json(point)}

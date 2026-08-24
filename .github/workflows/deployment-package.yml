@@ -1,0 +1,34 @@
+name: Deployment Package
+on:
+  workflow_dispatch:
+    inputs:
+      image_digest:
+        description: Registry sha256 digest from immutable image
+        required: true
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    env:
+      APP_VERSION: 0.32.0
+      BUILD_SHA: ${{ github.sha }}
+      RELEASE_CHANNEL: rc
+      ALUMAS_IMAGE: ghcr.io/${{ github.repository_owner }}/alumas
+      ALUMAS_IMAGE_DIGEST: ${{ inputs.image_digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: npm install
+      - run: npm run v32:check
+      - run: npm run release:manifest
+      - run: npm run deploy:artifact
+      - run: npm run deploy:go-no-go
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alumas-deployment-${{ github.sha }}
+          path: |
+            dist/release-manifest.json
+            dist/deployment-artifact.json
+            deploy/*.yml
+            RELEASE_CHECKLIST.md
+            DEPLOYMENT_PACKAGING.md

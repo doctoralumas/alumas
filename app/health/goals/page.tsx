@@ -1,0 +1,1 @@
+import HealthGoals from "@/components/health-goals";export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Ortak takip</span><h1>Sağlık hedeflerim</h1><p>Kendi hedeflerini oluştur veya uzmanla birlikte takip et.</p></div><HealthGoals/></div>}

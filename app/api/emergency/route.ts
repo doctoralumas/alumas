@@ -1,0 +1,1 @@
+import {NextResponse} from "next/server";import {prisma} from "@/lib/prisma";export async function GET(req:Request){const url=new URL(req.url),city=url.searchParams.get("city");return NextResponse.json(await prisma.emergencyDirectoryItem.findMany({where:{isActive:true,...(city?{city:{equals:city,mode:"insensitive"}}:{})},orderBy:[{kind:"asc"},{name:"asc"}]}))}

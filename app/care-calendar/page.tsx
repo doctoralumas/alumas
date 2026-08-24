@@ -1,0 +1,1 @@
+import CareCalendar from "@/components/care-calendar";export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Paylaşılan plan</span><h1>Bakım takvimi</h1><p>Uzmanınla ortak takip görevlerini yönet.</p></div><CareCalendar/></div>}

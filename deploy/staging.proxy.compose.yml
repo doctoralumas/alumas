@@ -1,0 +1,19 @@
+services:
+  proxy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      STAGING_DOMAIN: ${STAGING_DOMAIN:?STAGING_DOMAIN required}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/caddy/Caddyfile.staging:/etc/caddy/Caddyfile:ro
+      - alumas_staging_caddy_data:/data
+      - alumas_staging_caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+volumes:
+  alumas_staging_caddy_data:
+  alumas_staging_caddy_config:

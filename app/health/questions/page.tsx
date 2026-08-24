@@ -1,0 +1,1 @@
+import ClinicalQuestions from "@/components/clinical-questions";export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Klinik takip</span><h1>Doktora Sorularım</h1><p>Randevu ilişkin bulunan doktorlara takip sorusu ilet ve yanıtları burada sakla.</p></div><ClinicalQuestions/></div>}

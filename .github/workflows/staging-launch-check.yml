@@ -1,0 +1,21 @@
+name: Staging Launch Check
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "deploy/**"
+      - "scripts/staging-*.mjs"
+      - "scripts/dns-check.mjs"
+      - ".env.staging.example"
+      - "V33_STAGING_LAUNCH.md"
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run v33:check
+      - run: npm run v32:check
+      - run: npm run security:check

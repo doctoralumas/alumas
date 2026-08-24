@@ -1,0 +1,60 @@
+name: Alumas CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  source-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run schema:check
+      - run: npm run db:generate
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run release:check
+      - run: npm run security:check
+      - run: npm run v28:check
+      - run: npm run v29:check
+      - run: npm run v30:check
+      - run: npm run v31:check
+      - run: npm run v32:check
+      - run: npm run release:manifest
+      - run: npm run ops:check
+      - run: npm run test:api-contracts
+
+  database-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: alumas
+          POSTGRES_PASSWORD: alumas_ci_password
+          POSTGRES_DB: alumas_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U alumas -d alumas_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://alumas:alumas_ci_password@localhost:5432/alumas_ci?schema=public
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run db:generate
+      - run: npm run db:push
+      - run: npm run db:seed
+      - run: npm run db:smoke

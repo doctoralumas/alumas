@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {currentUser} from "@/lib/auth";import {buildHealthReport,resolveRange} from "@/lib/health-report-data";
+export async function GET(req:Request){const u=await currentUser();if(!u)return NextResponse.json({error:"Giriş gerekli"},{status:401});try{const r=resolveRange(new URL(req.url));return NextResponse.json(await buildHealthReport(u.id,r.from,r.to,r.period));}catch(e:any){return NextResponse.json({error:e.message||"Rapor hazırlanamadı"},{status:400});}}

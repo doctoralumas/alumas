@@ -1,0 +1,1 @@
+import PhoneLogin from "@/components/phone-login";export default function Page(){return <div className="page auth-page"><PhoneLogin/></div>}

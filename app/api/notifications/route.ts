@@ -1,0 +1,3 @@
+import {NextResponse} from "next/server";import {currentUser} from "@/lib/auth";import {prisma} from "@/lib/prisma";
+export async function GET(){const u=await currentUser();if(!u)return NextResponse.json({error:"Giriş gerekli"},{status:401});return NextResponse.json(await prisma.notification.findMany({where:{userId:u.id},orderBy:{createdAt:"desc"},take:50}))}
+export async function PATCH(){const u=await currentUser();if(!u)return NextResponse.json({error:"Giriş gerekli"},{status:401});await prisma.notification.updateMany({where:{userId:u.id,readAt:null},data:{readAt:new Date()}});return NextResponse.json({ok:true})}

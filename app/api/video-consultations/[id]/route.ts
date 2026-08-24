@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {currentUser} from "@/lib/auth";import {prisma} from "@/lib/prisma";
+export async function GET(_:Request,{params}:{params:Promise<{id:string}>}){const u=await currentUser();if(!u)return NextResponse.json({error:"Giriş gerekli"},{status:401});const {id}=await params;const row=await prisma.videoConsultation.findFirst({where:{id,OR:[{patientId:u.id},{doctor:{userId:u.id}}]},include:{doctor:true,patient:{select:{name:true}}}});return row?NextResponse.json(row):NextResponse.json({error:"Oda bulunamadı"},{status:404})}

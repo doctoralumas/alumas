@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "monitors": [
+    {
+      "name": "Alumas Staging Readiness",
+      "url": "https://${STAGING_DOMAIN}/api/readiness",
+      "method": "GET",
+      "expectedStatus": 200,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 10
+    },
+    {
+      "name": "Alumas Staging Health",
+      "url": "https://${STAGING_DOMAIN}/api/healthcheck",
+      "method": "GET",
+      "expectedStatus": 200,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 10
+    },
+    {
+      "name": "Alumas Staging Version",
+      "url": "https://${STAGING_DOMAIN}/api/version",
+      "method": "GET",
+      "expectedStatus": 200,
+      "intervalSeconds": 300,
+      "timeoutSeconds": 10
+    },
+    {
+      "name": "Alumas Production Readiness",
+      "url": "https://${PRODUCTION_DOMAIN}/api/readiness",
+      "method": "GET",
+      "expectedStatus": 200,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 10
+    },
+    {
+      "name": "Alumas Production Health",
+      "url": "https://${PRODUCTION_DOMAIN}/api/healthcheck",
+      "method": "GET",
+      "expectedStatus": 200,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 10
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+import {test,expect} from "@playwright/test";
+test("onaylı kurum dizini halka açık çalışır",async({request})=>{const r=await request.get("/api/organizations");expect(r.ok()).toBeTruthy();const rows=await r.json();expect(Array.isArray(rows)).toBe(true);expect(rows.some((x:any)=>x.slug==="alumas-sehir-hastanesi")).toBe(true);expect(rows.every((x:any)=>x.status==="APPROVED"&&x.isPublished===true)).toBe(true)});
+test("readiness veritabanı hazır olduğunda 200 verir",async({request})=>{const r=await request.get("/api/readiness");expect(r.status()).toBe(200);const j=await r.json();expect(j.ok).toBe(true)});

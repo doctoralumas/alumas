@@ -1,0 +1,41 @@
+{
+  "baseUrlEnv": "STAGING_BASE_URL",
+  "expectedReleaseChannel": "staging",
+  "checks": [
+    {
+      "path": "/api/healthcheck",
+      "status": 200,
+      "critical": true
+    },
+    {
+      "path": "/api/readiness",
+      "status": 200,
+      "critical": true
+    },
+    {
+      "path": "/api/version",
+      "status": 200,
+      "critical": true,
+      "assert": [
+        "version",
+        "buildSha",
+        "channel=staging"
+      ]
+    },
+    {
+      "path": "/api/app-config",
+      "status": 200,
+      "critical": true
+    },
+    {
+      "path": "/api/organizations",
+      "status": 200,
+      "critical": true
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "critical": true
+    }
+  ]
+}

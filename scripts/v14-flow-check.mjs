@@ -1,0 +1,4 @@
+import fs from 'node:fs';
+const required=['model BloodPressureReading','model GlucoseReading','model SleepRecord','model Medication','model HealthReminder'];
+const schema=fs.readFileSync('prisma/schema.prisma','utf8');for(const x of required)if(!schema.includes(x))throw new Error(`Eksik şema: ${x}`);
+const files=['app/health/blood-pressure/page.tsx','app/health/glucose/page.tsx','app/health/sleep/page.tsx','app/health/medications/page.tsx','app/calendar/page.tsx','app/api/health/blood-pressure/route.ts','app/api/health/glucose/route.ts','app/api/health/sleep/route.ts','app/api/health/medications/route.ts','app/api/reminders/route.ts','app/api/calendar/route.ts'];for(const f of files)if(!fs.existsSync(f))throw new Error(`Eksik dosya: ${f}`);console.log('Alumas v14 sağlık takip akışı kaynak kontrolü başarılı.');

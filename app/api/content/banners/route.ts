@@ -1,0 +1,1 @@
+import {NextResponse} from "next/server";import {prisma} from "@/lib/prisma";export async function GET(){const now=new Date();return NextResponse.json(await prisma.homeBanner.findMany({where:{isActive:true,AND:[{OR:[{startsAt:null},{startsAt:{lte:now}}]},{OR:[{endsAt:null},{endsAt:{gte:now}}]}]},orderBy:[{sortOrder:"asc"},{createdAt:"desc"}]}))}

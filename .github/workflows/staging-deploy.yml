@@ -1,0 +1,60 @@
+name: Deploy Staging
+on:
+  workflow_dispatch:
+    inputs:
+      image_ref:
+        description: Immutable image ref (registry/repo@sha256:...)
+        required: true
+      release_version:
+        description: App version
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: alumas-staging-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate immutable image
+        env:
+          IMAGE: ${{ inputs.image_ref }}
+        run: '[[ "$IMAGE" == *@sha256:* ]] || { echo "immutable digest required"; exit 2; }'
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          HOST: ${{ secrets.STAGING_HOST }}
+          PORT: ${{ secrets.STAGING_SSH_PORT }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${PORT:-22}" -H "$HOST" >> ~/.ssh/known_hosts
+      - name: Upload release files
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+          USER: ${{ secrets.STAGING_USER }}
+          PORT: ${{ secrets.STAGING_SSH_PORT }}
+        run: |
+          tar czf /tmp/alumas-release.tgz deploy scripts package.json prisma
+          scp -P "${PORT:-22}" /tmp/alumas-release.tgz "$USER@$HOST:/tmp/alumas-release.tgz"
+          ssh -p "${PORT:-22}" "$USER@$HOST" 'mkdir -p /opt/alumas/staging/releases/${{ github.sha }} && tar xzf /tmp/alumas-release.tgz -C /opt/alumas/staging/releases/${{ github.sha }} && ln -sfn /opt/alumas/staging/releases/${{ github.sha }} /opt/alumas/staging/current'
+      - name: Deploy exact digest
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+          USER: ${{ secrets.STAGING_USER }}
+          PORT: ${{ secrets.STAGING_SSH_PORT }}
+          IMAGE: ${{ inputs.image_ref }}
+          VERSION: ${{ inputs.release_version }}
+        run: |
+          ssh -p "${PORT:-22}" "$USER@$HOST" "cd /opt/alumas/staging/current && ALUMAS_IMAGE='$IMAGE' APP_VERSION='$VERSION' BUILD_SHA='${{ github.sha }}' bash scripts/remote-staging-deploy.sh"
+      - name: Collect diagnostics on failure
+        if: failure()
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+          USER: ${{ secrets.STAGING_USER }}
+          PORT: ${{ secrets.STAGING_SSH_PORT }}
+        run: ssh -p "${PORT:-22}" "$USER@$HOST" 'cd /opt/alumas/staging/current && bash scripts/collect-staging-logs.sh /tmp/alumas-staging-failure.log' || true

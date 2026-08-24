@@ -1,0 +1,2 @@
+import {redirect} from 'next/navigation';import {currentUser} from '@/lib/auth';import AdminReviewModeration from '@/components/admin-review-moderation';
+export default async function AdminReviews(){const u=await currentUser();if(!u||u.role!=='ADMIN')redirect('/login');return <div className="page"><div className="page-title"><span className="kicker">Admin</span><h1>Yorum moderasyonu</h1><p>Kurum ve doktor değerlendirmelerini yayınlamadan önce incele.</p></div><section className="panel"><AdminReviewModeration/></section></div>}

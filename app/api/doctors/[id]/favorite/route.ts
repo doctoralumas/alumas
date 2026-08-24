@@ -1,0 +1,7 @@
+import {NextResponse} from 'next/server';
+import {currentUser} from '@/lib/auth';
+import {prisma} from '@/lib/prisma';
+async function resolveDoctor(id:string){return prisma.doctor.findFirst({where:{OR:[{id},{slug:id}]},select:{id:true}})}
+export async function GET(_:Request,{params}:{params:Promise<{id:string}>}){const u=await currentUser();if(!u)return NextResponse.json({favorite:false});const {id}=await params;const d=await resolveDoctor(id);if(!d)return NextResponse.json({favorite:false});const row=await prisma.doctorFavorite.findUnique({where:{userId_doctorId:{userId:u.id,doctorId:d.id}}});return NextResponse.json({favorite:!!row})}
+export async function POST(_:Request,{params}:{params:Promise<{id:string}>}){const u=await currentUser();if(!u)return NextResponse.json({error:'Giriş gerekli'},{status:401});const {id}=await params;const d=await resolveDoctor(id);if(!d)return NextResponse.json({error:'Doktor bulunamadı'},{status:404});await prisma.doctorFavorite.upsert({where:{userId_doctorId:{userId:u.id,doctorId:d.id}},update:{},create:{userId:u.id,doctorId:d.id}});return NextResponse.json({favorite:true},{status:201})}
+export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){const u=await currentUser();if(!u)return NextResponse.json({error:'Giriş gerekli'},{status:401});const {id}=await params;const d=await resolveDoctor(id);if(!d)return NextResponse.json({favorite:false});await prisma.doctorFavorite.deleteMany({where:{userId:u.id,doctorId:d.id}});return NextResponse.json({favorite:false})}

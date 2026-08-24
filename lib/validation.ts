@@ -1,0 +1,7 @@
+import { z } from "zod";
+const trimmed=z.string().trim();
+export const registerSchema=z.object({name:trimmed.min(2,"Ad soyad en az 2 karakter olmalı.").max(120),email:z.string().trim().email("Geçerli bir e-posta girin.").max(254),password:z.string().min(10,"Parola en az 10 karakter olmalı.").max(200),privacyNotice:z.union([z.literal(true),z.literal("on")]),accountType:z.enum(["PATIENT","DOCTOR","ORGANIZATION","AGENCY"]).default("PATIENT")});
+export const loginSchema=z.object({email:z.string().trim().email("Geçerli bir e-posta girin.").max(254),password:z.string().min(1,"Parola gerekli.").max(200)});
+export const appointmentSchema=z.object({doctorId:trimmed.min(1),startsAt:z.string().datetime({offset:true}).or(z.string().datetime()),type:z.enum(["online","clinic"]).default("online"),note:z.string().trim().max(2000).optional().nullable(),organizationId:z.string().trim().max(80).optional().nullable(),specialProfileId:z.string().trim().max(80).optional().nullable()});
+export const bloodPressureSchema=z.object({systolic:z.coerce.number().int().min(60).max(260),diastolic:z.coerce.number().int().min(30).max(180),pulse:z.union([z.coerce.number().int().min(25).max(240),z.literal(""),z.null()]).optional(),measuredAt:z.string().datetime({offset:true}).or(z.string().datetime()).optional(),note:z.string().trim().max(1000).optional().nullable()});
+export function zodDetails(error:z.ZodError){return error.issues.map(x=>({path:x.path.join("."),message:x.message,code:x.code}))}

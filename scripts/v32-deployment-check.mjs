@@ -1,0 +1,3 @@
+import fs from "node:fs";
+const must=["deploy/staging.compose.yml","deploy/production.compose.yml","deploy/secret-matrix.json","scripts/create-deployment-artifact.mjs","scripts/create-rollback-artifact.mjs","scripts/go-no-go.mjs","DEPLOYMENT_PACKAGING.md","RELEASE_DASHBOARD.md"];let ok=true;for(const f of must){if(!fs.existsSync(f)){console.error("missing",f);ok=false}}
+const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));if(!/^0\.(3[2-9]|[4-9][0-9])\./.test(pkg.version)){console.error("version must be v32 or newer");ok=false}for(const k of ["deploy:artifact","deploy:go-no-go","deploy:rollback:artifact"]){if(!pkg.scripts?.[k]){console.error("script missing",k);ok=false}}if(!ok)process.exit(1);console.log("v32 deployment check OK");

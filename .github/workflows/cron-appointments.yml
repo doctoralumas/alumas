@@ -1,0 +1,18 @@
+name: Appointment Cron
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run appointment completion cron
+        env:
+          APP_URL: ${{ secrets.ALUMAS_CRON_APP_URL }}
+          CRON_SECRET: ${{ secrets.ALUMAS_CRON_SECRET }}
+        run: node scripts/run-cron-job.mjs appointments-completion

@@ -1,0 +1,1 @@
+import AuthForm from "@/components/auth-form"; export default function Login(){return <div className="page auth-page"><AuthForm mode="login"/><a className="secondary full auth-secondary" href="/phone-login">Telefonla giriş</a></div>}

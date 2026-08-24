@@ -1,0 +1,3 @@
+import {prometheus,snapshot} from "@/lib/metrics";import {apiError} from "@/lib/api-response";
+export const dynamic="force-dynamic";
+export async function GET(req:Request){const secret=process.env.METRICS_SECRET;if(!secret)return apiError("Metrics devre dışı",404,"NOT_FOUND");if(req.headers.get("authorization")!==`Bearer ${secret}`)return apiError("Yetkisiz",403,"FORBIDDEN");const accept=req.headers.get("accept")||"";if(accept.includes("application/json"))return Response.json({ok:true,data:snapshot()});return new Response(prometheus(),{headers:{"content-type":"text/plain; version=0.0.4; charset=utf-8","cache-control":"no-store"}})}

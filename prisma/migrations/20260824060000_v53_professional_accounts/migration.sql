@@ -1,0 +1,1 @@
+-- v53 schema migration: run `npx prisma migrate dev` in development to generate provider-specific SQL after review.

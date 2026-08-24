@@ -1,0 +1,1 @@
+import DiagnosticRequests from '@/components/diagnostic-requests';export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Takip</span><h1>Tetkik & Görevlerim</h1><p>Doktorunun istediği tetkikleri planla ve tamamlanma durumlarını takip et.</p></div><DiagnosticRequests/></div>}

@@ -1,0 +1,1 @@
+import SectionVisual from "@/components/section-visual";import EmergencyHealthCard from '@/components/emergency-health-card';export default function Page(){return <div className="page"><SectionVisual slug="health-card" alt="Sağlık kartı"/><EmergencyHealthCard/></div>}

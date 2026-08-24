@@ -1,0 +1,1 @@
+import SectionVisual from "@/components/section-visual";import LabCenter from "@/components/lab-center";export default function Page(){return <div className="page"><SectionVisual slug="labs" alt="Laboratuvar"/><LabCenter/></div>}

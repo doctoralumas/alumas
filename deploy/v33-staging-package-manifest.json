@@ -1,0 +1,13 @@
+{
+  "version": "0.33.0",
+  "generatedAt": "2026-08-22T00:45:05.761437+00:00",
+  "files": {
+    "package.json": "69143752fca456cdaa30897d2780c84659c630699e6d93cc685e892d365ed66b",
+    "deploy/staging.compose.yml": "d1fed0a6c96448f5c508b0eb4b93643adf2395bfaa89b473cba25cedff39f9ca",
+    "deploy/staging.proxy.compose.yml": "d9fec1854d88b4b13b691b93408cb5cd215281face2f52bb2a7e17db4ad97f57",
+    "deploy/caddy/Caddyfile.staging": "7508b3c89180269223acbfaa46d779ae709b8f056c0be9a4e09f105795489de7",
+    "deploy/monitoring/uptime-monitors.json": "24eec8f73744a2c5f45f9c29a66adcdc9b5ffe9e54f6f6b0d46d7bab86904989",
+    "deploy/cron/cron-jobs.json": "39387b75bf71ea76d8161befe09baf21f5cd4d415d60bbfe7bfe06d8534a6b5a",
+    "STAGING_LAUNCH_RUNBOOK.md": "c0a19e9fd2cd6fb64fb31a966530de07238a373b02784b1ead5237fc96afbc1a"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "name": "appointments-completion",
+      "path": "/api/cron/appointments",
+      "method": "POST",
+      "schedule": "*/15 * * * *",
+      "secretEnv": "CRON_SECRET",
+      "timeoutSeconds": 30,
+      "environments": [
+        "staging",
+        "production"
+      ]
+    }
+  ]
+}

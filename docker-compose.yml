@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: alumas
+      POSTGRES_PASSWORD: alumas
+      POSTGRES_DB: alumas
+    ports:
+      - "5432:5432"
+    volumes:
+      - alumas_pg:/var/lib/postgresql/data
+volumes:
+  alumas_pg:

@@ -1,0 +1,3 @@
+import {execFileSync} from "node:child_process";import fs from "node:fs";import path from "node:path";
+const url=process.env.BACKUP_DATABASE_URL||process.env.DATABASE_URL;if(!url){console.error("BACKUP_DATABASE_URL veya DATABASE_URL gerekli");process.exit(1)}
+const dir=process.env.BACKUP_DIR||path.resolve("backups");fs.mkdirSync(dir,{recursive:true});const stamp=new Date().toISOString().replace(/[:.]/g,"-");const out=path.join(dir,`alumas-${stamp}.dump`);execFileSync("pg_dump",["--format=custom","--no-owner","--no-acl","--file",out,url],{stdio:"inherit"});const stat=fs.statSync(out);if(stat.size<1024){console.error("Backup beklenenden küçük; başarısız sayıldı");process.exit(1)}console.log(JSON.stringify({ok:true,path:out,sizeBytes:stat.size}));

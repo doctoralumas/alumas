@@ -1,0 +1,50 @@
+name: Release Candidate
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Release channel
+        required: true
+        default: rc
+        type: choice
+        options: [rc, staging]
+jobs:
+  rc:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: alumas
+          POSTGRES_PASSWORD: alumas_rc_password
+          POSTGRES_DB: alumas_rc
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U alumas -d alumas_rc"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql://alumas:alumas_rc_password@127.0.0.1:5432/alumas_rc?schema=public
+      APP_VERSION: 0.32.0
+      RELEASE_CHANNEL: ${{ inputs.channel }}
+      BUILD_SHA: ${{ github.sha }}
+      ALLOWED_ORIGINS: http://127.0.0.1:3000
+      SECURITY_HASH_SALT: rc-ci-only
+      AUDIT_HASH_SALT: rc-ci-only
+      SESSION_COOKIE_SECURE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22, cache: npm}
+      - run: npm install
+      - run: npm run db:generate
+      - run: npm run db:push
+      - run: npm run db:seed
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run v31:check
+      - run: npm run release:manifest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alumas-rc-manifest-${{ github.sha }}
+          path: dist/release-manifest.json

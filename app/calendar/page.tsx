@@ -1,0 +1,1 @@
+import SectionVisual from "@/components/section-visual";import ReminderCalendar from "@/components/reminder-calendar";export default function Page(){return <div className="page"><SectionVisual slug="calendar" alt="Sağlık takvimi"/><ReminderCalendar/></div>}

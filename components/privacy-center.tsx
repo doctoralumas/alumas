@@ -1,0 +1,9 @@
+"use client";import {useEffect,useState} from "react";
+type C={kind:string;accepted:boolean;version:string};
+const items=[
+ {kind:"privacy_notice",title:"Aydınlatma metni",desc:"Alumas'ın hangi kişisel verileri hangi amaçlarla işlediğini açıklar.",required:true},
+ {kind:"health_processing",title:"Sağlık verisi işleme bilgilendirmesi",desc:"Sağlık verileri özel nitelikli kişisel veridir. İşleme şartı kullanım senaryosuna göre veri sorumlusu tarafından belirlenir; açık rıza gerekmeyen bir faaliyet açık rızaya dayandırılmaz.",required:true},
+ {kind:"health_integrations",title:"Apple Health / Health Connect",desc:"Telefonundaki seçili sağlık verilerini Alumas'a aktarmak için ayrı açık rıza.",required:false},
+ {kind:"marketing",title:"Kampanya ve iletişim",desc:"Pazarlama amaçlı elektronik ileti izni. Hizmeti kullanmak için zorunlu değildir.",required:false}
+];
+export default function PrivacyCenter(){const [rows,setRows]=useState<C[]>([]),[busy,setBusy]=useState("");const load=()=>fetch('/api/privacy/consents').then(r=>r.json()).then(setRows);useEffect(()=>{load()},[]);const latest=(k:string)=>rows.find(x=>x.kind===k)?.accepted??false;async function save(kind:string,accepted:boolean){setBusy(kind);await fetch('/api/privacy/consents',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,accepted,version:'2026-08-21'})});await load();setBusy("")}return <div className="privacy-grid">{items.map(i=><div className="privacy-row" key={i.kind}><div><b>{i.title}</b><p>{i.desc}</p><small>{i.required?'Hizmet/uyum kaydı':'İsteğe bağlı'}</small></div><button className={latest(i.kind)?'btn secondary':'btn'} disabled={busy===i.kind} onClick={()=>save(i.kind,!latest(i.kind))}>{busy===i.kind?'Kaydediliyor…':latest(i.kind)?'Kayıtlı ✓':'Kaydet'}</button></div>)}</div>}

@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {currentUser} from "@/lib/auth";import {prisma} from "@/lib/prisma";
+export async function GET(){const u=await currentUser();if(!u)return NextResponse.json({error:"Giriş gerekli"},{status:401});return NextResponse.json(await prisma.organization.findMany({where:{ownerUserId:u.id},include:{services:true,stocks:true,hours:true,departments:true,campaigns:true,doctorInvites:{orderBy:{createdAt:"desc"}},_count:{select:{doctors:true}}},orderBy:{createdAt:"desc"}}))}

@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';import {currentUser} from '@/lib/auth';import {prisma} from '@/lib/prisma';
+export async function GET(){const u=await currentUser();if(!u)return NextResponse.json({error:'Giriş gerekli'},{status:401});const rows=await prisma.doctorFavorite.findMany({where:{userId:u.id},include:{doctor:{include:{organization:{select:{name:true,slug:true}}}}},orderBy:{createdAt:'desc'}});return NextResponse.json(rows.map(x=>({...x.doctor,organization:x.doctor.organization}))) }
