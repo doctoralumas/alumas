@@ -63,3 +63,6 @@ coverage/
 *.key
 *.p12
 *.pfx
+
+# Project Documentation & Versions
+.docs/
