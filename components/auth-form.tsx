@@ -1,9 +1,17 @@
 "use client";
-import { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function AuthForm({ mode }: { mode: "login" | "register" }) {
+  return (
+    <Suspense fallback={<div className="auth-card">Yükleniyor...</div>}>
+      <AuthFormContent mode={mode} />
+    </Suspense>
+  );
+}
+
+function AuthFormContent({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
   const params = useSearchParams();
   const requested = String(params.get("type") || "patient").toLowerCase();
