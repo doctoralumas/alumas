@@ -35,7 +35,7 @@ export default function HealthNavigator({compact=false}:{compact?:boolean}){
       const json=await res.json();
       if(!res.ok) throw new Error(json.error||"İstek tamamlanamadı");
       setResult(json.data);
-      setHistory(h=>[...h,{role:"user",text:message},{role:"assistant",text:json.data.commentary}].slice(-8));
+      setHistory(h=>[...h,{role:"user" as const,text:message},{role:"assistant" as const,text:json.data.commentary}].slice(-8));
     }catch(err){setError(err instanceof Error?err.message:"Bir hata oluştu");}
     finally{setLoading(false)}
   }

@@ -8,7 +8,7 @@ function requestIp(req?: Request) {
 function hash(value: string | null) {
   return value ? createHash("sha256").update(`${process.env.AUDIT_HASH_SALT || "alumas"}:${value}`).digest("hex") : null;
 }
-export async function audit(input:{actorUserId?:string|null;action:string;entityType:string;entityId?:string|null;outcome?:string;metadata?:Record<string,unknown>;req?:Request}) {
+export async function audit(input:{actorUserId?:string|null;action:string;entityType:string;entityId?:string|null;outcome?:string;metadata?:any;req?:Request}) {
   try {
     await prisma.auditLog.create({data:{
       actorUserId:input.actorUserId || null, action:input.action, entityType:input.entityType,

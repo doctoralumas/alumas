@@ -3,14 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth/session";
 import { verificationReadiness } from "@/lib/professional/verification";
 
-export async function PATCH(req:NextRequest,{params}:{params:{id:string}}){
+export async function PATCH(req:NextRequest,{params}:{params:Promise<{id:string}>}){
+  const {id} = await params;
   const user=await getSessionUser();
   if(!user || user.role!=="ADMIN") return NextResponse.json({error:"Yetkisiz."},{status:403});
   const b=await req.json().catch(()=>({}));
   if(!["APPROVED","REJECTED","UNDER_REVIEW","EXPIRED"].includes(b.status)) return NextResponse.json({error:"Geçersiz durum."},{status:400});
 
   const doc=await prisma.professionalVerificationDocument.update({
-    where:{id:params.id},
+    where:{id},
     data:{
       status:b.status,
       reviewerNote:b.note||null,
