@@ -79,7 +79,7 @@ function AuthFormContent({ mode }: { mode: "login" | "register" }) {
 
       <label>
         Parola
-        <input name="password" type="password" minLength={10} required placeholder="En az 10 karakter" data-testid="auth-password" />
+        <input name="password" type="password" minLength={mode === "login" ? 1 : 10} required placeholder="En az 10 karakter" data-testid="auth-password" />
       </label>
 
       {mode === "register" && (
