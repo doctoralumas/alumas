@@ -23,7 +23,7 @@ export default function Home(){
   return <div className="page home-getir">
     <section className="home-getir-location">
       <div><span className="home-location-pin">⌖</span><div><small>Konum</small><b>Yakınımdaki sağlık hizmetleri</b></div></div>
-      <div className="home-location-actions"><Link href="/nearby">Değiştir</Link><Link href="/profile" className="home-mini-avatar">A</Link></div>
+      <div className="home-location-actions"><Link href="/nearby">Değiştir</Link></div>
     </section>
 
     <HealthNavigator compact/>
