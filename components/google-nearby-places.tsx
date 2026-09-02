@@ -1,3 +1,181 @@
 "use client";import {useEffect,useRef,useState} from "react";type Place={id:string;name:string;address:string;latitude:number;longitude:number;rating?:number|null;userRatingCount?:number|null;mapsUrl?:string|null;openNow?:boolean|null;distanceKm?:number|null;typeLabel?:string|null};
 const cats:any={health:"Sağlık kuruluşları",hospital:"Hastane",clinic:"Klinik",pharmacy:"Eczane",doctor:"Doktor",emergency:"Acil",hotel:"Otel"};
-export default function GoogleNearbyPlaces({initial="health"}:{initial?:string}){const [category,setCategory]=useState(initial in cats?initial:"health"),[rows,setRows]=useState<Place[]>([]),[msg,setMsg]=useState("Konumunu kullanarak yakındaki yerleri bulabilirsin."),[pos,setPos]=useState<any>(null);const mapRef=useRef<HTMLDivElement|null>(null);async function load(p:any=pos,c=category){if(!p)return;if(!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)setMsg("Yer listesi yükleniyor; harita için NEXT_PUBLIC_GOOGLE_MAPS_API_KEY gerekir.");const r=await fetch(`/api/places/nearby?lat=${p.lat}&lng=${p.lng}&category=${c}&radius=8000`);const j=await r.json();if(!r.ok){setMsg(j.error||"Yerler yüklenemedi");setRows([]);return}setRows(j.rows||[]);setMsg(`${(j.rows||[]).length} sonuç · Google Places`)}function locate(){if(!navigator.geolocation){setMsg("Cihaz konumu desteklemiyor.");return}setMsg("Konum alınıyor…");navigator.geolocation.getCurrentPosition(x=>{const p={lat:x.coords.latitude,lng:x.coords.longitude};setPos(p);load(p,category)},()=>setMsg("Konum izni verilmedi."),{enableHighAccuracy:true,timeout:10000})}useEffect(()=>{if(pos)load(pos,category)},[category]);useEffect(()=>{const key=process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;if(!key||!mapRef.current||!pos||!rows.length)return;const id="alumas-google-maps";function draw(){const g=(window as any).google;if(!g||!mapRef.current)return;const map=new g.maps.Map(mapRef.current,{center:pos,zoom:13,mapTypeControl:false,streetViewControl:false,fullscreenControl:false});new g.maps.Marker({map,position:pos,title:"Konumun"});rows.forEach(x=>{const m=new g.maps.Marker({map,position:{lat:x.latitude,lng:x.longitude},title:x.name});const info=new g.maps.InfoWindow({content:`<div style="max-width:220px"><b>${x.name.replace(/[<>]/g,"")}</b><br/><small>${x.address.replace(/[<>]/g,"")}</small>${x.mapsUrl?`<br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer">Google Maps'te aç</a>`:""}</div>`});m.addListener("click",()=>info.open({anchor:m,map}))})}if((window as any).google?.maps){draw();return}let script=document.getElementById(id) as HTMLScriptElement|null;if(!script){script=document.createElement("script");script.id=id;script.src=`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly`;script.async=true;script.onload=draw;document.head.appendChild(script)}else script.addEventListener("load",draw,{once:true})},[rows,pos]);return <><div className="directory-tools"><button className="primary" onClick={locate}>⌖ Konumumu kullan</button><span className="inline-message">{msg}</span></div><div className="filter-pills">{Object.entries(cats).map(([k,v])=><button key={k} className={category===k?"selected":""} onClick={()=>setCategory(k)}>{String(v)}</button>)}</div><div ref={mapRef} className="interactive-map" style={{marginBottom:14}}>{!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY&&<div className="map-fallback-copy"><b>Google Maps haritası için tarayıcı API anahtarı gerekli.</b><span>Liste, sunucu tarafı Places anahtarıyla yine çalışabilir.</span></div>}</div><div className="organization-grid">{rows.map(x=><article className="organization-card" key={x.id}><div className="org-logo hospital">G</div><div className="grow"><span className="kicker">{x.typeLabel||cats[category]}</span><h3>{x.name}</h3><p>{x.address}</p><div className="org-meta">{x.distanceKm!=null&&<span>{x.distanceKm} km</span>}{x.rating!=null&&<span>★ {x.rating} ({x.userRatingCount||0})</span>}{x.openNow===true&&<span>Açık</span>}{x.openNow===false&&<span>Kapalı</span>}</div>{x.mapsUrl&&<a className="secondary compact directions-button" href={x.mapsUrl} target="_blank" rel="noreferrer">Google Maps'te aç ↗</a>}</div></article>)}</div>{rows.length>0&&<div className="inline-message">Yer verileri Google Places tarafından sağlanır. Sonuçlar Alumas veritabanına kalıcı olarak kopyalanmaz.</div>}</>}
+export default function GoogleNearbyPlaces({initial="health"}:{initial?:string}) {
+  const [category, setCategory] = useState(initial in cats ? initial : "health");
+  const [rows, setRows] = useState<Place[]>([]);
+  const [msg, setMsg] = useState("Konumunu kullanarak yakındaki yerleri bulabilirsin.");
+  const [pos, setPos] = useState<any>(null);
+  const mapRef = useRef<HTMLDivElement | null>(null);
+
+  // Restore saved location from Session Storage on first load (so map stays open when navigating back)
+  useEffect(() => {
+    try {
+      const savedPos = sessionStorage.getItem("alumas_nearby_pos");
+      if (savedPos) {
+        setPos(JSON.parse(savedPos));
+      }
+    } catch(e) {}
+  }, []);
+
+  async function load(p: any = pos, c = category) {
+    if (!p) return;
+    
+    const cacheKey = `alumas_places_${p.lat}_${p.lng}_${c}`;
+    
+    // Check if we already fetched this exact location+category today/this session
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setRows(parsed);
+        setMsg(`${parsed.length} sonuç (Önbellekten) · Google Places`);
+        return; // Skip expensive API call!
+      }
+    } catch(e) {}
+
+    if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+      setMsg("Yer listesi yükleniyor; harita için NEXT_PUBLIC_GOOGLE_MAPS_API_KEY gerekir.");
+    }
+    
+    try {
+      const r = await fetch(`/api/places/nearby?lat=${p.lat}&lng=${p.lng}&category=${c}&radius=8000`);
+      const j = await r.json();
+      if (!r.ok) {
+        setMsg(j.error || "Yerler yüklenemedi");
+        setRows([]);
+        return;
+      }
+      
+      const newRows = j.rows || [];
+      setRows(newRows);
+      setMsg(`${newRows.length} sonuç · Google Places`);
+      
+      // Save result to cache so we don't pay for it again
+      try {
+        sessionStorage.setItem(cacheKey, JSON.stringify(newRows));
+      } catch(e) {}
+    } catch(err) {
+      setMsg("Bağlantı hatası oluştu.");
+    }
+  }
+
+  function locate() {
+    if (!navigator.geolocation) {
+      setMsg("Cihaz konumu desteklemiyor.");
+      return;
+    }
+    setMsg("Konum alınıyor…");
+    navigator.geolocation.getCurrentPosition(
+      (x) => {
+        const p = { lat: x.coords.latitude, lng: x.coords.longitude };
+        // Save to session storage so we remember the user's location across pages
+        try { sessionStorage.setItem("alumas_nearby_pos", JSON.stringify(p)); } catch(e) {}
+        setPos(p); // This triggers the useEffect below
+      },
+      () => setMsg("Konum izni verilmedi."),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  // Trigger load when category or location changes
+  useEffect(() => {
+    if (pos) load(pos, category);
+  }, [category, pos]);
+
+  // Google Maps Drawing Logic
+  useEffect(() => {
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!key || !mapRef.current || !pos || !rows.length) return;
+    const id = "alumas-google-maps";
+    
+    function draw() {
+      const g = (window as any).google;
+      if (!g || !mapRef.current) return;
+      const map = new g.maps.Map(mapRef.current, {
+        center: pos,
+        zoom: 13,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+      });
+      new g.maps.Marker({ map, position: pos, title: "Konumun" });
+      
+      rows.forEach(x => {
+        const m = new g.maps.Marker({ map, position: { lat: x.latitude, lng: x.longitude }, title: x.name });
+        const info = new g.maps.InfoWindow({
+          content: `<div style="max-width:220px"><b>${x.name.replace(/[<>]/g, "")}</b><br/><small>${x.address.replace(/[<>]/g, "")}</small>${x.mapsUrl ? `<br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer">Google Maps'te aç</a>` : ""}</div>`
+        });
+        m.addListener("click", () => info.open({ anchor: m, map }));
+      });
+    }
+    
+    if ((window as any).google?.maps) {
+      draw();
+      return;
+    }
+    
+    let script = document.getElementById(id) as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement("script");
+      script.id = id;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly`;
+      script.async = true;
+      script.onload = draw;
+      document.head.appendChild(script);
+    } else {
+      script.addEventListener("load", draw, { once: true });
+    }
+  }, [rows, pos]);
+
+  return (
+    <>
+      <div className="directory-tools">
+        <button className="primary" onClick={locate}>⌖ Konumumu kullan</button>
+        <span className="inline-message">{msg}</span>
+      </div>
+      <div className="filter-pills">
+        {Object.entries(cats).map(([k, v]) => (
+          <button key={k} className={category === k ? "selected" : ""} onClick={() => setCategory(k)}>
+            {String(v)}
+          </button>
+        ))}
+      </div>
+      <div ref={mapRef} className="interactive-map" style={{ marginBottom: 14 }}>
+        {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+          <div className="map-fallback-copy">
+            <b>Google Maps haritası için tarayıcı API anahtarı gerekli.</b>
+            <span>Liste, sunucu tarafı Places anahtarıyla yine çalışabilir.</span>
+          </div>
+        )}
+      </div>
+      <div className="organization-grid">
+        {rows.map(x => (
+          <article className="organization-card" key={x.id}>
+            <div className="org-logo hospital">G</div>
+            <div className="grow">
+              <span className="kicker">{x.typeLabel || cats[category]}</span>
+              <h3>{x.name}</h3>
+              <p>{x.address}</p>
+              <div className="org-meta">
+                {x.distanceKm != null && <span>{x.distanceKm} km</span>}
+                {x.rating != null && <span>★ {x.rating} ({x.userRatingCount || 0})</span>}
+                {x.openNow === true && <span>Açık</span>}
+                {x.openNow === false && <span>Kapalı</span>}
+              </div>
+              {x.mapsUrl && (
+                <a className="secondary compact directions-button" href={x.mapsUrl} target="_blank" rel="noreferrer">
+                  Google Maps'te aç ↗
+                </a>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+      {rows.length > 0 && (
+        <div className="inline-message">
+          Yer verileri Google Places tarafından sağlanır. Sonuçlar Alumas veritabanına kalıcı olarak kopyalanmaz.
+        </div>
+      )}
+    </>
+  );
+}
