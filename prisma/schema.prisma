@@ -137,6 +137,8 @@ model Doctor {
   isVerified Boolean @default(false)
   isPublished Boolean @default(false)
   createdAt     DateTime       @default(now())
+
+  @@index([isPublished, isVerified])
 }
 
 model Availability {
