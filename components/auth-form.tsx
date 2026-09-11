@@ -49,6 +49,7 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
       if (kind === "DOCTOR") router.push("/onboarding/doctor");
       else if (kind === "ORGANIZATION") router.push("/business/apply");
       else if (kind === "AGENCY") router.push("/agency/apply");
+      else if (kind === "PARTNER") router.push("/partner/apply");
       else router.push("/profile");
     } else {
       router.push("/profile"); // TODO: dashboard routing happens in profile page usually or middleware
