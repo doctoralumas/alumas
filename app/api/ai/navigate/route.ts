@@ -115,7 +115,7 @@ export async function POST(req: Request) {
         disclaimer:mandatoryHealthDisclaimer,
         medicalKnowledgeConnected:true,
         knowledgeMode:"curated_versioned_sources",
-        policy:"Ajan yalnız yönlendirme yapar; tanı, tedavi ve reçete üretmez."
+        policy:"Luma yalnız yönlendirme yapar; tanı, tedavi ve reçete üretmez."
       }
     }
   });

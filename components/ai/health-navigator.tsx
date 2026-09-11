@@ -43,17 +43,17 @@ export default function HealthNavigator({compact=false}:{compact?:boolean}){
   return <section className={`ai-navigator ${compact?"compact":""}`}>
     <div className="ai-navigator-head">
       <div>
-        <span className="ai-kicker"><ShieldCheck size={15}/> Güvenli sağlık navigasyonu</span>
-        <h1>{compact?"Size en uygun sağlık hizmetini bulalım.":"Size nasıl yardımcı olabilirim?"}</h1>
-        <p>İhtiyacınızı doğal şekilde yazın. Alumas sizi uygun branş, doktor veya sağlık kurumuna yönlendirsin.</p>
+        <span className="ai-kicker"><ShieldCheck size={15}/> Güvenli sağlık asistanın</span>
+        <h1>{compact?"Size en uygun sağlık hizmetini bulalım.":"Ben Luma. Size nasıl yardımcı olabilirim?"}</h1>
+        <p>İhtiyacınızı doğal şekilde yazın. Luma sizi uygun branş, doktor veya sağlık kurumuna yönlendirsin.</p>
       </div>
-      <img src="/brand/alumas-logo.png" className="ai-brand-logo" alt="Alumas"/>
+      <img src="/brand/alumas-logo.png" className="ai-brand-logo" alt="Luma"/>
     </div>
 
     <form className="ai-search-form" onSubmit={submit}>
       <Search size={20}/>
       <input value={message} onChange={e=>setMessage(e.target.value)} placeholder="Örn. 3 gündür dizim ağrıyor, Ataşehir'deyim..." aria-label="Sağlık ihtiyacınızı yazın"/>
-      <button disabled={loading||message.trim().length<3}>{loading?"Aranıyor…":"Bul"}</button>
+      <button disabled={loading||message.trim().length<3}>{loading?"Düşünüyor…":"Sor"}</button>
     </form>
     <div className="ai-prompt-row">{prompts.map(p=><button key={p} onClick={()=>setMessage(p)} type="button">{p}</button>)}</div>
     <label className="ai-personalize-toggle"><input type="checkbox" checked={personalize} onChange={e=>setPersonalize(e.target.checked)}/><span><b>Sağlık profilimi kullanarak kişiselleştir</b><small>Yalnız giriş yaptıysanız ve açık izin verirseniz yaş aralığı, aktif durumlar, ilaçlar ve alerjiler gibi gerekli alanlar kullanılır. Bu sürümde kişisel sağlık verileri harici bir dil modeline gönderilmez.</small></span></label>
@@ -61,9 +61,9 @@ export default function HealthNavigator({compact=false}:{compact?:boolean}){
 
     {result&&<div className="ai-result-wrap">
       <div className={`ai-safety ai-${result.intent.triage}`}>
-        <div><ShieldCheck size={18}/><strong>{result.intent.triage==="emergency"?"Acil yönlendirme":result.intent.triage==="urgent"?"Hızlı değerlendirme":"Yönlendirme sonucu"}</strong></div>
+        <div><ShieldCheck size={18}/><strong>{result.intent.triage==="emergency"?"Acil yönlendirme":result.intent.triage==="urgent"?"Hızlı değerlendirme":"Luma'nın yönlendirmesi"}</strong></div>
         <p>{result.summary}</p>
-        <div className="ai-commentary"><b>Alumas yorumu</b><span>{result.commentary}</span></div>
+        <div className="ai-commentary"><b>Luma'nın notu</b><span>{result.commentary}</span></div>
         {result.personalization?.enabled&&result.personalization.note&&<div className="ai-personalization-note"><b>Kişiselleştirme</b><span>{result.personalization.note}</span><small>{result.personalization.modelDisclosure}</small></div>}
         {result.intent.followUpQuestion&&<p><b>Ek bilgi:</b> {result.intent.followUpQuestion}</p>}
         {result.intent.triage==="emergency"&&<div className="ai-emergency-actions"><a href="tel:112">112’yi Ara</a><Link href="/nearby">En Yakın Acil</Link></div>}
