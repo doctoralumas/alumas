@@ -3,19 +3,21 @@ import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function AuthForm({ mode }: { mode: "login" | "register" }) {
+export default function AuthForm({ mode, isProfessional = false }: { mode: "login" | "register", isProfessional?: boolean }) {
   return (
     <Suspense fallback={<div className="auth-card">Yükleniyor...</div>}>
-      <AuthFormContent mode={mode} />
+      <AuthFormContent mode={mode} isProfessional={isProfessional} />
     </Suspense>
   );
 }
 
-function AuthFormContent({ mode }: { mode: "login" | "register" }) {
+function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register", isProfessional: boolean }) {
   const router = useRouter();
   const params = useSearchParams();
   const requested = String(params.get("type") || "patient").toLowerCase();
-  const initialType = requested === "doctor" ? "DOCTOR" : requested === "organization" ? "ORGANIZATION" : requested === "agency" ? "AGENCY" : "PATIENT";
+  const initialType = isProfessional 
+    ? (requested === "organization" ? "ORGANIZATION" : requested === "agency" ? "AGENCY" : "DOCTOR")
+    : "PATIENT";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +26,12 @@ function AuthFormContent({ mode }: { mode: "login" | "register" }) {
     setLoading(true);
     setError("");
     const data = Object.fromEntries(new FormData(e.currentTarget));
+    // Hastalar login olduğunda pro formunda iseler patient olarak gitmeli, prolar ise type'a göre
+    // Fakat login apisi aynı. Sadece kayıt esnasında form gizli bir accountType göndermeli eğer isProfessional false ise.
+    if (!isProfessional && mode === "register") {
+      data.accountType = "PATIENT";
+    }
+
     const res = await fetch(`/api/auth/${mode}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,32 +51,34 @@ function AuthFormContent({ mode }: { mode: "login" | "register" }) {
       else if (kind === "AGENCY") router.push("/agency/apply");
       else router.push("/profile");
     } else {
-      router.push("/profile");
+      router.push("/profile"); // TODO: dashboard routing happens in profile page usually or middleware
     }
     router.refresh();
   }
 
   return (
     <form className="auth-card" onSubmit={submit}>
-      <span className="kicker">Alumas hesabı</span>
-      <h1>{mode === "login" ? "Tekrar hoş geldin" : "Sağlığını tek yerde yönet"}</h1>
+      <span className="kicker">{isProfessional ? "Alumas İş Ortağı Ağı" : "Alumas hesabı"}</span>
+      <h1>{mode === "login" ? "Tekrar hoş geldin" : (isProfessional ? "Profesyonel ağa katılın" : "Sağlığını tek yerde yönet")}</h1>
 
       {mode === "register" && (
         <>
           <label>
-            Ad soyad
+            {isProfessional ? "Ad Soyad / Yetkili Kişi" : "Ad Soyad"}
             <input name="name" required placeholder="Ad Soyad" data-testid="register-name" />
           </label>
 
-          <label>
-            Hesap türü
-            <select name="accountType" defaultValue={initialType}>
-              <option value="PATIENT">Hasta / bireysel kullanıcı</option>
-              <option value="DOCTOR">Doktor / sağlık profesyoneli</option>
-              <option value="ORGANIZATION">Hastane / klinik / eczane</option>
-              <option value="AGENCY">Sağlık turizmi acentesi</option>
-            </select>
-          </label>
+          {isProfessional && (
+            <label>
+              Hesap türü
+              <select name="accountType" defaultValue={initialType}>
+                <option value="DOCTOR">Doktor / sağlık profesyoneli</option>
+                <option value="ORGANIZATION">Hastane / klinik / eczane</option>
+                <option value="AGENCY">Sağlık turizmi acentesi</option>
+                <option value="PARTNER">Çözüm Ortağı / Aracı Kurum</option>
+              </select>
+            </label>
+          )}
         </>
       )}
 
@@ -106,9 +116,9 @@ function AuthFormContent({ mode }: { mode: "login" | "register" }) {
 
       <p>
         {mode === "login" ? (
-          <>Hesabın yok mu? <Link href="/register">Kayıt ol</Link></>
+          <>Hesabın yok mu? <Link href={isProfessional ? "/pro/register" : "/register"}>Kayıt ol</Link></>
         ) : (
-          <>Zaten hesabın var mı? <Link href="/login">Giriş yap</Link></>
+          <>Zaten hesabın var mı? <Link href={isProfessional ? "/pro/login" : "/login"}>Giriş yap</Link></>
         )}
       </p>
     </form>
