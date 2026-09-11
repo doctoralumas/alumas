@@ -47,6 +47,7 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://alumas:alumas_ci_password@localhost:5432/alumas_ci?schema=public
+      DIRECT_URL: postgresql://alumas:alumas_ci_password@localhost:5432/alumas_ci?schema=public
       NODE_ENV: test
     steps:
       - uses: actions/checkout@v4
