@@ -39,7 +39,7 @@ const groups:{title:string;items:Item[]}[]=[
     {href:"/messages",title:"Mesajlar",desc:"Sağlık profesyonelleriyle güvenli mesajlaşma.",tone:"ice"},
     {href:"/notifications",title:"Bildirimler",desc:"Randevu ve takip bildirimlerini yönet.",tone:"sand"},
     {href:"/health-circle",title:"Sağlık Çevrem",desc:"Paylaşım, takip ve bakım işbirliği.",tone:"teal"},
-  }
+  ]}
 ];
 
 export default function Services(){return <div className="page services-page"><div className="page-title"><span className="kicker">Alumas</span><h1>Tüm Hizmetler</h1><p>Uygulamadaki bütün ana modüllere tek ekrandan ulaş.</p></div>{groups.map(g=><section key={g.title} className="services-section"><h2>{g.title}</h2><div className="services-grid">{g.items.map(i=><Link key={i.href} href={i.href} className={`service-link ${i.tone}`}><b>{i.title}</b><span>{i.desc}</span><em>›</em></Link>)}</div></section>)}</div>}
