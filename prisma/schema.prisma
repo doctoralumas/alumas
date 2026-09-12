@@ -13,6 +13,9 @@ enum Role {
   PATIENT
   DOCTOR
   ADMIN
+  ORGANIZATION
+  AGENCY
+  PARTNER
 }
 
 model User {
