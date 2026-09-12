@@ -36,3 +36,4 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     return NextResponse.json({ error: "Dosya okunamadı" }, { status: 500 });
   }
 }
+
