@@ -1,12 +1,12 @@
 "use client";
-import {useEffect,useMemo,useState,useRef} from "react";
+import {useEffect,useMemo,useState,useRef,Suspense} from "react";
 import {useSearchParams, useRouter} from "next/navigation";
 import {Check, CheckCheck} from "lucide-react";
 
 type Contact={id:string;name:string;subtitle:string;lastMessageAt:string};
 type Msg={id:string;body:string;createdAt:string;readAt:string|null;senderId:string;recipientId:string;mine:boolean;senderName:string};
 
-export default function Messages(){
+function MessagesContent(){
   const searchParams=useSearchParams();
   const router=useRouter();
   const initialUserId=searchParams.get("userId");
@@ -16,7 +16,6 @@ export default function Messages(){
   const [active,setActive]=useState(initialUserId||"");
   const [body,setBody]=useState("");
   
-  // Use a ref for active to access the latest value in setInterval
   const activeRef = useRef(active);
   useEffect(()=>{activeRef.current=active;},[active]);
 
@@ -27,7 +26,6 @@ export default function Messages(){
       const x=await r.json();
       setContacts(x.contacts||[]);
       setMessages(x.messages||[]);
-      // If there's no active contact and we have contacts, set the first one
       if(!activeRef.current && x.contacts?.[0] && !forceUserId){
         setActive(x.contacts[0].id);
       }
@@ -38,11 +36,10 @@ export default function Messages(){
     load(initialUserId||undefined);
     const interval = setInterval(() => {
       load(initialUserId||undefined);
-    }, 10000); // 10 seconds polling
+    }, 10000);
     return () => clearInterval(interval);
   },[initialUserId]);
 
-  // Mark as read when active changes
   useEffect(()=>{
     if(active){
       fetch('/api/messages/read',{
@@ -51,7 +48,7 @@ export default function Messages(){
         body:JSON.stringify({senderId:active})
       }).catch(()=>{});
     }
-  },[active, messages.length]); // Retrigger if active changes or new messages arrive
+  },[active, messages.length]);
 
   const thread=useMemo(()=>messages.filter(m=>m.senderId===active||m.recipientId===active),[messages,active]);
 
@@ -69,7 +66,6 @@ export default function Messages(){
     }
   }
 
-  // Calculate unread counts
   const unreadCounts = useMemo(()=>{
     const counts:Record<string,number>={};
     messages.forEach(m=>{
@@ -139,5 +135,13 @@ export default function Messages(){
         </section>
       </div>
     </div>
+  );
+}
+
+export default function Messages(){
+  return (
+    <Suspense fallback={<div className="page empty">Mesajlar yükleniyor...</div>}>
+      <MessagesContent />
+    </Suspense>
   );
 }
