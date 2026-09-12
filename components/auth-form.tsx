@@ -40,7 +40,11 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
     const json = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(typeof json.error === "string" ? json.error : (json.error?.message || "İşlem başarısız"));
+      let msg = typeof json.error === "string" ? json.error : (json.error?.message || "İşlem başarısız");
+      if (json.details && Array.isArray(json.details)) {
+        msg += " (" + json.details.map((d:any)=>`${d.path}: ${d.message}`).join(", ") + ")";
+      }
+      setError(msg);
       return;
     }
 
