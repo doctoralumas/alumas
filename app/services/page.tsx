@@ -3,7 +3,7 @@ import Link from "next/link";
 type Item={href:string;title:string;desc:string;tone:string};
 const groups:{title:string;items:Item[]}[]=[
   {title:"Sağlık hizmetleri",items:[
-    {href:"/doctors",title:"Doktor Bul",desc:"Uzmanları incele, müsaitlik gör ve randevu al.",tone:"blue"},
+    {href:"/doctors",title:"Doktor & Uzman Bul",desc:"Doktor, diyetisyen ve fizyoterapistleri incele.",tone:"blue"},
     {href:"/organizations",title:"Hastane & Klinik",desc:"Doğrulanmış sağlık kurumlarını keşfet.",tone:"blue2"},
     {href:"/nearby",title:"Yakınımdakiler",desc:"Hastane, klinik, eczane, acil servis ve otel bul.",tone:"mint"},
     {href:"/home-care",title:"Evde Sağlık",desc:"Doktor, hemşire ve evde bakım hizmetleri.",tone:"teal"},

@@ -83,7 +83,7 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
             <label>
               Hesap türü
               <select name="accountType" defaultValue={initialType}>
-                <option value="DOCTOR">Doktor / sağlık profesyoneli</option>
+                <option value="DOCTOR">Doktor / Uzman (Diyetisyen, Fzt. vb.)</option>
                 <option value="ORGANIZATION">Hastane / klinik / eczane</option>
                 <option value="AGENCY">Sağlık turizmi acentesi</option>
                 <option value="PARTNER">Çözüm Ortağı / Aracı Kurum</option>
