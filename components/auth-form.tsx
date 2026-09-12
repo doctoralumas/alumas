@@ -46,15 +46,14 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
 
     if (mode === "register") {
       const kind = String((data as any).accountType || "PATIENT");
-      if (kind === "DOCTOR") router.push("/onboarding/doctor");
-      else if (kind === "ORGANIZATION") router.push("/business/apply");
-      else if (kind === "AGENCY") router.push("/agency/apply");
-      else if (kind === "PARTNER") router.push("/partner/apply");
-      else router.push("/profile");
+      if (kind === "DOCTOR") window.location.href = "/onboarding/doctor";
+      else if (kind === "ORGANIZATION") window.location.href = "/business/apply";
+      else if (kind === "AGENCY") window.location.href = "/agency/apply";
+      else if (kind === "PARTNER") window.location.href = "/partner/apply";
+      else window.location.href = "/profile";
     } else {
-      router.push("/profile"); // TODO: dashboard routing happens in profile page usually or middleware
+      window.location.href = "/profile";
     }
-    router.refresh();
   }
 
   return (
