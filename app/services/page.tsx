@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { 
   Stethoscope, Hospital, MapPin, HouseLine, Ambulance, AirplaneTilt, ShieldCheck, Megaphone, AddressBook,
   Heart, Heartbeat, Drop, Moon, DropHalf, Scales, GenderFemale, Pill, Flask, Scan, Syringe, Bug, ClockCounterClockwise, FileText, IdentificationCard, Calendar,
-  Users, Key, Baby, CalendarCheck, ChatTeardropText, Bell, UsersThree
+  Users, Key, Baby, CalendarCheck, ChatTeardropText, Bell, UsersThree, MagnifyingGlass
 } from "@phosphor-icons/react";
 
 type Item={href:string;title:string;desc:string;tone:string;icon:React.ElementType};
@@ -50,27 +51,70 @@ const groups:{title:string;items:Item[]}[]=[
 ];
 
 export default function Services(){
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredGroups = groups.map(group => {
+    return {
+      ...group,
+      items: group.items.filter(item => 
+        item.title.toLocaleLowerCase("tr-TR").includes(searchQuery.toLocaleLowerCase("tr-TR")) ||
+        item.desc.toLocaleLowerCase("tr-TR").includes(searchQuery.toLocaleLowerCase("tr-TR"))
+      )
+    };
+  }).filter(group => group.items.length > 0);
+
   return (
     <div className="page services-page">
       <div className="page-title">
         <span className="kicker">Alumas</span>
         <h1>Tüm Hizmetler</h1>
         <p>Uygulamadaki bütün ana modüllere tek ekrandan ulaş.</p>
+        
+        <div style={{ marginTop: "24px", position: "relative", maxWidth: "400px" }}>
+          <MagnifyingGlass size={20} color="var(--primary, #123f6b)" style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", opacity: 0.5 }} />
+          <input 
+            type="text" 
+            placeholder="Hizmetlerde ara... (Örn: Aşı, Tansiyon)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "16px 16px 16px 48px",
+              borderRadius: "16px",
+              border: "1px solid rgba(18,63,107,0.15)",
+              backgroundColor: "rgba(255,255,255,0.8)",
+              fontSize: "16px",
+              color: "#123f6b",
+              outline: "none",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
+              transition: "border-color 0.2s"
+            }}
+          />
+        </div>
       </div>
-      {groups.map(g=>
-        <section key={g.title} className="services-section">
-          <h2>{g.title}</h2>
-          <div className="services-grid">
-            {g.items.map(i=>
-              <Link key={i.href} href={i.href} className={`service-link ${i.tone}`}>
-                <i.icon size={28} weight="duotone" style={{ marginBottom: "auto", opacity: 0.85 }} />
-                <b>{i.title}</b>
-                <span>{i.desc}</span>
-                <em>›</em>
-              </Link>
-            )}
-          </div>
-        </section>
+
+      {filteredGroups.length === 0 ? (
+        <div style={{ padding: "40px", textAlign: "center", color: "rgba(11,37,69,0.5)" }}>
+          <MagnifyingGlass size={48} opacity={0.3} style={{ marginBottom: "16px" }} />
+          <h3>Sonuç bulunamadı</h3>
+          <p>"{searchQuery}" ile eşleşen bir hizmet yok.</p>
+        </div>
+      ) : (
+        filteredGroups.map(g=>
+          <section key={g.title} className="services-section">
+            <h2>{g.title}</h2>
+            <div className="services-grid">
+              {g.items.map(i=>
+                <Link key={i.href} href={i.href} className={`service-link ${i.tone}`}>
+                  <i.icon size={28} weight="duotone" style={{ marginBottom: "auto", opacity: 0.85 }} />
+                  <b>{i.title}</b>
+                  <span>{i.desc}</span>
+                  <em>›</em>
+                </Link>
+              )}
+            </div>
+          </section>
+        )
       )}
     </div>
   )
