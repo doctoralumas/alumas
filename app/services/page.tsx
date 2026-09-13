@@ -31,7 +31,7 @@ const groups:{title:string;items:Item[]}[]=[
     {href:"/health/cycle",title:"Regl Takibi",desc:"Döngü, akış, belirtiler ve geçmiş kayıtları.",tone:"pink",icon:GenderFemale},
     {href:"/health/medications",title:"İlaçlarım",desc:"İlaç, doz ve kullanım hatırlatıcıları.",tone:"sand",icon:Pill},
     {href:"/health/labs",title:"Laboratuvar",desc:"Tahlil sonuçları, referans ve trendler.",tone:"blue",icon:Flask},
-    {href:"/health/imaging",title:"Radyoloji",desc:"MR, BT, röntgen ve görüntüleme kayıtları.",tone:"blue2",icon:Scan},
+    {href:"/health/imaging",title:"Görüntüleme",desc:"MR, BT, röntgen, ultrason kayıtları.",tone:"blue2",icon:Scan},
     {href:"/health/vaccinations",title:"Aşı Takvimi",desc:"Geçmiş aşılar ve sonraki dozlar.",tone:"mint",icon:Syringe},
     {href:"/health/allergies",title:"Alerjiler",desc:"Alerji ve reaksiyon kayıtları.",tone:"sand",icon:Bug},
     {href:"/health/medical-history",title:"Sağlık Geçmişi",desc:"Hastalık, ameliyat ve klinik geçmiş.",tone:"lavender",icon:ClockCounterClockwise},

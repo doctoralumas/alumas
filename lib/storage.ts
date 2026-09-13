@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { PDFDocument } from "pdf-lib";
 
 function safeExt(name:string){ return path.extname(name).replace(/[^.a-zA-Z0-9]/g,"").slice(0,8); }
-function s3(){ return new S3Client({region:process.env.S3_REGION || "auto",endpoint:process.env.S3_ENDPOINT || undefined,forcePathStyle:process.env.S3_FORCE_PATH_STYLE==="true",credentials:process.env.S3_ACCESS_KEY_ID&&process.env.S3_SECRET_ACCESS_KEY?{accessKeyId:process.env.S3_ACCESS_KEY_ID,secretAccessKey:process.env.S3_SECRET_ACCESS_KEY}:undefined}); }
+export function getS3Client(){ return new S3Client({region:process.env.S3_REGION || "auto",endpoint:process.env.S3_ENDPOINT || undefined,forcePathStyle:process.env.S3_FORCE_PATH_STYLE==="true",credentials:process.env.S3_ACCESS_KEY_ID&&process.env.S3_SECRET_ACCESS_KEY?{accessKeyId:process.env.S3_ACCESS_KEY_ID,secretAccessKey:process.env.S3_SECRET_ACCESS_KEY}:undefined}); }
 
 export async function storePrivateFile(file:File,userId:string){
   let bytes = Buffer.from(await file.arrayBuffer());
@@ -51,7 +51,7 @@ export async function storePrivateFile(file:File,userId:string){
   if((process.env.STORAGE_DRIVER||"local")==="s3") { 
     const bucket=process.env.S3_BUCKET; 
     if(!bucket) throw new Error("S3_BUCKET eksik"); 
-    await s3().send(new PutObjectCommand({Bucket:bucket,Key:key,Body:bytes,ContentType:contentType,ServerSideEncryption:process.env.S3_SSE as any || undefined})); 
+    await getS3Client().send(new PutObjectCommand({Bucket:bucket,Key:key,Body:bytes,ContentType:contentType,ServerSideEncryption:process.env.S3_SSE as any || undefined})); 
     return `s3:${key}`; 
   }
   const filePath=path.join(process.cwd(),"data","uploads",key); 
@@ -60,10 +60,10 @@ export async function storePrivateFile(file:File,userId:string){
   return `local:${key}`;
 }
 export async function readPrivateFile(storagePath:string){
-  if(storagePath.startsWith("s3:")){ const bucket=process.env.S3_BUCKET!; const out=await s3().send(new GetObjectCommand({Bucket:bucket,Key:storagePath.slice(3)})); return Buffer.from(await out.Body!.transformToByteArray()); }
+  if(storagePath.startsWith("s3:")){ const bucket=process.env.S3_BUCKET!; const out=await getS3Client().send(new GetObjectCommand({Bucket:bucket,Key:storagePath.slice(3)})); return Buffer.from(await out.Body!.transformToByteArray()); }
   const key=storagePath.replace(/^local:/,"").replace(/^data\/uploads\//,""); return readFile(path.join(process.cwd(),"data","uploads",key));
 }
 export async function deletePrivateFile(storagePath:string){
-  if(storagePath.startsWith("s3:")){ if(process.env.S3_BUCKET) await s3().send(new DeleteObjectCommand({Bucket:process.env.S3_BUCKET,Key:storagePath.slice(3)})); return; }
+  if(storagePath.startsWith("s3:")){ if(process.env.S3_BUCKET) await getS3Client().send(new DeleteObjectCommand({Bucket:process.env.S3_BUCKET,Key:storagePath.slice(3)})); return; }
   const key=storagePath.replace(/^local:/,"").replace(/^data\/uploads\//,""); await unlink(path.join(process.cwd(),"data","uploads",key)).catch(()=>{});
 }
