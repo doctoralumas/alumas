@@ -11,9 +11,8 @@ function safeExt(name: string) { return path.extname(name).replace(/[^.a-zA-Z0-9
 
 export async function POST(req: Request) {
   const u = await currentUser();
-  if (!u || u.role !== 'PATIENT') return NextResponse.json({ error: 'Hasta hesabı gerekli' }, { status: 403 });
-
-  if ((process.env.STORAGE_DRIVER || "local") !== "s3") {
+  if(!u) return NextResponse.json({error:"Giriş gerekli"},{status:401});
+if ((process.env.STORAGE_DRIVER || "local") !== "s3") {
     return NextResponse.json({ error: 'Depolama mimarisi S3/R2 olarak ayarlanmamış' }, { status: 400 });
   }
 

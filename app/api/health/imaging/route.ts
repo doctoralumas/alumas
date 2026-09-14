@@ -1,11 +1,10 @@
 import {NextResponse} from 'next/server';import {currentUser} from '@/lib/auth';import {prisma} from '@/lib/prisma';import {storePrivateFile} from '@/lib/storage';
 async function doctorAccess(patientId:string,doctorId:string){const [c,s,r]=await Promise.all([prisma.healthShareConsent.findUnique({where:{patientId_doctorId:{patientId,doctorId}}}),prisma.healthReportShare.findFirst({where:{patientId,doctorId,status:'active',OR:[{expiresAt:null},{expiresAt:{gt:new Date()}}]}}),prisma.appointment.findFirst({where:{userId:patientId,doctorId}})]);return !!r&&((c?.status==='active'&&c.scopes.includes('imaging'))||!!s)}
-export async function GET(req:Request){const u=await currentUser();if(!u)return NextResponse.json({error:'Giriş gerekli'},{status:401});const q=new URL(req.url).searchParams;let userId=u.id;if(u.role==='DOCTOR'&&u.doctorProfile){const p=String(q.get('patientId')||'');if(!p||!(await doctorAccess(p,u.doctorProfile.id)))return NextResponse.json({error:'Erişim yok'},{status:403});userId=p}else if(u.role!=='PATIENT')return NextResponse.json({error:'Erişim yok'},{status:403});return NextResponse.json(await prisma.imagingResult.findMany({where:{userId},orderBy:{performedAt:'desc'}}))}
+export async function GET(req:Request){const u=await currentUser();if(!u)return NextResponse.json({error:'Giriş gerekli'},{status:401});const q=new URL(req.url).searchParams;let userId=u.id;if(u.role==='DOCTOR'&&u.doctorProfile){const p=String(q.get('patientId')||'');if(!p||!(await doctorAccess(p,u.doctorProfile.id)))return NextResponse.json({error:'Erişim yok'},{status:403});userId=p}else return NextResponse.json(await prisma.imagingResult.findMany({where:{userId},orderBy:{performedAt:'desc'}}))}
 export async function POST(req:Request){
   const u=await currentUser();
-  if(!u||u.role!=='PATIENT')return NextResponse.json({error:'Hasta hesabı gerekli'},{status:403});
-  
-  const f=await req.formData();
+  if(!u) return NextResponse.json({error:"Giriş gerekli"},{status:401});
+const f=await req.formData();
   const title=String(f.get('title')||'').trim();
   const modality=String(f.get('modality')||'').trim();
   
