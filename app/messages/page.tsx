@@ -49,22 +49,14 @@ function MessagesContent(){
   useEffect(()=>{
     load(initialUserId||undefined);
     
-    // SENIOR: Supabase Realtime Integration (WebSocket) replacing the legacy setInterval polling
-    const channel = supabase
-      .channel('messages_channel')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'Message' },
-        (payload) => {
-          // Instantly fetch the hydrated data (with names) when a DB change happens
-          load(initialUserId||undefined);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    // Güvenlik & Mimari Notu: Sistemde Supabase Auth yerine NextAuth (Custom Auth) kullanıldığı için,
+    // Supabase Realtime'ı anonim (anon_key) ile dinlemek HIPAA/Sağlık verisi güvenliği açısından risklidir.
+    // Bu yüzden MVP aşamasında güvenli olan Polling (10 saniye) yöntemini geri getirdim.
+    // İleride WebSocket için NextAuth -> Supabase JWT entegrasyonu yapılmalıdır.
+    const interval = setInterval(() => {
+      load(initialUserId||undefined);
+    }, 10000);
+    return () => clearInterval(interval);
   },[initialUserId]);
 
   useEffect(()=>{
@@ -118,6 +110,7 @@ function MessagesContent(){
           mimeType: file.type || 'application/octet-stream'
         })
       });
+      load(initialUserId||undefined);
     } catch (err: any) {
       alert(err.message || 'Yükleme hatası');
     } finally {
@@ -139,6 +132,8 @@ function MessagesContent(){
     if(!r.ok){
        setBody(currentBody); // Revert on failure
        alert("Mesaj gönderilemedi");
+    } else {
+       load(initialUserId||undefined);
     }
   }
 
