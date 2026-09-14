@@ -4,19 +4,19 @@ const Req = () => <span style={{color:'#ef4444', marginLeft:'4px', fontWeight:'b
 return <form className="business-form premium-form" onSubmit={submit} style={{display:'flex', flexDirection:'column', gap:'16px'}}>
 <div className="org-type-select" style={{marginBottom:'12px'}}>{[["HOSPITAL","Hastane"],["CLINIC","Klinik"],["PHARMACY","Eczane"],["IMAGING_CENTER","Görüntüleme M."]].map(x=><button type="button" className={type===x[0]?"selected":""} key={x[0]} onClick={()=>setType(x[0])}>{x[1]}</button>)}</div>
 <input type="hidden" name="type" value={type}/>
-<label style={{fontWeight:'500'}}>Kurum adı <Req/></label><input name="name" required placeholder="Örn: Ayça Şirin Görüntüleme Merkezi" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/>
+<label><span style={{fontWeight:'500'}}>Kurum adı <Req/></span><input name="name" required placeholder="Örn: Alumas Görüntüleme Merkezi" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
 <div className="form-pair" style={{display:'flex', gap:'16px'}}>
-<div style={{flex:1, display:'flex', flexDirection:'column'}}><label style={{fontWeight:'500', marginBottom:'4px'}}>Şehir <Req/></label><input name="city" required placeholder="Örn: Mersin" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/></div>
-<div style={{flex:1, display:'flex', flexDirection:'column'}}><label style={{fontWeight:'500', marginBottom:'4px'}}>İlçe</label><input name="district" placeholder="Örn: Tarsus" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/></div>
+<label style={{flex:1}}><span style={{fontWeight:'500'}}>Şehir <Req/></span><input name="city" required placeholder="Örn: İstanbul" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
+<label style={{flex:1}}><span style={{fontWeight:'500'}}>İlçe</span><input name="district" placeholder="Örn: Kadıköy" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
 </div>
-<label style={{fontWeight:'500'}}>Açık Adres <Req/></label><input name="address" required placeholder="Mahalle, sokak, bina no vb." style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/>
+<label><span style={{fontWeight:'500'}}>Açık Adres <Req/></span><input name="address" required placeholder="Örn: Alumas Mahallesi, Sağlık Sokak, No:1" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
 <div className="form-pair" style={{display:'flex', gap:'16px'}}>
-<div style={{flex:1, display:'flex', flexDirection:'column'}}><label style={{fontWeight:'500', marginBottom:'4px'}}>Kurumsal Telefon <Req/></label><input name="phone" required placeholder="05XX XXX XX XX" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/></div>
-<div style={{flex:1, display:'flex', flexDirection:'column'}}><label style={{fontWeight:'500', marginBottom:'4px'}}>Kurumsal E-posta <Req/></label><input name="email" type="email" required placeholder="iletisim@kurum.com" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/></div>
+<label style={{flex:1}}><span style={{fontWeight:'500'}}>Kurumsal Telefon <Req/></span><input name="phone" required placeholder="Örn: 0850 123 45 67" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
+<label style={{flex:1}}><span style={{fontWeight:'500'}}>Kurumsal E-posta <Req/></span><input name="email" type="email" required placeholder="iletisim@alumas.com" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
 </div>
-<label style={{fontWeight:'500'}}>Web sitesi (İsteğe bağlı)</label><input name="website" placeholder="https://www.kurum.com" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/>
-<label style={{fontWeight:'500'}}>Kurum Açıklaması</label><textarea name="description" rows={4} placeholder="Kurumunuz hakkında kısa bir bilgilendirme yazısı..." style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0'}}/>
-<label style={{fontWeight:'500'}}>Ruhsat / Doğrulama belgesi (İsteğe bağlı)</label><input name="license" type="file" accept="application/pdf,image/jpeg,image/png" style={{padding:'8px', borderRadius:'8px', border:'1px dashed #cbd5e1', background:'#f8fafc', cursor:'pointer'}}/>
+<label><span style={{fontWeight:'500'}}>Web sitesi (İsteğe bağlı)</span><input name="website" placeholder="Örn: https://www.alumas.com" style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
+<label><span style={{fontWeight:'500'}}>Kurum Açıklaması</span><textarea name="description" rows={4} placeholder="Kurumunuz hakkında kısa bir bilgilendirme yazısı..." style={{padding:'12px', borderRadius:'8px', border:'1px solid #e2e8f0', marginTop:'6px'}}/></label>
+<label><span style={{fontWeight:'500'}}>Ruhsat / Doğrulama belgesi (İsteğe bağlı)</span><input name="license" type="file" accept="application/pdf,image/jpeg,image/png" style={{padding:'8px', borderRadius:'8px', border:'1px dashed #cbd5e1', background:'#f8fafc', cursor:'pointer', marginTop:'6px'}}/></label>
 {msg&&<div className="inline-message" style={{padding:'12px', borderRadius:'8px', background: msg.includes('Başvurunuz alındı') ? '#dcfce3' : '#fee2e2', color: msg.includes('Başvurunuz alındı') ? '#166534' : '#991b1b', fontWeight:'500'}}>{msg}</div>}
 <button className="primary" type="submit" style={{padding:'14px', fontSize:'16px', fontWeight:'600', marginTop:'8px', borderRadius:'8px'}}>Başvuruyu gönder</button>
 </form>}
