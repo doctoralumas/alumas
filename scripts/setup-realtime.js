@@ -25,3 +25,4 @@ async function main() {
   } catch (e) { console.log("Policy error:", e.message); }
 }
 main().finally(() => prisma.$disconnect());
+
