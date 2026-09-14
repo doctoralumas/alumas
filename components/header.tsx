@@ -68,7 +68,7 @@ export default function Header() {
         <Link className="secondary compact" href="/services">Tüm Hizmetler</Link>
         <div className="secure"><ShieldCheck size={17} /> Güvenli sağlık alanı</div>
         {me ? (
-          <Link className="account-pill" href={me.role === "DOCTOR" ? "/doctor" : me.role === "ADMIN" ? "/admin" : "/profile"}>
+          <Link className="account-pill" href="/profile">
             {me.name.split(" ")[0]}
           </Link>
         ) : (
