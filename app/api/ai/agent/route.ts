@@ -22,7 +22,7 @@ export async function POST(req: Request) {
             specialty: z.string().describe('Hastanın gitmesi gereken tıbbi branş (örn: Ortopedi, Kardiyoloji)'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
           }),
-          execute: async ({ specialty, city }) => {
+          execute: async ({ specialty, city }: { specialty: string, city?: string }) => {
             const doctors = await prisma.doctor.findMany({
               where: {
                 isVerified: true,
@@ -42,12 +42,12 @@ export async function POST(req: Request) {
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional().describe('Eğer hasta acil bir durum yaşıyorsa veya gece "nöbetçi" bir yer (eczane vb) arıyorsa true yap.'),
           }),
-          execute: async ({ type, city, needsEmergencyOrOnDuty }) => {
+          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "LAB", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
             const orgs = await prisma.organization.findMany({
               where: {
                 status: "APPROVED",
                 isPublished: true,
-                ...(type ? { type } : {}),
+                ...(type ? { type: type as any } : {}),
                 ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
                 ...(needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) // Nöbetçi veya 7/24 Açık kalkanı
               },
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
           },
         }),
       },
-      maxSteps: 3, // Agentic Loop: LLM aracı kullanır, veriyi alır, sonra hastaya düzgün bir dille sunar.
+      // Agentic Loop ayarı: (Bu versiyonda generateText tek adımda aracı döndürür)
     });
 
     return Response.json({
