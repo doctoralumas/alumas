@@ -21,35 +21,35 @@ export async function POST(req: Request) {
           parameters: z.object({
             specialty: z.string().describe('Hastanın gitmesi gereken tıbbi branş (örn: Ortopedi, Kardiyoloji)'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
-          }) as any,
-          execute: async (args: any) => {
+          }),
+          execute: async ({ specialty, city }: { specialty: string, city?: string }) => {
             const doctors = await prisma.doctor.findMany({
               where: {
                 isVerified: true,
-                specialty: { contains: args.specialty, mode: 'insensitive' },
-                ...(args.city ? { city: { contains: args.city, mode: 'insensitive' } } : {})
+                specialty: { contains: specialty, mode: 'insensitive' },
+                ...(city ? { city: { contains: city, mode: 'insensitive' } } : {})
               },
               include: { organization: true },
               take: 3
             });
             return doctors.length > 0 ? doctors : { error: "Bu kriterlerde doktor bulunamadı." };
           },
-        }),
+        } as any),
         find_organizations: tool({
           description: 'Hastaneler, klinikler, eczaneler veya laboratuvarları bulmak için bu aracı kullan.',
           parameters: z.object({
             type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'LAB']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Nöbetçi eczane için PHARMACY seç.'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional().describe('Eğer hasta acil bir durum yaşıyorsa veya gece "nöbetçi" bir yer (eczane vb) arıyorsa true yap.'),
-          }) as any,
-          execute: async (args: any) => {
+          }),
+          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "LAB", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
             const orgs = await prisma.organization.findMany({
               where: {
                 status: "APPROVED",
                 isPublished: true,
-                ...(args.type ? { type: args.type as any } : {}),
-                ...(args.city ? { city: { contains: args.city, mode: 'insensitive' } } : {}),
-                ...(args.needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) 
+                ...(type ? { type: type as any } : {}),
+                ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
+                ...(needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) 
               },
               select: { id: true, name: true, type: true, city: true, address: true, phone: true, isOnDuty: true },
               orderBy: [{ isOnDuty: "desc" }],
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
             });
             return orgs.length > 0 ? orgs : { error: "Bu kriterlerde aktif kurum bulunamadı." };
           },
-        }),
+        } as any),
       },
     });
 
@@ -66,8 +66,9 @@ export async function POST(req: Request) {
 
     if (result.toolResults) {
       for (const tr of result.toolResults) {
-        if (tr.toolName === 'find_doctors' && Array.isArray(tr.result)) doctors = tr.result;
-        if (tr.toolName === 'find_organizations' && Array.isArray(tr.result)) organizations = tr.result;
+        const data = (tr as any).result || (tr as any).output;
+        if (tr.toolName === 'find_doctors' && Array.isArray(data)) doctors = data;
+        if (tr.toolName === 'find_organizations' && Array.isArray(data)) organizations = data;
       }
     }
 
