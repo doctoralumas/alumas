@@ -47,16 +47,45 @@ function MessagesContent(){
   };
 
   useEffect(()=>{
-    load(initialUserId||undefined);
+    let channel: any;
+    let fallbackInterval: any;
+
+    async function setupRealtime() {
+      try {
+        // 1. Fetch custom JWT (Bridge between NextAuth and Supabase)
+        const r = await fetch('/api/auth/realtime');
+        if (!r.ok) throw new Error("JWT fetch failed");
+        
+        const { token } = await r.json();
+        
+        // 2. Authenticate the WebSocket connection securely
+        supabase.realtime.setAuth(token);
+
+        // 3. Subscribe to the Message table
+        // Thanks to the RLS policy we injected, Supabase will only broadcast messages belonging to this user!
+        channel = supabase
+          .channel('secure_messages')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'Message' },
+            () => {
+              load(initialUserId||undefined);
+            }
+          )
+          .subscribe();
+      } catch (e) {
+        console.warn("Realtime failed, falling back to polling", e);
+        fallbackInterval = setInterval(() => load(initialUserId||undefined), 10000);
+      }
+    }
     
-    // Güvenlik & Mimari Notu: Sistemde Supabase Auth yerine NextAuth (Custom Auth) kullanıldığı için,
-    // Supabase Realtime'ı anonim (anon_key) ile dinlemek HIPAA/Sağlık verisi güvenliği açısından risklidir.
-    // Bu yüzden MVP aşamasında güvenli olan Polling (10 saniye) yöntemini geri getirdim.
-    // İleride WebSocket için NextAuth -> Supabase JWT entegrasyonu yapılmalıdır.
-    const interval = setInterval(() => {
-      load(initialUserId||undefined);
-    }, 10000);
-    return () => clearInterval(interval);
+    load(initialUserId||undefined);
+    setupRealtime();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+      if (fallbackInterval) clearInterval(fallbackInterval);
+    };
   },[initialUserId]);
 
   useEffect(()=>{
