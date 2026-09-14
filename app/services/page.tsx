@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   Stethoscope, Hospital, MapPin, HouseLine, Ambulance, AirplaneTilt, ShieldCheck, Megaphone, AddressBook,
   Heart, Heartbeat, Drop, Moon, DropHalf, Scales, GenderFemale, Pill, Flask, Scan, Syringe, Bug, ClockCounterClockwise, FileText, IdentificationCard, Calendar,
-  Users, Key, Baby, CalendarCheck, ChatTeardropText, Bell, UsersThree, MagnifyingGlass
+  Users, Key, Baby, CalendarCheck, ChatTeardropText, Bell, UsersThree, MagnifyingGlass, Target, ListChecks, Question, TrendUp, Clock, FileMagnifyingGlass
 } from "@phosphor-icons/react";
 
 type Item={href:string;title:string;desc:string;tone:string;icon:React.ElementType};
@@ -35,15 +35,22 @@ const groups:{title:string;items:Item[]}[]=[
     {href:"/health/vaccinations",title:"Aşı Takvimi",desc:"Geçmiş aşılar ve sonraki dozlar.",tone:"mint",icon:Syringe},
     {href:"/health/allergies",title:"Alerjiler",desc:"Alerji ve reaksiyon kayıtları.",tone:"sand",icon:Bug},
     {href:"/health/medical-history",title:"Sağlık Geçmişi",desc:"Hastalık, ameliyat ve klinik geçmiş.",tone:"lavender",icon:ClockCounterClockwise},
+    {href:"/health/timeline",title:"Zaman Çizelgesi",desc:"Tüm klinik olaylar tek zaman çizelgesinde.",tone:"blue",icon:Clock},
+    {href:"/health/goals",title:"Sağlık Hedeflerim",desc:"Kişisel ve ortak hedefler.",tone:"mint",icon:Target},
+    {href:"/health/tasks",title:"Görev Listem",desc:"Doktor istekleri ve tetkikler.",tone:"teal",icon:ListChecks},
     {href:"/health/reports",title:"Sağlık Raporları",desc:"Sağlık özetleri ve paylaşılabilir raporlar.",tone:"ice",icon:FileText},
+    {href:"/health/summary",title:"Sağlık Özeti",desc:"Alerji, aşı, geçmiş ve aktif ilaçlar.",tone:"blue2",icon:FileMagnifyingGlass},
     {href:"/health-card",title:"Sağlık Kartım",desc:"Acil durumda paylaşılabilen kısa sağlık özeti.",tone:"blue",icon:IdentificationCard},
     {href:"/calendar",title:"Takvim & Alarmlar",desc:"Randevu, ilaç ve sağlık hatırlatıcıları.",tone:"teal",icon:Calendar},
   ]},
   {title:"Aile ve iletişim",items:[
-    {href:"/health/family-hub",title:"Aile Sağlığı",desc:"Aile paneli, çocuk ve gebelik profilleri.",tone:"pink",icon:Users},
+    {href:"/health/family-hub",title:"Aile Sağlığı",desc:"Aile paneli, randevu ve görevler.",tone:"pink",icon:Users},
+    {href:"/health/family",title:"Büyüme & Gebelik",desc:"Boy-kilo trendi ve gebelik takvimi.",tone:"mint",icon:TrendUp},
     {href:"/health/family-access",title:"Aile Erişimleri",desc:"Sağlık verisi paylaşım izinlerini yönet.",tone:"mint",icon:Key},
     {href:"/health/family-profiles",title:"Çocuk & Gebelik",desc:"Özel sağlık profillerini yönet.",tone:"lavender",icon:Baby},
     {href:"/appointments",title:"Randevularım",desc:"Yaklaşan ve geçmiş randevular.",tone:"blue2",icon:CalendarCheck},
+    {href:"/care-calendar",title:"Ortak Takvim",desc:"Doktorla paylaşılan görevler.",tone:"pink",icon:Calendar},
+    {href:"/health/questions",title:"Doktora Sor",desc:"Takip soruları ve yanıtlar.",tone:"purple",icon:Question},
     {href:"/messages",title:"Mesajlar",desc:"Sağlık profesyonelleriyle güvenli mesajlaşma.",tone:"ice",icon:ChatTeardropText},
     {href:"/notifications",title:"Bildirimler",desc:"Randevu ve takip bildirimlerini yönet.",tone:"sand",icon:Bell},
     {href:"/health-circle",title:"Sağlık Çevrem",desc:"Paylaşım, takip ve bakım işbirliği.",tone:"teal",icon:UsersThree},
