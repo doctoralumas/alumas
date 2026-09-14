@@ -10,9 +10,10 @@ export async function POST(req: Request) {
     const result = await generateText({
       model: getAIModel(),
       system: `Sen Alumas platformunun resmi yapay zeka sağlık asistanı Luma'sın. 
-      Görevin hastaların şikayetlerini dinleyip onları EN DOĞRU tıbbi branşa, doktora veya hastaneye yönlendirmektir.
+      Görevin hastaların şikayetlerini dinleyip onları EN DOĞRU tıbbi branşa, doktora veya kuruma (hastane/eczane) yönlendirmektir.
       KESİNLİKLE tıbbi tanı koyamazsın, tedavi uygulayamazsın ve ilaç (reçete) yazamazsın.
-      Eğer hasta doktor arıyorsa "find_doctors" aracını kullan.`,
+      Eğer hasta doktor veya uzman arıyorsa "find_doctors" aracını kullan. 
+      Eğer hasta hastane, klinik, laboratuvar veya nöbetçi eczane arıyorsa "find_organizations" aracını kullan.`,
       prompt: message,
       tools: {
         find_doctors: tool({
@@ -22,7 +23,6 @@ export async function POST(req: Request) {
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
           }),
           execute: async ({ specialty, city }) => {
-            // İşte güvenlik duvarı! LLM uyduramaz, veriyi biz Prisma ile gerçek veritabanından çekip ona veriyoruz.
             const doctors = await prisma.doctor.findMany({
               where: {
                 isVerified: true,
@@ -33,6 +33,29 @@ export async function POST(req: Request) {
               take: 3
             });
             return doctors.length > 0 ? doctors : { error: "Bu kriterlerde doktor bulunamadı." };
+          },
+        }),
+        find_organizations: tool({
+          description: 'Hastaneler, klinikler, eczaneler veya laboratuvarları bulmak için bu aracı kullan.',
+          parameters: z.object({
+            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'LAB']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Nöbetçi eczane için PHARMACY seç.'),
+            city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
+            needsEmergencyOrOnDuty: z.boolean().optional().describe('Eğer hasta acil bir durum yaşıyorsa veya gece "nöbetçi" bir yer (eczane vb) arıyorsa true yap.'),
+          }),
+          execute: async ({ type, city, needsEmergencyOrOnDuty }) => {
+            const orgs = await prisma.organization.findMany({
+              where: {
+                status: "APPROVED",
+                isPublished: true,
+                ...(type ? { type } : {}),
+                ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
+                ...(needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) // Nöbetçi veya 7/24 Açık kalkanı
+              },
+              select: { id: true, name: true, type: true, city: true, address: true, phone: true, isOnDuty: true },
+              orderBy: [{ isOnDuty: "desc" }],
+              take: 3
+            });
+            return orgs.length > 0 ? orgs : { error: "Bu kriterlerde aktif kurum bulunamadı." };
           },
         }),
       },
