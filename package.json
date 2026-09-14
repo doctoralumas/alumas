@@ -103,6 +103,7 @@
     "v54:check": "node scripts/v54-check.mjs"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^4.0.41",
     "@ai-sdk/openai": "^4.0.66",
     "@aws-sdk/client-s3": "^3.864.0",
     "@aws-sdk/s3-request-presigner": "^3.1131.0",
