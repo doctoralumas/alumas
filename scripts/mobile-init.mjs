@@ -15,4 +15,4 @@ if (!existsSync("node_modules/@capacitor/cli")) {
 if (!existsSync("ios")) run("npx", ["cap", "add", "ios"]);
 if (!existsSync("android")) run("npx", ["cap", "add", "android"]);
 run("npx", ["cap", "sync"]);
-console.log("\nNative projeler hazır. MOBILE_RELEASE.md içindeki HealthKit/Health Connect ve push adımlarını tamamlayın.");
+console.log("\nNative projeler hazır. docs/MOBILE_RELEASE.md içindeki HealthKit/Health Connect ve push adımlarını tamamlayın.");

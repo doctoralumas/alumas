@@ -17,4 +17,4 @@ base=${STAGING_BASE_URL:-https://$STAGING_DOMAIN}
 for i in {1..20}; do curl -fsS "$base/api/readiness" >/dev/null && break; sleep 3; done
 curl -fsS "$base/api/readiness" >/dev/null
 echo "ROLLBACK IMAGE COMPLETE: $ALUMAS_IMAGE"
-echo "NOT: Veritabanı migration geri alınmadı. Gerekirse BACKUP_POLICY.md prosedürünü izleyin."
+echo "NOT: Veritabanı migration geri alınmadı. Gerekirse docs/BACKUP_POLICY.md prosedürünü izleyin."

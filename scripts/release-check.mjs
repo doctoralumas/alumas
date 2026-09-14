@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 const errors=[];
-const requiredFiles=['capacitor.config.ts','MOBILE_RELEASE.md','PRODUCTION_RELEASE.md','store/app-store.tr-TR.json','store/google-play.tr-TR.json','public/privacy-policy.html'];
+const requiredFiles=['capacitor.config.ts','docs/MOBILE_RELEASE.md','docs/PRODUCTION_RELEASE.md','store/app-store.tr-TR.json','store/google-play.tr-TR.json','public/privacy-policy.html'];
 for (const f of requiredFiles) if (!fs.existsSync(f)) errors.push(`Eksik dosya: ${f}`);
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 if (!/^\d+\.\d+\.\d+$/.test(pkg.version||'')) errors.push('package.json version semver olmalı.');

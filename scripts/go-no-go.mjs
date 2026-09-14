@@ -2,9 +2,9 @@ import fs from "node:fs";
 const checks=[
  ["releaseManifest",fs.existsSync("dist/release-manifest.json")],
  ["deploymentArtifact",fs.existsSync("dist/deployment-artifact.json")],
- ["releaseChecklist",fs.existsSync("RELEASE_CHECKLIST.md")],
- ["incidentRunbook",fs.existsSync("INCIDENT_RUNBOOK.md")],
- ["backupPolicy",fs.existsSync("BACKUP_POLICY.md")],
+ ["releaseChecklist",fs.existsSync("docs/RELEASE_CHECKLIST.md")],
+ ["incidentRunbook",fs.existsSync("docs/INCIDENT_RUNBOOK.md")],
+ ["backupPolicy",fs.existsSync("docs/BACKUP_POLICY.md")],
  ["prodCompose",fs.existsSync("deploy/production.compose.yml")],
  ["stagingCompose",fs.existsSync("deploy/staging.compose.yml")]
 ];
