@@ -87,10 +87,10 @@ export default async function Home(){
       </section>
     ) : (
       <section className="home-account-row">
-        <Link href="/register?type=patient"><b>Hasta hesabı</b><span>Kişisel sağlık profili</span></Link>
-        <Link href="/register?type=doctor"><b>Doktor hesabı</b><span>Alumas Pro</span></Link>
-        <Link href="/register?type=organization"><b>Kurum hesabı</b><span>Hastane · Klinik · Eczane</span></Link>
-        <Link href="/register?type=agency"><b>Acente hesabı</b><span>Sağlık turizmi</span></Link>
+        <Link href="/register"><b>Hasta hesabı</b><span>Kişisel sağlık profili</span></Link>
+        <Link href="/pro/register"><b>Doktor hesabı</b><span>Alumas Pro</span></Link>
+        <Link href="/pro/register"><b>Kurum hesabı</b><span>Hastane · Klinik · Eczane</span></Link>
+        <Link href="/pro/register"><b>Acente hesabı</b><span>Sağlık turizmi</span></Link>
       </section>
     )}
   </div>
