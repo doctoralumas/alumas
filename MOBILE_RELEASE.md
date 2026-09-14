@@ -4,3 +4,4 @@
 - Alumas Mobile App Initial Release
 - Implemented iOS and Android capacitor wrappers
 - Push notifications support added
+
