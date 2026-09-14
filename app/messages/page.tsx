@@ -20,23 +20,15 @@ function MessagesContent(){
   const [searchQuery, setSearchQuery] = useState('');
 
   const load=async(forceActive?:string)=>{
-    const r=await fetch('/api/messages');
+    const r=await fetch('/api/messages' + (forceActive ? `?userId=${forceActive}` : ''));
     if(!r.ok)return;
-    const items:Message[]=await r.json();
-    setMessages(items);
+    const {contacts: apiContacts, messages: apiMessages} = await r.json();
+    setMessages(apiMessages || []);
+    setContacts(apiContacts || []);
     
-    const map=new Map<string,Contact>();
-    items.forEach(m=>{
-      const peerId=m.mine?m.recipientId:m.senderId;
-      if(peerId&&!map.has(peerId)){
-        map.set(peerId,{id:peerId,name:m.mine?'Bağlantı':m.senderName,subtitle:m.mine?'Giden Mesaj':'Gelen Mesaj'});
-      }
-    });
-    setContacts(Array.from(map.values()));
-    if(forceActive)setActive(forceActive);
-    else if(!active&&items.length>0){
-      const firstPeer=items[0].mine?items[0].recipientId:items[0].senderId;
-      setActive(initialUserId||firstPeer);
+    if(forceActive) setActive(forceActive);
+    else if(!active && apiContacts?.length > 0){
+      setActive(initialUserId || apiContacts[0].id);
     }
   };
   
