@@ -3,7 +3,7 @@ import {currentUser} from '@/lib/auth';
 import {prisma} from '@/lib/prisma';
 import Link from 'next/link';
 import SectionVisual from "@/components/section-visual";
-import { UserMd, Buildings, CalendarCheck, Heartbeat, CaretRight, Star, VideoCamera, FirstAid, CaretLeft } from "@phosphor-icons/react/dist/ssr";
+import { Stethoscope, Buildings, CalendarCheck, Heartbeat, CaretRight, Star, VideoCamera, FirstAid, CaretLeft } from "@phosphor-icons/react/dist/ssr";
 
 export default async function HealthCircle(){
   const u=await currentUser();
@@ -35,7 +35,7 @@ export default async function HealthCircle(){
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px", marginBottom: "32px" }}>
         <div style={{ padding: "24px", background: "#f0f9ff", borderRadius: "20px", border: "1px solid #e0f2fe", display: "flex", alignItems: "center", gap: "16px" }}>
           <div style={{ padding: "16px", background: "#fff", borderRadius: "16px", color: "#0284c7", boxShadow: "0 4px 6px -1px rgba(2,132,199,0.1)" }}>
-            <UserMd size={32} weight="duotone" />
+            <Stethoscope size={32} weight="duotone" />
           </div>
           <div>
             <span style={{ fontSize: "14px", color: "#0284c7", fontWeight: 600, display: "block", marginBottom: "4px" }}>Favori Doktor</span>

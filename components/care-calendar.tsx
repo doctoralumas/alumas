@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useState} from "react";
-import { CalendarCheck, CheckCircle, Circle, Plus, Pill, TestTube, Activity, User, Heartbeat } from "@phosphor-icons/react";
+import { CalendarCheck, CheckCircle, Circle, Plus, Pill, TestTube, Ruler, User, Heartbeat } from "@phosphor-icons/react";
 
 export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?:boolean,patients?:{id:string;name:string}[]}){
   const [rows,setRows]=useState<any[]>([]);
@@ -43,7 +43,7 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
 
   const getIcon = (kind: string) => {
     switch(kind){
-      case 'measurement': return <Activity size={24} weight="duotone" color="#0284c7" />;
+      case 'measurement': return <Ruler size={24} weight="duotone" color="#0284c7" />;
       case 'medication': return <Pill size={24} weight="duotone" color="#16a34a" />;
       case 'visit': return <User size={24} weight="duotone" color="#8b5cf6" />;
       case 'test': return <TestTube size={24} weight="duotone" color="#ea580c" />;

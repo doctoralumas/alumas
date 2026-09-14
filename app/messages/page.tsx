@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useState,useRef,useMemo,Suspense} from "react";
 import {useSearchParams} from "next/navigation";
-import {Paperclip, FileText, Check, CheckCheck, PaperPlaneRight, Image as ImageIcon, ChatsCircle, MagnifyingGlass, CaretLeft} from "@phosphor-icons/react";
+import {Paperclip, FileText, Check, Checks, PaperPlaneRight, Image as ImageIcon, ChatsCircle, MagnifyingGlass, CaretLeft} from "@phosphor-icons/react";
 import Link from "next/link";
 import SectionVisual from "@/components/section-visual";
 
@@ -202,7 +202,7 @@ function MessagesContent(){
                       <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>{new Date(m.createdAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
                       {m.mine && (
                         <span style={{ color: m.readAt ? "#3b82f6" : "#cbd5e1" }}>
-                          {m.readAt ? <CheckCheck size={14} weight="bold" /> : <Check size={14} weight="bold" />}
+                          {m.readAt ? <Checks size={14} weight="bold" /> : <Check size={14} weight="bold" />}
                         </span>
                       )}
                     </div>
