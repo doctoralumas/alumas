@@ -1,5 +1,5 @@
 "use client";import {useEffect,useRef,useState} from "react";type Place={id:string;name:string;address:string;latitude:number;longitude:number;rating?:number|null;userRatingCount?:number|null;mapsUrl?:string|null;openNow?:boolean|null;distanceKm?:number|null;typeLabel?:string|null};
-const cats:any={health:"Sağlık kuruluşları",hospital:"Hastane",clinic:"Klinik",pharmacy:"Eczane",doctor:"Doktor",emergency:"Acil",hotel:"Otel"};
+const cats:any={health:"Sağlık kuruluşları",hospital:"Hastane",clinic:"Klinik",pharmacy:"Eczane",imaging:"Görüntüleme",doctor:"Doktor",emergency:"Acil",hotel:"Otel"};
 export default function GoogleNearbyPlaces({initial="health"}:{initial?:string}) {
   const [category, setCategory] = useState(initial in cats ? initial : "health");
   const [rows, setRows] = useState<Place[]>([]);
