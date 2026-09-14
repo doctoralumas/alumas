@@ -25,13 +25,15 @@ export default function HealthNavigator({compact=false}:{compact?:boolean}){
   const [error,setError]=useState("");
   const [history,setHistory]=useState<Array<{role:"user"|"assistant";text:string}>>([]);
   const [personalize,setPersonalize]=useState(false);
+  const [useAgent,setUseAgent]=useState(false);
 
   async function submit(e?:FormEvent){
     e?.preventDefault();
     if(message.trim().length<3)return;
     setLoading(true);setError("");
     try{
-      const res=await fetch("/api/ai/navigate",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({message,history,personalize})});
+      const endpoint = useAgent ? "/api/ai/agent" : "/api/ai/navigate";
+      const res=await fetch(endpoint,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({message,history,personalize})});
       const json=await res.json();
       if(!res.ok) throw new Error(json.error||"İstek tamamlanamadı");
       setResult(json.data);
@@ -53,10 +55,23 @@ export default function HealthNavigator({compact=false}:{compact?:boolean}){
     <form className="ai-search-form" onSubmit={submit}>
       <Search size={20}/>
       <input value={message} onChange={e=>setMessage(e.target.value)} placeholder="Örn. 3 gündür dizim ağrıyor, Ataşehir'deyim..." aria-label="Sağlık ihtiyacınızı yazın"/>
-      <button disabled={loading||message.trim().length<3}>{loading?"Düşünüyor…":"Sor"}</button>
+      <button disabled={loading||message.trim().length<3}>{loading?"Düşünüyor...":"Sor"}</button>
     </form>
-    <div className="ai-prompt-row">{prompts.map(p=><button key={p} onClick={()=>setMessage(p)} type="button">{p}</button>)}</div>
-    <label className="ai-personalize-toggle"><input type="checkbox" checked={personalize} onChange={e=>setPersonalize(e.target.checked)}/><span><b>Sağlık profilimi kullanarak kişiselleştir</b><small>Yalnız giriş yaptıysanız ve açık izin verirseniz yaş aralığı, aktif durumlar, ilaçlar ve alerjiler gibi gerekli alanlar kullanılır. Bu sürümde kişisel sağlık verileri harici bir dil modeline gönderilmez.</small></span></label>
+    
+    <div className="ai-advanced-options" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '12px', padding: '12px', background: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+      <label className="ai-personalize-toggle" style={{ margin: 0 }}>
+        <input type="checkbox" checked={personalize} onChange={e=>setPersonalize(e.target.checked)}/>
+        <span><b>Sağlık profilimi kullan</b></span>
+      </label>
+      <label className="ai-personalize-toggle" style={{ margin: 0, marginLeft: 'auto' }}>
+        <input type="checkbox" checked={useAgent} onChange={e=>setUseAgent(e.target.checked)}/>
+        <span style={{ color: useAgent ? 'var(--primary)' : 'inherit' }}>
+          <b>✨ Luma AI+ (Agent Modu)</b>
+        </span>
+      </label>
+    </div>
+
+    <div className="ai-prompt-row" style={{ marginTop: '12px' }}>{prompts.map(p=><button key={p} onClick={()=>setMessage(p)} type="button">{p}</button>)}</div>
     {error&&<div className="ai-error">{error}</div>}
 
     {result&&<div className="ai-result-wrap">

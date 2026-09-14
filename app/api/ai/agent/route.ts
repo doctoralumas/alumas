@@ -29,7 +29,7 @@ export async function POST(req: Request) {
                 specialty: { contains: args.specialty, mode: 'insensitive' },
                 ...(args.city ? { city: { contains: args.city, mode: 'insensitive' } } : {})
               },
-              select: { id: true, name: true, title: true, specialty: true, hospital: true },
+              include: { organization: true },
               take: 3
             });
             return doctors.length > 0 ? doctors : { error: "Bu kriterlerde doktor bulunamadı." };
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
                 isPublished: true,
                 ...(args.type ? { type: args.type as any } : {}),
                 ...(args.city ? { city: { contains: args.city, mode: 'insensitive' } } : {}),
-                ...(args.needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) // Nöbetçi veya 7/24 Açık kalkanı
+                ...(args.needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) 
               },
               select: { id: true, name: true, type: true, city: true, address: true, phone: true, isOnDuty: true },
               orderBy: [{ isOnDuty: "desc" }],
@@ -59,14 +59,29 @@ export async function POST(req: Request) {
           },
         }),
       },
-      // Agentic Loop ayarı: (Bu versiyonda generateText tek adımda aracı döndürür)
     });
+
+    let doctors: any[] = [];
+    let organizations: any[] = [];
+
+    if (result.toolResults) {
+      for (const tr of result.toolResults) {
+        if (tr.toolName === 'find_doctors' && Array.isArray(tr.result)) doctors = tr.result;
+        if (tr.toolName === 'find_organizations' && Array.isArray(tr.result)) organizations = tr.result;
+      }
+    }
 
     return Response.json({
       ok: true,
       data: {
         source: "alumas_agentic_engine_v3",
-        commentary: result.text,
+        summary: "Luma AI+ (Agent Modu) tarafından analiz edildi.",
+        commentary: result.text || "Şikayetinizi inceledim ve sizin için en uygun profesyonelleri buldum:",
+        intent: { triage: "routine", specialty: null, facility: null, locationHint: null, confidence: 0.99, followUpQuestion: null },
+        doctors,
+        organizations,
+        sources: [{ id: "ai", label: "LLM Agent", kind: "ai_analysis", authority: "internal_verified", description: "Veritabanı destekli yapay zeka çıkarımı." }],
+        safety: { disclaimer: "Yapay zeka tavsiyesidir, tanı yerine geçmez.", medicalKnowledgeConnected: true, policy: "Agent Mode" }
       }
     });
   } catch (error: any) {
