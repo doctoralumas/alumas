@@ -375,6 +375,7 @@ enum OrganizationType {
   HOSPITAL
   CLINIC
   PHARMACY
+  IMAGING_CENTER
 }
 enum OrganizationStatus {
   PENDING

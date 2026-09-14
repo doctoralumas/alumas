@@ -10,10 +10,10 @@ export async function POST(req: Request) {
     const result = await generateText({
       model: getAIModel(),
       system: `Sen Alumas platformunun resmi yapay zeka sağlık asistanı Luma'sın. 
-      Görevin hastaların şikayetlerini dinleyip onları EN DOĞRU tıbbi branşa, doktora veya kuruma (hastane/eczane) yönlendirmektir.
+      Görevin hastaların şikayetlerini dinleyip onları EN DOĞRU tıbbi branşa, doktora veya kuruma (hastane/eczane/görüntüleme merkezi) yönlendirmektir.
       KESİNLİKLE tıbbi tanı koyamazsın, tedavi uygulayamazsın ve ilaç (reçete) yazamazsın.
       Eğer hasta doktor veya uzman arıyorsa "find_doctors" aracını kullan. 
-      Eğer hasta hastane, klinik, laboratuvar veya nöbetçi eczane arıyorsa "find_organizations" aracını kullan.`,
+      Eğer hasta hastane, klinik, laboratuvar, nöbetçi eczane veya MR/Röntgen için görüntüleme merkezi arıyorsa "find_organizations" aracını kullan.`,
       prompt: message,
       tools: {
         find_doctors: tool({
@@ -36,13 +36,13 @@ export async function POST(req: Request) {
           },
         } as any),
         find_organizations: tool({
-          description: 'Hastaneler, klinikler, eczaneler veya laboratuvarları bulmak için bu aracı kullan.',
+          description: 'Hastaneler, klinikler, eczaneler, laboratuvarlar veya GÖRÜNTÜLEME MERKEZLERİNİ (MR, Röntgen vb.) bulmak için bu aracı kullan.',
           parameters: z.object({
-            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'LAB']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Nöbetçi eczane için PHARMACY seç.'),
+            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'LAB', 'IMAGING_CENTER']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Görüntüleme merkezi/MR/Röntgen için IMAGING_CENTER seç.'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional().describe('Eğer hasta acil bir durum yaşıyorsa veya gece "nöbetçi" bir yer (eczane vb) arıyorsa true yap.'),
           }),
-          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "LAB", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
+          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "LAB" | "IMAGING_CENTER", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
             const orgs = await prisma.organization.findMany({
               where: {
                 status: "APPROVED",

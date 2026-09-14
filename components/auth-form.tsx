@@ -51,12 +51,13 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
     if (mode === "register") {
       const kind = String((data as any).accountType || "PATIENT");
       if (kind === "DOCTOR") router.push("/onboarding/doctor");
-      else if (kind === "ORGANIZATION") router.push("/business/apply");
+      else if (kind === "ORGANIZATION" || kind === "IMAGING_CENTER") router.push("/business/apply");
       else if (kind === "AGENCY") router.push("/agency/apply");
       else if (kind === "PARTNER") router.push("/partner/apply");
       else router.push("/profile");
+      
       if (kind === "DOCTOR") window.location.href = "/onboarding/doctor";
-      else if (kind === "ORGANIZATION") window.location.href = "/business/apply";
+      else if (kind === "ORGANIZATION" || kind === "IMAGING_CENTER") window.location.href = "/business/apply";
       else if (kind === "AGENCY") window.location.href = "/agency/apply";
       else if (kind === "PARTNER") window.location.href = "/partner/apply";
       else window.location.href = "/profile";
@@ -85,6 +86,7 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
               <select name="accountType" defaultValue={initialType}>
                 <option value="DOCTOR">Doktor / Uzman (Diyetisyen, Fzt. vb.)</option>
                 <option value="ORGANIZATION">Hastane / klinik / eczane</option>
+                <option value="IMAGING_CENTER">Görüntüleme Merkezi (MR, Röntgen, Tomografi)</option>
                 <option value="AGENCY">Sağlık turizmi acentesi</option>
                 <option value="PARTNER">Çözüm Ortağı / Aracı Kurum</option>
               </select>
