@@ -59,34 +59,12 @@ export default async function Home(){
     <section className="home-emergency-strip">
       <Link href="/emergency"><b>ACİL / 112</b><span>Hayati acil durumlarda hızlı erişim</span></Link>
       <a href="tel:112"><b>112</b><span>Acil Ara</span></a>
-      <Link href="/nearby"><b>⌖</b><span>En Yakın Acil</span></Link>
-      <Link href="/health-card"><b>▣</b><span>Sağlık Kartım</span></Link>
+      <Link href="/nearby"><b>📍</b><span>En Yakın Acil</span></Link>
+      <Link href="/health-card"><b>🪪</b><span>Sağlık Kartım</span></Link>
     </section>
 
-    {user ? (
-      <section className="home-account-row" style={{ marginTop: '16px' }}>
-        <Link 
-          href={user.role === 'DOCTOR' ? '/doctor' : user.role === 'ADMIN' ? '/admin' : '/profile'} 
-          style={{ 
-            width: '100%', 
-            padding: '24px', 
-            background: 'var(--primary, #123f6b)', 
-            color: '#ffffff', 
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(18, 63, 107, 0.15)',
-            textDecoration: 'none'
-          }}
-        >
-          <b style={{ fontSize: '1.25rem', marginBottom: '6px', fontWeight: '600' }}>Tekrar Hoş Geldin, {user.name.split(' ')[0]} 👋</b>
-          <span style={{ fontSize: '0.95rem', opacity: 0.9 }}>{user.role === 'DOCTOR' ? 'Alumas Pro Paneline Geçiş Yap →' : 'Kişisel Sağlık Profiline Git →'}</span>
-        </Link>
-      </section>
-    ) : (
-      <section className="home-account-row">
+    {!user && (
+      <section className="home-account-row" style={{ marginTop: '24px' }}>
         <Link href="/register"><b>Hasta hesabı</b><span>Kişisel sağlık profili</span></Link>
         <Link href="/pro/register?type=doctor"><b>Doktor hesabı</b><span>Alumas Pro</span></Link>
         <Link href="/pro/register?type=organization"><b>Kurum hesabı</b><span>Hastane · Klinik · Eczane</span></Link>
