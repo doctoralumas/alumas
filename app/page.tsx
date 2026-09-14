@@ -19,7 +19,11 @@ const tiles = [
   {href:"/profile", kicker:"Hesap", title:"PROFİL & HESAPLAR", text:"Hasta, doktor, kurum ve acente profillerini yönet", cls:"home-tile ice span4 row2", image:"/home-visuals/profile.webp"},
 ];
 
-export default function Home(){
+import { currentUser } from "@/lib/auth";
+
+export default async function Home(){
+  const user = await currentUser();
+
   return <div className="page home-getir">
     <section className="home-getir-location">
       <div><span className="home-location-pin">⌖</span><div><small>Konum</small><b>Yakınımdaki sağlık hizmetleri</b></div></div>
@@ -59,11 +63,20 @@ export default function Home(){
       <Link href="/health-card"><b>▣</b><span>Sağlık Kartım</span></Link>
     </section>
 
-    <section className="home-account-row">
-      <Link href="/register?type=patient"><b>Hasta hesabı</b><span>Kişisel sağlık profili</span></Link>
-      <Link href="/register?type=doctor"><b>Doktor hesabı</b><span>Alumas Pro</span></Link>
-      <Link href="/register?type=organization"><b>Kurum hesabı</b><span>Hastane · Klinik · Eczane</span></Link>
-      <Link href="/register?type=agency"><b>Acente hesabı</b><span>Sağlık turizmi</span></Link>
-    </section>
+    {user ? (
+      <section className="home-emergency-strip" style={{ marginTop: '16px', background: 'var(--surface-sunken)', border: '1px solid var(--border)' }}>
+        <Link href={user.role === 'DOCTOR' ? '/doctor' : user.role === 'ADMIN' ? '/admin' : '/profile'} style={{flex: 1, justifyContent: 'center', textAlign: 'center'}}>
+          <b style={{ color: 'var(--primary)' }}>Tekrar Hoş Geldin, {user.name.split(' ')[0]} 👋</b>
+          <span>{user.role === 'DOCTOR' ? 'Alumas Pro Paneline Geçiş Yap' : 'Kişisel Sağlık Profiline Git'}</span>
+        </Link>
+      </section>
+    ) : (
+      <section className="home-account-row">
+        <Link href="/register?type=patient"><b>Hasta hesabı</b><span>Kişisel sağlık profili</span></Link>
+        <Link href="/register?type=doctor"><b>Doktor hesabı</b><span>Alumas Pro</span></Link>
+        <Link href="/register?type=organization"><b>Kurum hesabı</b><span>Hastane · Klinik · Eczane</span></Link>
+        <Link href="/register?type=agency"><b>Acente hesabı</b><span>Sağlık turizmi</span></Link>
+      </section>
+    )}
   </div>
 }
