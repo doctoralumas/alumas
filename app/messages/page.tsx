@@ -1,117 +1,65 @@
 "use client";
-import {useEffect,useMemo,useState,useRef,Suspense} from "react";
-import {useSearchParams, useRouter} from "next/navigation";
-import {Check, CheckCheck, Paperclip, FileText} from "lucide-react";
-import { supabase } from "@/lib/supabase-client";
+import {useEffect,useState,useRef,useMemo,Suspense} from "react";
+import {useSearchParams} from "next/navigation";
+import {Paperclip, FileText, Check, CheckCheck, PaperPlaneRight, Image as ImageIcon, ChatsCircle, MagnifyingGlass, CaretLeft} from "@phosphor-icons/react";
+import Link from "next/link";
+import SectionVisual from "@/components/section-visual";
 
-type Contact={id:string;name:string;subtitle:string;lastMessageAt:string};
-type Msg={id:string;body:string;createdAt:string;readAt:string|null;senderId:string;recipientId:string;mine:boolean;senderName:string;attachmentPath:string|null;fileName:string|null;mimeType:string|null};
+type Message={id:string;senderId:string;recipientId:string;body:string;senderName:string;createdAt:string;readAt:string|null;mine:boolean;attachmentPath?:string;fileName?:string;mimeType?:string};
+type Contact={id:string;name:string;subtitle:string};
 
 function MessagesContent(){
-  const searchParams=useSearchParams();
-  const router=useRouter();
-  const initialUserId=searchParams.get("userId");
-  
+  const sp=useSearchParams(), initialUserId=sp.get('userId');
+  const [messages,setMessages]=useState<Message[]>([]);
   const [contacts,setContacts]=useState<Contact[]>([]);
-  const [messages,setMessages]=useState<Msg[]>([]);
-  const [active,setActive]=useState(initialUserId||"");
-  const [body,setBody]=useState("");
-  const [uploading, setUploading] = useState(false);
-  
-  const activeRef = useRef(active);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const currentUserIdRef = useRef<string | null>(null);
+  const [active,setActive]=useState<string>(initialUserId||'');
+  const [body,setBody]=useState('');
+  const [uploading,setUploading]=useState(false);
+  const messagesEndRef=useRef<HTMLDivElement>(null);
+  const fileInputRef=useRef<HTMLInputElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(()=>{activeRef.current=active;},[active]);
-
-  const load=async(forceUserId?:string)=>{
-    const qs=forceUserId?`?userId=${forceUserId}`:'';
-    const r=await fetch('/api/messages'+qs);
-    if(r.ok){
-      const x=await r.json();
-      setContacts(x.contacts||[]);
-      setMessages(x.messages||[]);
-      
-      // Keep track of our own ID to configure Supabase filters correctly
-      if(x.messages.length > 0) {
-         const myMsg = x.messages.find((m: Msg) => m.mine);
-         if(myMsg) currentUserIdRef.current = myMsg.senderId;
-         else currentUserIdRef.current = x.messages.find((m: Msg) => !m.mine)?.recipientId || null;
+  const load=async(forceActive?:string)=>{
+    const r=await fetch('/api/messages');
+    if(!r.ok)return;
+    const items:Message[]=await r.json();
+    setMessages(items);
+    
+    const map=new Map<string,Contact>();
+    items.forEach(m=>{
+      const peerId=m.mine?m.recipientId:m.senderId;
+      if(peerId&&!map.has(peerId)){
+        map.set(peerId,{id:peerId,name:m.mine?'Bağlantı':m.senderName,subtitle:m.mine?'Giden Mesaj':'Gelen Mesaj'});
       }
-
-      if(!activeRef.current && x.contacts?.[0] && !forceUserId){
-        setActive(x.contacts[0].id);
-      }
+    });
+    setContacts(Array.from(map.values()));
+    if(forceActive)setActive(forceActive);
+    else if(!active&&items.length>0){
+      const firstPeer=items[0].mine?items[0].recipientId:items[0].senderId;
+      setActive(initialUserId||firstPeer);
     }
   };
-
-  useEffect(()=>{
-    let channel: any;
-    let fallbackInterval: any;
-
-    async function setupRealtime() {
-      try {
-        // 1. Fetch custom JWT (Bridge between NextAuth and Supabase)
-        const r = await fetch('/api/auth/realtime');
-        if (!r.ok) throw new Error("JWT fetch failed");
-        
-        const { token } = await r.json();
-        
-        // 2. Authenticate the WebSocket connection securely
-        supabase.realtime.setAuth(token);
-
-        // 3. Subscribe to the Message table
-        // Thanks to the RLS policy we injected, Supabase will only broadcast messages belonging to this user!
-        channel = supabase
-          .channel('secure_messages')
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'Message' },
-            () => {
-              load(initialUserId||undefined);
-            }
-          )
-          .subscribe();
-      } catch (e) {
-        console.warn("Realtime failed, falling back to polling", e);
-        fallbackInterval = setInterval(() => load(initialUserId||undefined), 10000);
-      }
-    }
-    
-    load(initialUserId||undefined);
-    setupRealtime();
-
-    return () => {
-      if (channel) supabase.removeChannel(channel);
-      if (fallbackInterval) clearInterval(fallbackInterval);
-    };
-  },[initialUserId]);
-
+  
+  useEffect(()=>{load(initialUserId||undefined)},[initialUserId]);
+  
   useEffect(()=>{
     if(active){
-      fetch('/api/messages/read',{
-        method:'PATCH',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({senderId:active})
-      }).catch(()=>{});
+      fetch('/api/messages/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senderId:active})}).then(()=>load());
     }
-  },[active, messages.length]);
+  },[active]);
+  
+  const thread=useMemo(()=>messages.filter(m=>(m.senderId===active&&!m.mine)||(m.recipientId===active&&m.mine)).sort((a,b)=>new Date(a.createdAt).getTime()-new Date(b.createdAt).getTime()),[messages,active]);
+  
+  useEffect(()=>{ messagesEndRef.current?.scrollIntoView({behavior:'smooth'}) },[thread]);
 
-  const thread=useMemo(()=>messages.filter(m=>m.senderId===active||m.recipientId===active),[messages,active]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [thread]);
-
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileUpload(e:React.ChangeEvent<HTMLInputElement>){
     const file = e.target.files?.[0];
-    if(!file || !active) return;
+    if(!file||!active)return;
+    if(file.size > 5 * 1024 * 1024){ alert('Dosya boyutu en fazla 5MB olabilir.'); return; }
     
     setUploading(true);
     try {
-      // 1. Get R2 presigned URL
-      const presignRes = await fetch('/api/health/imaging/presign', {
+      const presignRes = await fetch('/api/messages/presign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fileName: file.name, fileType: file.type || 'application/octet-stream', fileSize: file.size })
@@ -119,163 +67,205 @@ function MessagesContent(){
       if(!presignRes.ok) throw new Error("Yükleme adresi alınamadı");
       const { presignedUrl, storagePath } = await presignRes.json();
       
-      // 2. Upload directly to Cloudflare R2
-      const uploadRes = await fetch(presignedUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type || 'application/octet-stream' }
-      });
+      const uploadRes = await fetch(presignedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } });
       if(!uploadRes.ok) throw new Error("Dosya yüklenemedi");
       
-      // 3. Send message with attachment
       await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientId: active,
-          body: '',
-          attachmentPath: storagePath,
-          fileName: file.name,
-          mimeType: file.type || 'application/octet-stream'
-        })
+        body: JSON.stringify({ recipientId: active, body: '', attachmentPath: storagePath, fileName: file.name, mimeType: file.type || 'application/octet-stream' })
       });
       load(initialUserId||undefined);
-    } catch (err: any) {
-      alert(err.message || 'Yükleme hatası');
-    } finally {
-      setUploading(false);
-      if(fileInputRef.current) fileInputRef.current.value = '';
-    }
+    } catch (err: any) { alert(err.message || 'Yükleme hatası'); } 
+    finally { setUploading(false); if(fileInputRef.current) fileInputRef.current.value = ''; }
   }
 
   async function send(e:React.FormEvent){
     e.preventDefault();
     if(!active||!body.trim())return;
     const currentBody = body;
-    setBody(''); // Optimistic clear
+    setBody(''); 
     const r=await fetch('/api/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({recipientId:active,body:currentBody})
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({recipientId:active,body:currentBody})
     });
-    if(!r.ok){
-       setBody(currentBody); // Revert on failure
-       alert("Mesaj gönderilemedi");
-    } else {
-       load(initialUserId||undefined);
-    }
+    if(!r.ok){ setBody(currentBody); alert("Mesaj gönderilemedi"); } 
+    else { load(initialUserId||undefined); }
   }
 
   const unreadCounts = useMemo(()=>{
     const counts:Record<string,number>={};
-    messages.forEach(m=>{
-      if(!m.mine && !m.readAt){
-        counts[m.senderId] = (counts[m.senderId]||0) + 1;
-      }
-    });
+    messages.forEach(m=>{ if(!m.mine && !m.readAt) counts[m.senderId] = (counts[m.senderId]||0) + 1; });
     return counts;
   },[messages]);
 
+  const filteredContacts = contacts.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
   return (
-    <div className="page">
-      <div className="page-title">
-        <span className="kicker">İletişim</span>
-        <h1>Mesajlar</h1>
-        <p>Sağlık ağındaki tüm kişilerle uygulama içi güvenli iletişim kur.</p>
+    <div className="page" style={{ maxWidth: "1200px" }}>
+      <SectionVisual slug="family" alt="Mesajlar" />
+      <div style={{ marginBottom: "24px" }}>
+        <Link href="/services" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", textDecoration: "none", fontSize: "14px", fontWeight: 500, marginBottom: "16px" }}>
+          <CaretLeft size={16} /> Tüm Hizmetlere Dön
+        </Link>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
+          <div>
+            <span className="kicker">İletişim</span>
+            <h1 style={{ fontSize: "28px", color: "#0f172a", margin: "8px 0" }}>Mesajlar</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Sağlık profesyonelleri ve kurumlarla güvenli iletişim kurun.</p>
+          </div>
+        </div>
       </div>
       
-      <div className="message-layout">
-        <aside className="contact-list">
-          {contacts.map(c=>(
-            <button key={c.id} onClick={()=>setActive(c.id)} className={active===c.id?'contact active-contact':'contact'}>
-              <div>
-                <b>{c.name}</b>
-                <span>{c.subtitle}</span>
-              </div>
-              {unreadCounts[c.id] > 0 && <span className="unread-badge">{unreadCounts[c.id]}</span>}
-            </button>
-          ))}
-          {!contacts.length&&<div className="empty">Gelen kutusu boş.</div>}
-        </aside>
+      <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: "24px", height: "calc(100vh - 280px)", minHeight: "600px" }}>
         
-        <section className="chat-panel">
-          <div className="chat-head">
-            <div className="avatar mini">{contacts.find(c=>c.id===active)?.name?.slice(0,2)||"AL"}</div>
-            <div>
-              <b>{contacts.find(c=>c.id===active)?.name||"Sohbet Seçin"}</b>
-              <span>{contacts.find(c=>c.id===active)?.subtitle||"Güvenli iletişim"}</span>
+        {/* Sol Panel: Kişiler */}
+        <aside style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
+          <div style={{ padding: "20px", borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{ position: "relative" }}>
+              <MagnifyingGlass size={18} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
+              <input 
+                value={searchQuery}
+                onChange={e=>setSearchQuery(e.target.value)}
+                placeholder="Kişi ara..." 
+                style={{ width: "100%", padding: "10px 12px 10px 38px", borderRadius: "12px", border: "1px solid #cbd5e1", fontSize: "14px", background: "#f8fafc", color: "#0f172a" }} 
+              />
             </div>
           </div>
-          
-          <div className="chat-stream">
-            {thread.map(m=>(
-              <div key={m.id} className={m.mine?'bubble mine':'bubble'}>
-                <b>{m.mine?'Sen':m.senderName}</b>
-                {m.body && <p>{m.body}</p>}
-                
-                {m.attachmentPath && (
-                  <div className="message-attachment" style={{marginTop: '6px', marginBottom: '4px'}}>
-                    {m.mimeType?.startsWith('image/') ? (
-                      <a href={`/api/messages/${m.id}/file`} target="_blank" rel="noopener noreferrer">
-                        <img src={`/api/messages/${m.id}/file`} alt={m.fileName||'Ek'} style={{maxWidth: '220px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.1)'}} />
-                      </a>
-                    ) : (
-                      <a href={`/api/messages/${m.id}/file`} target="_blank" rel="noopener noreferrer" style={{display: 'inline-flex', alignItems: 'center', gap: '8px', background: m.mine ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)', padding: '8px 12px', borderRadius: '8px', textDecoration: 'none', color: 'inherit'}}>
-                        <FileText size={20} />
-                        <span style={{fontSize: '13px', wordBreak: 'break-all'}}>{m.fileName}</span>
-                      </a>
-                    )}
+          <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
+            {filteredContacts.map(c=>(
+              <button 
+                key={c.id} 
+                onClick={()=>setActive(c.id)} 
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", padding: "16px", borderRadius: "16px", border: "none", background: active===c.id ? "#f0f9ff" : "transparent", cursor: "pointer", textAlign: "left", transition: "all 0.2s", marginBottom: "4px" }}
+                className={active!==c.id ? "hover-bg-slate" : ""}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: active===c.id ? "#0284c7" : "#e2e8f0", color: active===c.id ? "#fff" : "#64748b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 600 }}>
+                    {c.name.substring(0,2).toUpperCase()}
                   </div>
+                  <div>
+                    <strong style={{ display: "block", fontSize: "15px", color: active===c.id ? "#0369a1" : "#0f172a", marginBottom: "2px" }}>{c.name}</strong>
+                    <span style={{ fontSize: "12px", color: "#64748b" }}>{c.subtitle}</span>
+                  </div>
+                </div>
+                {unreadCounts[c.id] > 0 && (
+                  <span style={{ background: "#ef4444", color: "#fff", fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "12px" }}>{unreadCounts[c.id]}</span>
                 )}
-                
-                <div className="bubble-meta">
-                  <small>{new Date(m.createdAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})}</small>
-                  {m.mine && (
-                    <span className="read-receipt">
-                      {m.readAt ? <CheckCheck size={14} className="text-blue-500" /> : <Check size={14} />}
-                    </span>
-                  )}
+              </button>
+            ))}
+            {!filteredContacts.length && (
+              <div style={{ padding: "32px 16px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                <ChatsCircle size={32} weight="duotone" style={{ margin: "0 auto 8px", opacity: 0.5 }} />
+                Görüşme bulunamadı.
+              </div>
+            )}
+          </div>
+        </aside>
+        
+        {/* Sağ Panel: Sohbet Alanı */}
+        <section style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
+          {active ? (
+            <>
+              <div style={{ padding: "20px 24px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: "16px", background: "#f8fafc" }}>
+                <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "#0284c7", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 600 }}>
+                  {contacts.find(c=>c.id===active)?.name?.substring(0,2).toUpperCase() || "AL"}
+                </div>
+                <div>
+                  <strong style={{ display: "block", fontSize: "18px", color: "#0f172a" }}>{contacts.find(c=>c.id===active)?.name || "Sohbet"}</strong>
+                  <span style={{ fontSize: "13px", color: "#64748b" }}>Güvenli İletişim Kanalı</span>
                 </div>
               </div>
-            ))}
-            <div ref={messagesEndRef} />
-            {!thread.length&&active&&<div className="empty">Konuşmayı başlatmak için bir mesaj yaz.</div>}
-            {!active&&<div className="empty">Sol menüden bir kişi seçin.</div>}
-          </div>
-          
-          {active && (
-            <form className="chat-form" onSubmit={send} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <input type="file" ref={fileInputRef} style={{display:'none'}} onChange={handleFileUpload} accept="image/*,application/pdf" />
-              <button 
-                type="button" 
-                className="icon-button" 
-                onClick={()=>fileInputRef.current?.click()} 
-                disabled={uploading}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--primary)' }}
-                title="Dosya veya Resim Yükle"
-              >
-                <Paperclip size={24} />
-              </button>
               
-              <input 
-                value={body} 
-                onChange={e=>setBody(e.target.value)} 
-                placeholder={uploading ? "Dosya yükleniyor..." : "Mesajını yaz..."} 
-                disabled={uploading} 
-                style={{flex: 1, padding: '12px', borderRadius: '20px', border: '1px solid var(--border)'}}
-              />
-              <button className="primary" disabled={(!body.trim() && !uploading) || uploading} style={{borderRadius: '20px', padding: '10px 20px'}}>Gönder</button>
-            </form>
+              <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: "16px", background: "#f1f5f9" }}>
+                {thread.map(m=>(
+                  <div key={m.id} style={{ alignSelf: m.mine ? "flex-end" : "flex-start", maxWidth: "75%" }}>
+                    <div style={{ background: m.mine ? "#0284c7" : "#fff", color: m.mine ? "#fff" : "#0f172a", padding: "16px", borderRadius: "20px", borderBottomRightRadius: m.mine ? "4px" : "20px", borderBottomLeftRadius: m.mine ? "20px" : "4px", boxShadow: "0 2px 4px rgba(0,0,0,0.04)" }}>
+                      {m.body && <p style={{ margin: 0, fontSize: "15px", lineHeight: "1.5" }}>{m.body}</p>}
+                      
+                      {m.attachmentPath && (
+                        <div style={{ marginTop: m.body ? "12px" : "0" }}>
+                          {m.mimeType?.startsWith('image/') ? (
+                            <a href={`/api/messages/${m.id}/file`} target="_blank" rel="noopener noreferrer" style={{ display: "block", borderRadius: "12px", overflow: "hidden" }}>
+                              <img src={`/api/messages/${m.id}/file`} alt={m.fileName||'Ek'} style={{ maxWidth: '100%', maxHeight: "250px", display: "block", objectFit: "cover" }} />
+                            </a>
+                          ) : (
+                            <a href={`/api/messages/${m.id}/file`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: m.mine ? 'rgba(255,255,255,0.2)' : '#f1f5f9', padding: '12px', borderRadius: '12px', textDecoration: 'none', color: 'inherit' }}>
+                              <FileText size={24} weight="duotone" />
+                              <span style={{ fontSize: '14px', fontWeight: 500, wordBreak: 'break-all' }}>{m.fileName}</span>
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: m.mine ? "flex-end" : "flex-start", gap: "6px", marginTop: "6px", padding: "0 4px" }}>
+                      <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>{new Date(m.createdAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+                      {m.mine && (
+                        <span style={{ color: m.readAt ? "#3b82f6" : "#cbd5e1" }}>
+                          {m.readAt ? <CheckCheck size={14} weight="bold" /> : <Check size={14} weight="bold" />}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+                {!thread.length && (
+                  <div style={{ margin: "auto", textAlign: "center", padding: "24px", background: "rgba(255,255,255,0.6)", borderRadius: "16px", color: "#64748b" }}>
+                    Bu kişiyle henüz bir görüşmeniz yok.<br/>Mesaj yazarak sohbeti başlatabilirsiniz.
+                  </div>
+                )}
+              </div>
+              
+              <div style={{ padding: "20px 24px", background: "#fff", borderTop: "1px solid #e2e8f0" }}>
+                <form onSubmit={send} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <input type="file" ref={fileInputRef} style={{display:'none'}} onChange={handleFileUpload} accept="image/*,application/pdf" />
+                  <button 
+                    type="button" 
+                    onClick={()=>fileInputRef.current?.click()} 
+                    disabled={uploading}
+                    style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', padding: '12px', borderRadius: '50%', color: '#64748b', display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                    title="Dosya veya Resim Yükle"
+                  >
+                    <Paperclip size={24} weight="bold" />
+                  </button>
+                  
+                  <input 
+                    value={body} 
+                    onChange={e=>setBody(e.target.value)} 
+                    placeholder={uploading ? "Dosya yükleniyor..." : "Mesajınızı yazın..."} 
+                    disabled={uploading} 
+                    style={{ flex: 1, padding: '14px 20px', borderRadius: '100px', border: '1px solid #cbd5e1', fontSize: "15px", background: "#f8fafc", outline: "none" }}
+                  />
+                  
+                  <button 
+                    className="primary" 
+                    disabled={(!body.trim() && !uploading) || uploading} 
+                    style={{ borderRadius: '50%', width: "48px", height: "48px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: (!body.trim() && !uploading) ? 0.5 : 1 }}
+                  >
+                    <PaperPlaneRight size={24} weight="fill" />
+                  </button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", background: "#f8fafc", color: "#94a3b8" }}>
+              <ChatsCircle size={64} weight="duotone" style={{ marginBottom: "16px", opacity: 0.5 }} />
+              <h3 style={{ margin: "0 0 8px 0", color: "#64748b" }}>Mesajlaşma</h3>
+              <p style={{ margin: 0, fontSize: "14px" }}>Soldaki listeden bir kişi seçerek sohbeti başlatın.</p>
+            </div>
           )}
         </section>
       </div>
+      <style dangerouslySetInnerHTML={{__html: `
+        .hover-bg-slate:hover { background: #f8fafc !important; }
+      `}}/>
     </div>
   );
 }
 
 export default function Messages(){
   return (
-    <Suspense fallback={<div className="page empty">Mesajlar yükleniyor...</div>}>
+    <Suspense fallback={<div style={{padding: "40px", textAlign: "center", color: "#64748b"}}>Mesajlar yükleniyor...</div>}>
       <MessagesContent />
     </Suspense>
   );
