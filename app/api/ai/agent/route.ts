@@ -21,13 +21,13 @@ export async function POST(req: Request) {
           parameters: z.object({
             specialty: z.string().describe('Hastanın gitmesi gereken tıbbi branş (örn: Ortopedi, Kardiyoloji)'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
-          }),
-          execute: async ({ specialty, city }: { specialty: string, city?: string }) => {
+          }) as any,
+          execute: async (args: any) => {
             const doctors = await prisma.doctor.findMany({
               where: {
                 isVerified: true,
-                specialty: { contains: specialty, mode: 'insensitive' },
-                ...(city ? { city: { contains: city, mode: 'insensitive' } } : {})
+                specialty: { contains: args.specialty, mode: 'insensitive' },
+                ...(args.city ? { city: { contains: args.city, mode: 'insensitive' } } : {})
               },
               select: { id: true, name: true, title: true, specialty: true, hospital: true },
               take: 3
@@ -41,15 +41,15 @@ export async function POST(req: Request) {
             type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'LAB']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Nöbetçi eczane için PHARMACY seç.'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional().describe('Eğer hasta acil bir durum yaşıyorsa veya gece "nöbetçi" bir yer (eczane vb) arıyorsa true yap.'),
-          }),
-          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "LAB", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
+          }) as any,
+          execute: async (args: any) => {
             const orgs = await prisma.organization.findMany({
               where: {
                 status: "APPROVED",
                 isPublished: true,
-                ...(type ? { type: type as any } : {}),
-                ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
-                ...(needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) // Nöbetçi veya 7/24 Açık kalkanı
+                ...(args.type ? { type: args.type as any } : {}),
+                ...(args.city ? { city: { contains: args.city, mode: 'insensitive' } } : {}),
+                ...(args.needsEmergencyOrOnDuty ? { isOnDuty: true } : {}) // Nöbetçi veya 7/24 Açık kalkanı
               },
               select: { id: true, name: true, type: true, city: true, address: true, phone: true, isOnDuty: true },
               orderBy: [{ isOnDuty: "desc" }],
