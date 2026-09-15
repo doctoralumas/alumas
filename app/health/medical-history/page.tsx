@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import SectionVisual from "@/components/section-visual";
-import { FolderUser, Heartbeat, Scissors, Plus, X, CalendarBlank, Buildings, Activity } from "@phosphor-icons/react";
+import { FolderUser, Heartbeat, Scissors, Plus, X, CalendarBlank, Buildings, FirstAid } from "@phosphor-icons/react";
 
 type H={conditions:any[];procedures:any[]};
 
@@ -121,7 +121,7 @@ export default function Page(){
             {d.conditions.map((x:any) => (
               <div key={x.id} style={{ display: "flex", alignItems: "center", gap: "16px", padding: "20px", background: "#f8fafc", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
                 <div style={{ width: "48px", height: "48px", borderRadius: "16px", background: x.status === 'active' ? "#fee2e2" : "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", color: x.status === 'active' ? "#ef4444" : "#94a3b8" }}>
-                  <Activity size={24} weight="duotone" />
+                  <FirstAid size={24} weight="duotone" />
                 </div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>{x.name}</h3>

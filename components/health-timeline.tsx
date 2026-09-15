@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import { ClockCounterClockwise, CalendarBlank, MagnifyingGlass, Activity, User, Heartbeat, Pill, Images, Syringe, FolderUser, Flask } from "@phosphor-icons/react";
+import { ClockCounterClockwise, CalendarBlank, MagnifyingGlass, FirstAid, User, Heartbeat, Pill, Images, Syringe, FolderUser, Flask } from "@phosphor-icons/react";
 
 export default function HealthTimeline(){
   const [items,setItems]=useState<any[]>([]);
@@ -22,7 +22,7 @@ export default function HealthTimeline(){
       case 'randevu': return <User size={20} weight="fill" color="#3b82f6" />;
       case 'laboratuvar': return <Flask size={20} weight="fill" color="#8b5cf6" />;
       case 'görüntüleme': return <Images size={20} weight="fill" color="#f59e0b" />;
-      case 'tetkik isteği': return <Activity size={20} weight="fill" color="#ef4444" />;
+      case 'tetkik isteği': return <FirstAid size={20} weight="fill" color="#ef4444" />;
       case 'aşı': return <Syringe size={20} weight="fill" color="#10b981" />;
       case 'ilaç': return <Pill size={20} weight="fill" color="#db2777" />;
       case 'tıbbi geçmiş': return <FolderUser size={20} weight="fill" color="#64748b" />;

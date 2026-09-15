@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Heartbeat, CaretRight, WarningCircle, Drop, IdentificationCard, User, Users, Envelope, Link as LinkIcon, DownloadSimple, Pill, Activity } from "@phosphor-icons/react";
+import { ShieldCheck, Heartbeat, CaretRight, WarningCircle, Drop, IdentificationCard, User, Users, Envelope, Link as LinkIcon, DownloadSimple, Pill, FirstAid } from "@phosphor-icons/react";
 
 export default function EmergencyHealthCard(){
   const [data,setData]=useState<any>(null);
@@ -101,7 +101,7 @@ export default function EmergencyHealthCard(){
 
           <div>
             <h3 style={{ margin: "0 0 16px", fontSize: "16px", color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.5px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <Activity size={20} color="#3b82f6" /> Tıbbi Durumlar
+              <FirstAid size={20} color="#3b82f6" /> Tıbbi Durumlar
             </h3>
             {data.conditions.length > 0 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>

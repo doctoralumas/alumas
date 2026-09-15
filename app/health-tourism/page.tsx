@@ -1,7 +1,7 @@
 "use client";
 import SectionVisual from "@/components/section-visual";
 import {useEffect,useState} from "react";
-import { MagnifyingGlass, AirplaneTilt, Suitcase, GlobeHemisphere, Buildings, ShieldCheck, Translate, CarProfile, CaretRight, PhoneCall, Link as LinkIcon, Star, Bed, Handshake } from "@phosphor-icons/react";
+import { MagnifyingGlass, AirplaneTilt, Suitcase, GlobeHemisphereWest, Buildings, ShieldCheck, Translate, CarProfile, CaretRight, PhoneCall, Link as LinkIcon, Star, Bed, Handshake } from "@phosphor-icons/react";
 import Link from "next/link";
 
 export default function Page(){
@@ -29,7 +29,7 @@ export default function Page(){
       
       <div style={{ marginBottom: "40px", background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", borderRadius: "32px", padding: "40px", color: "#fff", display: "flex", flexDirection: "column", gap: "24px", position: "relative", overflow: "hidden" }}>
         <AirplaneTilt size={200} weight="duotone" color="#fff" style={{ position: "absolute", right: "-20px", top: "-20px", opacity: 0.05 }} />
-        <GlobeHemisphere size={150} weight="duotone" color="#fff" style={{ position: "absolute", left: "-20px", bottom: "-20px", opacity: 0.05 }} />
+        <GlobeHemisphereWest size={150} weight="duotone" color="#fff" style={{ position: "absolute", left: "-20px", bottom: "-20px", opacity: 0.05 }} />
         
         <div style={{ position: "relative", zIndex: 1 }}>
           <span style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", color: "#e2e8f0", background: "rgba(255,255,255,0.1)", padding: "4px 12px", borderRadius: "100px", display: "inline-block", marginBottom: "12px" }}>

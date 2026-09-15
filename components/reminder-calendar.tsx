@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import {scheduleLocalReminder} from "@/lib/local-reminders";
-import { Calendar, Bell, Plus, X, CaretLeft, CaretRight, User, Stethoscope, Target, Question, Syringe, Baby, Heartbeat, Pill, Drop, Moon, Activity } from "@phosphor-icons/react";
+import { Calendar, Bell, Plus, X, CaretLeft, CaretRight, User, Stethoscope, Target, Question, Syringe, Baby, Heartbeat, Pill, Drop, Moon, FirstAid } from "@phosphor-icons/react";
 
 const iso=(d:Date)=>d.toISOString().slice(0,10);
 const labels=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
@@ -58,7 +58,7 @@ export default function ReminderCalendar(){
 
   const getEventIcon = (type: string, kind?: string) => {
     if(type.includes('Randevu')) return <User size={24} weight="duotone" color="#2563eb" />;
-    if(type.includes('Tetkik')) return <Activity size={24} weight="duotone" color="#ef4444" />;
+    if(type.includes('Tetkik')) return <FirstAid size={24} weight="duotone" color="#ef4444" />;
     if(type.includes('Aşı')) return <Syringe size={24} weight="duotone" color="#10b981" />;
     if(type.includes('Hedef')) return <Target size={24} weight="duotone" color="#d97706" />;
     if(type.includes('Soru') || type.includes('Doktor')) return <Stethoscope size={24} weight="duotone" color="#8b5cf6" />;

@@ -2,7 +2,7 @@
 import {useEffect,useState} from "react";
 import Link from "next/link";
 import HealthSummarySharing from "@/components/health-summary-sharing";
-import { Activity, ShieldCheck, Heartbeat, Drop, Pill, Users, CaretRight, Warning, Scissors, Syringe, Info, Scan } from "@phosphor-icons/react";
+import { FirstAid, ShieldCheck, Heartbeat, Drop, Pill, Users, CaretRight, Warning, Scissors, Syringe, Info, Scan } from "@phosphor-icons/react";
 
 export default function Page(){
   const [d,setD]=useState<any>(null);
@@ -24,7 +24,7 @@ export default function Page(){
       <div style={{ marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <div style={{ background: "#f0fdfa", padding: "16px", borderRadius: "24px" }}>
-            <Activity size={32} weight="duotone" color="#0d9488" />
+            <FirstAid size={32} weight="duotone" color="#0d9488" />
           </div>
           <div>
             <span className="kicker" style={{ color: "#0d9488" }}>Tek Bakışta</span>
