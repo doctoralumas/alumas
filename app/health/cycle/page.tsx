@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
-import { Drop, CalendarBlank, Heart, Sparkles, Plus, Trash, Info, Activity, ClockCounterClockwise, CaretRight, Textbox } from "@phosphor-icons/react";
+import { Drop, CalendarBlank, Heart, Sparkle, Plus, Trash, Info, Heartbeat, ClockCounterClockwise, CaretRight, Textbox } from "@phosphor-icons/react";
 
 type R={id:string;startsAt:string;endsAt?:string|null;flow?:string|null;symptoms:string[];note?:string|null};
 const fmt=(d:string)=>new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -85,7 +85,7 @@ export default function Page(){
 
         <div style={{ background: "#fff", padding: "24px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#0ea5e9", marginBottom: "16px" }}>
-            <Activity size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>Ortalama Döngü</span>
+            <Heartbeat size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>Ortalama Döngü</span>
           </div>
           <strong style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>{stats.avg?`${stats.avg} `:'--'} <small style={{ fontSize: "16px", color: "#64748b", fontWeight: 600 }}>gün</small></strong>
           <span style={{ fontSize: "14px", color: "#64748b", marginTop: "8px", fontWeight: 500 }}>geçmiş verilere göre</span>
@@ -93,7 +93,7 @@ export default function Page(){
 
         <div style={{ background: "linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)", padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#db2777", marginBottom: "16px" }}>
-            <Sparkles size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>Tahmini Sonraki</span>
+            <Sparkle size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>Tahmini Sonraki</span>
           </div>
           <strong style={{ fontSize: "28px", fontWeight: 800, color: "#9d174d", lineHeight: 1 }}>{stats.next?shortFmt(stats.next.toISOString()):'--'}</strong>
           <span style={{ fontSize: "14px", color: "#be185d", marginTop: "8px", fontWeight: 500 }}>beklenen regl tarihi</span>
