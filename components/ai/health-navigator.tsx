@@ -96,28 +96,26 @@ export default function HealthNavigator({ compact = false }: { compact?: boolean
           </button>
         </form>
 
-        {!compact && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", padding: "0 8px" }}>
-            <div style={{ display: "flex", gap: "12px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: personalize ? "#0ea5e9" : "#64748b", cursor: "pointer", transition: "color 0.2s" }}>
-                <input type="checkbox" checked={personalize} onChange={e => setPersonalize(e.target.checked)} style={{ accentColor: "#0ea5e9", width: "16px", height: "16px", cursor: "pointer" }} />
-                <User size={16} weight={personalize ? "bold" : "regular"} /> Sağlık profilimi kullan
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: useAgent ? "#8b5cf6" : "#64748b", cursor: "pointer", transition: "color 0.2s" }}>
-                <input type="checkbox" checked={useAgent} onChange={e => setUseAgent(e.target.checked)} style={{ accentColor: "#8b5cf6", width: "16px", height: "16px", cursor: "pointer" }} />
-                <Sparkle size={16} weight={useAgent ? "fill" : "regular"} /> Luma AI+ (Agent Modu)
-              </label>
-            </div>
-            <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}>
-              <ShieldCheck size={14} /> Şifrelenmiş Uçtan Uca Gizlilik
-            </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", padding: "0 8px" }}>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: personalize ? "#0ea5e9" : "#64748b", cursor: "pointer", transition: "color 0.2s" }}>
+              <input type="checkbox" checked={personalize} onChange={e => setPersonalize(e.target.checked)} style={{ accentColor: "#0ea5e9", width: "16px", height: "16px", cursor: "pointer" }} />
+              <User size={16} weight={personalize ? "bold" : "regular"} /> Sağlık profilimi kullan
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: useAgent ? "#8b5cf6" : "#64748b", cursor: "pointer", transition: "color 0.2s" }}>
+              <input type="checkbox" checked={useAgent} onChange={e => setUseAgent(e.target.checked)} style={{ accentColor: "#8b5cf6", width: "16px", height: "16px", cursor: "pointer" }} />
+              <Sparkle size={16} weight={useAgent ? "fill" : "regular"} /> Luma AI+ (Agent Modu)
+            </label>
           </div>
-        )}
+          <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}>
+            <ShieldCheck size={14} /> Şifrelenmiş Uçtan Uca Gizlilik
+          </div>
+        </div>
 
       </div>
 
       {/* Suggestion Chips */}
-      {!result && !loading && !compact && (
+      {!result && !loading && (
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px", maxWidth: "760px", margin: "0 auto" }}>
           {prompts.map(p => (
             <button 
