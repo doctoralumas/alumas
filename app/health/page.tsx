@@ -5,7 +5,7 @@ import SectionVisual from "@/components/section-visual";
 import HealthIntegrations from "@/components/health-integrations";
 import HealthSharing from "@/components/health-sharing";
 import CarePlans from "@/components/care-plans";
-import { Plus, Drop, Heartbeat, Scale, FileText, FileArrowUp, Trash, CaretRight, Activity, Flask, Info, UploadSimple, PlusCircle } from "@phosphor-icons/react";
+import { Plus, Drop, Heartbeat, Scales, FileText, FileArrowUp, Trash, CaretRight, Thermometer, Flask, Info, UploadSimple, PlusCircle } from "@phosphor-icons/react";
 
 type Doc={id:string;title:string;fileName:string;category:string;createdAt:string};
 type Lab={id:string;testName:string;value:string;unit?:string;reference?:string;status:string;measuredAt:string};
@@ -117,8 +117,8 @@ export default function Health(){
     const t = type.toLowerCase();
     if(t.includes('glukoz') || t.includes('şeker')) return <Drop size={24} weight="duotone" color="#ea580c" />;
     if(t.includes('tansiyon') || t.includes('nabız')) return <Heartbeat size={24} weight="duotone" color="#ef4444" />;
-    if(t.includes('kilo') || t.includes('boy')) return <Scale size={24} weight="duotone" color="#0284c7" />;
-    return <Activity size={24} weight="duotone" color="#8b5cf6" />;
+    if(t.includes('kilo') || t.includes('boy')) return <Scales size={24} weight="duotone" color="#0284c7" />;
+    return <Thermometer size={24} weight="duotone" color="#8b5cf6" />;
   }
 
   return (
@@ -185,7 +185,7 @@ export default function Health(){
         ))}
         {!loading && !entries.length && (
           <div style={{ gridColumn: "1 / -1", padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "20px", border: "1px dashed #cbd5e1", color: "#64748b" }}>
-            <Activity size={32} weight="duotone" style={{ margin: "0 auto 12px", opacity: 0.5 }} />
+            <Heartbeat size={32} weight="duotone" style={{ margin: "0 auto 12px", opacity: 0.5 }} />
             Henüz manuel bir ölçüm eklemediniz.
           </div>
         )}
