@@ -49,9 +49,4 @@ export const doctors = [
   }
 ] as const;
 
-export const healthMetrics = [
-  { type: "Tansiyon", value: "118/76", unit: "mmHg", status: "Normal", trend: "Son ölçüm" },
-  { type: "Nabız", value: "72", unit: "bpm", status: "Normal", trend: "Dinlenme" },
-  { type: "Kilo", value: "74.2", unit: "kg", status: "-0.6 kg", trend: "30 günde" },
-  { type: "Uyku", value: "7s 28d", unit: "", status: "+22 dk", trend: "Haftalık ort." },
-];
+
