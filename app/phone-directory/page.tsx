@@ -1,1 +1,19 @@
-import HealthPhoneDirectory from '@/components/health-phone-directory';export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Hızlı erişim</span><h1>Sağlık Telefon Rehberi</h1><p>112 ve favori sağlık numaralarını tek ekranda tut. Acil durumlarda doğrudan resmi acil çağrı hattını kullan.</p></div><HealthPhoneDirectory/></div>}
+import SectionVisual from "@/components/section-visual";
+import HealthPhoneDirectory from '@/components/health-phone-directory';
+
+export default function Page(){
+  return (
+    <div className="page" style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <SectionVisual slug="phone-directory" alt="Telefon Rehberi" />
+      
+      <div style={{ marginBottom: "32px", textAlign: "center" }}>
+        <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "0 0 12px", fontWeight: 700 }}>Sağlık Rehberi</h1>
+        <p style={{ color: "#64748b", margin: 0, fontSize: "16px", lineHeight: "1.5" }}>
+          Sık görüştüğünüz doktorlar, kurumlar ve acil numaralar. Tek tıkla arayın, favorilerinize ekleyin.
+        </p>
+      </div>
+      
+      <HealthPhoneDirectory />
+    </div>
+  )
+}
