@@ -34,7 +34,12 @@ export default function FavoriteDoctors() {
 
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "auto" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", fontWeight: 700, color: "#f59e0b" }}>
-                <Star size={16} weight="fill" /> {d.rating}
+                <Star size={16} weight="fill" />
+                {d.reviewCount > 0 ? (
+                  <>{d.rating.toFixed(1)} <span style={{ color: "#94a3b8", fontWeight: 500 }}>({d.reviewCount})</span></>
+                ) : (
+                  <span style={{ color: "#64748b", fontWeight: 600 }}>Yeni</span>
+                )}
               </div>
               {d.organization?.name && (
                 <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
