@@ -16,9 +16,20 @@ export default function HealthIntegrations() {
   const [scopes, setScopes] = useState<HealthScope[]>(["steps", "heart_rate", "weight"]);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [isNative, setIsNative] = useState(true); // default true for SSR, hide on web client
 
   const load = () => fetch("/api/health/integrations").then((r) => (r.ok ? r.json() : [])).then(setRows);
-  useEffect(() => { load(); }, []);
+  
+  useEffect(() => {
+    load();
+    if (typeof window !== 'undefined') {
+      import("@capacitor/core").then(({ Capacitor }) => {
+        setIsNative(Capacitor.isNativePlatform());
+      }).catch(() => {});
+    }
+  }, []);
+
+  if (!isNative) return null; // Hayalet Mod: Sadece native mobilde görünür
 
   function toggle(scope: HealthScope) {
     setScopes((current) => current.includes(scope) ? current.filter((x) => x !== scope) : [...current, scope]);

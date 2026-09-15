@@ -42,14 +42,21 @@ const items=[
 export default function PrivacyCenter(){
   const [rows,setRows]=useState<C[]>([]);
   const [busy,setBusy]=useState("");
+  const [isNative, setIsNative] = useState(true); // default true for SSR layout stability, then hide if web
 
   const load=()=>fetch('/api/privacy/consents').then(r=>r.json()).then(setRows);
-  useEffect(()=>{load()},[]);
+  useEffect(()=>{
+    load();
+    if (typeof window !== 'undefined') {
+      import("@capacitor/core").then(({ Capacitor }) => {
+        setIsNative(Capacitor.isNativePlatform());
+      }).catch(() => {});
+    }
+  },[]);
 
   const latest=(k:string)=>rows.find(x=>x.kind===k)?.accepted??false;
 
   async function save(kind:string,accepted:boolean){
-    // Zorunlu olanları iptal etmeyi engellemek için front-end kontrolü (ekstra güvenlik)
     const isRequired = items.find(x => x.kind === kind)?.required;
     if(isRequired && !accepted) return;
 
@@ -76,6 +83,9 @@ export default function PrivacyCenter(){
 
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         {items.map(i => {
+          // Hayalet Mod (Ghost Mode): Eğer native uygulamada değilsek Cihaz Entegrasyonlarını gizle
+          if (i.kind === 'health_integrations' && !isNative) return null;
+
           const isAccepted = latest(i.kind);
           const isBusy = busy === i.kind;
           const Icon = i.icon;
