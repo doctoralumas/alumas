@@ -90,16 +90,16 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
     function draw() {
       const g = (window as any).google;
       if (!g || !mapRef.current) return;
+      
+      // Prevent g.maps.Map is not a constructor error by awaiting the library if needed,
+      // but since we dropped loading=async, g.maps.Map should be available.
       const map = new g.maps.Map(mapRef.current, {
         center: pos,
         zoom: 14,
         mapId: "ALUMAS_MAP_ID", // Required for AdvancedMarkerElement
         mapTypeControl: false,
         streetViewControl: false,
-        fullscreenControl: false,
-        styles: [
-          { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }
-        ]
+        fullscreenControl: false
       });
 
       // AdvancedMarkerElement migration
@@ -113,7 +113,7 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
           const info = new g.maps.InfoWindow({
             content: `<div style="padding:4px"><b>${x.name.replace(/[<>]/g, "")}</b><br/><span style="color:#64748b;font-size:12px">${x.address.replace(/[<>]/g, "")}</span>${x.mapsUrl ? `<br/><br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer" style="color:#0f172a;font-weight:600;text-decoration:none">Yol Tarifi Al →</a>` : ""}</div>`
           });
-          m.addListener("click", () => info.open({ anchor: m, map }));
+          m.addListener("gmp-click", () => info.open({ anchor: m, map }));
         });
       }
       addMarkers();
@@ -125,7 +125,7 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
     if (!script) {
       script = document.createElement("script");
       script.id = id;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&loading=async&libraries=marker`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&libraries=marker`;
       script.async = true;
       script.onload = draw;
       document.head.appendChild(script);
