@@ -1,26 +1,41 @@
 'use client';
 import {useEffect,useState} from 'react';
-import Link from 'next/link';
-import { ShieldCheck, Heartbeat, CaretRight, WarningCircle, Drop, IdentificationCard, User, Users, Envelope, Link as LinkIcon, DownloadSimple, Pill, FirstAid } from "@phosphor-icons/react";
+import { ShieldCheck, Heartbeat, CaretRight, WarningCircle, Drop, IdentificationCard, User, Users, Envelope, Link as LinkIcon, DownloadSimple, Pill, FirstAid, PhoneCall } from "@phosphor-icons/react";
 
 export default function EmergencyHealthCard(){
   const [data,setData]=useState<any>(null);
-  const [open,setOpen]=useState(false);
   const [loading, setLoading]=useState(true);
+  const [msg, setMsg]=useState('');
   const [copyMsg, setCopyMsg]=useState('');
 
-  const load=()=>fetch('/api/health-card').then(r=>r.ok?r.json():null).then(setData).finally(()=>setLoading(false));
+  const load=()=>fetch('/api/health/emergency-card').then(r=>r.ok?r.json():null).then(setData).finally(()=>setLoading(false));
   useEffect(()=>{load()},[]);
 
-  async function toggle(){
-    await fetch('/api/health-card',{method:'POST'});
-    load();
+  async function save(e:React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    setMsg('Kaydediliyor...');
+    const f=new FormData(e.currentTarget);
+    const body={
+      bloodType:f.get('bloodType'),
+      allergies:f.get('allergies'),
+      chronicConditions:f.get('chronicConditions'),
+      medicationsSummary:f.get('medicationsSummary'),
+      emergencyContactName:f.get('emergencyContactName'),
+      emergencyContactPhone:f.get('emergencyContactPhone'),
+      notes:f.get('notes'),
+      sharingEnabled:f.get('sharingEnabled')==='on'
+    };
+    const r=await fetch('/api/health/emergency-card',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json();
+    setData(j);
+    setMsg(r.ok?'Sağlık kartınız başarıyla güncellendi.':'Kaydedilemedi');
+    setTimeout(() => setMsg(''), 3000);
   }
 
   const copyLink = () => {
     if(data?.shareToken) {
-      navigator.clipboard.writeText(`${window.location.origin}/share/${data.shareToken}`);
-      setCopyMsg("Bağlantı Kopyalandı!");
+      navigator.clipboard.writeText(`${window.location.origin}/health-card/${data.shareToken}`);
+      setCopyMsg("Kopyalandı!");
       setTimeout(() => setCopyMsg(""), 2000);
     }
   };
@@ -33,6 +48,8 @@ export default function EmergencyHealthCard(){
   );
   if(!data) return <div style={{ padding: "64px", textAlign: "center", color: "#ef4444" }}>Veriler yüklenemedi.</div>;
 
+  const url = typeof window !== 'undefined' ? `${window.location.origin}/health-card/${data.shareToken}` : '';
+
   return (
     <div className="page" style={{ maxWidth: "800px", margin: "0 auto", paddingBottom: "48px" }}>
       
@@ -42,151 +59,92 @@ export default function EmergencyHealthCard(){
             <ShieldCheck size={32} weight="duotone" color="#ef4444" />
           </div>
           <div>
-            <span className="kicker" style={{ color: "#ef4444" }}>Acil Durum & Paylaşım</span>
+            <span className="kicker" style={{ color: "#ef4444" }}>Acil Durum</span>
             <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>Sağlık Kartım</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Kritik tıbbi bilgilerinizi acil durumlarda sağlık profesyonelleriyle paylaşın.</p>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Acil durumlarda görünmesini istediğiniz özet bilgileri yönetin.</p>
           </div>
         </div>
       </div>
 
-      <div style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", marginBottom: "32px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
+      <form onSubmit={save} style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", marginBottom: "32px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
         
-        {/* Apple Medical ID Style Header */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "40px" }}>
-          <div style={{ width: "96px", height: "96px", borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", marginBottom: "16px", border: "4px solid #fff", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
-            <User size={48} weight="fill" />
-          </div>
-          <h2 style={{ margin: "0 0 4px", fontSize: "28px", color: "#0f172a" }}>{data.user.name}</h2>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#64748b", fontSize: "15px" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Envelope size={16} /> {data.user.email}</span>
-          </div>
-        </div>
-
-        {/* Basic Stats / Demographics */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "40px", borderTop: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", padding: "24px 0" }}>
-          <div style={{ textAlign: "center", borderRight: "1px solid #f1f5f9" }}>
-            <span style={{ display: "block", fontSize: "12px", textTransform: "uppercase", fontWeight: 700, color: "#94a3b8", letterSpacing: "1px", marginBottom: "4px" }}>Kan Grubu</span>
-            <strong style={{ fontSize: "24px", color: "#ef4444" }}>{data.bloodType || '--'}</strong>
-          </div>
-          <div style={{ textAlign: "center", borderRight: "1px solid #f1f5f9" }}>
-            <span style={{ display: "block", fontSize: "12px", textTransform: "uppercase", fontWeight: 700, color: "#94a3b8", letterSpacing: "1px", marginBottom: "4px" }}>Boy</span>
-            <strong style={{ fontSize: "24px", color: "#0f172a" }}>{data.height ? `${data.height} cm` : '--'}</strong>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <span style={{ display: "block", fontSize: "12px", textTransform: "uppercase", fontWeight: 700, color: "#94a3b8", letterSpacing: "1px", marginBottom: "4px" }}>Kilo</span>
-            <strong style={{ fontSize: "24px", color: "#0f172a" }}>{data.weight ? `${data.weight} kg` : '--'}</strong>
-          </div>
-        </div>
-
-        {/* Critical Information Lists */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           
-          <div>
-            <h3 style={{ margin: "0 0 16px", fontSize: "16px", color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.5px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <WarningCircle size={20} color="#ef4444" /> Alerjiler & Reaksiyonlar
-            </h3>
-            {data.allergies.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {data.allergies.map((a:any) => (
-                  <div key={a.id} style={{ padding: "12px 16px", background: "#fef2f2", borderRadius: "12px", border: "1px solid #fee2e2", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <b style={{ color: "#991b1b", fontSize: "15px" }}>{a.allergen}</b>
-                    <span style={{ fontSize: "13px", color: "#dc2626" }}>{a.reaction || 'Belirtilmedi'}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ padding: "16px", background: "#f8fafc", borderRadius: "12px", color: "#64748b", fontSize: "14px" }}>Bilinen alerji yok.</div>
-            )}
-          </div>
-
-          <div>
-            <h3 style={{ margin: "0 0 16px", fontSize: "16px", color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.5px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <FirstAid size={20} color="#3b82f6" /> Tıbbi Durumlar
-            </h3>
-            {data.conditions.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {data.conditions.map((c:any) => (
-                  <div key={c.id} style={{ padding: "12px 16px", background: "#eff6ff", borderRadius: "12px", border: "1px solid #dbeafe", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <b style={{ color: "#1e40af", fontSize: "15px" }}>{c.name}</b>
-                    {c.notes && <span style={{ fontSize: "13px", color: "#2563eb" }}>{c.notes}</span>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ padding: "16px", background: "#f8fafc", borderRadius: "12px", color: "#64748b", fontSize: "14px" }}>Kayıtlı tıbbi durum yok.</div>
-            )}
-          </div>
-
-          <div>
-            <h3 style={{ margin: "0 0 16px", fontSize: "16px", color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.5px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <Pill size={20} color="#10b981" /> Düzenli İlaçlar
-            </h3>
-            {data.medications.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {data.medications.map((m:any) => (
-                  <div key={m.id} style={{ padding: "12px 16px", background: "#ecfdf5", borderRadius: "12px", border: "1px solid #d1fae5", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <b style={{ color: "#065f46", fontSize: "15px" }}>{m.name}</b>
-                    <span style={{ fontSize: "13px", color: "#059669" }}>{m.dose}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ padding: "16px", background: "#f8fafc", borderRadius: "12px", color: "#64748b", fontSize: "14px" }}>Düzenli kullanılan ilaç yok.</div>
-            )}
-          </div>
-          
-        </div>
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        
-        {/* Paylaşım Yönetimi */}
-        <div style={{ background: "#fff", borderRadius: "24px", padding: "32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
             <div>
-              <h2 style={{ margin: "0 0 8px", fontSize: "20px", color: "#0f172a", display: "flex", alignItems: "center", gap: "8px" }}>
-                <Users size={24} weight="duotone" color="#4f46e5" /> Güvenli Paylaşım
-              </h2>
-              <p style={{ margin: 0, fontSize: "14px", color: "#64748b", maxWidth: "400px" }}>Sağlık kartınızı doktorunuzla veya acil durum ekipleriyle bir bağlantı aracılığıyla anında paylaşın.</p>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Drop size={18} color="#ef4444" /> Kan Grubu</label>
+              <input name="bloodType" defaultValue={data.bloodType||''} placeholder="Örn: A RH+" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><WarningCircle size={18} color="#f59e0b" /> Alerjiler</label>
+              <input name="allergies" defaultValue={(data.allergies||[]).join(', ')} placeholder="Virgülle ayırarak yazın" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
             
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <span style={{ fontSize: "14px", fontWeight: 600, color: data.isShared ? "#16a34a" : "#64748b" }}>{data.isShared ? "Paylaşıma Açık" : "Paylaşıma Kapalı"}</span>
-              <button 
-                onClick={toggle}
-                style={{ width: "52px", height: "28px", borderRadius: "100px", background: data.isShared ? "#16a34a" : "#cbd5e1", border: "none", position: "relative", cursor: "pointer", transition: "background 0.3s" }}
-              >
-                <div style={{ width: "24px", height: "24px", background: "#fff", borderRadius: "50%", position: "absolute", top: "2px", left: data.isShared ? "26px" : "2px", transition: "left 0.3s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
-              </button>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><FirstAid size={18} color="#3b82f6" /> Kronik Hastalıklar & Durumlar</label>
+              <input name="chronicConditions" defaultValue={(data.chronicConditions||[]).join(', ')} placeholder="Virgülle ayırarak yazın" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+            </div>
+
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Pill size={18} color="#10b981" /> Önemli İlaçlar</label>
+              <input name="medicationsSummary" defaultValue={(data.medicationsSummary||[]).join(', ')} placeholder="Virgülle ayırarak yazın" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Users size={18} color="#8b5cf6" /> Acil Durum Kişisi</label>
+              <input name="emergencyContactName" defaultValue={data.emergencyContactName||''} placeholder="İsim Soyisim" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><PhoneCall size={18} color="#8b5cf6" /> Acil Durum Telefonu</label>
+              <input name="emergencyContactPhone" defaultValue={data.emergencyContactPhone||''} placeholder="Telefon numarası" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+            </div>
+
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>Not / Ek Bilgi</label>
+              <textarea name="notes" rows={3} defaultValue={data.notes||''} placeholder="Sağlık görevlilerinin bilmesi gereken ekstra notlar" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a", resize: "vertical" }} />
             </div>
           </div>
 
-          {data.isShared && data.shareToken && (
-            <div style={{ marginTop: "24px", background: "#f8fafc", padding: "16px", borderRadius: "16px", border: "1px dashed #cbd5e1", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-              <div style={{ fontSize: "14px", color: "#334155", wordBreak: "break-all" }}>
-                {window.location.origin}/share/{data.shareToken}
-              </div>
-              <button onClick={copyLink} style={{ padding: "10px 16px", background: "#4f46e5", color: "#fff", borderRadius: "12px", border: "none", fontWeight: 600, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", transition: "background 0.2s" }} className="hover-shadow">
-                {copyMsg || <><LinkIcon size={16} /> Kopyala</>}
-              </button>
+          <div style={{ padding: "20px", background: "#f8fafc", borderRadius: "20px", border: "1px solid #e2e8f0", display: "flex", alignItems: "flex-start", gap: "16px" }}>
+            <input type="checkbox" name="sharingEnabled" id="sharingEnabled" defaultChecked={data.sharingEnabled} style={{ width: "20px", height: "20px", marginTop: "2px" }} />
+            <div>
+              <label htmlFor="sharingEnabled" style={{ fontSize: "16px", fontWeight: 700, color: "#0f172a", cursor: "pointer", display: "block", marginBottom: "4px" }}>
+                Acil Sağlık Kartımı Paylaşıma Aç
+              </label>
+              <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>
+                Kabul ederseniz, sağlık kartınız özel bir bağlantı üzerinden görüntülenebilir. Bu bağlantı sağlık kayıtlarınızın tamamına değil, yalnızca yukarıda seçtiğiniz kısıtlı bilgilere erişim sağlar.
+              </p>
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Güncelleme Yönlendirmeleri */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-          <Link href="/health/medical-history" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px", background: "#f8fafc", borderRadius: "20px", border: "1px solid #e2e8f0", textDecoration: "none", color: "#0f172a", fontWeight: 600, transition: "background 0.2s" }} className="hover-bg-slate-100">
-            Tıbbi Durumları Güncelle <CaretRight size={16} color="#64748b" />
-          </Link>
-          <Link href="/health/allergies" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px", background: "#f8fafc", borderRadius: "20px", border: "1px solid #e2e8f0", textDecoration: "none", color: "#0f172a", fontWeight: 600, transition: "background 0.2s" }} className="hover-bg-slate-100">
-            Alerjileri Güncelle <CaretRight size={16} color="#64748b" />
-          </Link>
-          <Link href="/health/medications" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px", background: "#f8fafc", borderRadius: "20px", border: "1px solid #e2e8f0", textDecoration: "none", color: "#0f172a", fontWeight: 600, transition: "background 0.2s" }} className="hover-bg-slate-100">
-            İlaçları Güncelle <CaretRight size={16} color="#64748b" />
-          </Link>
-        </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <button type="submit" style={{ padding: "16px 32px", background: "#0f172a", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", transition: "background 0.2s" }} className="hover-shadow">
+              Bilgileri Kaydet
+            </button>
+            {msg && <span style={{ fontSize: "14px", fontWeight: 600, color: msg.includes('başarı') ? "#16a34a" : "#dc2626" }}>{msg}</span>}
+          </div>
 
-      </div>
+        </div>
+      </form>
+
+      {data.sharingEnabled && data.shareToken && (
+        <section style={{ background: "#fff", borderRadius: "24px", padding: "32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+            <div style={{ background: "#e0e7ff", color: "#4f46e5", padding: "8px", borderRadius: "12px" }}><LinkIcon size={20} weight="bold" /></div>
+            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Acil Paylaşım Bağlantısı</h2>
+          </div>
+          <p style={{ margin: "0 0 24px", fontSize: "15px", color: "#64748b" }}>Bu bağlantıya sahip olan kişi yalnızca sağlık kartında belirttiğiniz kısa bilgileri görür. QR kod vb. yerlerde bu adresi kullanabilirsiniz.</p>
+          
+          <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "16px", border: "1px dashed #cbd5e1", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+            <code style={{ fontSize: "14px", color: "#334155", wordBreak: "break-all" }}>
+              {url}
+            </code>
+            <button type="button" onClick={copyLink} style={{ padding: "10px 16px", background: "#4f46e5", color: "#fff", borderRadius: "12px", border: "none", fontWeight: 600, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", transition: "background 0.2s" }} className="hover-shadow">
+              {copyMsg || <><LinkIcon size={16} /> Kopyala</>}
+            </button>
+          </div>
+        </section>
+      )}
 
     </div>
   )
