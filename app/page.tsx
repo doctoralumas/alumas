@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Search } from "@/components/icons";
-import HealthNavigator from "@/components/ai/health-navigator";
 
 const tiles = [
   {href:"/health", kicker:"Kişisel sağlık", title:"SAĞLIĞIM", text:"Tüm sağlık verilerin tek yerde", cls:"home-tile blue span7 row2", image:"/home-visuals/health.webp"},
@@ -29,10 +28,6 @@ export default async function Home(){
       <div><span className="home-location-pin">⌖</span><div><small>Konum</small><b>Yakınımdaki sağlık hizmetleri</b></div></div>
       <div className="home-location-actions"><Link href="/nearby">Değiştir</Link></div>
     </section>
-
-    <div style={{ marginBottom: '24px', marginTop: '12px' }}>
-      <HealthNavigator compact/>
-    </div>
 
     <section className="home-getir-hero home-getir-hero-with-image">
       <div className="home-hero-copy">
