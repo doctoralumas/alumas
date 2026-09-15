@@ -1,120 +1,278 @@
 "use client";
+
+import { FormEvent, useState, useRef, useEffect } from "react";
+import { ShieldCheck, Stethoscope, CalendarBlank, MapPin, Sparkle, User, PaperPlaneRight, WarningCircle, CheckCircle, ArrowRight } from "@phosphor-icons/react";
 import Link from "next/link";
-import {FormEvent, useState} from "react";
-import {MapPin, Search, ShieldCheck, Stethoscope, CalendarDays} from "@/components/icons";
 
-type Result = {
-  source:string;
-  summary:string;
-  commentary:string;
-  sources:Array<{id:string;label:string;kind:string;authority:string;description:string;publisher?:string;url?:string;verifiedAt?:string|null}>;
-  intent:{triage:"routine"|"urgent"|"emergency";specialty:string|null;facility:string|null;locationHint:string|null;confidence:number;followUpQuestion:string|null};
-  doctors:Array<{id:string;slug:string;name:string;title:string;specialty:string;hospital:string;city:string;rating:number;reviewCount:number;price:number;organization?:{name:string;district?:string|null}|null;nextAvailable?:string|null}>;
-  organizations:Array<{id:string;slug:string;name:string;type:string;city:string;district?:string|null;address:string;phone:string;isOnDuty:boolean}>;
-  safety:{disclaimer:string;medicalKnowledgeConnected:boolean;knowledgeMode?:string;policy:string};
-  followUps?:string[];
-  personalization?:{enabled:boolean;note:string|null;usedFields:string[];dataMinimization:boolean;modelDisclosure:string};
-};
+const prompts = ["3 gündür başım ağrıyor", "Çocuğumun ateşi var, ne yapmalıyım?", "Dahiliye doktoru arıyorum", "Tahlil sonuçlarımı yorumla"];
 
-const prompts=["Başım ağrıyor","Diş ağrısı","Çocuğumun ateşi var","Tahlil sonuçlarım","Yakın eczane"];
+export default function HealthNavigator({ compact = false }: { compact?: boolean }) {
+  const [message, setMessage] = useState("");
+  const [result, setResult] = useState<any | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [history, setHistory] = useState<Array<{ role: "user" | "assistant"; text: string }>>([]);
+  
+  const [personalize, setPersonalize] = useState(false);
+  const [useAgent, setUseAgent] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-export default function HealthNavigator({compact=false}:{compact?:boolean}){
-  const [message,setMessage]=useState("");
-  const [result,setResult]=useState<Result|null>(null);
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
-  const [history,setHistory]=useState<Array<{role:"user"|"assistant";text:string}>>([]);
-  const [personalize,setPersonalize]=useState(false);
-  const [useAgent,setUseAgent]=useState(false);
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+      inputRef.current.style.height = inputRef.current.scrollHeight + "px";
+    }
+  }, [message]);
 
-  async function submit(e?:FormEvent){
+  async function submit(e?: FormEvent) {
     e?.preventDefault();
-    if(message.trim().length<3)return;
-    setLoading(true);setError("");
-    try{
+    if (message.trim().length < 3) return;
+    setLoading(true);
+    setError("");
+    try {
       const endpoint = useAgent ? "/api/ai/agent" : "/api/ai/navigate";
-      const res=await fetch(endpoint,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({message,history,personalize})});
-      const json=await res.json();
-      if(!res.ok) throw new Error(json.error||"İstek tamamlanamadı");
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message, history, personalize })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "İstek tamamlanamadı");
       setResult(json.data);
-      setHistory(h=>[...h,{role:"user" as const,text:message},{role:"assistant" as const,text:json.data.commentary}].slice(-8));
-    }catch(err){setError(err instanceof Error?err.message:"Bir hata oluştu");}
-    finally{setLoading(false)}
+      setHistory(h => [...h, { role: "user" as const, text: message }, { role: "assistant" as const, text: json.data.commentary }].slice(-8));
+      setMessage(""); // Clear input after submit
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Bir hata oluştu");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  return <section className={`ai-navigator ${compact?"compact":""}`}>
-    <div className="ai-navigator-head">
-      <div>
-        <span className="ai-kicker"><ShieldCheck size={15}/> Güvenli sağlık asistanın</span>
-        <h1>{compact?"Size en uygun sağlık hizmetini bulalım.":"Ben Luma. Size nasıl yardımcı olabilirim?"}</h1>
-        <p>İhtiyacınızı doğal şekilde yazın. Luma sizi uygun branş, doktor veya sağlık kurumuna yönlendirsin.</p>
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submit();
+    }
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "32px", width: "100%" }}>
+      
+      {/* Header / Greeting */}
+      {!result && !loading && !compact && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "64px 0 32px 0", animation: "fadeIn 0.5s ease-out" }}>
+          <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", marginBottom: "24px", boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.4)" }}>
+            <Sparkle size={40} weight="fill" />
+          </div>
+          <h1 style={{ fontSize: "36px", color: "#0f172a", margin: "0 0 16px 0", fontWeight: 800, letterSpacing: "-1px" }}>
+            Ben Luma. Size nasıl yardımcı olabilirim?
+          </h1>
+          <p style={{ margin: 0, fontSize: "16px", color: "#64748b", maxWidth: "500px" }}>
+            Şikayetinizi veya ihtiyacınızı doğal bir şekilde yazın. Sizi en doğru uzman, kurum veya sağlık servisine yönlendireyim.
+          </p>
+        </div>
+      )}
+
+      {/* Input Area */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", maxWidth: compact ? "100%" : "760px", margin: "0 auto", transition: "all 0.3s ease" }}>
+        
+        <form onSubmit={submit} style={{ position: "relative", display: "flex", flexDirection: "column", background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 10px 30px -10px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05)", transition: "all 0.2s" }}>
+          <textarea
+            ref={inputRef}
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Mesajınızı Luma'ya iletin..."
+            rows={1}
+            style={{ width: "100%", padding: "20px 64px 20px 24px", border: "none", borderRadius: "24px", background: "transparent", fontSize: "16px", color: "#0f172a", outline: "none", resize: "none", minHeight: "64px", maxHeight: "200px", fontFamily: "inherit", lineHeight: "1.5" }}
+            disabled={loading}
+          />
+          <button 
+            type="submit" 
+            disabled={loading || message.trim().length < 3}
+            style={{ position: "absolute", right: "12px", bottom: "12px", width: "40px", height: "40px", borderRadius: "16px", background: message.trim().length >= 3 ? "#0f172a" : "#f1f5f9", color: message.trim().length >= 3 ? "#fff" : "#94a3b8", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: message.trim().length >= 3 ? "pointer" : "not-allowed", transition: "all 0.2s" }}
+          >
+            {loading ? <div className="spinner" style={{ width: "18px", height: "18px", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 1s linear infinite" }} /> : <PaperPlaneRight size={20} weight="fill" />}
+          </button>
+        </form>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", padding: "0 8px" }}>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: personalize ? "#0ea5e9" : "#64748b", cursor: "pointer", transition: "color 0.2s" }}>
+              <input type="checkbox" checked={personalize} onChange={e => setPersonalize(e.target.checked)} style={{ accentColor: "#0ea5e9", width: "16px", height: "16px", cursor: "pointer" }} />
+              <User size={16} weight={personalize ? "bold" : "regular"} /> Sağlık profilimi kullan
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: useAgent ? "#8b5cf6" : "#64748b", cursor: "pointer", transition: "color 0.2s" }}>
+              <input type="checkbox" checked={useAgent} onChange={e => setUseAgent(e.target.checked)} style={{ accentColor: "#8b5cf6", width: "16px", height: "16px", cursor: "pointer" }} />
+              <Sparkle size={16} weight={useAgent ? "fill" : "regular"} /> Luma AI+ (Agent Modu)
+            </label>
+          </div>
+          <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}>
+            <ShieldCheck size={14} /> Şifrelenmiş Uçtan Uca Gizlilik
+          </div>
+        </div>
+
       </div>
-      <img src="/brand/alumas-logo.png" className="ai-brand-logo" alt="Luma"/>
+
+      {/* Suggestion Chips */}
+      {!result && !loading && !compact && (
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px", maxWidth: "760px", margin: "0 auto" }}>
+          {prompts.map(p => (
+            <button 
+              key={p} 
+              onClick={() => setMessage(p)} 
+              type="button"
+              style={{ padding: "10px 16px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "100px", fontSize: "14px", color: "#475569", fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}
+              onMouseOver={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.borderColor = "#cbd5e1"; }}
+              onMouseOut={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {error && (
+        <div style={{ maxWidth: "760px", margin: "0 auto", width: "100%", padding: "16px", background: "#fef2f2", color: "#ef4444", borderRadius: "16px", border: "1px solid #fecaca", display: "flex", alignItems: "center", gap: "12px", fontSize: "14px", fontWeight: 500 }}>
+          <WarningCircle size={20} weight="fill" /> {error}
+        </div>
+      )}
+
+      {/* Results Area */}
+      {result && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "760px", margin: "0 auto", width: "100%", animation: "fadeInUp 0.5s ease-out" }}>
+          
+          {/* Luma's Response Message */}
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "12px", background: "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}>
+              <Sparkle size={18} weight="fill" />
+            </div>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "12px", paddingTop: "8px" }}>
+              <p style={{ margin: 0, fontSize: "16px", color: "#0f172a", lineHeight: "1.6" }}>{result.summary}</p>
+              
+              <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "14px", color: "#475569", lineHeight: "1.6" }}>
+                {result.commentary}
+              </div>
+
+              {result.personalization?.enabled && result.personalization.note && (
+                <div style={{ display: "flex", gap: "8px", alignItems: "flex-start", fontSize: "13px", color: "#0369a1", background: "#f0f9ff", padding: "12px", borderRadius: "12px", border: "1px solid #bae6fd" }}>
+                  <User size={16} weight="duotone" style={{ flexShrink: 0, marginTop: "2px" }} />
+                  <div>
+                    <strong style={{ display: "block", marginBottom: "2px" }}>Kişiselleştirme devrede</strong>
+                    {result.personalization.note}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Doctors List */}
+          {result.doctors && result.doctors.length > 0 && (
+            <div style={{ marginLeft: "52px" }}>
+              <h3 style={{ fontSize: "15px", color: "#0f172a", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <Stethoscope size={18} color="#3b82f6" /> Önerilen Doğrulanmış Uzmanlar
+              </h3>
+              <div style={{ display: "grid", gap: "12px" }}>
+                {result.doctors.map((d: any) => (
+                  <Link key={d.id} href={`/doctors/${d.slug}`} style={{ display: "flex", alignItems: "center", gap: "16px", padding: "16px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: "16px", textDecoration: "none", color: "inherit", transition: "all 0.2s" }} onMouseOver={e => e.currentTarget.style.borderColor = "#cbd5e1"} onMouseOut={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
+                    <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", color: "#3b82f6", fontWeight: 700, fontSize: "15px", flexShrink: 0 }}>
+                      {d.name.split(" ").slice(-2).map((x: string) => x[0]).join("").slice(0, 2)}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <strong style={{ display: "block", fontSize: "15px", color: "#0f172a", marginBottom: "2px" }}>{d.title} {d.name}</strong>
+                      <span style={{ fontSize: "13px", color: "#64748b" }}>{d.specialty} • {d.organization?.name || d.hospital}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f8fafc", padding: "8px 12px", borderRadius: "100px", fontSize: "13px", fontWeight: 600, color: "#0f172a" }}>
+                      Profili Gör <ArrowRight size={14} weight="bold" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Organizations List */}
+          {result.organizations && result.organizations.length > 0 && (
+            <div style={{ marginLeft: "52px" }}>
+              <h3 style={{ fontSize: "15px", color: "#0f172a", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <MapPin size={18} color="#10b981" /> Uygun Sağlık Kurumları
+              </h3>
+              <div style={{ display: "grid", gap: "12px" }}>
+                {result.organizations.map((o: any) => (
+                  <Link key={o.id} href={`/organizations/${o.slug}`} style={{ display: "flex", alignItems: "center", gap: "16px", padding: "16px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: "16px", textDecoration: "none", color: "inherit" }}>
+                    <div style={{ flex: 1 }}>
+                      <strong style={{ display: "block", fontSize: "15px", color: "#0f172a", marginBottom: "2px" }}>{o.name}</strong>
+                      <span style={{ fontSize: "13px", color: "#64748b" }}>{o.city}{o.district ? `, ${o.district}` : ""}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f8fafc", padding: "8px 12px", borderRadius: "100px", fontSize: "13px", fontWeight: 600, color: "#0f172a" }}>
+                      İncele <ArrowRight size={14} weight="bold" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Follow up actions */}
+          {result.followUps && result.followUps.length > 0 && (
+            <div style={{ marginLeft: "52px", marginTop: "16px", display: "flex", flexWrap: "wrap", gap: "12px" }}>
+              {result.followUps.map((q: string) => (
+                <button 
+                  key={q} 
+                  onClick={() => { setMessage(q); submit(); }}
+                  style={{ padding: "8px 16px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: "100px", fontSize: "13px", color: "#3b82f6", fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Emergency Triage */}
+          {result.intent?.triage === "emergency" && (
+            <div style={{ marginLeft: "52px", background: "#fef2f2", padding: "16px", borderRadius: "16px", border: "1px solid #fecaca", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#dc2626", fontWeight: 600 }}>
+                <WarningCircle size={24} weight="fill" /> Acil Tıbbi Durum Şüphesi
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <a href="tel:112" style={{ padding: "10px 20px", background: "#dc2626", color: "#fff", borderRadius: "12px", textDecoration: "none", fontWeight: 700, fontSize: "14px" }}>112'yi Ara</a>
+                <Link href="/nearby" style={{ padding: "10px 20px", background: "#fff", color: "#dc2626", border: "1px solid #fca5a5", borderRadius: "12px", textDecoration: "none", fontWeight: 700, fontSize: "14px" }}>En Yakın Acil</Link>
+              </div>
+            </div>
+          )}
+
+          {/* Sources panel */}
+          {result.sources && result.sources.length > 0 && (
+            <div style={{ marginLeft: "52px", marginTop: "16px" }}>
+              <div style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 700 }}>
+                <CheckCircle size={14} weight="fill" /> Kullanılan Kaynaklar
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {result.sources.map((src: any) => (
+                  <div key={src.id} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 10px", background: "#f1f5f9", borderRadius: "6px", fontSize: "12px", color: "#475569" }}>
+                    <ShieldCheck size={12} weight="fill" color="#10b981" /> {src.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+        </div>
+      )}
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}} />
     </div>
-
-    <form className="ai-search-form" onSubmit={submit}>
-      <Search size={20}/>
-      <input value={message} onChange={e=>setMessage(e.target.value)} placeholder="Örn. 3 gündür dizim ağrıyor, Ataşehir'deyim..." aria-label="Sağlık ihtiyacınızı yazın"/>
-      <button disabled={loading||message.trim().length<3}>{loading?"Düşünüyor...":"Sor"}</button>
-    </form>
-    
-    <div className="ai-advanced-options" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '12px', padding: '12px', background: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-      <label className="ai-personalize-toggle" style={{ margin: 0 }}>
-        <input type="checkbox" checked={personalize} onChange={e=>setPersonalize(e.target.checked)}/>
-        <span><b>Sağlık profilimi kullan</b></span>
-      </label>
-      <label className="ai-personalize-toggle" style={{ margin: 0, marginLeft: 'auto' }}>
-        <input type="checkbox" checked={useAgent} onChange={e=>setUseAgent(e.target.checked)}/>
-        <span style={{ color: useAgent ? 'var(--primary)' : 'inherit' }}>
-          <b>✨ Luma AI+ (Agent Modu)</b>
-        </span>
-      </label>
-    </div>
-
-    <div className="ai-prompt-row" style={{ marginTop: '12px' }}>{prompts.map(p=><button key={p} onClick={()=>setMessage(p)} type="button">{p}</button>)}</div>
-    {error&&<div className="ai-error">{error}</div>}
-
-    {result&&<div className="ai-result-wrap">
-      <div className={`ai-safety ai-${result.intent.triage}`}>
-        <div><ShieldCheck size={18}/><strong>{result.intent.triage==="emergency"?"Acil yönlendirme":result.intent.triage==="urgent"?"Hızlı değerlendirme":"Luma'nın yönlendirmesi"}</strong></div>
-        <p>{result.summary}</p>
-        <div className="ai-commentary"><b>Luma'nın notu</b><span>{result.commentary}</span></div>
-        {result.personalization?.enabled&&result.personalization.note&&<div className="ai-personalization-note"><b>Kişiselleştirme</b><span>{result.personalization.note}</span><small>{result.personalization.modelDisclosure}</small></div>}
-        {result.intent.followUpQuestion&&<p><b>Ek bilgi:</b> {result.intent.followUpQuestion}</p>}
-        {result.intent.triage==="emergency"&&<div className="ai-emergency-actions"><a href="tel:112">112’yi Ara</a><Link href="/nearby">En Yakın Acil</Link></div>}
-      </div>
-
-      {result.doctors.length>0&&<div className="ai-results-section">
-        <div className="ai-section-title"><span><Stethoscope size={18}/> Önerilen doğrulanmış uzmanlar</span><small>Güven {(result.intent.confidence*100).toFixed(0)}%</small></div>
-        <div className="ai-doctor-list">{result.doctors.map(d=><article key={d.id} className="ai-doctor-card">
-          <div className="ai-avatar">{d.name.split(" ").slice(-2).map(x=>x[0]).join("").slice(0,2)}</div>
-          <div className="ai-doctor-copy"><b>{d.title} {d.name}</b><span>{d.specialty}</span><small>{d.organization?.name||d.hospital} · {d.organization?.district||d.city}</small><div>★ {d.rating.toFixed(1)} <em>({d.reviewCount})</em></div></div>
-          <div className="ai-doctor-actions">{d.nextAvailable&&<small><CalendarDays size={13}/> {new Date(d.nextAvailable).toLocaleString("tr-TR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</small>}<Link href={`/doctors/${d.slug}`}>Profili Gör</Link></div>
-        </article>)}</div>
-      </div>}
-
-      {result.organizations.length>0&&<div className="ai-results-section">
-        <div className="ai-section-title"><span><MapPin size={18}/> Uygun sağlık kurumları</span></div>
-        <div className="ai-org-list">{result.organizations.map(o=><Link href={`/organizations/${o.slug}`} key={o.id}><b>{o.name}</b><span>{o.district?`${o.district}, `:""}{o.city}</span><small>{o.isOnDuty?"Şu an nöbetçi/açık bilgisi mevcut":"Doğrulanmış kurum"}</small></Link>)}</div>
-      </div>}
-
-      {result.doctors.length===0&&result.organizations.length===0&&result.intent.triage!=="emergency"&&<div className="ai-empty-result">
-        <b>Doğrulanmış eşleşme bulunamadı.</b><span>Filtreleri genişletebilir veya tüm doktor ve kurumları inceleyebilirsiniz.</span><div><Link href="/doctors">Doktorları Gör</Link><Link href="/organizations">Kurumları Gör</Link></div>
-      </div>}
-      <section className="ai-source-panel">
-        <div className="ai-section-title"><span><ShieldCheck size={18}/> Bu cevabın kaynakları</span><small>{result.sources.length} kaynak</small></div>
-        <div className="ai-source-list">{result.sources.map(src=><article key={src.id}>
-          <div><b>{src.label}</b><span>{src.authority==="internal_verified"?"Doğrulanmış Alumas verisi":src.authority==="external_medical"?"Tıbbi bilgi kaynağı":"Kontrollü yönlendirme kuralı"}</span></div>
-          <p>{src.description}</p>{src.url&&<a href={src.url} target="_blank" rel="noreferrer">Kaynağı aç ↗</a>}{src.publisher&&<small>{src.publisher}{src.verifiedAt?` · Son kontrol ${src.verifiedAt}`:""}</small>}
-        </article>)}</div>
-        <div className="ai-kb-warning ai-kb-ok"><b>Kaynaklı bilgi modu aktif</b><span>Tıbbi açıklamalar yalnız sürüm kontrollü ve onaylı kaynak özetleriyle sınırlandırılır. Tanı veya reçete üretilmez.</span></div>
-      </section>
-      {result.followUps&&result.followUps.length>0&&<section className="ai-followups">
-        <b>Devam etmek için sorabilirsiniz</b>
-        <div>{result.followUps.map(q=><button key={q} type="button" onClick={()=>{setMessage(q);}}>{q}</button>)}</div>
-      </section>}
-      <p className="ai-disclaimer"><strong>{result.safety.disclaimer}</strong></p>
-    </div>}
-    <p className="ai-always-disclaimer"><strong>Ben sağlık profesyoneli değilim.</strong> Alumas yönlendirme ve bilgilendirme sağlar; tanı ve tedavi için yetkili sağlık profesyoneline başvurun.</p>
-  </section>
+  );
 }

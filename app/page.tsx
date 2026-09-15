@@ -37,7 +37,7 @@ export default async function Home(){
         <span>ALUMAS</span>
         <h1>Sağlığın için<br/>her şey tek yerde.</h1>
         <p>Sağlık kayıtların, randevuların ve ihtiyaçların Alumas’ta.</p>
-        <Link className="home-search" href="/doctors"><Search/> Keşfet</Link>
+        <Link className="home-search" href="/ai"><Search/> Asistan ile Keşfet</Link>
       </div>
       <img className="home-hero-image" src="/home-visuals/hero-doctor.webp" alt="Alumas sağlık hizmetleri"/>
     </section>

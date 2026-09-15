@@ -1,18 +1,26 @@
-import LiveHealthResults from "@/components/ai/LiveHealthResults";
 import HealthNavigator from "@/components/ai/health-navigator";
 import Link from "next/link";
+import { ShieldCheck } from "@phosphor-icons/react/dist/ssr";
 
 export default function AiPage(){
-  return <div className="page ai-page">
-    <HealthNavigator/>
-    <section className="ai-trust-grid">
-      <article><b>Kaynağı görünür cevap</b><span>Her sonuçta kullanılan veri kaynakları ve yönlendirme nedeni gösterilir.</span></article>
-      <article><b>Doğrulanmış profiller</b><span>Doktor ve kurum önerileri yalnız doğrulanmış, yayınlanmış Alumas kayıtlarından gelir.</span></article>
-      <article><b>Güvenli yorum</b><span>Luma neden bu yönlendirmeyi yaptığını açıklar; tanı veya tedavi üretmez.</span></article>
-      <article><b>Sabit güvenlik uyarısı</b><span>Her yanıt “Ben sağlık profesyoneli değilim.” ifadesiyle güvenlik sınırını açıkça belirtir.</span></article>
-    </section>
-    <div className="ai-page-footer"><Link href="/services">Tüm hizmetleri görüntüle</Link><Link href="/emergency">Acil / 112</Link></div>
-  </div>
-}
+  return (
+    <div className="page" style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 20px", display: "flex", flexDirection: "column", minHeight: "calc(100vh - 80px)" }}>
+      
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <HealthNavigator />
+      </div>
 
-// v48: AI doctor match engine available at /api/ai/matches with explainable scoring.
+      <div style={{ marginTop: "auto", paddingTop: "40px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+        <p style={{ margin: 0, fontSize: "12px", color: "#64748b", textAlign: "center", lineHeight: "1.5" }}>
+          Luma bir yapay zeka asistanıdır ve tıbbi teşhis koyamaz. Acil durumlarda lütfen <Link href="/emergency" style={{ color: "#ef4444", fontWeight: 600, textDecoration: "none" }}>112'yi arayın</Link> veya en yakın sağlık kuruluşuna başvurun.
+        </p>
+        <div style={{ display: "flex", gap: "16px", fontSize: "13px", fontWeight: 600 }}>
+          <Link href="/services" style={{ color: "#3b82f6", textDecoration: "none" }}>Tüm Hizmetler</Link>
+          <span style={{ color: "#cbd5e1" }}>•</span>
+          <Link href="/ai-policy" style={{ color: "#64748b", textDecoration: "none" }}>Yapay Zeka Politikası</Link>
+        </div>
+      </div>
+      
+    </div>
+  );
+}
