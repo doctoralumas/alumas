@@ -108,10 +108,10 @@ function MessagesContent(){
         </div>
       </div>
       
-      <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: "24px", height: "calc(100vh - 280px)", minHeight: "600px" }}>
+      <div className="messages-layout">
         
         {/* Sol Panel: Kişiler */}
-        <aside style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
+        <aside className={`contact-list ${active ? 'mobile-hidden' : ''}`} style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
           <div style={{ padding: "20px", borderBottom: "1px solid #e2e8f0" }}>
             <div style={{ position: "relative" }}>
               <MagnifyingGlass size={18} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
@@ -155,10 +155,11 @@ function MessagesContent(){
         </aside>
         
         {/* Sağ Panel: Sohbet Alanı */}
-        <section style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
+        <section className={`chat-area ${!active ? 'mobile-hidden' : ''}`} style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
           {active ? (
             <>
               <div style={{ padding: "20px 24px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: "16px", background: "#f8fafc" }}>
+                <button className="mobile-back-btn" onClick={() => setActive('')} style={{ background: "transparent", border: "none", color: "#64748b", cursor: "pointer", display: "none", alignItems: "center", justifyContent: "center", padding: 0 }}><CaretLeft size={24} weight="bold" /></button>
                 <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "#0284c7", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 600 }}>
                   {contacts.find(c=>c.id===active)?.name?.substring(0,2).toUpperCase() || "AL"}
                 </div>
@@ -250,6 +251,14 @@ function MessagesContent(){
       </div>
       <style dangerouslySetInnerHTML={{__html: `
         .hover-bg-slate:hover { background: #f8fafc !important; }
+        .messages-layout { display: grid; grid-template-columns: 300px 1fr; gap: 24px; height: calc(100vh - 280px); min-height: 600px; }
+        @media (max-width: 768px) {
+          .messages-layout { grid-template-columns: 1fr; height: calc(100vh - 200px); }
+          .mobile-hidden { display: none !important; }
+          .mobile-back-btn { display: flex !important; }
+          .chat-area { border-radius: 16px; }
+          .contact-list { border-radius: 16px; }
+        }
       `}}/>
     </div>
   );
