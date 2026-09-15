@@ -102,7 +102,7 @@ function VaccinationsContent(){
                 <input name="administeredAt" type="date" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#475569" }} />
               </div>
               <div style={{ background: "#f0fdf4", border: "1px dashed #bbf7d0", padding: "16px", borderRadius: "16px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 700, color: "#065f46", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                <label style={{ fontSize: "14px", fontWeight: 700, color: "#065f46", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
                   <CalendarBlank size={16} /> Sonraki Doz Tarihi
                 </label>
                 <input name="nextDoseAt" type="date" style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", border: "1px solid #86efac", background: "#fff", outline: "none", fontSize: "15px", color: "#065f46" }} />

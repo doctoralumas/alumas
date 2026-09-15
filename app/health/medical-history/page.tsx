@@ -47,7 +47,7 @@ export default function Page(){
       {open && (
         <div style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", marginBottom: "40px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
           
-          <div style={{ display: "flex", gap: "12px", marginBottom: "24px", background: "#f8fafc", padding: "8px", borderRadius: "20px", display: "inline-flex" }}>
+          <div style={{ gap: "12px", marginBottom: "24px", background: "#f8fafc", padding: "8px", borderRadius: "20px", display: "inline-flex" }}>
             <button onClick={() => setKind('condition')} style={{ padding: "12px 24px", background: kind === 'condition' ? "#fff" : "transparent", color: kind === 'condition' ? "#0f172a" : "#64748b", border: "none", borderRadius: "16px", fontWeight: 600, cursor: "pointer", boxShadow: kind === 'condition' ? "0 2px 4px rgba(0,0,0,0.05)" : "none", display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s" }}>
               <Heartbeat size={18} weight={kind === 'condition' ? "fill" : "regular"} /> Hastalık / Durum
             </button>
