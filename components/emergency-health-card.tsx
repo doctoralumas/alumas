@@ -72,35 +72,35 @@ export default function EmergencyHealthCard(){
           
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Drop size={18} color="#ef4444" /> Kan Grubu</label>
+              <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Drop size={18} color="#ef4444" /> Kan Grubu</label>
               <input name="bloodType" defaultValue={data.bloodType||''} placeholder="Örn: A RH+" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><WarningCircle size={18} color="#f59e0b" /> Alerjiler</label>
+              <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><WarningCircle size={18} color="#f59e0b" /> Alerjiler</label>
               <input name="allergies" defaultValue={(data.allergies||[]).join(', ')} placeholder="Virgülle ayırarak yazın" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
             
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><FirstAid size={18} color="#3b82f6" /> Kronik Hastalıklar & Durumlar</label>
+              <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><FirstAid size={18} color="#3b82f6" /> Kronik Hastalıklar & Durumlar</label>
               <input name="chronicConditions" defaultValue={(data.chronicConditions||[]).join(', ')} placeholder="Virgülle ayırarak yazın" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
 
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Pill size={18} color="#10b981" /> Önemli İlaçlar</label>
+              <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Pill size={18} color="#10b981" /> Önemli İlaçlar</label>
               <input name="medicationsSummary" defaultValue={(data.medicationsSummary||[]).join(', ')} placeholder="Virgülle ayırarak yazın" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Users size={18} color="#8b5cf6" /> Acil Durum Kişisi</label>
+              <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Users size={18} color="#8b5cf6" /> Acil Durum Kişisi</label>
               <input name="emergencyContactName" defaultValue={data.emergencyContactName||''} placeholder="İsim Soyisim" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><PhoneCall size={18} color="#8b5cf6" /> Acil Durum Telefonu</label>
+              <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><PhoneCall size={18} color="#8b5cf6" /> Acil Durum Telefonu</label>
               <input name="emergencyContactPhone" defaultValue={data.emergencyContactPhone||''} placeholder="Telefon numarası" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
 
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>Not / Ek Bilgi</label>
+              <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>Not / Ek Bilgi</label>
               <textarea name="notes" rows={3} defaultValue={data.notes||''} placeholder="Sağlık görevlilerinin bilmesi gereken ekstra notlar" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a", resize: "vertical" }} />
             </div>
           </div>
