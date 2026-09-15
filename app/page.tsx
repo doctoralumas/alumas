@@ -30,7 +30,9 @@ export default async function Home(){
       <div className="home-location-actions"><Link href="/nearby">Değiştir</Link></div>
     </section>
 
-    <HealthNavigator compact/>
+    <div style={{ marginBottom: '24px', marginTop: '12px' }}>
+      <HealthNavigator compact/>
+    </div>
 
     <section className="home-getir-hero home-getir-hero-with-image">
       <div className="home-hero-copy">
