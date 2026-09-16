@@ -87,7 +87,7 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
 
       {mode === "register" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "16px" }}>
-          <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155" }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155", margin: 0 }}>
             {isProfessional ? "Ad Soyad / Yetkili Kişi" : "Ad Soyad"}
             <input name="name" required placeholder="Ad Soyad" data-testid="register-name" style={{ padding: "12px 14px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "14px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
           </label>
@@ -126,12 +126,12 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155" }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155", margin: 0 }}>
           E-posta
           <input name="email" type="email" required placeholder="ornek@email.com" data-testid="auth-email" style={{ padding: "12px 14px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "14px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
         </label>
 
-        <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155" }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155", margin: 0 }}>
           Parola
           <input name="password" type="password" minLength={mode === "login" ? 1 : 10} required placeholder="En az 10 karakter" data-testid="auth-password" style={{ padding: "12px 14px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "14px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
         </label>
@@ -139,14 +139,14 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
 
       {mode === "register" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px", marginBottom: "8px" }}>
-          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer", fontSize: "12px", color: "#64748b", lineHeight: "1.4" }}>
+          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer", fontSize: "12px", color: "#64748b", lineHeight: "1.4", margin: 0 }}>
             <input name="privacyNotice" type="checkbox" required data-testid="privacy-notice" style={{ marginTop: "2px", width: "14px", height: "14px", accentColor: "#3b82f6" }} />
             <span>
               <Link href="/privacy" style={{ color: "#3b82f6", fontWeight: 600, textDecoration: "none" }}>KVKK Aydınlatma Metnini</Link> okudum; <Link href="/terms" style={{ color: "#3b82f6", fontWeight: 600, textDecoration: "none" }}>Kullanım Koşullarını</Link> kabul ediyorum.
             </span>
           </label>
 
-          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer", fontSize: "12px", color: "#64748b", lineHeight: "1.4" }}>
+          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer", fontSize: "12px", color: "#64748b", lineHeight: "1.4", margin: 0 }}>
             <input name="marketingConsent" type="checkbox" style={{ marginTop: "2px", width: "14px", height: "14px", accentColor: "#3b82f6" }} />
             <span>Kampanya ve duyurular için elektronik ileti izni veriyorum.</span>
           </label>

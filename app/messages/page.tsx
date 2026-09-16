@@ -36,7 +36,7 @@ function MessagesContent(){
   
   useEffect(()=>{
     if(active){
-      fetch('/api/messages/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senderId:active})}).then(()=>load());
+      fetch('/api/messages/read',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({senderId:active})}).then(()=>load());
     }
   },[active]);
   
@@ -94,16 +94,17 @@ function MessagesContent(){
 
   return (
     <div className="page" style={{ maxWidth: "1200px" }}>
-      <SectionVisual slug="family" alt="Mesajlar" />
-      <div style={{ marginBottom: "24px" }}>
-        <Link href="/services" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", textDecoration: "none", fontSize: "14px", fontWeight: 500, marginBottom: "16px" }}>
-          <CaretLeft size={16} /> Tüm Hizmetlere Dön
+      <div style={{ marginBottom: "24px", padding: "32px", background: "linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)", borderRadius: "24px", border: "1px solid #e2e8f0" }}>
+        <Link href="/services" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", textDecoration: "none", fontSize: "14px", fontWeight: 600, marginBottom: "20px", transition: "color 0.2s" }} onMouseOver={e=>e.currentTarget.style.color="#3b82f6"} onMouseOut={e=>e.currentTarget.style.color="#64748b"}>
+          <CaretLeft size={16} weight="bold" /> Tüm Hizmetlere Dön
         </Link>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <span className="kicker">İletişim</span>
-            <h1 style={{ fontSize: "28px", color: "#0f172a", margin: "8px 0" }}>Mesajlar</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Sağlık profesyonelleri ve kurumlarla güvenli iletişim kurun.</p>
+            <span className="kicker" style={{ background: "#dbeafe", color: "#1d4ed8", padding: "6px 12px", borderRadius: "100px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>GÜVENLİ İLETİŞİM KANALI</span>
+            <h1 style={{ fontSize: "32px", fontWeight: 800, color: "#0f172a", margin: "16px 0 8px 0", letterSpacing: "-0.5px", display: "flex", alignItems: "center", gap: "12px" }}>
+              Mesajlar
+            </h1>
+            <p style={{ color: "#475569", margin: 0, fontSize: "15px" }}>Sağlık profesyonelleri ve kurumlarla güvenli bir şekilde iletişim kurun.</p>
           </div>
         </div>
       </div>
