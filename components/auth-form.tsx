@@ -72,37 +72,37 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
   }
 
   return (
-    <form className="auth-card premium-auth-card" onSubmit={submit} style={{ padding: "40px", borderRadius: "32px", border: "none", boxShadow: "0 20px 40px -10px rgba(0,0,0,0.1), 0 0 20px rgba(0,0,0,0.02)", background: "#fff", width: "100%", maxWidth: isProfessional && mode === "register" ? "560px" : "440px" }}>
-      <div style={{ textAlign: "center", marginBottom: "32px" }}>
-        <span style={{ fontSize: "12px", fontWeight: 800, color: "#3b82f6", letterSpacing: "1px", textTransform: "uppercase", background: "#eff6ff", padding: "6px 12px", borderRadius: "100px" }}>
+    <form className="auth-card premium-auth-card" onSubmit={submit} style={{ padding: "32px", borderRadius: "28px", border: "none", boxShadow: "0 20px 40px -10px rgba(0,0,0,0.08), 0 0 20px rgba(0,0,0,0.02)", background: "#fff", width: "100%", maxWidth: isProfessional && mode === "register" ? "540px" : "400px" }}>
+      <div style={{ textAlign: "center", marginBottom: "24px" }}>
+        <span style={{ fontSize: "11px", fontWeight: 800, color: "#3b82f6", letterSpacing: "1px", textTransform: "uppercase", background: "#eff6ff", padding: "6px 12px", borderRadius: "100px" }}>
           {isProfessional ? "Alumas İş Ortağı Ağı" : "Alumas Hesabı"}
         </span>
-        <h1 style={{ fontSize: "32px", fontWeight: 800, color: "#0f172a", margin: "16px 0 8px 0", letterSpacing: "-1px" }}>
+        <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", margin: "14px 0 6px 0", letterSpacing: "-0.5px" }}>
           {mode === "login" ? "Tekrar hoş geldin" : (isProfessional ? "Profesyonel ağa katılın" : "Sağlığını tek yerde yönet")}
         </h1>
-        <p style={{ margin: 0, color: "#64748b", fontSize: "15px" }}>
+        <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
           {mode === "login" ? "Bilgilerini girerek platforma giriş yap." : "Hızlıca hesabını oluştur ve hemen başla."}
         </p>
       </div>
 
       {mode === "register" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "20px" }}>
-          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "16px" }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155" }}>
             {isProfessional ? "Ad Soyad / Yetkili Kişi" : "Ad Soyad"}
-            <input name="name" required placeholder="Ad Soyad" data-testid="register-name" style={{ padding: "16px", borderRadius: "16px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "15px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
+            <input name="name" required placeholder="Ad Soyad" data-testid="register-name" style={{ padding: "12px 14px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "14px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
           </label>
 
           {isProfessional && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <span style={{ fontSize: "14px", fontWeight: 600, color: "#334155" }}>Hesap Türü</span>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#334155" }}>Hesap Türü</span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "8px" }}>
                 {proOptions.map(opt => (
                   <div 
                     key={opt.id} 
                     onClick={() => setAccountType(opt.id)}
                     style={{ 
-                      padding: "16px", 
-                      borderRadius: "16px", 
+                      padding: "12px", 
+                      borderRadius: "12px", 
                       border: "2px solid", 
                       borderColor: accountType === opt.id ? "#3b82f6" : "#e2e8f0",
                       background: accountType === opt.id ? "#eff6ff" : "#fff",
@@ -110,12 +110,12 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
                       transition: "all 0.2s",
                       display: "flex",
                       flexDirection: "column",
-                      gap: "4px"
+                      gap: "2px"
                     }}
                   >
-                    <div style={{ fontSize: "24px", marginBottom: "4px" }}>{opt.icon}</div>
-                    <strong style={{ fontSize: "14px", color: accountType === opt.id ? "#1d4ed8" : "#334155" }}>{opt.label}</strong>
-                    <span style={{ fontSize: "12px", color: accountType === opt.id ? "#3b82f6" : "#64748b" }}>{opt.sub}</span>
+                    <div style={{ fontSize: "20px", marginBottom: "2px" }}>{opt.icon}</div>
+                    <strong style={{ fontSize: "13px", color: accountType === opt.id ? "#1d4ed8" : "#334155" }}>{opt.label}</strong>
+                    <span style={{ fontSize: "11px", color: accountType === opt.id ? "#3b82f6" : "#64748b" }}>{opt.sub}</span>
                   </div>
                 ))}
               </div>
@@ -125,41 +125,41 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
         </div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-        <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155" }}>
           E-posta
-          <input name="email" type="email" required placeholder="ornek@email.com" data-testid="auth-email" style={{ padding: "16px", borderRadius: "16px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "15px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
+          <input name="email" type="email" required placeholder="ornek@email.com" data-testid="auth-email" style={{ padding: "12px 14px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "14px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
         </label>
 
-        <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#334155" }}>
           Parola
-          <input name="password" type="password" minLength={mode === "login" ? 1 : 10} required placeholder="En az 10 karakter" data-testid="auth-password" style={{ padding: "16px", borderRadius: "16px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "15px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
+          <input name="password" type="password" minLength={mode === "login" ? 1 : 10} required placeholder="En az 10 karakter" data-testid="auth-password" style={{ padding: "12px 14px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "#f8fafc", fontSize: "14px", outline: "none", transition: "all 0.2s" }} onFocus={e => e.target.style.borderColor = "#3b82f6"} onBlur={e => e.target.style.borderColor = "#e2e8f0"} />
         </label>
       </div>
 
       {mode === "register" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "24px", marginBottom: "8px" }}>
-          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer", fontSize: "13px", color: "#64748b", lineHeight: "1.5" }}>
-            <input name="privacyNotice" type="checkbox" required data-testid="privacy-notice" style={{ marginTop: "2px", width: "16px", height: "16px", accentColor: "#3b82f6" }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px", marginBottom: "8px" }}>
+          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer", fontSize: "12px", color: "#64748b", lineHeight: "1.4" }}>
+            <input name="privacyNotice" type="checkbox" required data-testid="privacy-notice" style={{ marginTop: "2px", width: "14px", height: "14px", accentColor: "#3b82f6" }} />
             <span>
               <Link href="/privacy" style={{ color: "#3b82f6", fontWeight: 600, textDecoration: "none" }}>KVKK Aydınlatma Metnini</Link> okudum; <Link href="/terms" style={{ color: "#3b82f6", fontWeight: 600, textDecoration: "none" }}>Kullanım Koşullarını</Link> kabul ediyorum.
             </span>
           </label>
 
-          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer", fontSize: "13px", color: "#64748b", lineHeight: "1.5" }}>
-            <input name="marketingConsent" type="checkbox" style={{ marginTop: "2px", width: "16px", height: "16px", accentColor: "#3b82f6" }} />
+          <label className="consent-check" style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer", fontSize: "12px", color: "#64748b", lineHeight: "1.4" }}>
+            <input name="marketingConsent" type="checkbox" style={{ marginTop: "2px", width: "14px", height: "14px", accentColor: "#3b82f6" }} />
             <span>Kampanya ve duyurular için elektronik ileti izni veriyorum.</span>
           </label>
         </div>
       )}
 
-      {error && <div className="form-error" style={{ background: "#fef2f2", color: "#b91c1c", padding: "14px", borderRadius: "12px", border: "1px solid #fecaca", fontSize: "14px", fontWeight: 500, margin: "16px 0", textAlign: "center" }}>{error}</div>}
+      {error && <div className="form-error" style={{ background: "#fef2f2", color: "#b91c1c", padding: "12px", borderRadius: "12px", border: "1px solid #fecaca", fontSize: "13px", fontWeight: 500, margin: "14px 0", textAlign: "center" }}>{error}</div>}
 
-      <button className="primary full" disabled={loading} data-testid="auth-submit" style={{ width: "100%", padding: "16px", borderRadius: "100px", fontSize: "16px", fontWeight: 700, marginTop: "24px", transition: "all 0.2s", opacity: loading ? 0.7 : 1 }}>
+      <button className="primary full" disabled={loading} data-testid="auth-submit" style={{ width: "100%", padding: "14px", borderRadius: "100px", fontSize: "15px", fontWeight: 700, marginTop: "20px", transition: "all 0.2s", opacity: loading ? 0.7 : 1 }}>
         {loading ? "İşleniyor..." : mode === "login" ? "Giriş yap" : "Hesap oluştur"}
       </button>
 
-      <p style={{ textAlign: "center", marginTop: "24px", fontSize: "14px", color: "#64748b" }}>
+      <p style={{ textAlign: "center", marginTop: "20px", fontSize: "13px", color: "#64748b" }}>
         {mode === "login" ? (
           <>Hesabın yok mu? <Link href={isProfessional ? "/pro/register" : "/register"} style={{ color: "#0f172a", fontWeight: 700, textDecoration: "none" }}>Kayıt ol</Link></>
         ) : (
