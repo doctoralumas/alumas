@@ -210,14 +210,14 @@ function MessagesContent(){
                 )}
               </div>
               
-              <div style={{ padding: "20px 24px", background: "#fff", borderTop: "1px solid #e2e8f0" }}>
-                <form onSubmit={send} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <div style={{ padding: "16px", background: "#fff", borderTop: "1px solid #e2e8f0" }}>
+                <form onSubmit={send} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <input type="file" ref={fileInputRef} style={{display:'none'}} onChange={handleFileUpload} accept="image/*,application/pdf" />
                   <button 
                     type="button" 
                     onClick={()=>fileInputRef.current?.click()} 
                     disabled={uploading}
-                    style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', padding: '12px', borderRadius: '50%', color: '#64748b', display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                    style={{ flexShrink: 0, background: '#f1f5f9', border: 'none', cursor: 'pointer', padding: '12px', borderRadius: '50%', color: '#64748b', display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
                     title="Dosya veya Resim Yükle"
                   >
                     <Paperclip size={24} weight="bold" />
@@ -228,13 +228,13 @@ function MessagesContent(){
                     onChange={e=>setBody(e.target.value)} 
                     placeholder={uploading ? "Dosya yükleniyor..." : "Mesajınızı yazın..."} 
                     disabled={uploading} 
-                    style={{ flex: 1, padding: '14px 20px', borderRadius: '100px', border: '1px solid #cbd5e1', fontSize: "15px", background: "#f8fafc", outline: "none" }}
+                    style={{ flex: 1, minWidth: 0, padding: '14px 16px', borderRadius: '100px', border: '1px solid #cbd5e1', fontSize: "15px", background: "#f8fafc", outline: "none" }}
                   />
                   
                   <button 
                     className="primary" 
                     disabled={(!body.trim() && !uploading) || uploading} 
-                    style={{ borderRadius: '50%', width: "48px", height: "48px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: (!body.trim() && !uploading) ? 0.5 : 1 }}
+                    style={{ flexShrink: 0, borderRadius: '50%', width: "48px", height: "48px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: (!body.trim() && !uploading) ? 0.5 : 1 }}
                   >
                     <PaperPlaneRight size={24} weight="fill" />
                   </button>
