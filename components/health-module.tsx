@@ -68,6 +68,15 @@ export default function HealthModule({ mode }: { mode: Mode }) {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setMsg("");
     const f = new FormData(e.currentTarget), body: any = Object.fromEntries(f.entries());
+    
+    for (const k of Object.keys(body)) {
+      if (body[k] === "") delete body[k];
+    }
+    
+    if (body.measuredAt) body.measuredAt = new Date(body.measuredAt).toISOString();
+    if (body.startedAt) body.startedAt = new Date(body.startedAt).toISOString();
+    if (body.endedAt) body.endedAt = new Date(body.endedAt).toISOString();
+
     const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const j = await r.json();
     if (!r.ok) { setMsg(j.error || "Kaydedilemedi"); return; }
