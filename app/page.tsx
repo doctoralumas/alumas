@@ -15,7 +15,7 @@ const tiles = [
   {href:"/insurance", kicker:"Kapsam", title:"SİGORTALARIM", text:"Poliçe ve anlaşmalı kurumlarını yönet", cls:"home-tile mint span4 row2", image:"/home-visuals/insurance.webp"},
   {href:"/calendar", kicker:"Plan", title:"TAKVİM", text:"Randevu ve hatırlatıcılarını gör", cls:"home-tile ice span4 row2", image:"/home-visuals/calendar.webp"},
   {href:"/health-card", kicker:"Acil sağlık özeti", title:"SAĞLIK KARTIM", text:"Önemli sağlık bilgilerini kontrollü paylaş", cls:"home-tile blue2 span4 row2", image:"/home-visuals/health-card.webp"},
-  {href:"/profile", kicker:"Hesap", title:"PROFİL & HESAPLAR", text:"Hasta, doktor, kurum ve acente profillerini yönet", cls:"home-tile ice span4 row2", image:"/home-visuals/profile.webp"},
+  {href:"/profile", kicker:"Hesap", title:"PROFİL & HESAPLAR", text:"Hasta, doktor, kurum ve sağlık turizmi profillerini yönet", cls:"home-tile ice span4 row2", image:"/home-visuals/profile.webp"},
 ];
 
 import { currentUser } from "@/lib/auth";
@@ -65,7 +65,7 @@ export default async function Home(){
         <Link href="/register"><b>Hasta hesabı</b><span>Kişisel sağlık profili</span></Link>
         <Link href="/pro/register?type=doctor"><b>Doktor hesabı</b><span>Alumas Pro</span></Link>
         <Link href="/pro/register?type=organization"><b>Kurum hesabı</b><span>Hastane · Klinik · Eczane</span></Link>
-        <Link href="/pro/register?type=agency"><b>Acente hesabı</b><span>Sağlık turizmi</span></Link>
+        <Link href="/pro/register?type=agency"><b>Sağlık Turizmi</b><span>Acente & Koordinasyon</span></Link>
       </section>
     )}
   </div>

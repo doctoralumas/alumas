@@ -21,7 +21,7 @@ export default async function Profile(){
     prisma.healthTourismAgency.count({where:{ownerUserId:user.id}})
   ]);
 
-  const displayRole = user.role === 'ADMIN' ? 'Yönetici' : user.role === 'DOCTOR' ? 'Uzman' : orgCount > 0 ? 'Kurum Yöneticisi' : agencyCount > 0 ? 'Acente Yöneticisi' : 'Hasta';
+  const displayRole = user.role === 'ADMIN' ? 'Yönetici' : user.role === 'DOCTOR' ? 'Uzman' : orgCount > 0 ? 'Kurum Yöneticisi' : agencyCount > 0 ? 'Sağlık Turizmi Yöneticisi' : 'Hasta';
 
   return (
     <div className="page" style={{ maxWidth: "1000px", margin: "0 auto", paddingBottom: "64px" }}>
@@ -61,7 +61,7 @@ export default async function Profile(){
               <h2 style={{ margin: 0, fontSize: "20px" }}>Profesyonel Paneller</h2>
             </div>
             <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px", lineHeight: "1.5" }}>
-              Kurum, acente veya uzman hesaplarınızı buradan yönetebilir veya yeni başvuru yapabilirsiniz.
+              Kurum, sağlık turizmi veya uzman hesaplarınızı buradan yönetebilir veya yeni başvuru yapabilirsiniz.
             </p>
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
               {orgCount > 0 ? (
@@ -71,9 +71,9 @@ export default async function Profile(){
               )}
               
               {agencyCount > 0 ? (
-                <Link href="/agency" style={{ padding: "10px 20px", background: "#0ea5e9", color: "#fff", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Acente Paneli</Link>
+                <Link href="/agency" style={{ padding: "10px 20px", background: "#0ea5e9", color: "#fff", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Sağlık Turizmi Paneli</Link>
               ) : (
-                <Link href="/agency/apply" style={{ padding: "10px 20px", background: "#f1f5f9", color: "#475569", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Acente Başvurusu</Link>
+                <Link href="/agency/apply" style={{ padding: "10px 20px", background: "#f1f5f9", color: "#475569", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Sağlık Turizmi Başvurusu</Link>
               )}
 
               {user.role === 'DOCTOR' ? (

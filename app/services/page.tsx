@@ -16,7 +16,7 @@ const groups:{title:string;items:Item[]}[]=[
     {href:"/nearby",title:"Yakınımdakiler",desc:"Hastane, klinik, eczane, acil servis ve otel bul.",tone:"mint",icon:MapPin},
     {href:"/home-care",title:"Evde Sağlık",desc:"Doktor, hemşire ve evde bakım hizmetleri.",tone:"teal",icon:HouseLine},
     {href:"/emergency",title:"Acil / 112",desc:"112, ambulans, acil servis ve sağlık kartı.",tone:"emergency",icon:Ambulance},
-    {href:"/health-tourism",title:"Sağlık Turizmi",desc:"Acente, paket, transfer, konaklama ve tercüman.",tone:"navy",icon:AirplaneTilt},
+    {href:"/health-tourism",title:"Sağlık Turizmi",desc:"Klinik, paket, transfer, konaklama ve tercüman.",tone:"navy",icon:AirplaneTilt},
     {href:"/insurance",title:"Sigortalar",desc:"Sigorta sağlayıcıları ve anlaşmalı kurumlar.",tone:"ice",icon:ShieldCheck},
     {href:"/campaigns",title:"Kampanyalar",desc:"Sağlık kurumlarının kampanya ve duyuruları.",tone:"sand",icon:Megaphone},
     {href:"/phone-directory",title:"Telefon Rehberi",desc:"112 ve favori sağlık numaraları.",tone:"lavender",icon:AddressBook},

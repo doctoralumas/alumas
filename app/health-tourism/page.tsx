@@ -48,7 +48,7 @@ export default function Page(){
               value={q} 
               onChange={e=>setQ(e.target.value)} 
               onKeyDown={e=>{if(e.key==='Enter')load()}} 
-              placeholder="Tedavi, şehir, acente veya kategori ara..."
+              placeholder="Tedavi, şehir, klinik veya kategori ara..."
               style={{ width: "100%", padding: "16px 16px 16px 44px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.1)", color: "#fff", outline: "none", fontSize: "15px" }}
             />
           </div>

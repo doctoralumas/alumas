@@ -12,7 +12,7 @@ export async function PATCH(req:NextRequest,{params}:{params:Promise<{id:string}
   if(!current) return NextResponse.json({error:"Kayıt bulunamadı."},{status:404});
 
   if(current.accountType==="HEALTH_TOURISM_AGENCY" && b.status==="APPROVED" && current.healthTourism?.status!=="APPROVED"){
-    return NextResponse.json({error:"Sağlık turizmi yetki belgesi onaylanmadan acente hesabı aktifleştirilemez."},{status:409});
+    return NextResponse.json({error:"Sağlık turizmi yetki belgesi onaylanmadan sağlık turizmi hesabı aktifleştirilemez."},{status:409});
   }
   const account=await prisma.professionalAccount.update({
     where:{id},

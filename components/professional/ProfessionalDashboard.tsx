@@ -20,7 +20,7 @@ export default function ProfessionalDashboard({account}:{account:any}){
     <div><small>Alumas Professional</small><h1>{account.displayName}</h1><p>{cfg?.label}</p></div>
     <span className={`verify-pill ${approved&&!agencyBlocked?"ok":"pending"}`}>{approved&&!agencyBlocked?"✓ Doğrulandı":"Doğrulama bekleniyor"}</span>
    </header>
-   {agencyBlocked&&<div className="professional-warning">Sağlık turizmi yetki belgeniz doğrulanmadan acente hizmetleri, paket yayını ve hasta yönlendirme özellikleri aktifleşmez.</div>}
+   {agencyBlocked&&<div className="professional-warning">Sağlık turizmi yetki belgeniz doğrulanmadan sağlık turizmi hizmetleri, paket yayını ve hasta yönlendirme özellikleri aktifleşmez.</div>}
    <section className="professional-grid">
     {(cfg?.modules||[]).map(m=><a key={m} href={`/professional/${account.id}/${m}`} className="professional-card"><b>{moduleLabels[m]||m}</b><span>Yönet →</span></a>)}
    </section>
