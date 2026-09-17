@@ -87,22 +87,21 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
     if (!key || !mapRef.current || !pos || !rows.length) return;
     const id = "alumas-google-maps";
     
-    function draw() {
+    async function draw() {
       const g = (window as any).google;
       if (!g || !mapRef.current) return;
       
-      // Prevent g.maps.Map is not a constructor error by awaiting the library if needed,
-      // but since we dropped loading=async, g.maps.Map should be available.
+      if (!g.maps.Map) await g.maps.importLibrary("maps");
+      
       const map = new g.maps.Map(mapRef.current, {
         center: pos,
         zoom: 14,
-        mapId: "ALUMAS_MAP_ID", // Required for AdvancedMarkerElement
+        mapId: "ALUMAS_MAP_ID",
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false
       });
 
-      // AdvancedMarkerElement migration
       async function addMarkers() {
         if (!g.maps.marker) await g.maps.importLibrary("marker");
         
