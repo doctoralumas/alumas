@@ -87,13 +87,9 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
     if (!key || !mapRef.current || !pos || !rows.length) return;
     const id = "alumas-google-maps";
     
-    async function draw() {
     function draw() {
       const g = (window as any).google;
-      if (!g || !mapRef.current) return;
       if (!g || !mapRef.current || !g.maps.Map) return;
-      
-      if (!g.maps.Map) await g.maps.importLibrary("maps");
       
       const map = new g.maps.Map(mapRef.current, {
         center: pos,
@@ -104,17 +100,6 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
         fullscreenControl: false
       });
 
-      async function addMarkers() {
-        if (!g.maps.marker) await g.maps.importLibrary("marker");
-        
-        new g.maps.marker.AdvancedMarkerElement({ map, position: pos, title: "Konumunuz" });
-        
-        rows.forEach(x => {
-          const m = new g.maps.marker.AdvancedMarkerElement({ map, position: { lat: x.latitude, lng: x.longitude }, title: x.name });
-          const info = new g.maps.InfoWindow({
-            content: `<div style="padding:4px"><b>${x.name.replace(/[<>]/g, "")}</b><br/><span style="color:#64748b;font-size:12px">${x.address.replace(/[<>]/g, "")}</span>${x.mapsUrl ? `<br/><br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer" style="color:#0f172a;font-weight:600;text-decoration:none">Yol Tarifi Al →</a>` : ""}</div>`
-          });
-          m.addEventListener("gmp-click", () => info.open({ anchor: m, map }));
       new g.maps.marker.AdvancedMarkerElement({ map, position: pos, title: "Konumunuz" });
       
       rows.forEach(x => {
@@ -122,13 +107,10 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
         const info = new g.maps.InfoWindow({
           content: `<div style="padding:4px"><b>${x.name.replace(/[<>]/g, "")}</b><br/><span style="color:#64748b;font-size:12px">${x.address.replace(/[<>]/g, "")}</span>${x.mapsUrl ? `<br/><br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer" style="color:#0f172a;font-weight:600;text-decoration:none">Yol Tarifi Al →</a>` : ""}</div>`
         });
-      }
-      addMarkers();
         m.addEventListener("gmp-click", () => info.open({ anchor: m, map }));
       });
     }
     
-    if ((window as any).google?.maps) { draw(); return; }
     if ((window as any).google?.maps?.Map) { draw(); return; }
     
     const prev = (window as any).alumasMapCallback;
@@ -141,14 +123,10 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
     if (!script) {
       script = document.createElement("script");
       script.id = id;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&libraries=marker&loading=async`;
       script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&libraries=marker&loading=async&callback=alumasMapCallback`;
       script.async = true;
       script.defer = true;
-      script.onload = draw;
       document.head.appendChild(script);
-    } else {
-      script.addEventListener("load", draw, { once: true });
     }
   }, [rows, pos]);
 
