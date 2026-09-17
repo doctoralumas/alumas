@@ -33,7 +33,8 @@ export default function LabCenter(){
     e.preventDefault();
     setIsSubmitting(true);
     setMsg('');
-    const f=new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const f=new FormData(form);
     const body=Object.fromEntries(f.entries());
     
     try {
@@ -41,7 +42,7 @@ export default function LabCenter(){
       const j=await r.json();
       if(r.ok){
         setMsg('Laboratuvar sonucu başarıyla kaydedildi.');
-        e.currentTarget.reset();
+        form.reset();
         setDraft({panel:'',testName:'',unit:''});
         load();
       } else {
