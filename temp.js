@@ -1,4 +1,5 @@
-'use client';
+const fs = require('fs');
+const content = `'use client';
 import {useEffect,useState} from 'react';
 import { ShieldCheck, Heartbeat, CaretRight, WarningCircle, Drop, IdentificationCard, User, Users, Envelope, Link as LinkIcon, DownloadSimple, Pill, FirstAid, PhoneCall, QrCode } from "@phosphor-icons/react";
 
@@ -49,14 +50,14 @@ export default function EmergencyHealthCard(){
     const j=await r.json();
     setData(j);
     setPreviewData(j);
-    setMsg(r.ok?'Saï¿½lï¿½k kartï¿½nï¿½z baï¿½arï¿½yla gï¿½ncellendi.':'Kaydedilemedi');
+    setMsg(r.ok?'Saðlýk kartýnýz baþarýyla güncellendi.':'Kaydedilemedi');
     setTimeout(() => setMsg(''), 3000);
   }
 
   const copyLink = () => {
     if(data?.shareToken) {
-      navigator.clipboard.writeText(`${window.location.origin}/health-card/${data.shareToken}`);
-      setCopyMsg("Kopyalandï¿½!");
+      navigator.clipboard.writeText(\`\${window.location.origin}/health-card/\${data.shareToken}\`);
+      setCopyMsg("Kopyalandý!");
       setTimeout(() => setCopyMsg(""), 2000);
     }
   };
@@ -64,12 +65,12 @@ export default function EmergencyHealthCard(){
   if(!data && loading) return (
     <div style={{ padding: "64px", textAlign: "center", color: "#64748b" }}>
       <ShieldCheck size={48} weight="duotone" className="spin-slow" style={{ marginBottom: "16px", opacity: 0.5 }} />
-      <div style={{ fontSize: "16px" }}>Acil durum kartï¿½nï¿½z yï¿½kleniyor...</div>
+      <div style={{ fontSize: "16px" }}>Acil durum kartýnýz yükleniyor...</div>
     </div>
   );
-  if(!data) return <div style={{ padding: "64px", textAlign: "center", color: "#ef4444" }}>Veriler yï¿½klenemedi.</div>;
+  if(!data) return <div style={{ padding: "64px", textAlign: "center", color: "#ef4444" }}>Veriler yüklenemedi.</div>;
 
-  const url = typeof window !== 'undefined' ? `${window.location.origin}/health-card/${data.shareToken}` : '';
+  const url = typeof window !== 'undefined' ? \`\${window.location.origin}/health-card/\${data.shareToken}\` : '';
 
   return (
     <div className="page" style={{ maxWidth: "1200px", margin: "0 auto", paddingBottom: "48px" }}>
@@ -81,8 +82,8 @@ export default function EmergencyHealthCard(){
           </div>
           <div>
             <span className="kicker" style={{ color: "#ef4444" }}>Acil Durum</span>
-            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>Saï¿½lï¿½k Kartï¿½m</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Acil durumlarda gï¿½rï¿½nmesini istediï¿½iniz ï¿½zet bilgileri yï¿½netin.</p>
+            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>Saðlýk Kartým</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Acil durumlarda görünmesini istediðiniz özet bilgileri yönetin.</p>
           </div>
         </div>
       </div>
@@ -98,35 +99,35 @@ export default function EmergencyHealthCard(){
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
                 <div>
                   <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Drop size={18} color="#ef4444" /> Kan Grubu</label>
-                  <input name="bloodType" defaultValue={data.bloodType||''} placeholder="ï¿½rn: A RH+" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+                  <input name="bloodType" defaultValue={data.bloodType||''} placeholder="Örn: A RH+" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
                 </div>
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><WarningCircle size={18} color="#f59e0b" /> Alerjiler</label>
-                  <input name="allergies" defaultValue={(data.allergies||[]).join(', ')} placeholder="Virgï¿½lle ayï¿½rarak yazï¿½n" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+                  <input name="allergies" defaultValue={(data.allergies||[]).join(', ')} placeholder="Virgülle ayýrarak yazýn" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
                 </div>
                 
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><FirstAid size={18} color="#3b82f6" /> Kronik Hastalï¿½klar & Durumlar</label>
-                  <input name="chronicConditions" defaultValue={(data.chronicConditions||[]).join(', ')} placeholder="Virgï¿½lle ayï¿½rarak yazï¿½n" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+                  <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><FirstAid size={18} color="#3b82f6" /> Kronik Hastalýklar & Durumlar</label>
+                  <input name="chronicConditions" defaultValue={(data.chronicConditions||[]).join(', ')} placeholder="Virgülle ayýrarak yazýn" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
                 </div>
 
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Pill size={18} color="#10b981" /> ï¿½nemli ï¿½laï¿½lar</label>
-                  <input name="medicationsSummary" defaultValue={(data.medicationsSummary||[]).join(', ')} placeholder="Virgï¿½lle ayï¿½rarak yazï¿½n" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+                  <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Pill size={18} color="#10b981" /> Önemli Ýlaçlar</label>
+                  <input name="medicationsSummary" defaultValue={(data.medicationsSummary||[]).join(', ')} placeholder="Virgülle ayýrarak yazýn" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
                 </div>
 
                 <div>
-                  <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Users size={18} color="#8b5cf6" /> Acil Durum Kiï¿½isi</label>
-                  <input name="emergencyContactName" defaultValue={data.emergencyContactName||''} placeholder="ï¿½sim Soyisim" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+                  <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><Users size={18} color="#8b5cf6" /> Acil Durum Kiþisi</label>
+                  <input name="emergencyContactName" defaultValue={data.emergencyContactName||''} placeholder="Ýsim Soyisim" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
                 </div>
                 <div>
                   <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><PhoneCall size={18} color="#8b5cf6" /> Acil Durum Telefonu</label>
-                  <input name="emergencyContactPhone" defaultValue={data.emergencyContactPhone||''} placeholder="Telefon numarasï¿½" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+                  <input name="emergencyContactPhone" defaultValue={data.emergencyContactPhone||''} placeholder="Telefon numarasý" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
                 </div>
 
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={{ fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>Not / Ek Bilgi</label>
-                  <textarea name="notes" rows={3} defaultValue={data.notes||''} placeholder="Saï¿½lï¿½k gï¿½revlilerinin bilmesi gereken ekstra notlar" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a", resize: "vertical" }} />
+                  <textarea name="notes" rows={3} defaultValue={data.notes||''} placeholder="Saðlýk görevlilerinin bilmesi gereken ekstra notlar" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a", resize: "vertical" }} />
                 </div>
               </div>
 
@@ -134,10 +135,10 @@ export default function EmergencyHealthCard(){
                 <input type="checkbox" name="sharingEnabled" id="sharingEnabled" defaultChecked={data.sharingEnabled} style={{ width: "20px", height: "20px", marginTop: "2px" }} />
                 <div>
                   <label htmlFor="sharingEnabled" style={{ fontSize: "16px", fontWeight: 700, color: "#0f172a", cursor: "pointer", display: "block", marginBottom: "4px" }}>
-                    Acil Saï¿½lï¿½k Kartï¿½mï¿½ Paylaï¿½ï¿½ma Aï¿½
+                    Acil Saðlýk Kartýmý Paylaþýma Aç
                   </label>
                   <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>
-                    Kabul ederseniz, saï¿½lï¿½k kartï¿½nï¿½z ï¿½zel bir baï¿½lantï¿½ ï¿½zerinden gï¿½rï¿½ntï¿½lenebilir.
+                    Kabul ederseniz, saðlýk kartýnýz özel bir baðlantý üzerinden görüntülenebilir.
                   </p>
                 </div>
               </div>
@@ -146,7 +147,7 @@ export default function EmergencyHealthCard(){
                 <button type="submit" style={{ padding: "16px 32px", background: "#0f172a", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", transition: "background 0.2s" }} className="hover-shadow">
                   Bilgileri Kaydet
                 </button>
-                {msg && <span style={{ fontSize: "14px", fontWeight: 600, color: msg.includes('baï¿½arï¿½') ? "#16a34a" : "#dc2626" }}>{msg}</span>}
+                {msg && <span style={{ fontSize: "14px", fontWeight: 600, color: msg.includes('baþarý') ? "#16a34a" : "#dc2626" }}>{msg}</span>}
               </div>
 
             </div>
@@ -156,9 +157,9 @@ export default function EmergencyHealthCard(){
             <section style={{ background: "#fff", borderRadius: "24px", padding: "32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
                 <div style={{ background: "#e0e7ff", color: "#4f46e5", padding: "8px", borderRadius: "12px" }}><LinkIcon size={20} weight="bold" /></div>
-                <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Acil Paylaï¿½ï¿½m Baï¿½lantï¿½sï¿½</h2>
+                <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Acil Paylaþým Baðlantýsý</h2>
               </div>
-              <p style={{ margin: "0 0 24px", fontSize: "15px", color: "#64748b" }}>Bu baï¿½lantï¿½ya sahip olan kiï¿½i yalnï¿½zca saï¿½lï¿½k kartï¿½nda belirttiï¿½iniz kï¿½sa bilgileri gï¿½rï¿½r. QR kod vb. yerlerde bu adresi kullanabilirsiniz.</p>
+              <p style={{ margin: "0 0 24px", fontSize: "15px", color: "#64748b" }}>Bu baðlantýya sahip olan kiþi yalnýzca saðlýk kartýnda belirttiðiniz kýsa bilgileri görür. QR kod vb. yerlerde bu adresi kullanabilirsiniz.</p>
               
               <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "16px", border: "1px dashed #cbd5e1", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
                 <code style={{ fontSize: "14px", color: "#334155", wordBreak: "break-all" }}>
@@ -172,10 +173,10 @@ export default function EmergencyHealthCard(){
           )}
         </div>
 
-        {/* Saï¿½ Taraf: Canlï¿½ ï¿½nizleme */}
+        {/* Sað Taraf: Canlý Önizleme */}
         <div style={{ position: "sticky", top: "32px" }}>
           <div style={{ padding: "8px 0 16px", display: "flex", alignItems: "center", gap: "8px", color: "#64748b" }}>
-            <Heartbeat size={20} weight="duotone" /> <span style={{ fontSize: "14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" }}>Canlï¿½ ï¿½nizleme</span>
+            <Heartbeat size={20} weight="duotone" /> <span style={{ fontSize: "14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" }}>Canlý Önizleme</span>
           </div>
           
           <div style={{
@@ -190,7 +191,7 @@ export default function EmergencyHealthCard(){
             
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px", position: "relative", zIndex: 1 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 800, letterSpacing: "0.5px" }}>ACï¿½L SAï¿½LIK KARTI</h3>
+                <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 800, letterSpacing: "0.5px" }}>ACÝL SAÐLIK KARTI</h3>
                 <span style={{ fontSize: "12px", opacity: 0.8, textTransform: "uppercase", letterSpacing: "2px", fontWeight: 600 }}>Medical ID</span>
               </div>
               <div style={{ background: "#fff", padding: "10px", borderRadius: "14px", color: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -218,13 +219,13 @@ export default function EmergencyHealthCard(){
             </div>
 
             <div style={{ marginTop: "32px", paddingTop: "24px", borderTop: "1px dashed rgba(255,255,255,0.3)", position: "relative", zIndex: 1 }}>
-               <span style={{ fontSize: "11px", textTransform: "uppercase", opacity: 0.8, display: "block", marginBottom: "8px", fontWeight: 600, letterSpacing: "0.5px" }}>Acil Durum Kiï¿½isi</span>
+               <span style={{ fontSize: "11px", textTransform: "uppercase", opacity: 0.8, display: "block", marginBottom: "8px", fontWeight: 600, letterSpacing: "0.5px" }}>Acil Durum Kiþisi</span>
                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                  <div style={{ background: "rgba(255,255,255,0.2)", padding: "10px", borderRadius: "50%" }}>
                    <PhoneCall size={20} weight="fill" />
                  </div>
                  <div>
-                   <strong style={{ fontSize: "16px", display: "block" }}>{previewData?.emergencyContactName || "Kiï¿½i eklenmedi"}</strong>
+                   <strong style={{ fontSize: "16px", display: "block" }}>{previewData?.emergencyContactName || "Kiþi eklenmedi"}</strong>
                    <span style={{ fontSize: "14px", opacity: 0.9 }}>{previewData?.emergencyContactPhone || "-"}</span>
                  </div>
                </div>
@@ -239,7 +240,7 @@ export default function EmergencyHealthCard(){
           </div>
           
           <div style={{ marginTop: "16px", fontSize: "13px", color: "#94a3b8", textAlign: "center" }}>
-            Bu ï¿½nizleme, verilerinizin gerï¿½ek acil saï¿½lï¿½k personelinin (veya QR kodu okutan kiï¿½inin) ekranï¿½nda nasï¿½l gï¿½rï¿½neceï¿½ini simï¿½le eder.
+            Bu önizleme, verilerinizin gerçek acil saðlýk personelinin (veya QR kodu okutan kiþinin) ekranýnda nasýl görüneceðini simüle eder.
           </div>
         </div>
 
@@ -248,3 +249,5 @@ export default function EmergencyHealthCard(){
     </div>
   )
 }
+`;
+fs.writeFileSync('components/emergency-health-card.tsx', content, 'utf8');
