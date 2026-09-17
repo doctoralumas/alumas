@@ -113,7 +113,7 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
           const info = new g.maps.InfoWindow({
             content: `<div style="padding:4px"><b>${x.name.replace(/[<>]/g, "")}</b><br/><span style="color:#64748b;font-size:12px">${x.address.replace(/[<>]/g, "")}</span>${x.mapsUrl ? `<br/><br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer" style="color:#0f172a;font-weight:600;text-decoration:none">Yol Tarifi Al →</a>` : ""}</div>`
           });
-          m.addListener("gmp-click", () => info.open({ anchor: m, map }));
+          m.addEventListener("gmp-click", () => info.open({ anchor: m, map }));
         });
       }
       addMarkers();
@@ -125,8 +125,9 @@ export default function GoogleNearbyPlaces({initial="health"}:{initial?:string})
     if (!script) {
       script = document.createElement("script");
       script.id = id;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&libraries=marker`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&libraries=marker&loading=async`;
       script.async = true;
+      script.defer = true;
       script.onload = draw;
       document.head.appendChild(script);
     } else {
