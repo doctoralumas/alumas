@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 // @ts-nocheck
 "use client";
 import { useState, useRef, useEffect } from "react";
@@ -130,9 +131,18 @@ export default function HealthNavigator({
               boxShadow: m.role === 'user' ? "0 4px 6px -1px rgba(0,0,0,0.1)" : "none",
             }}>
                {m.content && (
-                 <p style={{ margin: 0, fontSize: "15px", lineHeight: "1.6", whiteSpace: "pre-wrap" }}>
-                   {m.content}
-                 </p>
+                 <div className="ai-markdown" style={{ margin: 0, fontSize: "15px", lineHeight: "1.6" }}>
+                   <ReactMarkdown
+                     components={{
+                       p: ({node, ...props}) => <p style={{margin: "0 0 12px 0", whiteSpace: "pre-wrap"}} {...props} />,
+                       ul: ({node, ...props}) => <ul style={{margin: "0 0 12px 0", paddingLeft: "24px"}} {...props} />,
+                       li: ({node, ...props}) => <li style={{marginBottom: "4px"}} {...props} />,
+                       strong: ({node, ...props}) => <strong style={{fontWeight: 700}} {...props} />
+                     }}
+                   >
+                     {m.content}
+                   </ReactMarkdown>
+                 </div>
                )}
 
                {/* Render rich UI if the assistant called tools */}
