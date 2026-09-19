@@ -21,6 +21,7 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
   }
 
   const [category, setCategory] = useState(initial in cats ? initial : "health");
+  const [ownership, setOwnership] = useState<"all"|"private"|"public">("all");
   const [rows, setRows] = useState<Place[]>([]);
   const [msg, setMsg] = useState("Konumunuzu kullanarak yakındaki yerleri bulabilirsiniz.");
   const [pos, setPos] = useState<any>(null);
@@ -34,10 +35,10 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
     } catch(e) {}
   }, []);
 
-  async function load(p: any = pos, c = category) {
+  async function load(p: any = pos, c = category, o = ownership) {
     if (!p) return;
     setLoading(true);
-    const cacheKey = `alumas_places_${p.lat}_${p.lng}_${c}`;
+    const cacheKey = `alumas_places_${p.lat}_${p.lng}_${c}_${o}`;
     
     try {
       const cached = sessionStorage.getItem(cacheKey);
@@ -55,7 +56,7 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
     }
     
     try {
-      const r = await fetch(`/api/places/nearby?lat=${p.lat}&lng=${p.lng}&category=${c}&radius=8000`);
+      const r = await fetch(`/api/places/nearby?lat=${p.lat}&lng=${p.lng}&category=${c}&radius=8000${o !== "all" ? "&ownership=" + o : ""}`);
       const j = await r.json();
       if (!r.ok) {
         setMsg(j.error || "Yerler yüklenemedi");
@@ -92,8 +93,8 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
   }
 
   useEffect(() => {
-    if (pos) load(pos, category);
-  }, [category, pos]);
+    if (pos) load(pos, category, ownership);
+  }, [category, pos, ownership]);
 
   useEffect(() => {
     const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -165,6 +166,13 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
         <div style={{ padding: "12px 16px", background: "#f8fafc", color: "#475569", borderRadius: "12px", fontSize: "14px", fontWeight: 500, flex: 1 }}>
           {loading ? 'Yükleniyor...' : msg}
         </div>
+      </div>
+
+      
+      <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+        <button onClick={() => setOwnership("all")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "all" ? "#0ea5e9" : "#e2e8f0", background: ownership === "all" ? "#e0f2fe" : "#fff", color: ownership === "all" ? "#0369a1" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Tümü</button>
+        <button onClick={() => setOwnership("private")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "private" ? "#8b5cf6" : "#e2e8f0", background: ownership === "private" ? "#ede9fe" : "#fff", color: ownership === "private" ? "#6d28d9" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Özel Hastaneler</button>
+        <button onClick={() => setOwnership("public")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "public" ? "#10b981" : "#e2e8f0", background: ownership === "public" ? "#d1fae5" : "#fff", color: ownership === "public" ? "#047857" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Devlet Hastaneleri</button>
       </div>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "32px", overflowX: "auto", paddingBottom: "8px" }}>
