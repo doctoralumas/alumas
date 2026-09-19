@@ -37,12 +37,12 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
-        body, html { overflow: hidden !important; height: 100%; }
-        .legal-footer { display: none !important; }
-        .app-shell { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+        body, html { overflow: hidden !important; }
+        .legal-footer, .bottom-nav, .cookie-consent, .copilot-widget { display: none !important; }
+        :root { --ai-top: 74px; }
+        @media (max-width: 820px) { :root { --ai-top: 60px; } }
       `}} />
-      <div style={{ flex: 1, width: "100%", backgroundColor: "#f8fafc", display: "flex", flexDirection: "column" }}>
+      <div style={{ position: "fixed", top: "var(--ai-top)", left: 0, right: 0, bottom: 0, backgroundColor: "#f8fafc", zIndex: 40, display: "flex", flexDirection: "column" }}>
          <AiLayout 
            history={history} 
            currentConversationId={q.c || null} 
