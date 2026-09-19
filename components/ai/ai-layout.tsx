@@ -128,6 +128,7 @@ export default function AiLayout({ history, currentConversationId, initialMessag
         {/* Chat Area */}
         <div style={{ flex: 1, overflow: "hidden", paddingTop: isMobile ? "73px" : "0" }}>
           <HealthNavigator 
+            key={currentConversationId || 'new'}
             initialConversationId={currentConversationId} 
             initialMessages={initialMessages} 
             compact={true}
