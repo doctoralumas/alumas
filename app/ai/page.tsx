@@ -5,7 +5,7 @@ import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
-export default async function AiPage({ searchParams }: { searchParams: Promise<{ c?: string }> }){
+export default async function AiPage({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
   const user = await currentUser();
   if (!user) redirect("/login?next=/ai");
   
