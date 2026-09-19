@@ -35,12 +35,20 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
   });
 
   return (
-    <div style={{ width: "100%", height: "calc(100vh - 80px)", overflow: "hidden", backgroundColor: "#f8fafc" }}>
-       <AiLayout 
-         history={history} 
-         currentConversationId={q.c || null} 
-         initialMessages={initialMessages} 
-       />
-    </div>
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        body, html { overflow: hidden !important; height: 100%; }
+        .legal-footer { display: none !important; }
+        .app-shell { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+      `}} />
+      <div style={{ flex: 1, width: "100%", backgroundColor: "#f8fafc", display: "flex", flexDirection: "column" }}>
+         <AiLayout 
+           history={history} 
+           currentConversationId={q.c || null} 
+           initialMessages={initialMessages} 
+         />
+      </div>
+    </>
   );
 }

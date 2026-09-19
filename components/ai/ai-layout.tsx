@@ -33,7 +33,7 @@ export default function AiLayout({ history, currentConversationId, initialMessag
   }, [isMobile]);
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 80px)", width: "100%", maxWidth: "1400px", margin: "0 auto", overflow: "hidden", position: "relative", backgroundColor: "#fff", borderTop: "1px solid #f1f5f9" }}>
+    <div style={{ display: "flex", height: "100%", width: "100%", maxWidth: "1400px", margin: "0 auto", overflow: "hidden", position: "relative", backgroundColor: "#fff", borderTop: "1px solid #f1f5f9" }}>
       
       {/* Mobile Sidebar Overlay */}
       {isMobile && sidebarOpen && (
