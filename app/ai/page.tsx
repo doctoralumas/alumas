@@ -38,7 +38,7 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
     <div className="page" style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 20px", display: "flex", gap: "32px", minHeight: "calc(100vh - 80px)", alignItems: "flex-start" }}>
       
       {/* Sidebar */}
-      <div style={{ width: "280px", display: "flex", flexDirection: "column", gap: "16px", flexShrink: 0, display: "none", "@media (min-width: 768px)": { display: "flex" } } as any}>
+      <div className="hidden md:flex flex-col gap-4 w-[280px] flex-shrink-0">
         <Link href="/ai" style={{ padding: "12px 16px", background: "#0f172a", color: "#fff", borderRadius: "12px", textDecoration: "none", fontWeight: 600, textAlign: "center" }}>
           + Yeni Sohbet
         </Link>
