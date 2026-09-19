@@ -169,17 +169,24 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
       </div>
 
       
+      {["health", "hospital", "emergency", "clinic"].includes(category) && (
       <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
         <button onClick={() => setOwnership("all")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "all" ? "#0ea5e9" : "#e2e8f0", background: ownership === "all" ? "#e0f2fe" : "#fff", color: ownership === "all" ? "#0369a1" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Tümü</button>
-        <button onClick={() => setOwnership("private")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "private" ? "#8b5cf6" : "#e2e8f0", background: ownership === "private" ? "#ede9fe" : "#fff", color: ownership === "private" ? "#6d28d9" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Özel Hastaneler</button>
-        <button onClick={() => setOwnership("public")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "public" ? "#10b981" : "#e2e8f0", background: ownership === "public" ? "#d1fae5" : "#fff", color: ownership === "public" ? "#047857" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Devlet Hastaneleri</button>
+        <button onClick={() => setOwnership("private")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "private" ? "#8b5cf6" : "#e2e8f0", background: ownership === "private" ? "#ede9fe" : "#fff", color: ownership === "private" ? "#6d28d9" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Özel</button>
+        <button onClick={() => setOwnership("public")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "public" ? "#10b981" : "#e2e8f0", background: ownership === "public" ? "#d1fae5" : "#fff", color: ownership === "public" ? "#047857" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Devlet</button>
       </div>
+      )}
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "32px", overflowX: "auto", paddingBottom: "8px" }}>
         {Object.entries(cats).map(([k, v]) => (
           <button 
             key={k} 
-            onClick={() => setCategory(k)}
+            onClick={() => {
+               setCategory(k);
+               if (!["health", "hospital", "emergency", "clinic"].includes(k)) {
+                  setOwnership("all");
+               }
+            }}
             style={{ padding: "10px 20px", borderRadius: "100px", border: category === k ? "none" : "1px solid #cbd5e1", background: category === k ? "#0f172a" : "#fff", color: category === k ? "#fff" : "#475569", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s" }}
           >
             {String(v)}
