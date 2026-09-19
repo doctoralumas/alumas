@@ -159,25 +159,8 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
 
   return (
     <>
-      <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap", alignItems: "center", background: "#fff", padding: "16px", borderRadius: "24px", border: "1px solid #e2e8f0" }}>
-        <button onClick={locate} style={{ padding: "12px 24px", background: "#0f172a", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
-          <Crosshair size={20} weight="bold" /> {pos ? 'Konumu Güncelle' : 'Konumumu Bul'}
-        </button>
-        <div style={{ padding: "12px 16px", background: "#f8fafc", color: "#475569", borderRadius: "12px", fontSize: "14px", fontWeight: 500, flex: 1 }}>
-          {loading ? 'Yükleniyor...' : msg}
-        </div>
-      </div>
-
-      
-      {["health", "hospital", "emergency", "clinic"].includes(category) && (
-      <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
-        <button onClick={() => setOwnership("all")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "all" ? "#0ea5e9" : "#e2e8f0", background: ownership === "all" ? "#e0f2fe" : "#fff", color: ownership === "all" ? "#0369a1" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Tümü</button>
-        <button onClick={() => setOwnership("private")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "private" ? "#8b5cf6" : "#e2e8f0", background: ownership === "private" ? "#ede9fe" : "#fff", color: ownership === "private" ? "#6d28d9" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Özel</button>
-        <button onClick={() => setOwnership("public")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "public" ? "#10b981" : "#e2e8f0", background: ownership === "public" ? "#d1fae5" : "#fff", color: ownership === "public" ? "#047857" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}>Devlet</button>
-      </div>
-      )}
-
-      <div style={{ display: "flex", gap: "10px", marginBottom: "32px", overflowX: "auto", paddingBottom: "8px" }}>
+            {/* Kategori Pill'leri (Her Zaman En Üstte) */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "16px", overflowX: "auto", paddingBottom: "8px" }}>
         {Object.entries(cats).map(([k, v]) => (
           <button 
             key={k} 
@@ -192,6 +175,34 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
             {String(v)}
           </button>
         ))}
+      </div>
+
+      {/* Kontrol Çubuğu: Konum Bul + Filtre Dropdown (Sabit Yükseklik = Layout Shift Yok!) */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", background: "#f8fafc", padding: "12px 16px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <button onClick={locate} style={{ padding: "8px 16px", background: "#0f172a", color: "#fff", borderRadius: "8px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px" }}>
+            <Crosshair size={18} weight="bold" /> {pos ? 'Konumu Güncelle' : 'Konumumu Bul'}
+          </button>
+          <span style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>
+            {loading ? 'Yükleniyor...' : msg}
+          </span>
+        </div>
+
+        {/* Dropdown Filtre (Sadece geçerli kategorilerde belirginleşir) */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", opacity: ["health", "hospital", "emergency", "clinic"].includes(category) ? 1 : 0.3, pointerEvents: ["health", "hospital", "emergency", "clinic"].includes(category) ? "auto" : "none", transition: "all 0.2s" }}>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "#64748b" }}>Filtre:</span>
+          <select 
+            value={ownership} 
+            onChange={e => setOwnership(e.target.value as any)}
+            style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a", fontSize: "14px", fontWeight: 600, outline: "none", cursor: "pointer" }}
+          >
+            <option value="all">Tüm Kurumlar</option>
+            <option value="private">Özel Hastaneler</option>
+            <option value="public">Devlet Hastaneleri</option>
+          </select>
+        </div>
+
       </div>
 
       <div ref={mapRef} style={{ height: "400px", borderRadius: "24px", background: "#f1f5f9", marginBottom: "32px", border: "1px solid #e2e8f0", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
