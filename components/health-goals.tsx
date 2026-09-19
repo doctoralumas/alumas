@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import {useEffect,useState} from "react";
 import { Target, Trophy, Clock, CheckCircle, PauseCircle, Plus, X, TrendUp } from "@phosphor-icons/react";
 
@@ -14,15 +14,16 @@ export default function HealthGoals({patientId}:{patientId?:string}){
 
   async function add(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault();
-    const f=new FormData(e.currentTarget),body:any=Object.fromEntries(f.entries());
+    const form = e.currentTarget;
+    const f=new FormData(form),body:any=Object.fromEntries(f.entries());
     if(patientId)body.patientId=patientId;
     
     const r=await fetch('/api/health/goals',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const j=await r.json();
-    setMsg(r.ok?'Yeni hedef başarıyla eklendi.':j.error||'Eklenemedi');
+    setMsg(r.ok?'Yeni hedef baÅŸarÄ±yla eklendi.':j.error||'Eklenemedi');
     
     if(r.ok){
-      e.currentTarget.reset();
+      form.reset();
       setTimeout(()=>{ setOpen(false); setMsg(""); load(); }, 1500);
     }
   }
@@ -44,13 +45,13 @@ export default function HealthGoals({patientId}:{patientId?:string}){
             <Target size={32} weight="duotone" color="#d97706" />
           </div>
           <div>
-            <span className="kicker" style={{ color: "#d97706" }}>Gelişim & Takip</span>
-            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{patientId ? 'Hasta Hedefleri' : 'Sağlık Hedeflerim'}</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>{patientId ? 'Hastanın tedavi hedeflerini belirle.' : 'Uzmanla birlikte belirlenen veya kişisel hedeflerini takip et.'}</p>
+            <span className="kicker" style={{ color: "#d97706" }}>GeliÅŸim & Takip</span>
+            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{patientId ? 'Hasta Hedefleri' : 'SaÄŸlÄ±k Hedeflerim'}</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>{patientId ? 'HastanÄ±n tedavi hedeflerini belirle.' : 'Uzmanla birlikte belirlenen veya kiÅŸisel hedeflerini takip et.'}</p>
           </div>
         </div>
         <button onClick={()=>setOpen(!open)} style={{ padding: "12px 24px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
-          {open ? <X size={20} /> : <Plus size={20} />} {open ? "İptal" : "Yeni Hedef Belirle"}
+          {open ? <X size={20} /> : <Plus size={20} />} {open ? "Ä°ptal" : "Yeni Hedef Belirle"}
         </button>
       </div>
 
@@ -58,40 +59,40 @@ export default function HealthGoals({patientId}:{patientId?:string}){
         <form onSubmit={add} style={{ background: "#fff", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0", marginBottom: "40px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Hedef Başlığı <span style={{ color: "#ef4444" }}>*</span></label>
-              <input name="title" placeholder="Örn. Haftada 4 gün yürüyüş" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Hedef BaÅŸlÄ±ÄŸÄ± <span style={{ color: "#ef4444" }}>*</span></label>
+              <input name="title" placeholder="Ã–rn. Haftada 4 gÃ¼n yÃ¼rÃ¼yÃ¼ÅŸ" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
             </div>
             <div>
               <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Metrik (Opsiyonel)</label>
-              <input name="metric" placeholder="Örn. Kilo, Adım Sayısı" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+              <input name="metric" placeholder="Ã–rn. Kilo, AdÄ±m SayÄ±sÄ±" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Hedef Değer</label>
-              <input name="targetValue" type="number" step="any" placeholder="Örn. 75, 10000" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Hedef DeÄŸer</label>
+              <input name="targetValue" type="number" step="any" placeholder="Ã–rn. 75, 10000" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
             </div>
             <div>
               <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Birim</label>
-              <input name="unit" placeholder="Örn. kg, adım" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+              <input name="unit" placeholder="Ã–rn. kg, adÄ±m" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
             </div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px", marginTop: "20px" }}>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Bitiş Tarihi</label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>BitiÅŸ Tarihi</label>
               <input name="targetDate" type="date" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#475569" }} />
             </div>
             <div>
               <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Ek Notlar</label>
-              <input name="note" placeholder="Diyetisyenin önerisi vb." style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+              <input name="note" placeholder="Diyetisyenin Ã¶nerisi vb." style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
             </div>
           </div>
 
-          <button style={{ padding: "16px", background: "#d97706", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", marginTop: "20px" }}>Hedefi Başlat</button>
-          {msg && <div style={{ background: msg.includes('başarı') ? '#fef3c7' : '#fef2f2', color: msg.includes('başarı') ? '#b45309' : '#b91c1c', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center", marginTop: "16px" }}>{msg}</div>}
+          <button style={{ padding: "16px", background: "#d97706", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", marginTop: "20px" }}>Hedefi BaÅŸlat</button>
+          {msg && <div style={{ background: msg.includes('baÅŸarÄ±') ? '#fef3c7' : '#fef2f2', color: msg.includes('baÅŸarÄ±') ? '#b45309' : '#b91c1c', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center", marginTop: "16px" }}>{msg}</div>}
         </form>
       )}
 
-      {loading && <div style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>Hedefler yükleniyor...</div>}
+      {loading && <div style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>Hedefler yÃ¼kleniyor...</div>}
 
       {/* Aktif Hedefler */}
       {activeGoals.length > 0 && (
@@ -119,7 +120,7 @@ export default function HealthGoals({patientId}:{patientId?:string}){
 
               <div style={{ background: "#f8fafc", padding: "24px", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#475569" }}>İlerleme Durumu</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#475569" }}>Ä°lerleme Durumu</span>
                   <strong style={{ fontSize: "18px", color: "#d97706" }}>%{g.progressPercent || 0}</strong>
                 </div>
                 
@@ -129,7 +130,7 @@ export default function HealthGoals({patientId}:{patientId?:string}){
                 
                 <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
                   <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{ fontSize: "13px", color: "#64748b" }}>Yüzde Güncelle:</span>
+                    <span style={{ fontSize: "13px", color: "#64748b" }}>YÃ¼zde GÃ¼ncelle:</span>
                     <input 
                       type="range" 
                       min="0" 
@@ -149,10 +150,10 @@ export default function HealthGoals({patientId}:{patientId?:string}){
         </div>
       )}
 
-      {/* Geçmiş / Tamamlanan Hedefler */}
+      {/* GeÃ§miÅŸ / Tamamlanan Hedefler */}
       {otherGoals.length > 0 && (
         <>
-          <h3 style={{ fontSize: "18px", color: "#64748b", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #e2e8f0" }}>Geçmiş Hedefler</h3>
+          <h3 style={{ fontSize: "18px", color: "#64748b", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #e2e8f0" }}>GeÃ§miÅŸ Hedefler</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "16px" }}>
             {otherGoals.map(g => (
               <div key={g.id} style={{ background: "#f8fafc", borderRadius: "20px", padding: "20px", border: "1px solid #e2e8f0", opacity: 0.8 }}>
@@ -161,7 +162,7 @@ export default function HealthGoals({patientId}:{patientId?:string}){
                   <h3 style={{ margin: 0, fontSize: "16px", color: "#475569" }}>{g.title}</h3>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#64748b" }}>
-                  <span>{g.status === 'completed' ? 'Başarıyla Tamamlandı' : 'Duraklatıldı'}</span>
+                  <span>{g.status === 'completed' ? 'BaÅŸarÄ±yla TamamlandÄ±' : 'DuraklatÄ±ldÄ±'}</span>
                   <strong>%{g.progressPercent || 0}</strong>
                 </div>
               </div>
@@ -173,9 +174,10 @@ export default function HealthGoals({patientId}:{patientId?:string}){
       {!loading && rows.length === 0 && (
         <div style={{ padding: "64px", textAlign: "center", background: "#f8fafc", borderRadius: "32px", border: "1px dashed #cbd5e1" }}>
           <Target size={48} weight="duotone" color="#cbd5e1" style={{ marginBottom: "16px" }} />
-          <div style={{ fontSize: "16px", color: "#64748b", fontWeight: 500 }}>Belirlenmiş bir sağlık hedefiniz bulunmuyor.</div>
+          <div style={{ fontSize: "16px", color: "#64748b", fontWeight: 500 }}>BelirlenmiÅŸ bir saÄŸlÄ±k hedefiniz bulunmuyor.</div>
         </div>
       )}
     </div>
   )
 }
+

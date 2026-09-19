@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, {useEffect,useMemo,useState,Suspense} from "react";
 import Link from "next/link";
 import {useSearchParams} from "next/navigation";
@@ -8,7 +8,7 @@ type Profile={id:string;type:'PREGNANCY'|'CHILD';name:string;relationLabel?:stri
 
 function MiniChart({rows,field,unit,color}:{rows:any[];field:string;unit:string;color:string}){
   const vals=rows.map(x=>Number(x[field])).filter(Number.isFinite);
-  if(vals.length<2) return <div style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", color: "#64748b", textAlign: "center", fontSize: "13px" }}>Grafik için en az iki kayıt gerekir.</div>;
+  if(vals.length<2) return <div style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", color: "#64748b", textAlign: "center", fontSize: "13px" }}>Grafik iÃ§in en az iki kayÄ±t gerekir.</div>;
   const min=Math.min(...vals), max=Math.max(...vals), span=max-min||1;
   const points=rows.map((x,i)=>{
     const v=Number(x[field]);
@@ -30,7 +30,7 @@ function MiniChart({rows,field,unit,color}:{rows:any[];field:string;unit:string;
 }
 
 export default function Page(){ 
-  return <Suspense fallback={<div style={{padding: "40px", textAlign: "center", color: "#64748b"}}>Yükleniyor...</div>}><FamilyContent/></Suspense>; 
+  return <Suspense fallback={<div style={{padding: "40px", textAlign: "center", color: "#64748b"}}>YÃ¼kleniyor...</div>}><FamilyContent/></Suspense>; 
 }
 
 function FamilyContent(){
@@ -62,13 +62,14 @@ function FamilyContent(){
   async function addGrowth(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault();
     if(!current)return;
-    const f=new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const f=new FormData(form);
     const body={profileId:current.id,...Object.fromEntries(f.entries())};
     const r=await fetch('/api/health/growth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const j=await r.json();
-    setMsg(r.ok?'Büyüme kaydı eklendi.':j.error||'Kaydedilemedi');
+    setMsg(r.ok?'BÃ¼yÃ¼me kaydÄ± eklendi.':j.error||'Kaydedilemedi');
     if(r.ok){
-      e.currentTarget.reset();
+      form.reset();
       fetch('/api/health/growth?profileId='+current.id).then(x=>x.json()).then(setGrowth);
       setTimeout(()=>setMsg(''), 3000);
     }
@@ -82,13 +83,14 @@ function FamilyContent(){
   async function addEvent(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault();
     if(!current)return;
-    const f=new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const f=new FormData(form);
     const body={profileId:current.id,...Object.fromEntries(f.entries())};
     const r=await fetch('/api/health/pregnancy-events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const j=await r.json();
-    setMsg(r.ok?'Takvim kaydı eklendi.':j.error||'Kaydedilemedi');
+    setMsg(r.ok?'Takvim kaydÄ± eklendi.':j.error||'Kaydedilemedi');
     if(r.ok){
-      e.currentTarget.reset();
+      form.reset();
       fetch('/api/health/pregnancy-events?profileId='+current.id).then(x=>x.json()).then(setEvents);
       setTimeout(()=>setMsg(''), 3000);
     }
@@ -98,13 +100,13 @@ function FamilyContent(){
     <div className="page" style={{ maxWidth: "800px" }}>
       <div style={{ marginBottom: "32px" }}>
         <Link href="/health/family-hub" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", textDecoration: "none", fontSize: "14px", fontWeight: 500, marginBottom: "16px" }}>
-          <CaretLeft size={16} /> Aile Paneline Dön
+          <CaretLeft size={16} /> Aile Paneline DÃ¶n
         </Link>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <span className="kicker">Büyüme & Gebelik</span>
-            <h1 style={{ fontSize: "28px", color: "#0f172a", margin: "8px 0" }}>Sağlık Takibi</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Profiliniz ile özel çocuk ve gebelik profilleri arasında geçiş yapın.</p>
+            <span className="kicker">BÃ¼yÃ¼me & Gebelik</span>
+            <h1 style={{ fontSize: "28px", color: "#0f172a", margin: "8px 0" }}>SaÄŸlÄ±k Takibi</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Profiliniz ile Ã¶zel Ã§ocuk ve gebelik profilleri arasÄ±nda geÃ§iÅŸ yapÄ±n.</p>
           </div>
         </div>
       </div>
@@ -114,7 +116,7 @@ function FamilyContent(){
           onClick={()=>setSelected('me')}
           style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "100px", border: selected === 'me' ? "2px solid #0284c7" : "1px solid #cbd5e1", background: selected === 'me' ? "#f0f9ff" : "#fff", color: selected === 'me' ? "#0369a1" : "#475569", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s" }}
         >
-          <User size={18} weight={selected==='me' ? "duotone" : "regular"} /> Benim Sağlığım
+          <User size={18} weight={selected==='me' ? "duotone" : "regular"} /> Benim SaÄŸlÄ±ÄŸÄ±m
         </button>
         {profiles.map(p=>(
           <button 
@@ -142,17 +144,17 @@ function FamilyContent(){
           <div style={{ display: "inline-flex", padding: "16px", background: "#f1f5f9", borderRadius: "50%", color: "#64748b", marginBottom: "16px" }}>
             <User size={48} weight="duotone" />
           </div>
-          <h2 style={{ fontSize: "20px", color: "#0f172a", marginBottom: "8px" }}>Kendi Sağlık Profiliniz</h2>
+          <h2 style={{ fontSize: "20px", color: "#0f172a", marginBottom: "8px" }}>Kendi SaÄŸlÄ±k Profiliniz</h2>
           <p style={{ color: "#64748b", marginBottom: "24px", maxWidth: "400px", margin: "0 auto 24px" }}>
-            Kişisel sağlık kayıtlarınız, laboratuvar sonuçlarınız ve diğer tüm sağlık verileriniz ana Sağlık Özeti alanında tutulur.
+            KiÅŸisel saÄŸlÄ±k kayÄ±tlarÄ±nÄ±z, laboratuvar sonuÃ§larÄ±nÄ±z ve diÄŸer tÃ¼m saÄŸlÄ±k verileriniz ana SaÄŸlÄ±k Ã–zeti alanÄ±nda tutulur.
           </p>
-          <Link href="/health/summary" className="primary" style={{ padding: "12px 24px", borderRadius: "12px", textDecoration: "none" }}>Sağlık Özetine Git</Link>
+          <Link href="/health/summary" className="primary" style={{ padding: "12px 24px", borderRadius: "12px", textDecoration: "none" }}>SaÄŸlÄ±k Ã–zetine Git</Link>
         </section>
       ) : current?.type==='CHILD' ? (
         <>
           <section className="panel" style={{ padding: "32px", borderRadius: "24px", marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "20px", color: "#0f172a", marginBottom: "8px" }}>Yeni Ölçüm Ekle</h2>
-            <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px" }}>{current.name} için boy, kilo ve baş çevresi ölçümlerini kaydedin.</p>
+            <h2 style={{ fontSize: "20px", color: "#0f172a", marginBottom: "8px" }}>Yeni Ã–lÃ§Ã¼m Ekle</h2>
+            <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px" }}>{current.name} iÃ§in boy, kilo ve baÅŸ Ã§evresi Ã¶lÃ§Ã¼mlerini kaydedin.</p>
             
             <form onSubmit={addGrowth} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "16px" }}>
@@ -162,22 +164,22 @@ function FamilyContent(){
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Boy (cm)</label>
-                  <input name="heightCm" type="number" step="0.1" placeholder="Örn: 75.5" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
+                  <input name="heightCm" type="number" step="0.1" placeholder="Ã–rn: 75.5" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Kilo (kg)</label>
-                  <input name="weightKg" type="number" step="0.01" placeholder="Örn: 9.2" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
+                  <input name="weightKg" type="number" step="0.01" placeholder="Ã–rn: 9.2" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Baş Çevresi (cm)</label>
-                  <input name="headCircumferenceCm" type="number" step="0.1" placeholder="Örn: 44.0" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>BaÅŸ Ã‡evresi (cm)</label>
+                  <input name="headCircumferenceCm" type="number" step="0.1" placeholder="Ã–rn: 44.0" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                 </div>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Not</label>
-                <input name="notes" placeholder="Ekstra belirtmek istediğiniz bir not..." style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
+                <input name="notes" placeholder="Ekstra belirtmek istediÄŸiniz bir not..." style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
               </div>
-              <button className="primary" style={{ padding: "14px", borderRadius: "10px", alignSelf: "flex-start", marginTop: "4px" }}>Ölçümü Kaydet</button>
+              <button className="primary" style={{ padding: "14px", borderRadius: "10px", alignSelf: "flex-start", marginTop: "4px" }}>Ã–lÃ§Ã¼mÃ¼ Kaydet</button>
             </form>
           </section>
 
@@ -193,7 +195,7 @@ function FamilyContent(){
           </div>
 
           <section className="panel" style={{ padding: "24px", borderRadius: "24px" }}>
-            <h2 style={{ fontSize: "18px", color: "#0f172a", marginBottom: "16px" }}>Geçmiş Ölçümler</h2>
+            <h2 style={{ fontSize: "18px", color: "#0f172a", marginBottom: "16px" }}>GeÃ§miÅŸ Ã–lÃ§Ã¼mler</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {[...growth].reverse().map(x=>(
                 <div key={x.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
@@ -204,12 +206,12 @@ function FamilyContent(){
                       {x.weightKg && <span style={{ margin: "0 8px", color: "#cbd5e1" }}>|</span>}
                       {x.weightKg && <strong style={{ color: "#0284c7" }}>Kilo: {x.weightKg} kg</strong>}
                       {x.headCircumferenceCm && <span style={{ margin: "0 8px", color: "#cbd5e1" }}>|</span>}
-                      {x.headCircumferenceCm && <strong style={{ color: "#8b5cf6" }}>Baş Çevresi: {x.headCircumferenceCm} cm</strong>}
+                      {x.headCircumferenceCm && <strong style={{ color: "#8b5cf6" }}>BaÅŸ Ã‡evresi: {x.headCircumferenceCm} cm</strong>}
                     </span>
                   </div>
                 </div>
               ))}
-              {!growth.length && <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1", color: "#64748b" }}>Henüz ölçüm kaydı bulunmuyor.</div>}
+              {!growth.length && <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1", color: "#64748b" }}>HenÃ¼z Ã¶lÃ§Ã¼m kaydÄ± bulunmuyor.</div>}
             </div>
           </section>
         </>
@@ -217,13 +219,13 @@ function FamilyContent(){
         <>
           <section className="panel" style={{ padding: "32px", borderRadius: "24px", marginBottom: "24px" }}>
             <h2 style={{ fontSize: "20px", color: "#0f172a", marginBottom: "8px" }}>Yeni Plan Ekle</h2>
-            <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px" }}>Kontrol randevularını ve tetkik hatırlatmalarını {current?.name} için takvime ekleyin.</p>
+            <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px" }}>Kontrol randevularÄ±nÄ± ve tetkik hatÄ±rlatmalarÄ±nÄ± {current?.name} iÃ§in takvime ekleyin.</p>
             
             <form onSubmit={addEvent} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Başlık *</label>
-                  <input name="title" required placeholder="Örn: 12. Hafta Ultrason Kontrolü" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>BaÅŸlÄ±k *</label>
+                  <input name="title" required placeholder="Ã–rn: 12. Hafta Ultrason KontrolÃ¼" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Tarih / Saat *</label>
@@ -232,12 +234,12 @@ function FamilyContent(){
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 3fr", gap: "16px" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Kayıt Türü</label>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>KayÄ±t TÃ¼rÃ¼</label>
                   <select name="kind" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a" }}>
                     <option value="checkup">Kontrol</option>
                     <option value="test">Tetkik</option>
-                    <option value="reminder">Hatırlatma</option>
-                    <option value="other">Diğer</option>
+                    <option value="reminder">HatÄ±rlatma</option>
+                    <option value="other">DiÄŸer</option>
                   </select>
                 </div>
                 <div>
@@ -258,18 +260,18 @@ function FamilyContent(){
                     <button 
                       onClick={()=>toggleEvent(x.id,!x.completedAt)}
                       style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: x.completedAt ? "#16a34a" : "#cbd5e1" }}
-                      title={x.completedAt ? "Tamamlandı" : "Tamamla"}
+                      title={x.completedAt ? "TamamlandÄ±" : "Tamamla"}
                     >
                       {x.completedAt ? <CheckCircle size={28} weight="fill" /> : <Circle size={28} weight="bold" />}
                     </button>
                     <div>
                       <strong style={{ display: "block", color: x.completedAt ? "#64748b" : "#0f172a", fontSize: "16px", textDecoration: x.completedAt ? "line-through" : "none", marginBottom: "4px" }}>{x.title}</strong>
-                      <span style={{ fontSize: "13px", color: "#64748b" }}>{new Date(x.startsAt).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })} • {x.kind === 'checkup' ? 'Kontrol' : x.kind === 'test' ? 'Tetkik' : x.kind === 'reminder' ? 'Hatırlatma' : 'Diğer'}</span>
+                      <span style={{ fontSize: "13px", color: "#64748b" }}>{new Date(x.startsAt).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })} â€¢ {x.kind === 'checkup' ? 'Kontrol' : x.kind === 'test' ? 'Tetkik' : x.kind === 'reminder' ? 'HatÄ±rlatma' : 'DiÄŸer'}</span>
                     </div>
                   </div>
                 </div>
               ))}
-              {!events.length && <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1", color: "#64748b" }}>Planlanmış bir etkinlik bulunmuyor.</div>}
+              {!events.length && <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1", color: "#64748b" }}>PlanlanmÄ±ÅŸ bir etkinlik bulunmuyor.</div>}
             </div>
           </section>
         </>
@@ -277,3 +279,4 @@ function FamilyContent(){
     </div>
   )
 }
+

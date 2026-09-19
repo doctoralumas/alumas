@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import {useEffect,useState} from "react";
 import SectionVisual from "@/components/section-visual";
 import { User, Ruler, Scales, Circle, Plus, Clock, TrendUp } from "@phosphor-icons/react";
@@ -14,9 +14,10 @@ export default function Page(){
 
   async function submit(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault();
-    const f=new FormData(e.currentTarget),b=Object.fromEntries(f.entries());
+    const form = e.currentTarget;
+    const f=new FormData(form),b=Object.fromEntries(f.entries());
     await fetch('/api/health/body',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
-    e.currentTarget.reset();
+    form.reset();
     load();
   }
 
@@ -35,9 +36,9 @@ export default function Page(){
             <User size={32} weight="duotone" color="#9333ea" />
           </div>
           <div>
-            <span className="kicker" style={{ color: "#9333ea" }}>Fiziksel Ölçümler</span>
-            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>Vücut Ölçüleri</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Boy, kilo ve bel çevresi değişimlerinizi takip edin.</p>
+            <span className="kicker" style={{ color: "#9333ea" }}>Fiziksel Ã–lÃ§Ã¼mler</span>
+            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>VÃ¼cut Ã–lÃ§Ã¼leri</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Boy, kilo ve bel Ã§evresi deÄŸiÅŸimlerinizi takip edin.</p>
           </div>
         </div>
       </div>
@@ -46,24 +47,24 @@ export default function Page(){
         
         {/* BMI Card */}
         <div style={{ background: "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)", borderRadius: "32px", padding: "32px", color: "#fff", display: "flex", flexDirection: "column", justifyContent: "center", boxShadow: "0 10px 15px -3px rgba(147, 51, 234, 0.3)" }}>
-          <span style={{ fontSize: "14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px", opacity: 0.9 }}>Son Vücut Kitle İndeksi (BMI)</span>
+          <span style={{ fontSize: "14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px", opacity: 0.9 }}>Son VÃ¼cut Kitle Ä°ndeksi (BMI)</span>
           <strong style={{ fontSize: "64px", lineHeight: 1, fontWeight: 800 }}>
             {calcBMI(latest?.weightKg, latest?.heightCm) || "--"}
           </strong>
           {latest && (
             <div style={{ display: "flex", gap: "16px", marginTop: "16px", opacity: 0.9 }}>
               <span>{latest.weightKg} kg</span>
-              <span>•</span>
+              <span>â€¢</span>
               <span>{latest.heightCm} cm</span>
             </div>
           )}
         </div>
 
-        {/* Yeni Kayıt Formu */}
+        {/* Yeni KayÄ±t Formu */}
         <form onSubmit={submit} style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", gap: "16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
             <div style={{ background: "#f1f5f9", color: "#475569", padding: "8px", borderRadius: "12px" }}><Plus size={20} weight="bold" /></div>
-            <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>Yeni Ölçüm Gir</h2>
+            <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>Yeni Ã–lÃ§Ã¼m Gir</h2>
           </div>
           
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -76,7 +77,7 @@ export default function Page(){
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ width: "40px", color: "#64748b", display: "flex", justifyContent: "center" }}><Circle size={24} weight="duotone" /></div>
-            <input name="waistCm" type="number" step="0.1" placeholder="Bel Çevresi (cm)" style={{ flex: 1, padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+            <input name="waistCm" type="number" step="0.1" placeholder="Bel Ã‡evresi (cm)" style={{ flex: 1, padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
           </div>
           
           <button style={{ padding: "16px", background: "#0f172a", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", marginTop: "8px" }}>Kaydet</button>
@@ -88,8 +89,8 @@ export default function Page(){
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
           <div style={{ background: "#f1f5f9", color: "#475569", padding: "12px", borderRadius: "16px" }}><Clock size={24} weight="duotone" /></div>
           <div>
-            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Ölçüm Geçmişi</h2>
-            <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>Girdiğiniz tüm kayıtlar.</p>
+            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Ã–lÃ§Ã¼m GeÃ§miÅŸi</h2>
+            <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>GirdiÄŸiniz tÃ¼m kayÄ±tlar.</p>
           </div>
         </div>
         
@@ -123,7 +124,7 @@ export default function Page(){
             </div>
           ))}
           {!loading && rows.length === 0 && (
-            <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", fontSize: "14px", background: "#f8fafc", borderRadius: "16px" }}>Henüz ölçüm kaydınız bulunmuyor.</div>
+            <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", fontSize: "14px", background: "#f8fafc", borderRadius: "16px" }}>HenÃ¼z Ã¶lÃ§Ã¼m kaydÄ±nÄ±z bulunmuyor.</div>
           )}
         </div>
       </section>
@@ -131,3 +132,4 @@ export default function Page(){
     </div>
   )
 }
+

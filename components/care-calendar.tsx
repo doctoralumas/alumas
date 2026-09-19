@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import {useEffect,useState} from "react";
 import { CalendarCheck, CheckCircle, Circle, Plus, Pill, TestTube, Ruler, User, Heartbeat } from "@phosphor-icons/react";
 
@@ -15,15 +15,15 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
 
   async function add(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault();
-    const f=new FormData(e.currentTarget);
+    const form=e.currentTarget;const f=new FormData(form);
     const r=await fetch('/api/care-calendar',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(Object.fromEntries(f.entries()))
     });
     if(r.ok){
-      e.currentTarget.reset();
-      setMsg({ text: 'Görev takvime eklendi.', type: 'success' });
+      form.reset();
+      setMsg({ text: 'GÃ¶rev takvime eklendi.', type: 'success' });
       load();
     }else{
       const j=await r.json();
@@ -53,11 +53,11 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
 
   const getLabel = (kind: string) => {
     switch(kind){
-      case 'measurement': return 'Ölçüm';
-      case 'medication': return 'İlaç';
+      case 'measurement': return 'Ã–lÃ§Ã¼m';
+      case 'medication': return 'Ä°laÃ§';
       case 'visit': return 'Kontrol';
       case 'test': return 'Tetkik';
-      default: return 'Diğer';
+      default: return 'DiÄŸer';
     }
   }
 
@@ -70,8 +70,8 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
             <CalendarCheck size={24} weight="duotone" />
           </div>
           <div>
-            <h2 style={{ fontSize: "20px", color: "#0f172a", margin: 0 }}>Ortak Bakım Takvimi</h2>
-            <p style={{ margin: 0, fontSize: "14px", color: "#64748b", marginTop: "4px" }}>Doktor ve hastanın eş zamanlı görebildiği ortak takip planı.</p>
+            <h2 style={{ fontSize: "20px", color: "#0f172a", margin: 0 }}>Ortak BakÄ±m Takvimi</h2>
+            <p style={{ margin: 0, fontSize: "14px", color: "#64748b", marginTop: "4px" }}>Doktor ve hastanÄ±n eÅŸ zamanlÄ± gÃ¶rebildiÄŸi ortak takip planÄ±.</p>
           </div>
         </div>
 
@@ -79,19 +79,19 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
             {doctorMode ? (
               <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Hasta Seçimi *</label>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Hasta SeÃ§imi *</label>
                 <select name="patientId" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }}>
-                  <option value="">Hasta seçin</option>
+                  <option value="">Hasta seÃ§in</option>
                   {patients.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}
                 </select>
               </div>
             ) : (
               <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>İlgili Bakım Planı *</label>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Ä°lgili BakÄ±m PlanÄ± *</label>
                 <select name="carePlanId" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }}>
-                  <option value="">Plan seçin</option>
+                  <option value="">Plan seÃ§in</option>
                   {plans.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}
-                  {!plans.length && <option value="">Aktif plan bulunamadı</option>}
+                  {!plans.length && <option value="">Aktif plan bulunamadÄ±</option>}
                 </select>
               </div>
             )}
@@ -102,21 +102,21 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
             </div>
             
             <div>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Görev Türü</label>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>GÃ¶rev TÃ¼rÃ¼</label>
               <select name="kind" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }}>
-                <option value="measurement">Ölçüm</option>
-                <option value="medication">İlaç</option>
+                <option value="measurement">Ã–lÃ§Ã¼m</option>
+                <option value="medication">Ä°laÃ§</option>
                 <option value="visit">Kontrol</option>
                 <option value="test">Tetkik</option>
-                <option value="care">Diğer</option>
+                <option value="care">DiÄŸer</option>
               </select>
             </div>
           </div>
           
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px", alignItems: "end" }}>
             <div>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Görev Başlığı *</label>
-              <input name="title" placeholder="Örn: Sabah tansiyon ölçümü" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>GÃ¶rev BaÅŸlÄ±ÄŸÄ± *</label>
+              <input name="title" placeholder="Ã–rn: Sabah tansiyon Ã¶lÃ§Ã¼mÃ¼" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
             </div>
             <button className="primary" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "12px", borderRadius: "10px", height: "42px" }}>
               <Plus size={18} weight="bold" /> Ekle
@@ -138,7 +138,7 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
               <button 
                 onClick={()=>done(x.id,!x.completedAt)}
                 style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: x.completedAt ? "#16a34a" : "#cbd5e1" }}
-                title={x.completedAt ? "Tamamlandı" : "Tamamla"}
+                title={x.completedAt ? "TamamlandÄ±" : "Tamamla"}
               >
                 {x.completedAt ? <CheckCircle size={32} weight="fill" /> : <Circle size={32} weight="bold" />}
               </button>
@@ -153,13 +153,13 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
                 </strong>
                 <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#64748b" }}>
                   <span style={{ fontWeight: 600, color: "#475569" }}>{new Date(x.startsAt).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <span>{getLabel(x.kind)}</span>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <span>{doctorMode ? x.patient?.name : x.doctor?.name}</span>
                   {x.carePlan?.title && (
                     <>
-                      <span>•</span>
+                      <span>â€¢</span>
                       <span style={{ background: "#e2e8f0", padding: "2px 8px", borderRadius: "8px", fontSize: "11px" }}>Plan: {x.carePlan.title}</span>
                     </>
                   )}
@@ -171,10 +171,11 @@ export default function CareCalendar({doctorMode=false,patients=[]}:{doctorMode?
         {!rows.length && (
           <div style={{ padding: "48px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #cbd5e1", color: "#64748b" }}>
             <CalendarCheck size={48} weight="duotone" color="#cbd5e1" style={{ margin: "0 auto 16px" }} />
-            <p style={{ margin: 0, fontSize: "15px" }}>Takvimde henüz planlanmış bir ortak bakım görevi yok.</p>
+            <p style={{ margin: 0, fontSize: "15px" }}>Takvimde henÃ¼z planlanmÄ±ÅŸ bir ortak bakÄ±m gÃ¶revi yok.</p>
           </div>
         )}
       </div>
     </div>
   )
 }
+
