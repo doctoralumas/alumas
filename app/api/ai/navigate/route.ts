@@ -15,6 +15,11 @@ function organizationTypeFor(facility: string | null) {
 }
 
 export async function POST(req: Request) {
+  const user = await currentUser().catch(() => null);
+  if (!user) {
+    return Response.json({error: "Giriş gerekli."}, {status: 401});
+  }
+
   let body: {message?: unknown; history?: unknown; personalize?: unknown};
   try { body = await req.json(); }
   catch { return Response.json({error:"Geçersiz istek."},{status:400}); }
@@ -74,7 +79,6 @@ export async function POST(req: Request) {
     organizations = rows;
   }
 
-  const user = await currentUser().catch(() => null);
   const personalization = personalize && user?.id ? await buildSafePersonalizationContext(user.id, intent.locationHint) : null;
   await audit({
     actorUserId:user?.id || null,

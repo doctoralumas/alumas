@@ -1,7 +1,13 @@
 import SectionVisual from "@/components/section-visual";
 import GoogleNearbyPlaces from "@/components/google-nearby-places";
+import { currentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function Page({searchParams}:{searchParams:Promise<{category?:string}>}) {
+  const user = await currentUser();
+  if (!user) {
+    redirect("/login?next=/nearby");
+  }
   const q=await searchParams;
   return (
     <div className="page" style={{ maxWidth: "1200px" }}>

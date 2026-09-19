@@ -1,9 +1,14 @@
 import { NextRequest,NextResponse } from "next/server";
 import { searchNearbyHealthPlaces } from "@/lib/integrations/google-places";
+import { currentUser } from "@/lib/auth";
 
 const ALLOWED=new Set(["hospital","doctor","pharmacy"]);
 
 export async function POST(req:NextRequest){
+  const user = await currentUser();
+  if (!user) {
+    return NextResponse.json({error: "Giriş gerekli."}, {status: 401});
+  }
   const body=await req.json().catch(()=>({}));
   const lat=Number(body.lat), lng=Number(body.lng);
   const type=String(body.type||"hospital");

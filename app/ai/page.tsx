@@ -1,8 +1,14 @@
 import HealthNavigator from "@/components/ai/health-navigator";
 import Link from "next/link";
 import { ShieldCheck } from "@phosphor-icons/react/dist/ssr";
+import { currentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function AiPage(){
+export default async function AiPage(){
+  const user = await currentUser();
+  if (!user) {
+    redirect("/login?next=/ai");
+  }
   return (
     <div className="page" style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 20px", display: "flex", flexDirection: "column", minHeight: "calc(100vh - 80px)" }}>
       

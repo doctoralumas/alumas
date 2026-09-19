@@ -2,8 +2,14 @@ import CareCalendar from "@/components/care-calendar";
 import SectionVisual from "@/components/section-visual";
 import Link from "next/link";
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr";
+import { currentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function Page(){
+export default async function Page(){
+  const user = await currentUser();
+  if (!user) {
+    redirect("/login?next=/care-calendar");
+  }
   return (
     <div className="page">
       <SectionVisual slug="family" alt="Ortak Takvim" />
