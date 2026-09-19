@@ -177,32 +177,26 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
         ))}
       </div>
 
-      {/* Kontrol Çubuğu: Konum Bul + Filtre Dropdown (Sabit Yükseklik = Layout Shift Yok!) */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", background: "#f8fafc", padding: "12px 16px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
         
+        {/* Left Side: Konum Bul + Status */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-          <button onClick={locate} style={{ padding: "8px 16px", background: "#0f172a", color: "#fff", borderRadius: "8px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px" }}>
-            <Crosshair size={18} weight="bold" /> {pos ? 'Konumu Güncelle' : 'Konumumu Bul'}
+          <button onClick={locate} style={{ padding: "10px 20px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
+            <Crosshair size={18} weight="bold" /> {pos ? 'Güncelle' : 'Konum Bul'}
           </button>
           <span style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>
             {loading ? 'Yükleniyor...' : msg}
           </span>
         </div>
 
-        {/* Dropdown Filtre (Sadece geçerli kategorilerde belirginleşir) */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", opacity: ["health", "hospital", "emergency", "clinic"].includes(category) ? 1 : 0.3, pointerEvents: ["health", "hospital", "emergency", "clinic"].includes(category) ? "auto" : "none", transition: "all 0.2s" }}>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "#64748b" }}>Filtre:</span>
-          <select 
-            value={ownership} 
-            onChange={e => setOwnership(e.target.value as any)}
-            style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a", fontSize: "14px", fontWeight: 600, outline: "none", cursor: "pointer" }}
-          >
-            <option value="all">Tüm Kurumlar</option>
-            <option value="private">Özel Hastaneler</option>
-            <option value="public">Devlet Hastaneleri</option>
-          </select>
+        {/* Right Side: Ownership Pills (Fixed Height Container to prevent CLS) */}
+        <div style={{ minHeight: "40px", display: "flex", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "8px", opacity: ["health", "hospital", "emergency", "clinic"].includes(category) ? 1 : 0, pointerEvents: ["health", "hospital", "emergency", "clinic"].includes(category) ? "auto" : "none", transition: "opacity 0.2s" }}>
+            <button onClick={() => setOwnership("all")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "all" ? "#0ea5e9" : "#e2e8f0", background: ownership === "all" ? "#e0f2fe" : "#fff", color: ownership === "all" ? "#0369a1" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "13px" }}>Tümü</button>
+            <button onClick={() => setOwnership("private")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "private" ? "#8b5cf6" : "#e2e8f0", background: ownership === "private" ? "#ede9fe" : "#fff", color: ownership === "private" ? "#6d28d9" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "13px" }}>Özel</button>
+            <button onClick={() => setOwnership("public")} style={{ padding: "8px 16px", borderRadius: "100px", border: "1px solid", borderColor: ownership === "public" ? "#10b981" : "#e2e8f0", background: ownership === "public" ? "#d1fae5" : "#fff", color: ownership === "public" ? "#047857" : "#64748b", fontWeight: 600, cursor: "pointer", fontSize: "13px" }}>Devlet</button>
+          </div>
         </div>
-
       </div>
 
       <div ref={mapRef} style={{ height: "400px", borderRadius: "24px", background: "#f1f5f9", marginBottom: "32px", border: "1px solid #e2e8f0", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
