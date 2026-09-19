@@ -1,9 +1,78 @@
 // @ts-nocheck
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { useChat } from "@ai-sdk/react";
 import { Sparkle, User, Stethoscope, MapPin, ArrowRight, WarningCircle, ShieldCheck, CheckCircle, PaperPlaneRight } from "@phosphor-icons/react";
 import Link from "next/link";
+
+function useCustomChat({ api, initialConversationId, initialMessages, body, onResponse }) {
+  const [messages, setMessages] = useState(initialMessages || []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const append = async (msg) => {
+    const newMessages = [...messages, { ...msg, id: Date.now().toString() }];
+    setMessages(newMessages);
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const res = await fetch(api, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: newMessages,
+          ...body
+        })
+      });
+      
+      if (onResponse) onResponse(res);
+      
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      
+      let assistantContent = "";
+      let toolInvocations = [];
+      const assistantId = Date.now().toString();
+      
+      setMessages(prev => [...prev, { id: assistantId, role: "assistant", content: "", toolInvocations: [] }]);
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n').filter(Boolean);
+        
+        for (const line of lines) {
+          if (line.startsWith('0:')) {
+            const text = JSON.parse(line.substring(2));
+            assistantContent += text;
+            setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, content: assistantContent } : p));
+          }
+          else if (line.startsWith('9:')) {
+            const toolCall = JSON.parse(line.substring(2));
+            toolInvocations.push({ state: 'call', toolCallId: toolCall.toolCallId, toolName: toolCall.toolName, args: toolCall.args });
+            setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, toolInvocations: [...toolInvocations] } : p));
+          }
+          else if (line.startsWith('a:')) {
+            const toolResult = JSON.parse(line.substring(2));
+            const idx = toolInvocations.findIndex(t => t.toolCallId === toolResult.toolCallId);
+            if (idx >= 0) {
+               toolInvocations[idx] = { ...toolInvocations[idx], state: 'result', result: toolResult.result };
+               setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, toolInvocations: [...toolInvocations] } : p));
+            }
+          }
+        }
+      }
+    } catch (e) {
+      setError(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return { messages, append, isLoading, error };
+}
 
 export default function HealthNavigator({ 
   compact = false,
@@ -19,9 +88,9 @@ export default function HealthNavigator({
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   
-  const { messages, append, isLoading, error } = useChat({
+  const { messages, append, isLoading, error } = useCustomChat({
     api: "/api/ai/chat",
-    id: initialConversationId || undefined,
+    initialConversationId,
     initialMessages,
     body: { id: conversationId, personalize },
     onResponse: (response) => {
@@ -61,7 +130,7 @@ export default function HealthNavigator({
           </div>
         )}
 
-        {messages.map(m => (
+        {messages.map((m: any) => (
           <div key={m.id} style={{ display: "flex", gap: "16px", alignSelf: m.role === 'user' ? "flex-end" : "flex-start", maxWidth: m.role === 'user' ? "85%" : "100%" }}>
             
             {m.role === 'assistant' && (
