@@ -8,7 +8,7 @@ type Org={id:string;slug:string;type:"HOSPITAL"|"CLINIC"|"PHARMACY"|"IMAGING_CEN
 
 const labels:any = { HOSPITAL:"Hastane", CLINIC:"Klinik", PHARMACY:"Eczane", IMAGING_CENTER:"Görüntüleme Merkezi" };
 
-export default function OrganizationDirectory(){
+export default function OrganizationDirectory({ isLoggedIn = false }: { isLoggedIn?: boolean }){
   const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
   const [rows,setRows] = useState<Org[]>([]);
   const [type,setType] = useState("");
@@ -40,6 +40,10 @@ export default function OrganizationDirectory(){
   useEffect(()=>{load()},[type,onDuty]);
 
   function nearby(){
+    if (!isLoggedIn) {
+      window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
     if(!navigator.geolocation){
       setGeoMsg('Konum bu cihazda kullanılamıyor.');
       return;

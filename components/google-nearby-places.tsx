@@ -6,7 +6,20 @@ type Place={id:string;name:string;address:string;latitude:number;longitude:numbe
 
 const cats:any = { health:"Tümü", hospital:"Hastane", clinic:"Klinik", pharmacy:"Eczane", imaging:"Görüntüleme", doctor:"Doktor", emergency:"Acil", hotel:"Otel" };
 
-export default function GoogleNearbyPlaces({initial="health"}:{initial?:string}) {
+export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initial?:string, isLoggedIn: boolean}) {
+  if (!isLoggedIn) {
+    return (
+      <div style={{ padding: "64px 20px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #cbd5e1", marginTop: "24px" }}>
+        <MapPin size={48} color="#94a3b8" style={{ marginBottom: "16px" }} />
+        <h2 style={{ fontSize: "24px", color: "#0f172a", marginBottom: "8px" }}>Yakınınızdaki Kurumları Keşfedin</h2>
+        <p style={{ color: "#64748b", marginBottom: "32px", maxWidth: "500px", margin: "0 auto 32px", fontSize: "16px", lineHeight: 1.6 }}>
+          Cihaz konumunuzu kullanarak çevrenizdeki hastane, eczane ve klinikleri anında görmek ve yol tarifi almak için lütfen giriş yapın.
+        </p>
+        <a href="/login?next=/nearby" style={{ display: "inline-flex", background: "#0f172a", color: "#fff", padding: "12px 24px", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "16px" }}>Giriş Yap / Kayıt Ol</a>
+      </div>
+    );
+  }
+
   const [category, setCategory] = useState(initial in cats ? initial : "health");
   const [rows, setRows] = useState<Place[]>([]);
   const [msg, setMsg] = useState("Konumunuzu kullanarak yakındaki yerleri bulabilirsiniz.");

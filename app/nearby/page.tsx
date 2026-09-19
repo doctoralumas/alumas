@@ -23,7 +23,7 @@ export default async function Page({searchParams}:{searchParams:Promise<{categor
         </div>
       </div>
 
-      <GoogleNearbyPlaces initial={q.category || "health"} />
+      <GoogleNearbyPlaces initial={q.category || 'health'} isLoggedIn={!!user} />
     </div>
   );
 }

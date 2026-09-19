@@ -1,7 +1,9 @@
 import SectionVisual from "@/components/section-visual";
-import OrganizationDirectory from "@/components/organization-directory";
+import OrganizationDirectory from '@/components/organization-directory';
+import { currentUser } from '@/lib/auth';
 
-export default function Organizations() {
+export default async function Organizations() {
+  const user = await currentUser();
   return (
     <div className="page" style={{ maxWidth: "1200px" }}>
       <SectionVisual slug="organizations" alt="Sağlık Kurumları" />
@@ -16,7 +18,7 @@ export default function Organizations() {
         </div>
       </div>
 
-      <OrganizationDirectory />
+      <OrganizationDirectory isLoggedIn={!!user} />
     </div>
   );
 }

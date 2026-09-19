@@ -1,4 +1,4 @@
-import { streamText, tool } from 'ai';
+import { streamText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 import { getAIModel } from '@/lib/ai-provider';
 import { prisma } from '@/lib/prisma';
@@ -82,7 +82,7 @@ LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${dbUser.name.split(
 
     const result = streamText({
       model: getAIModel(),
-      maxSteps: 5,
+      stopWhen: isStepCount(5),
       system: `Sen Alumas platformunun resmi yapay zeka sağlık asistanı Luma'sın. 
       Görevin hastaların şikayetlerini dinleyip onları EN DOĞRU tıbbi branşa, doktora veya kuruma yönlendirmektir.
       KESİNLİKLE tıbbi tanı koyamazsın, tedavi uygulayamazsın ve ilaç yazamazsın.
