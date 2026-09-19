@@ -20,3 +20,4 @@ c = c.replace(
 c = c.replace('Devlet Hastaneleri</button>\n      </div>', 'Devlet Hastaneleri</button>\n      </div>\n      )}');
 
 // Let's ensure we don't duplicate logic. I will rewrite the whole file nicely.
+
