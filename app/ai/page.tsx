@@ -35,7 +35,7 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
   });
 
   return (
-    <div style={{ width: "100%", backgroundColor: "#f8fafc" }}>
+    <div style={{ width: "100%", height: "calc(100vh - 80px)", overflow: "hidden", backgroundColor: "#f8fafc" }}>
        <AiLayout 
          history={history} 
          currentConversationId={q.c || null} 
