@@ -1,6 +1,6 @@
-import ReactMarkdown from "react-markdown";
 // @ts-nocheck
 "use client";
+import ReactMarkdown from "react-markdown";
 import { useState, useRef, useEffect } from "react";
 import { Sparkle, User, Stethoscope, MapPin, ArrowRight, WarningCircle, ShieldCheck, CheckCircle, PaperPlaneRight } from "@phosphor-icons/react";
 import Link from "next/link";
