@@ -1,4 +1,4 @@
-import { streamText, tool } from 'ai';
+﻿import { streamText, tool } from 'ai';
 import { z } from 'zod';
 import { getAIModel } from '@/lib/ai-provider';
 import { prisma } from '@/lib/prisma';
@@ -63,37 +63,37 @@ export async function POST(req: Request) {
          const labsStr = dbUser.labResults.map(l => `- ${l.testName}: ${l.value} ${l.unit || ''} (Durum: ${l.status})`).join('\n');
          const plansStr = dbUser.carePlans.map(cp => `- ${cp.title}: ${cp.items.map(i => i.title).join(', ')}`).join('\n');
 
-         personalizedContext = `\n\n--- HASTA SAĞLIK PROFİLİ ---
-Kullanıcı Adı: ${dbUser.name}
-Yaş: ${age}
+         personalizedContext = `\n\n--- HASTA SAÄLIK PROFÄ°LÄ° ---
+KullanÄ±cÄ± AdÄ±: ${dbUser.name}
+YaÅŸ: ${age}
 
-Son Sağlık Ölçümleri (Tansiyon, Kilo vb):
+Son SaÄŸlÄ±k Ã–lÃ§Ã¼mleri (Tansiyon, Kilo vb):
 ${entriesStr || 'Yok'}
 
-Son Laboratuvar Sonuçları:
+Son Laboratuvar SonuÃ§larÄ±:
 ${labsStr || 'Yok'}
 
-Aktif Tedavi Planları / İlaçlar:
+Aktif Tedavi PlanlarÄ± / Ä°laÃ§lar:
 ${plansStr || 'Yok'}
 ----------------------------
-LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${dbUser.name.split(' ')[0]} Bey/Hanım) HİTAP ET VE GEREKİRSE ÖLÇÜMLERİ/İLAÇLARIYLA İLGİLİ BAĞLANTI KURARAK EMPATİK BİR YANIT VER. ANCAK KESİNLİKLE TIBBİ TANI KOYMA VEYA İLAÇ ÖNERME! SADECE DOĞRU UZMANLIĞA VEYA KURUMA YÖNLENDİR.`;
+LÃœTFEN BU BÄ°LGÄ°LERÄ° KULLANARAK HASTAYA Ä°SMÄ°YLE (Ã–rn: ${dbUser.name.split(' ')[0]} Bey/HanÄ±m) HÄ°TAP ET VE GEREKÄ°RSE Ã–LÃ‡ÃœMLERÄ°/Ä°LAÃ‡LARIYLA Ä°LGÄ°LÄ° BAÄLANTI KURARAK EMPATÄ°K BÄ°R YANIT VER. ANCAK KESÄ°NLÄ°KLE TIBBÄ° TANI KOYMA VEYA Ä°LAÃ‡ Ã–NERME! SADECE DOÄRU UZMANLIÄA VEYA KURUMA YÃ–NLENDÄ°R.`;
       }
     }
 
     const result = streamText({
       model: getAIModel(),
-      system: `Sen Alumas platformunun resmi yapay zeka sağlık asistanı Luma'sın. 
-      Görevin hastaların şikayetlerini dinleyip onları EN DOĞRU tıbbi branşa, doktora veya kuruma yönlendirmektir.
-      KESİNLİKLE tıbbi tanı koyamazsın, tedavi uygulayamazsın ve ilaç yazamazsın.
-      Sana sorulan sorulara kısa, net ve empati kurarak cevap ver.
-      Gerekirse veritabanından doktor veya kurum bulmak için araçları (tools) kullan.${personalizedContext}`,
+      system: `Sen Alumas platformunun resmi yapay zeka saÄŸlÄ±k asistanÄ± Luma'sÄ±n. 
+      GÃ¶revin hastalarÄ±n ÅŸikayetlerini dinleyip onlarÄ± EN DOÄRU tÄ±bbi branÅŸa, doktora veya kuruma yÃ¶nlendirmektir.
+      KESÄ°NLÄ°KLE tÄ±bbi tanÄ± koyamazsÄ±n, tedavi uygulayamazsÄ±n ve ilaÃ§ yazamazsÄ±n.
+      Sana sorulan sorulara kÄ±sa, net ve empati kurarak cevap ver.
+      Gerekirse veritabanÄ±ndan doktor veya kurum bulmak iÃ§in araÃ§larÄ± (tools) kullan.${personalizedContext}`,
       messages,
       tools: {
         find_doctors: tool({
-          description: 'Veritabanındaki gerçek doktorları bulmak için bu aracı kullan.',
+          description: 'VeritabanÄ±ndaki gerÃ§ek doktorlarÄ± bulmak iÃ§in bu aracÄ± kullan.',
           parameters: z.object({
-            specialty: z.string().describe('Hastanın gitmesi gereken tıbbi branş (örn: Ortopedi, Kardiyoloji)'),
-            city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
+            specialty: z.string().describe('HastanÄ±n gitmesi gereken tÄ±bbi branÅŸ (Ã¶rn: Ortopedi, Kardiyoloji)'),
+            city: z.string().optional().describe('HastanÄ±n bulunduÄŸu ÅŸehir (varsa)'),
           }),
           execute: async ({ specialty, city }: { specialty: string, city?: string }) => {
             const doctors = await prisma.doctor.findMany({
@@ -105,14 +105,14 @@ LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${dbUser.name.split(
               include: { organization: { select: { name: true, city: true, address: true } } },
               take: 3
             });
-            return doctors.length > 0 ? doctors : { error: "Bu kriterlerde doktor bulunamadı." };
+            return doctors.length > 0 ? doctors : { error: "Bu kriterlerde doktor bulunamadÄ±." };
           },
         } as any),
         find_organizations: tool({
-          description: 'Hastaneler, klinikler, eczaneler veya GÖRÜNTÜLEME MERKEZLERİNİ bulmak için bu aracı kullan.',
+          description: 'Hastaneler, klinikler, eczaneler veya GÃ–RÃœNTÃœLEME MERKEZLERÄ°NÄ° bulmak iÃ§in bu aracÄ± kullan.',
           parameters: z.object({
             type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'LAB', 'IMAGING_CENTER']).optional(),
-            city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
+            city: z.string().optional().describe('HastanÄ±n bulunduÄŸu ÅŸehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional(),
           }),
           execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: any, city?: string, needsEmergencyOrOnDuty?: boolean }) => {
@@ -128,7 +128,7 @@ LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${dbUser.name.split(
               orderBy: [{ isOnDuty: "desc" }],
               take: 3
             });
-            return orgs.length > 0 ? orgs : { error: "Bu kriterlerde aktif kurum bulunamadı." };
+            return orgs.length > 0 ? orgs : { error: "Bu kriterlerde aktif kurum bulunamadÄ±." };
           },
         } as any),
       },
@@ -170,4 +170,5 @@ LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${dbUser.name.split(
     return new Response(error.message, { status: 500 });
   }
 }
+
 

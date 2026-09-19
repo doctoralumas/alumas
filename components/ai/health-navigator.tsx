@@ -36,50 +36,13 @@ function useCustomChat({ api, initialConversationId, initialMessages, body, onRe
       
       setMessages(prev => [...prev, { id: assistantId, role: "assistant", content: "", toolInvocations: [] }]);
       
-      let buffer = "";
-      
-      const parseLine = (trimmed: string) => {
-        try {
-          if (trimmed.startsWith('0:')) {
-            const text = JSON.parse(trimmed.substring(2));
-            assistantContent += text;
-            setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, content: assistantContent } : p));
-          }
-          else if (trimmed.startsWith('9:')) {
-            const toolCall = JSON.parse(trimmed.substring(2));
-            toolInvocations.push({ state: 'call', toolCallId: toolCall.toolCallId, toolName: toolCall.toolName, args: toolCall.args });
-            setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, toolInvocations: [...toolInvocations] } : p));
-          }
-          else if (trimmed.startsWith('a:')) {
-            const toolResult = JSON.parse(trimmed.substring(2));
-            const idx = toolInvocations.findIndex(t => t.toolCallId === toolResult.toolCallId);
-            if (idx >= 0) {
-               toolInvocations[idx] = { ...toolInvocations[idx], state: 'result', result: toolResult.result };
-               setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, toolInvocations: [...toolInvocations] } : p));
-            }
-          }
-        } catch (err) {
-          console.error("Failed to parse stream chunk:", trimmed, err);
-        }
-      };
-
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        // Keep the last incomplete line in the buffer
-        buffer = lines.pop() || "";
-        
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed) parseLine(trimmed);
-        }
-      }
-      
-      if (buffer.trim()) {
-        parseLine(buffer.trim());
+        const text = decoder.decode(value, { stream: true });
+        assistantContent += text;
+        setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, content: assistantContent } : p));
       }
     } catch (e) {
       setError(e);

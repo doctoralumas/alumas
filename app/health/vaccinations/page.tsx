@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { Suspense, useEffect, useState } from "react";
 import SectionVisual from "@/components/section-visual";
 import Link from "next/link";
@@ -10,7 +10,7 @@ type V={id:string;vaccineName:string;doseLabel?:string;administeredAt:string;pro
 
 export default function Page(){ 
   return (
-    <Suspense fallback={<div style={{ padding: "48px", textAlign: "center", color: "#64748b" }}>YÃ¼kleniyor...</div>}>
+    <Suspense fallback={<div style={{ padding: "48px", textAlign: "center", color: "#64748b" }}>Yükleniyor...</div>}>
       <VaccinationsContent/>
     </Suspense>
   ); 
@@ -30,8 +30,7 @@ function VaccinationsContent(){
 
   async function add(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault();
-    const form = e.currentTarget;
-    const f=new FormData(form);
+    const form=e.currentTarget;const f=new FormData(form);
     const r=await fetch('/api/health/vaccinations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...Object.fromEntries(f.entries()),specialProfileId:profileId||undefined})});
     const j=await r.json();
     if(!r.ok){
@@ -40,9 +39,9 @@ function VaccinationsContent(){
     }
     if(j.reminder){
       const native=await scheduleLocalReminder(j.reminder);
-      setMsg(native.scheduled?'AÅŸÄ± kaydÄ± ve cihaz hatÄ±rlatÄ±cÄ±sÄ± oluÅŸturuldu.':'AÅŸÄ± kaydÄ± ve Alumas hatÄ±rlatÄ±cÄ±sÄ± oluÅŸturuldu.');
+      setMsg(native.scheduled?'Aşı kaydı ve cihaz hatırlatıcısı oluşturuldu.':'Aşı kaydı ve Alumas hatırlatıcısı oluşturuldu.');
     }else {
-      setMsg('AÅŸÄ± kaydÄ± baÅŸarÄ±yla oluÅŸturuldu.');
+      setMsg('Aşı kaydı başarıyla oluşturuldu.');
     }
     form.reset();
     setTimeout(() => { setOpen(false); setMsg(""); load(); }, 1500);
@@ -57,20 +56,20 @@ function VaccinationsContent(){
             <Syringe size={32} weight="duotone" color="#059669" />
           </div>
           <div>
-            <span className="kicker" style={{ color: "#059669" }}>Koruyucu SaÄŸlÄ±k</span>
-            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{profileId ? "Aile Profili AÅŸÄ± Takibi" : "AÅŸÄ± Takvimi"}</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Uygulanan aÅŸÄ±larÄ± ve planlanan doz tarihlerini gÃ¼venle saklayÄ±n.</p>
+            <span className="kicker" style={{ color: "#059669" }}>Koruyucu Sağlık</span>
+            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{profileId ? "Aile Profili Aşı Takibi" : "Aşı Takvimi"}</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Uygulanan aşıları ve planlanan doz tarihlerini güvenle saklayın.</p>
           </div>
         </div>
         <button onClick={()=>setOpen(!open)} style={{ padding: "12px 24px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
-          {open ? <X size={20} /> : <Plus size={20} />} {open ? "Ä°ptal" : "Yeni AÅŸÄ± Ekle"}
+          {open ? <X size={20} /> : <Plus size={20} />} {open ? "İptal" : "Yeni Aşı Ekle"}
         </button>
       </div>
 
       {profileId && (
         <div style={{ background: "#fef3c7", color: "#d97706", padding: "16px 20px", borderRadius: "16px", marginBottom: "32px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid #fde68a" }}>
           <ShieldCheck size={24} weight="duotone" />
-          <span style={{ fontSize: "14px", fontWeight: 600 }}>Bu ekrandaki yeni aÅŸÄ± kayÄ±tlarÄ± seÃ§ili aile profiline kaydedilecektir.</span>
+          <span style={{ fontSize: "14px", fontWeight: 600 }}>Bu ekrandaki yeni aşı kayıtları seçili aile profiline kaydedilecektir.</span>
         </div>
       )}
 
@@ -78,22 +77,22 @@ function VaccinationsContent(){
         <div style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", marginBottom: "40px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
             <div style={{ background: "#f1f5f9", color: "#475569", padding: "8px", borderRadius: "12px" }}><ShieldPlus size={20} weight="bold" /></div>
-            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Yeni AÅŸÄ± KaydÄ±</h2>
+            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Yeni Aşı Kaydı</h2>
           </div>
           
           <form onSubmit={add} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
               <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>AÅŸÄ± AdÄ± <span style={{ color: "#ef4444" }}>*</span></label>
-                <input name="vaccineName" required placeholder="Ã–rn. Biontech, Tetanoz" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Aşı Adı <span style={{ color: "#ef4444" }}>*</span></label>
+                <input name="vaccineName" required placeholder="Örn. Biontech, Tetanoz" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
               </div>
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Doz Etiketi</label>
-                <input name="doseLabel" placeholder="Ã–rn. 2. Doz, HatÄ±rlatma" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+                <input name="doseLabel" placeholder="Örn. 2. Doz, Hatırlatma" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
               </div>
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Uygulanan Kurum</label>
-                <input name="provider" placeholder="Ã–rn. Aile Hekimi, Hastane" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+                <input name="provider" placeholder="Örn. Aile Hekimi, Hastane" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
               </div>
             </div>
 
@@ -107,17 +106,17 @@ function VaccinationsContent(){
                   <CalendarBlank size={16} /> Sonraki Doz Tarihi
                 </label>
                 <input name="nextDoseAt" type="date" style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", border: "1px solid #86efac", background: "#fff", outline: "none", fontSize: "15px", color: "#065f46" }} />
-                <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#059669" }}>Girerseniz Alumas size hatÄ±rlatma gÃ¶nderecektir.</p>
+                <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#059669" }}>Girerseniz Alumas size hatırlatma gönderecektir.</p>
               </div>
             </div>
 
             <button style={{ padding: "16px", background: "#059669", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", marginTop: "8px" }}>Kaydet</button>
-            {msg && <div style={{ background: msg.includes('baÅŸarÄ±')||msg.includes('oluÅŸturuldu') ? '#ecfdf5' : '#fef2f2', color: msg.includes('baÅŸarÄ±')||msg.includes('oluÅŸturuldu') ? '#047857' : '#b91c1c', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center" }}>{msg}</div>}
+            {msg && <div style={{ background: msg.includes('başarı')||msg.includes('oluşturuldu') ? '#ecfdf5' : '#fef2f2', color: msg.includes('başarı')||msg.includes('oluşturuldu') ? '#047857' : '#b91c1c', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center" }}>{msg}</div>}
           </form>
         </div>
       )}
 
-      {loading && <div style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>AÅŸÄ± kayÄ±tlarÄ± yÃ¼kleniyor...</div>}
+      {loading && <div style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>Aşı kayıtları yükleniyor...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px", marginBottom: "48px" }}>
         {rows.map(v => (
@@ -145,7 +144,7 @@ function VaccinationsContent(){
               <div style={{ background: v.nextDoseAt ? "#f0fdf4" : "#f8fafc", border: `1px solid ${v.nextDoseAt ? '#bbf7d0' : '#e2e8f0'}`, padding: "12px 16px", borderRadius: "16px" }}>
                 <span style={{ display: "block", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", color: v.nextDoseAt ? "#059669" : "#94a3b8", fontWeight: 600, marginBottom: "4px" }}>Sonraki Doz</span>
                 <span style={{ fontSize: "14px", color: v.nextDoseAt ? "#065f46" : "#64748b", fontWeight: v.nextDoseAt ? 700 : 500 }}>
-                  {v.nextDoseAt ? new Date(v.nextDoseAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'PlanlanmadÄ±'}
+                  {v.nextDoseAt ? new Date(v.nextDoseAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Planlanmadı'}
                 </span>
               </div>
             </div>
@@ -156,7 +155,7 @@ function VaccinationsContent(){
         {!loading && rows.length === 0 && (
           <div style={{ padding: "64px", textAlign: "center", background: "#f8fafc", borderRadius: "32px", border: "1px dashed #cbd5e1" }}>
             <Syringe size={48} weight="duotone" color="#cbd5e1" style={{ marginBottom: "16px" }} />
-            <div style={{ fontSize: "16px", color: "#64748b", fontWeight: 500 }}>KayÄ±tlÄ± aÅŸÄ±nÄ±z bulunmuyor.</div>
+            <div style={{ fontSize: "16px", color: "#64748b", fontWeight: 500 }}>Kayıtlı aşınız bulunmuyor.</div>
           </div>
         )}
       </div>
@@ -164,14 +163,13 @@ function VaccinationsContent(){
       <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", background: "#f8fafc", padding: "16px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "24px" }}>
         <Info size={20} color="#64748b" style={{ flexShrink: 0, marginTop: "2px" }} />
         <p style={{ margin: 0, fontSize: "13px", color: "#475569", lineHeight: "1.5" }}>
-          Alumas kendi baÅŸÄ±na otomatik bir tÄ±bbi aÅŸÄ± takvimi Ã¶nermez; hatÄ±rlatmalar yalnÄ±zca sizin kaydettiÄŸiniz manuel <b>Sonraki Doz Tarihine</b> gÃ¶re cihazÄ±nÄ±za gÃ¶nderilir.
+          Alumas kendi başına otomatik bir tıbbi aşı takvimi önermez; hatırlatmalar yalnızca sizin kaydettiğiniz manuel <b>Sonraki Doz Tarihine</b> göre cihazınıza gönderilir.
         </p>
       </div>
 
       <Link href="/health/summary" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "14px", fontWeight: 600, color: "#0284c7", textDecoration: "none" }}>
-        SaÄŸlÄ±k Ã–zetine DÃ¶n <CaretRight size={14} weight="bold" />
+        Sağlık Özetine Dön <CaretRight size={14} weight="bold" />
       </Link>
     </div>
   )
 }
-
