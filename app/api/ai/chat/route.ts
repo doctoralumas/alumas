@@ -48,39 +48,70 @@ export async function POST(req: Request) {
     let personalizedContext = "";
     if (personalize) {
       const dbUser = await prisma.user.findUnique({
-        where: { id: user.id },
-        include: {
-          healthEntries: { orderBy: { measuredAt: 'desc' }, take: 5 },
-          labResults: { orderBy: { measuredAt: 'desc' }, take: 3 },
-          carePlans: { where: { status: 'active' }, include: { items: true }, take: 2 }
+          where: { id: user.id },
+          include: {
+            healthEntries: { orderBy: { measuredAt: 'desc' }, take: 3 },
+            bodyMeasurements: { orderBy: { measuredAt: 'desc' }, take: 1 },
+            bloodPressureReadings: { orderBy: { measuredAt: 'desc' }, take: 2 },
+            glucoseReadings: { orderBy: { measuredAt: 'desc' }, take: 2 },
+            medications: { where: { isActive: true }, take: 10 },
+            medicalConditions: { take: 10 },
+            allergies: { take: 10 },
+            labResults: { orderBy: { measuredAt: 'desc' }, take: 3 },
+            carePlans: { where: { status: 'active' }, include: { items: true }, take: 2 }
+          }
+        });
+        
+        if (dbUser) {
+           const age = dbUser.birthDate ? Math.floor((new Date().getTime() - dbUser.birthDate.getTime()) / 3.15576e+10) : 'Bilinmiyor';
+           
+           let boyKiloStr = 'Bilinmiyor';
+           if (dbUser.bodyMeasurements && dbUser.bodyMeasurements.length > 0) {
+             const b = dbUser.bodyMeasurements[0];
+             boyKiloStr = `Boy: ${b.heightCm ? b.heightCm + ' cm' : 'Bilinmiyor'}, Kilo: ${b.weightKg ? b.weightKg + ' kg' : 'Bilinmiyor'}`;
+           }
+
+           const conditionsStr = dbUser.medicalConditions?.map((c: any) => `- ${c.name} (Durum: ${c.status})`).join('\n');
+           const allergiesStr = dbUser.allergies?.map((a: any) => `- ${a.allergen} (Reaksiyon: ${a.reaction || 'Bilinmiyor'})`).join('\n');
+           const medsStr = dbUser.medications?.map((m: any) => `- ${m.name} (${m.dosage})`).join('\n');
+           
+           const bpStr = dbUser.bloodPressureReadings?.map((b: any) => `- Tansiyon: ${b.systolic}/${b.diastolic} (${new Date(b.measuredAt).toLocaleDateString('tr-TR')})`).join('\n');
+           const glStr = dbUser.glucoseReadings?.map((g: any) => `- Şeker: ${g.level} mg/dL (${g.context}, ${new Date(g.measuredAt).toLocaleDateString('tr-TR')})`).join('\n');
+
+           const entriesStr = dbUser.healthEntries?.map((e: any) => `- ${e.type}: ${e.value} ${e.unit} (${new Date(e.measuredAt).toLocaleDateString('tr-TR')})`).join('\n');
+           const labsStr = dbUser.labResults?.map((l: any) => `- ${l.testName}: ${l.value} ${l.unit || ''} (Durum: ${l.status})`).join('\n');
+           const plansStr = dbUser.carePlans?.map((cp: any) => `- ${cp.title}: ${cp.items.map((i: any) => i.title).join(', ')}`).join('\n');
+  
+           personalizedContext = `\n\n--- HASTA SAĞLIK PROFİLİ ---
+  Kullanıcı Adı: ${dbUser.name}
+  Yaş: ${age}
+  Vücut Ölçüleri: ${boyKiloStr}
+  
+  Kronik Hastalıklar:
+  ${conditionsStr || 'Yok / Kayıtlı Değil'}
+
+  Alerjiler:
+  ${allergiesStr || 'Yok / Kayıtlı Değil'}
+
+  Aktif İlaçlar:
+  ${medsStr || 'Yok / Kayıtlı Değil'}
+
+  Son Ölçümler (Tansiyon/Şeker/Diğer):
+  ${bpStr || ''}
+  ${glStr || ''}
+  ${entriesStr || ''}
+  
+  Son Laboratuvar Sonuçları:
+  ${labsStr || 'Yok'}
+  
+  Aktif Tedavi Planları:
+  ${plansStr || 'Yok'}
+  ----------------------------
+  LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${dbUser.name.split(' ')[0]} Bey/Hanım) HİTAP ET VE GEREKİRSE KRONİK HASTALIKLARIYLA, İLAÇLARIYLA VEYA ÖLÇÜMLERİYLE İLGİLİ BAĞLANTI KURARAK EMPATİK BİR YANIT VER. ANCAK KESİNLİKLE TIBBİ TANI KOYMA VEYA İLAÇ ÖNERME! SADECE DOĞRU UZMANLIĞA VEYA KURUMA YÖNLENDİR.`;
         }
-      });
-      
-      if (dbUser) {
-         const age = dbUser.birthDate ? Math.floor((new Date().getTime() - dbUser.birthDate.getTime()) / 3.15576e+10) : 'Bilinmiyor';
-         
-         const entriesStr = dbUser.healthEntries.map(e => `- ${e.type}: ${e.value} ${e.unit} (${new Date(e.measuredAt).toLocaleDateString('tr-TR')})`).join('\n');
-         const labsStr = dbUser.labResults.map(l => `- ${l.testName}: ${l.value} ${l.unit || ''} (Durum: ${l.status})`).join('\n');
-         const plansStr = dbUser.carePlans.map(cp => `- ${cp.title}: ${cp.items.map(i => i.title).join(', ')}`).join('\n');
-
-         personalizedContext = `\n\n--- HASTA SAĞLIK PROFİLİ ---
-Kullanıcı Adı: ${dbUser.name}
-Yaş: ${age}
-
-Son Sağlık Ölçümleri (Tansiyon, Kilo vb):
-${entriesStr || 'Yok'}
-
-Son Laboratuvar Sonuçları:
-${labsStr || 'Yok'}
-
-Aktif Tedavi Planları / İlaçlar:
-${plansStr || 'Yok'}
-----------------------------
-LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${dbUser.name.split(' ')[0]} Bey/Hanım) HİTAP ET VE GEREKİRSE ÖLÇÜMLERİ/İLAÇLARIYLA İLGİLİ BAĞLANTI KURARAK EMPATİK BİR YANIT VER. ANCAK KESİNLİKLE TIBBİ TANI KOYMA VEYA İLAÇ ÖNERME! SADECE DOĞRU UZMANLIĞA VEYA KURUMA YÖNLENDİR.`;
       }
-    }
 
-    const result = streamText({
+      const result = streamText({
       model: getAIModel(),
       stopWhen: isStepCount(5),
       system: `Sen Alumas platformunun resmi yapay zeka sağlık asistanı Luma'sın. 
