@@ -22,7 +22,12 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
         id: m.id,
         role: m.role,
         content: m.content,
-        toolInvocations: m.uiState ? (typeof m.uiState === 'string' ? JSON.parse(m.uiState) : m.uiState).map((t: any) => ({...t, state: 'result'})) : undefined
+        toolInvocations: m.uiState ? (typeof m.uiState === 'string' ? JSON.parse(m.uiState) : m.uiState).map((t: any) => ({
+          ...t,
+          state: 'result',
+          args: t.args || t.input,
+          result: t.result || t.output
+        })) : undefined
       }));
     }
   }

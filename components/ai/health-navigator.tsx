@@ -141,6 +141,7 @@ export default function HealthNavigator({
                   
                   if (ti.toolName === 'find_doctors') {
                      const docs = ti.result as any[];
+                     if (!docs) return null;
                      if (docs.error) return null;
                      return (
                         <div key={ti.toolCallId} style={{ marginTop: m.content ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -162,6 +163,7 @@ export default function HealthNavigator({
 
                   if (ti.toolName === 'find_organizations') {
                      const orgs = ti.result as any[];
+                     if (!orgs) return null;
                      if (orgs.error) return null;
                      return (
                         <div key={ti.toolCallId} style={{ marginTop: m.content ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
