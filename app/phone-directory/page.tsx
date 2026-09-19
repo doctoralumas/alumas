@@ -1,7 +1,9 @@
 import SectionVisual from "@/components/section-visual";
 import HealthPhoneDirectory from '@/components/health-phone-directory';
 
-export default function Page(){
+import { currentUser } from '@/lib/auth';
+export default async function Page(){
+  const user = await currentUser();
   return (
     <div className="page" style={{ maxWidth: "800px", margin: "0 auto" }}>
       <SectionVisual slug="phone-directory" alt="Telefon Rehberi" />
@@ -13,7 +15,7 @@ export default function Page(){
         </p>
       </div>
       
-      <HealthPhoneDirectory />
+      <HealthPhoneDirectory isLoggedIn={!!user} />
     </div>
   )
 }

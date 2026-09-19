@@ -2,7 +2,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { PhoneCall, Heart, MagnifyingGlass, Ambulance, UserList } from "@phosphor-icons/react";
 
-export default function HealthPhoneDirectory(){
+export default function HealthPhoneDirectory({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const [rows,setRows]=useState<any[]>([]);
   const [fav,setFav]=useState<Set<string>>(new Set());
   const [q, setQ]=useState('');
@@ -19,6 +19,10 @@ export default function HealthPhoneDirectory(){
   },[]);
 
   async function toggle(id:string){
+    if (!isLoggedIn) {
+      window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
     if(fav.has(id)){
       await fetch('/api/emergency/favorites',{method:'DELETE',headers:{'content-type':'application/json'},body:JSON.stringify({directoryItemId:id})});
       setFav(s=>{const n=new Set(s);n.delete(id);return n});

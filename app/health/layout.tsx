@@ -17,3 +17,4 @@ export default async function HealthLayout({ children }: { children: React.React
 
   return <>{children}</>;
 }
+
