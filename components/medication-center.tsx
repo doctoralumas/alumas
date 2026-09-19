@@ -10,6 +10,7 @@ export default function MedicationCenter(){
   const [open,setOpen]=useState(false);
   const [msg,setMsg]=useState("");
   const [loading,setLoading]=useState(true);
+  const [timesList,setTimesList]=useState<string[]>(["09:00"]);
   
   const load=()=>fetch('/api/health/medications').then(r=>r.ok?r.json():[]).then(setRows).finally(()=>setLoading(false));
   useEffect(()=>{load()},[]);
@@ -18,7 +19,7 @@ export default function MedicationCenter(){
     e.preventDefault();
     setMsg("");
     const f=new FormData(e.currentTarget);
-    const times=String(f.get('times')||'').split(',').map(x=>x.trim()).filter(Boolean);
+    const times = f.getAll('times').map(x=>String(x).trim()).filter(Boolean);
     const body={name:f.get('name'),dose:f.get('dose'),instructions:f.get('instructions'),times};
     
     const r=await fetch('/api/health/medications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -31,7 +32,7 @@ export default function MedicationCenter(){
     
     for(const reminder of j.reminders||[]) await scheduleLocalReminder(reminder);
     setMsg('İlaç ve hatırlatıcılar başarıyla eklendi.');
-    setTimeout(()=> { setOpen(false); setMsg(""); load(); }, 1500);
+    setTimeout(()=> { setOpen(false); setMsg(""); setTimesList(["09:00"]); load(); }, 1500);
   }
   
   async function toggle(id:string,isActive:boolean){
@@ -57,7 +58,7 @@ export default function MedicationCenter(){
             <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>İlaçlarını, dozlarını, günlük saatlerini ve alım geçmişini yönet.</p>
           </div>
         </div>
-        <button onClick={()=>setOpen(!open)} style={{ padding: "12px 24px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+        <button onClick={()=>{setOpen(!open); setTimesList(["09:00"]); setMsg("");}} style={{ padding: "12px 24px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
           {open ? <X size={20} /> : <Plus size={20} />} {open ? "İptal" : "Yeni İlaç Ekle"}
         </button>
       </div>
@@ -82,7 +83,15 @@ export default function MedicationCenter(){
               </div>
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Saatler (Hatırlatıcı)</label>
-                <input name="times" placeholder="09:00, 21:00" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {timesList.map((t, idx) => (
+                    <div key={idx} style={{ display: "flex", gap: "8px" }}>
+                      <input name="times" type="time" required value={t} onChange={e => { const newT = [...timesList]; newT[idx] = e.target.value; setTimesList(newT); }} style={{ flex: 1, padding: "12px 16px", borderRadius: "12px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+                      <button type="button" onClick={() => { const newT = timesList.filter((_, i) => i !== idx); setTimesList(newT.length ? newT : ["09:00"]); }} style={{ background: "#fee2e2", border: "none", borderRadius: "12px", width: "45px", display: "flex", alignItems: "center", justifyContent: "center", color: "#ef4444", cursor: "pointer" }}><X size={16} weight="bold" /></button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setTimesList([...timesList, "12:00"])} style={{ background: "#f1f5f9", border: "1px dashed #cbd5e1", padding: "10px", borderRadius: "12px", color: "#475569", fontWeight: 600, cursor: "pointer", fontSize: "13px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}><Plus size={14} /> Saat Ekle</button>
+                </div>
               </div>
             </div>
             
