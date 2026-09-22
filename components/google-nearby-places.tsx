@@ -1,12 +1,12 @@
 "use client";
-import {useEffect,useRef,useState} from "react";
-import { Crosshair, MapPin, NavigationArrow, Star, MapTrifold, Buildings, FirstAid, Pill, Prescription, Stethoscope, Ambulance, Bed, Info } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
+import { Crosshair, MapPin, NavigationArrow, Star, MapTrifold, Buildings, FirstAid, Pill, Prescription, Stethoscope, Ambulance, Bed, Info, MagnifyingGlass } from "@phosphor-icons/react";
 
-type Place={id:string;name:string;address:string;latitude:number;longitude:number;rating?:number|null;userRatingCount?:number|null;mapsUrl?:string|null;openNow?:boolean|null;distanceKm?:number|null;typeLabel?:string|null};
+type Place = { id: string; name: string; address: string; latitude: number; longitude: number; rating?: number | null; userRatingCount?: number | null; mapsUrl?: string | null; openNow?: boolean | null; distanceKm?: number | null; typeLabel?: string | null };
 
-const cats:any = { health:"Tümü", hospital:"Hastane", clinic:"Klinik", pharmacy:"Eczane", imaging:"Görüntüleme", doctor:"Doktor", emergency:"Acil", hotel:"Otel" };
+const cats: any = { health: "Tümü", hospital: "Hastane", clinic: "Klinik", pharmacy: "Eczane", imaging: "Görüntüleme", doctor: "Doktor", emergency: "Acil", hotel: "Otel" };
 
-export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initial?:string, isLoggedIn: boolean}) {
+export default function GoogleNearbyPlaces({ initial = "health", isLoggedIn }: { initial?: string, isLoggedIn: boolean }) {
   if (!isLoggedIn) {
     return (
       <div style={{ padding: "64px 20px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #cbd5e1", marginTop: "24px" }}>
@@ -21,25 +21,42 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
   }
 
   const [category, setCategory] = useState(initial in cats ? initial : "health");
-  const [ownership, setOwnership] = useState<"all"|"private"|"public">("all");
+  const [ownership, setOwnership] = useState<"all" | "private" | "public">("all");
   const [rows, setRows] = useState<Place[]>([]);
   const [msg, setMsg] = useState("Konumunuzu kullanarak yakındaki yerleri bulabilirsiniz.");
-  const [pos, setPos] = useState<any>(null);
+  
+  const [pos, setPos] = useState<any>(null); // Physical GPS position
+  const [searchCenter, setSearchCenter] = useState<any>(null); // Center of the search
+  const [showSearchHere, setShowSearchHere] = useState(false); // Show "Bu Alanda Ara" button
+  
   const [loading, setLoading] = useState(false);
   const mapRef = useRef<HTMLDivElement | null>(null);
+  
+  // To avoid recreating the map
+  const mapInstance = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
 
   useEffect(() => {
     try {
       const savedPos = sessionStorage.getItem("alumas_nearby_pos");
-      if (savedPos) setPos(JSON.parse(savedPos));
-    } catch(e) {}
+      if (savedPos) {
+        const p = JSON.parse(savedPos);
+        setPos(p);
+        setSearchCenter(p);
+      }
+    } catch (e) { }
   }, []);
 
-  async function load(p: any = pos, c = category, o = ownership) {
+  async function load(p: any = searchCenter || pos, c = category, o = ownership) {
     if (!p) return;
     setLoading(true);
-    const cacheKey = `alumas_places_${p.lat}_${p.lng}_${c}_${o}`;
+    setShowSearchHere(false);
     
+    // We update searchCenter so the map reflects the searched area
+    setSearchCenter(p);
+
+    const cacheKey = `alumas_places_${p.lat.toFixed(3)}_${p.lng.toFixed(3)}_${c}_${o}`;
+
     try {
       const cached = sessionStorage.getItem(cacheKey);
       if (cached) {
@@ -47,14 +64,14 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
         setRows(parsed);
         setMsg(`${parsed.length} sonuç (Önbellekten)`);
         setLoading(false);
-        return; 
+        return;
       }
-    } catch(e) {}
+    } catch (e) { }
 
     if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
       setMsg("Harita için API anahtarı gerekli.");
     }
-    
+
     try {
       const r = await fetch(`/api/places/nearby?lat=${p.lat}&lng=${p.lng}&category=${c}&radius=8000${o !== "all" ? "&ownership=" + o : ""}`);
       const j = await r.json();
@@ -63,12 +80,12 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
         setRows([]);
         return;
       }
-      
+
       const newRows = j.rows || [];
       setRows(newRows);
       setMsg(`${newRows.length} sonuç bulundu`);
-      try { sessionStorage.setItem(cacheKey, JSON.stringify(newRows)); } catch(e) {}
-    } catch(err) {
+      try { sessionStorage.setItem(cacheKey, JSON.stringify(newRows)); } catch (e) { }
+    } catch (err) {
       setMsg("Bağlantı hatası oluştu.");
     } finally {
       setLoading(false);
@@ -84,53 +101,89 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
     navigator.geolocation.getCurrentPosition(
       (x) => {
         const p = { lat: x.coords.latitude, lng: x.coords.longitude };
-        try { sessionStorage.setItem("alumas_nearby_pos", JSON.stringify(p)); } catch(e) {}
+        try { sessionStorage.setItem("alumas_nearby_pos", JSON.stringify(p)); } catch (e) { }
         setPos(p);
+        setSearchCenter(p);
+        if (mapInstance.current) {
+          mapInstance.current.setCenter(p);
+          mapInstance.current.setZoom(14);
+        }
       },
       () => setMsg("Konum izni verilmedi."),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }
 
+  // Trigger load when category or ownership changes
   useEffect(() => {
-    if (pos) load(pos, category, ownership);
-  }, [category, pos, ownership]);
+    if (searchCenter || pos) load(searchCenter || pos, category, ownership);
+  }, [category, ownership]);
+  
+  // Trigger load when searchCenter initially sets from POS
+  useEffect(() => {
+    if (searchCenter && rows.length === 0 && !loading) {
+        load(searchCenter, category, ownership);
+    }
+  }, [searchCenter]);
 
+  // Google Maps Initialization & Marker Management
   useEffect(() => {
     const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    if (!key || !mapRef.current || !pos || !rows.length) return;
+    if (!key || !mapRef.current || (!pos && !searchCenter)) return;
     const id = "alumas-google-maps";
-    
-    function draw() {
+
+    function initOrUpdateMap() {
       const g = (window as any).google;
       if (!g || !mapRef.current || !g.maps.Map) return;
-      
-      const map = new g.maps.Map(mapRef.current, {
-        center: pos,
-        zoom: 14,
-        mapId: "ALUMAS_MAP_ID",
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false
-      });
 
-      new g.maps.marker.AdvancedMarkerElement({ map, position: pos, title: "Konumunuz" });
-      
+      // 1. Initialize map if not exists
+      if (!mapInstance.current) {
+        mapInstance.current = new g.maps.Map(mapRef.current, {
+          center: searchCenter || pos,
+          zoom: 14,
+          mapId: "ALUMAS_MAP_ID",
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false
+        });
+
+        // Add dragend/idle listener to detect movement
+        mapInstance.current.addListener("dragend", () => {
+          setShowSearchHere(true);
+        });
+      }
+
+      // 2. Clear old markers
+      markersRef.current.forEach(m => {
+        if (m) m.map = null;
+      });
+      markersRef.current = [];
+
+      const map = mapInstance.current;
+
+      // 3. Add User Position Marker
+      if (pos) {
+        const userMarker = new g.maps.marker.AdvancedMarkerElement({ map, position: pos, title: "Konumunuz" });
+        markersRef.current.push(userMarker);
+      }
+
+      // 4. Add Result Markers
       rows.forEach(x => {
         const m = new g.maps.marker.AdvancedMarkerElement({ map, position: { lat: x.latitude, lng: x.longitude }, title: x.name });
         const info = new g.maps.InfoWindow({
-          content: `<div style="padding:4px"><b>${x.name.replace(/[<>]/g, "")}</b><br/><span style="color:#64748b;font-size:12px">${x.address.replace(/[<>]/g, "")}</span>${x.mapsUrl ? `<br/><br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer" style="color:#0f172a;font-weight:600;text-decoration:none">Yol Tarifi Al →</a>` : ""}</div>`
+          content: `<div style="padding:4px"><b>${x.name.replace(/[<>]/g, "")}</b><br/><span style="color:#64748b;font-size:12px">${x.address.replace(/[<>]/g, "")}</span>${x.mapsUrl ? `<br/><br/><a href="${x.mapsUrl}" target="_blank" rel="noreferrer" style="color:#0f172a;font-weight:600;text-decoration:none">Yol Tarifi Al ↗</a>` : ""}</div>`
         });
         m.addEventListener("gmp-click", () => info.open({ anchor: m, map }));
+        markersRef.current.push(m);
       });
     }
-    
-    if ((window as any).google?.maps?.Map) { draw(); return; }
-    
+
+    if ((window as any).google?.maps?.Map) { initOrUpdateMap(); return; }
+
     const prev = (window as any).alumasMapCallback;
     (window as any).alumasMapCallback = () => {
       if (typeof prev === 'function') prev();
-      draw();
+      initOrUpdateMap();
     };
 
     let script = document.getElementById(id) as HTMLScriptElement | null;
@@ -142,7 +195,13 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
       script.defer = true;
       document.head.appendChild(script);
     }
-  }, [rows, pos]);
+  }, [rows, pos, searchCenter]); // We depend on rows to update markers, but mapInstance persists!
+
+  const handleSearchHere = () => {
+    if (!mapInstance.current) return;
+    const center = mapInstance.current.getCenter();
+    load({ lat: center.lat(), lng: center.lng() }, category, ownership);
+  };
 
   const getCategoryIcon = (cat: string) => {
     switch (cat) {
@@ -159,16 +218,16 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
 
   return (
     <>
-            {/* Kategori Pill'leri (Her Zaman En Üstte) */}
+      {/* Kategori Pill'leri (Her Zaman En Üstte) */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "16px", overflowX: "auto", paddingBottom: "8px" }}>
         {Object.entries(cats).map(([k, v]) => (
-          <button 
-            key={k} 
+          <button
+            key={k}
             onClick={() => {
-               setCategory(k);
-               if (!["health", "hospital", "emergency", "clinic"].includes(k)) {
-                  setOwnership("all");
-               }
+              setCategory(k);
+              if (!["health", "hospital", "emergency", "clinic"].includes(k)) {
+                setOwnership("all");
+              }
             }}
             style={{ padding: "10px 20px", borderRadius: "100px", border: category === k ? "none" : "1px solid #cbd5e1", background: category === k ? "#0f172a" : "#fff", color: category === k ? "#fff" : "#475569", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s" }}
           >
@@ -178,11 +237,11 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
-        
+
         {/* Left Side: Konum Bul + Status */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
           <button onClick={locate} style={{ padding: "10px 20px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
-            <Crosshair size={18} weight="bold" /> {pos ? 'Güncelle' : 'Konum Bul'}
+            <Crosshair size={18} weight="bold" /> {pos ? 'Konumuma Git' : 'Konum Bul'}
           </button>
           <span style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>
             {loading ? 'Yükleniyor...' : msg}
@@ -199,8 +258,22 @@ export default function GoogleNearbyPlaces({initial="health", isLoggedIn}:{initi
         </div>
       </div>
 
-      <div ref={mapRef} style={{ height: "400px", borderRadius: "24px", background: "#f1f5f9", marginBottom: "32px", border: "1px solid #e2e8f0", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        {!pos && <div style={{ color: "#94a3b8", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}><MapTrifold size={48} weight="duotone" /> Haritayı görmek için konum izni verin.</div>}
+      <div style={{ position: "relative", marginBottom: "32px" }}>
+        {/* BU ALANDA ARA BUTONU */}
+        {showSearchHere && (
+          <div style={{ position: "absolute", top: "16px", left: "50%", transform: "translateX(-50%)", zIndex: 10, pointerEvents: "auto" }}>
+            <button 
+              onClick={handleSearchHere} 
+              style={{ background: "#fff", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", padding: "10px 20px", borderRadius: "100px", fontWeight: 700, fontSize: "14px", color: "#0f172a", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", transition: "transform 0.2s" }}
+            >
+              <MagnifyingGlass size={18} weight="bold" /> Bu alanda ara
+            </button>
+          </div>
+        )}
+
+        <div ref={mapRef} style={{ height: "400px", borderRadius: "24px", background: "#f1f5f9", border: "1px solid #e2e8f0", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {!pos && <div style={{ color: "#94a3b8", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}><MapTrifold size={48} weight="duotone" /> Haritayı görmek için konum izni verin.</div>}
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "24px", marginBottom: "48px" }}>
