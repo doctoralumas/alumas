@@ -168,6 +168,49 @@ export async function POST(req: Request) {
             return orgs.length > 0 ? orgs : { error: "Bu kriterlerde aktif kurum bulunamadı." };
           },
         } as any),
+
+        record_blood_pressure: tool({
+          description: 'Hastanın ilettiği tansiyon ölçümünü sisteme kaydetmek için kullan.',
+          parameters: z.object({
+            systolic: z.number().describe('Büyük tansiyon (örn: 120)'),
+            diastolic: z.number().describe('Küçük tansiyon (örn: 80)'),
+            pulse: z.number().optional().describe('Nabız'),
+          }),
+          execute: async ({ systolic, diastolic, pulse }: any) => {
+            await prisma.bloodPressureReading.create({
+              data: { userId: user.id, systolic, diastolic, pulse }
+            });
+            return { success: true, message: 'Tansiyon ölçümü kaydedildi.' };
+          }
+        } as any),
+        record_body_measurement: tool({
+          description: 'Hastanın kilosunu (weight) veya boyunu (height) sisteme kaydetmek veya güncellemek için kullan.',
+          parameters: z.object({
+            weightKg: z.number().optional().describe('Kilo (kg)'),
+            heightCm: z.number().optional().describe('Boy (cm)'),
+          }),
+          execute: async ({ weightKg, heightCm }: any) => {
+            await prisma.bodyMeasurement.create({
+              data: { userId: user.id, weightKg, heightCm }
+            });
+            return { success: true, message: 'Beden ölçüleri başarıyla güncellendi.' };
+          }
+        } as any),
+        add_medication: tool({
+          description: 'Hastanın yeni kullanmaya başladığı bir ilacı sisteme kaydetmek için kullan.',
+          parameters: z.object({
+            name: z.string().describe('İlaç adı (örn: Parol)'),
+            dose: z.string().describe('Dozajı (örn: 500mg)'),
+            instructions: z.string().optional().describe('Kullanım talimatı (örn: Sabah tok karnına)'),
+          }),
+          execute: async ({ name, dose, instructions }: any) => {
+            await prisma.medication.create({
+              data: { userId: user.id, name, dose: dose || '', instructions, times: [] }
+            });
+            return { success: true, message: name + ' ilacı sağlık profiline eklendi.' };
+          }
+        } as any),
+
       },
       async onFinish({ text, toolCalls, toolResults }) {
          // Auto-generate a title if it's the first assistant message and the title is "Yeni Sohbet"
