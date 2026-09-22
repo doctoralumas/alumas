@@ -21,16 +21,17 @@ export default function HealthNavigator({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   
-  const { messages, sendMessage, isLoading, error } = useChat({
-    api: "/api/ai/chat",
+  const { messages, sendMessage, status, error } = useChat({
+    transport: {
+      api: "/api/ai/chat",
+      body: { id: conversationId, personalize },
+    },
     id: initialConversationId || undefined,
     initialMessages,
-    body: { id: conversationId, personalize },
-    onResponse: (response) => {
-      const convId = response.headers.get("x-conversation-id");
-      if (convId) setConversationId(convId);
-    }
+    onFinish: () => {},
   });
+
+  const isLoading = status === 'streaming' || status === 'submitted';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
