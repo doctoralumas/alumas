@@ -1,10 +1,67 @@
 // @ts-nocheck
 "use client";
 import ReactMarkdown from "react-markdown";
-import { useState, useRef, useEffect } from "react";
-import { Sparkle, User, Stethoscope, MapPin, ArrowRight, WarningCircle, ShieldCheck, CheckCircle, PaperPlaneRight } from "@phosphor-icons/react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { Sparkle, Stethoscope, MapPin, WarningCircle, ShieldCheck, PaperPlaneRight } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+
+function toUIMessages(raw: any[]) {
+  return (raw || []).map((message, index) => {
+    if (Array.isArray(message?.parts) && message.parts.length > 0) {
+      return { id: String(message.id ?? index), role: message.role, parts: message.parts };
+    }
+    const parts: any[] = [];
+    if (typeof message?.content === "string" && message.content) {
+      parts.push({ type: "text", text: message.content });
+    }
+    const invocations = Array.isArray(message?.toolInvocations) ? message.toolInvocations : [];
+    for (const invocation of invocations) {
+      if (!invocation?.toolName) continue;
+      parts.push({
+        type: `tool-${invocation.toolName}`,
+        toolCallId: String(invocation.toolCallId || `${message?.id}-${invocation.toolName}`),
+        state: "output-available",
+        input: invocation.input ?? invocation.args ?? {},
+        output: invocation.output ?? invocation.result,
+      });
+    }
+    if (!parts.length) parts.push({ type: "text", text: "" });
+    return {
+      id: String(message?.id ?? index),
+      role: message?.role === "assistant" || message?.role === "system" ? message.role : "user",
+      parts,
+    };
+  });
+}
+
+function messageText(message: any) {
+  if (typeof message?.content === "string" && message.content) return message.content;
+  if (!Array.isArray(message?.parts)) return "";
+  return message.parts
+    .filter((part: any) => part?.type === "text" && part.text)
+    .map((part: any) => part.text)
+    .join("");
+}
+
+function messageTools(message: any) {
+  if (!Array.isArray(message?.parts)) return [];
+  return message.parts.flatMap((part: any) => {
+    const toolName = part?.type === "dynamic-tool"
+      ? part.toolName
+      : typeof part?.type === "string" && part.type.startsWith("tool-")
+        ? part.type.slice(5)
+        : null;
+    if (!toolName) return [];
+    return [{
+      toolCallId: part.toolCallId || toolName,
+      toolName,
+      pending: part.state !== "output-available" && part.state !== "output-error",
+      result: part.output,
+    }];
+  });
+}
 
 
 export default function HealthNavigator({ 
@@ -17,18 +74,24 @@ export default function HealthNavigator({
   initialMessages?: any[];
 }) {
   const [personalize, setPersonalize] = useState(true);
-  const [conversationId, setConversationId] = useState<string | null>(initialConversationId);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
-  
+  const personalizeRef = useRef(personalize);
+  personalizeRef.current = personalize;
+
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/ai/chat",
+        body: () => ({ personalize: personalizeRef.current }),
+      }),
+    []
+  );
+
   const { messages, sendMessage, status, error } = useChat({
-    transport: {
-      api: "/api/ai/chat",
-      body: { id: conversationId, personalize },
-    },
     id: initialConversationId || undefined,
-    initialMessages,
-    onFinish: () => {},
+    messages: toUIMessages(initialMessages),
+    transport,
   });
 
   const isLoading = status === 'streaming' || status === 'submitted';
@@ -64,7 +127,11 @@ export default function HealthNavigator({
           </div>
         )}
 
-        {messages.map((m: any) => (
+        {messages.map((m: any) => {
+          const text = messageText(m);
+          const tools = messageTools(m);
+          if (!text && tools.length === 0) return null;
+          return (
           <div key={m.id} style={{ display: "flex", gap: "16px", alignSelf: m.role === 'user' ? "flex-end" : "flex-start", maxWidth: m.role === 'user' ? "85%" : "100%" }}>
             
             {m.role === 'assistant' && (
@@ -83,7 +150,7 @@ export default function HealthNavigator({
               borderTopLeftRadius: m.role === 'assistant' ? "4px" : "20px",
               boxShadow: m.role === 'user' ? "0 4px 6px -1px rgba(0,0,0,0.1)" : "none",
             }}>
-               {m.content && (
+               {text && (
                  <div className="ai-markdown" style={{ margin: 0, fontSize: "15px", lineHeight: "1.6" }}>
                    <ReactMarkdown
                      components={{
@@ -93,26 +160,24 @@ export default function HealthNavigator({
                        strong: ({node, ...props}) => <strong style={{fontWeight: 700}} {...props} />
                      }}
                    >
-                     {m.content}
+                     {text}
                    </ReactMarkdown>
                  </div>
                )}
 
-               {/* Render rich UI if the assistant called tools */}
-               {m.toolInvocations?.map((ti: any) => {
-                  if (ti.state !== 'result') return <div key={ti.toolCallId} style={{ marginTop: m.content ? "12px" : "0", color: "#64748b", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}><Sparkle className="spinner" size={14} color="#3b82f6" /> Luma araştırıyor...</div>;
+               {tools.map((ti: any) => {
+                  if (ti.pending) return <div key={ti.toolCallId} style={{ marginTop: text ? "12px" : "0", color: "#64748b", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}><Sparkle className="spinner" size={14} color="#3b82f6" /> Luma araştırıyor...</div>;
                   
                   if (ti.toolName === 'find_doctors') {
-                     const docs = ti.result as any[];
-                     if (!docs) return null;
-                     if (docs.error) return null;
+                     const docs = ti.result;
+                     if (!Array.isArray(docs)) return null;
                      return (
-                        <div key={ti.toolCallId} style={{ marginTop: m.content ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div key={ti.toolCallId} style={{ marginTop: text ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
                           <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#3b82f6" }}><Stethoscope size={16} /> Önerilen Uzmanlar</strong>
                           <div style={{ display: "flex", flexDirection: compact ? "column" : "row", gap: "8px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "none" }}>
                             {docs.map((d: any) => (
                               <Link key={d.id} href={`/doctors/${d.slug}`} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "12px", borderRadius: "12px", minWidth: compact ? "100%" : "240px", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.2s" }} onMouseOver={e => e.currentTarget.style.borderColor = "#3b82f6"} onMouseOut={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
-                                 <div style={{ width: "40px", height: "40px", background: "#eff6ff", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", color: "#3b82f6", fontWeight: "bold", fontSize: "14px" }}>{d.name.split(" ").slice(-2).map((x: string) => x[0]).join("").slice(0, 2)}</div>
+                                 <div style={{ width: "40px", height: "40px", background: "#eff6ff", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", color: "#3b82f6", fontWeight: "bold", fontSize: "14px" }}>{String(d.name || "?").split(" ").filter(Boolean).slice(-2).map((x: string) => x[0]).join("").slice(0, 2)}</div>
                                  <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{d.name}</div>
                                     <div style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{d.specialty}</div>
@@ -125,11 +190,10 @@ export default function HealthNavigator({
                   }
 
                   if (ti.toolName === 'find_organizations') {
-                     const orgs = ti.result as any[];
-                     if (!orgs) return null;
-                     if (orgs.error) return null;
+                     const orgs = ti.result;
+                     if (!Array.isArray(orgs)) return null;
                      return (
-                        <div key={ti.toolCallId} style={{ marginTop: m.content ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div key={ti.toolCallId} style={{ marginTop: text ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
                           <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#10b981" }}><MapPin size={16} /> Uygun Kurumlar</strong>
                           <div style={{ display: "flex", flexDirection: compact ? "column" : "row", gap: "8px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "none" }}>
                             {orgs.map((o: any) => (
@@ -146,7 +210,8 @@ export default function HealthNavigator({
                })}
             </div>
           </div>
-        ))}
+          );
+        })}
 
         {error && (
            <div style={{ alignSelf: "center", background: "#fef2f2", color: "#ef4444", padding: "12px 20px", borderRadius: "12px", fontSize: "14px", display: "flex", alignItems: "center", gap: "8px" }}>

@@ -1,4 +1,4 @@
-import { generateText, tool } from 'ai';
+import { generateText, isStepCount, tool } from 'ai';
 import { z } from 'zod';
 import { getAIModel } from '@/lib/ai-provider';
 import { prisma } from '@/lib/prisma';
@@ -9,6 +9,10 @@ export async function POST(req: Request) {
 
     const result = await generateText({
       model: getAIModel(),
+      stopWhen: isStepCount(5),
+      providerOptions: {
+        groq: { reasoningEffort: 'none' },
+      },
       system: `Sen Alumas platformunun resmi yapay zeka sağlık asistanı Luma'sın. 
       Görevin hastaların şikayetlerini dinleyip onları EN DOĞRU tıbbi branşa, doktora veya kuruma (hastane/eczane/görüntüleme merkezi) yönlendirmektir.
       KESİNLİKLE tıbbi tanı koyamazsın, tedavi uygulayamazsın ve ilaç (reçete) yazamazsın.
@@ -18,7 +22,7 @@ export async function POST(req: Request) {
       tools: {
         find_doctors: tool({
           description: 'Veritabanındaki gerçek doktorları bulmak için bu aracı kullan.',
-          parameters: z.object({
+          inputSchema: z.object({
             specialty: z.string().describe('Hastanın gitmesi gereken tıbbi branş (örn: Ortopedi, Kardiyoloji)'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
           }),
@@ -37,12 +41,12 @@ export async function POST(req: Request) {
         } as any),
         find_organizations: tool({
           description: 'Hastaneler, klinikler, eczaneler, laboratuvarlar veya GÖRÜNTÜLEME MERKEZLERİNİ (MR, Röntgen vb.) bulmak için bu aracı kullan.',
-          parameters: z.object({
-            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'LAB', 'IMAGING_CENTER']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Görüntüleme merkezi/MR/Röntgen için IMAGING_CENTER seç.'),
+          inputSchema: z.object({
+            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'IMAGING_CENTER']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Görüntüleme merkezi/MR/Röntgen için IMAGING_CENTER seç.'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional().describe('Eğer hasta acil bir durum yaşıyorsa veya gece "nöbetçi" bir yer (eczane vb) arıyorsa true yap.'),
           }),
-          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "LAB" | "IMAGING_CENTER", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
+          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "IMAGING_CENTER", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
             const orgs = await prisma.organization.findMany({
               where: {
                 status: "APPROVED",

@@ -18,17 +18,29 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
       include: { messages: { orderBy: { createdAt: 'asc' } } }
     });
     if (conv) {
-      initialMessages = conv.messages.map((m: any) => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        toolInvocations: m.uiState ? (typeof m.uiState === 'string' ? JSON.parse(m.uiState) : m.uiState).map((t: any) => ({
-          ...t,
-          state: 'result',
-          args: t.args || t.input,
-          result: t.result || t.output
-        })) : undefined
-      }));
+      initialMessages = conv.messages.map((m: any) => {
+        const parts: any[] = [];
+        if (m.content) parts.push({ type: "text", text: m.content });
+        let ui = m.uiState;
+        if (typeof ui === "string") {
+          try { ui = JSON.parse(ui); } catch { ui = null; }
+        }
+        if (Array.isArray(ui)) {
+          for (const t of ui) {
+            const toolName = t?.toolName;
+            if (!toolName) continue;
+            parts.push({
+              type: `tool-${toolName}`,
+              toolCallId: t.toolCallId || `${m.id}-${toolName}`,
+              state: "output-available",
+              input: t.input || t.args || {},
+              output: t.output ?? t.result,
+            });
+          }
+        }
+        if (!parts.length) parts.push({ type: "text", text: m.content || "" });
+        return { id: m.id, role: m.role, parts };
+      });
     }
   }
 
