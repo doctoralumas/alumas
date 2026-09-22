@@ -1,4 +1,4 @@
-import { streamText, tool, isStepCount } from 'ai';
+import { streamText, tool, isStepCount, convertToModelMessages } from 'ai';
 import { z } from 'zod';
 import { getAIModel } from '@/lib/ai-provider';
 import { prisma } from '@/lib/prisma';
@@ -13,8 +13,11 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    const { messages, id: conversationId, personalize } = await req.json();
+    const { messages: rawMessages, id: conversationId, personalize } = await req.json();
     
+    // Convert UIMessage format (from useChat v4) to model messages for streamText
+    const messages = await convertToModelMessages(rawMessages);
+
     // Ensure conversation exists or create one
     let convId = conversationId;
     if (!convId) {
@@ -34,15 +37,27 @@ export async function POST(req: Request) {
       }
     }
 
-    const latestUserMessage = messages[messages.length - 1];
-    if (latestUserMessage && latestUserMessage.role === 'user') {
-       await prisma.aiMessage.create({
-         data: {
-           conversationId: convId,
-           role: 'user',
-           content: latestUserMessage.content,
-         }
-       });
+    // Extract text from the latest user message (UIMessage parts format)
+    const latestRaw = rawMessages[rawMessages.length - 1];
+    if (latestRaw && latestRaw.role === 'user') {
+       let userText = '';
+       if (typeof latestRaw.content === 'string') {
+         userText = latestRaw.content;
+       } else if (latestRaw.parts) {
+         userText = latestRaw.parts
+           .filter((p: any) => p.type === 'text')
+           .map((p: any) => p.text)
+           .join('');
+       }
+       if (userText) {
+         await prisma.aiMessage.create({
+           data: {
+             conversationId: convId,
+             role: 'user',
+             content: userText,
+           }
+         });
+       }
     }
 
     let personalizedContext = "";
