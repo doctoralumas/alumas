@@ -33,7 +33,7 @@ export default function HealthNavigator({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input?.trim() || isLoading) return;
     submitChat(e);
   };
 
@@ -166,8 +166,8 @@ export default function HealthNavigator({
            />
            <button 
              type="submit" 
-             disabled={isLoading || !input.trim()}
-             style={{ position: "absolute", right: "8px", width: "40px", height: "40px", borderRadius: "20px", background: input.trim() ? "#0f172a" : "transparent", color: input.trim() ? "#fff" : "#94a3b8", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: input.trim() ? "pointer" : "not-allowed", transition: "all 0.2s" }}
+             disabled={isLoading || !input?.trim()}
+             style={{ position: "absolute", right: "8px", width: "40px", height: "40px", borderRadius: "20px", background: input?.trim() ? "#0f172a" : "transparent", color: input?.trim() ? "#fff" : "#94a3b8", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: input?.trim() ? "pointer" : "not-allowed", transition: "all 0.2s" }}
            >
              {isLoading ? <div className="spinner" style={{ width: "18px", height: "18px", border: "2px solid rgba(15,23,42,0.2)", borderTopColor: "#0f172a", borderRadius: "50%" }} /> : <PaperPlaneRight size={20} weight="fill" />}
            </button>
