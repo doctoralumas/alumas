@@ -18,10 +18,9 @@ export default function HealthNavigator({
 }) {
   const [personalize, setPersonalize] = useState(true);
   const [conversationId, setConversationId] = useState<string | null>(initialConversationId);
-  const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   
-  const { messages, append, isLoading, error } = useChat({
+  const { messages, input, handleInputChange, handleSubmit: submitChat, isLoading, error } = useChat({
     api: "/api/ai/chat",
     id: initialConversationId || undefined,
     initialMessages,
@@ -35,8 +34,7 @@ export default function HealthNavigator({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
-    append({ role: 'user', content: input });
-    setInput("");
+    submitChat(e);
   };
 
   // Auto-scroll to bottom
