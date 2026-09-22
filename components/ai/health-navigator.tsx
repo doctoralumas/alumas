@@ -4,56 +4,8 @@ import ReactMarkdown from "react-markdown";
 import { useState, useRef, useEffect } from "react";
 import { Sparkle, User, Stethoscope, MapPin, ArrowRight, WarningCircle, ShieldCheck, CheckCircle, PaperPlaneRight } from "@phosphor-icons/react";
 import Link from "next/link";
+import { useChat } from "@ai-sdk/react";
 
-function useCustomChat({ api, initialConversationId, initialMessages, body, onResponse }) {
-  const [messages, setMessages] = useState(initialMessages || []);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const append = async (msg) => {
-    const newMessages = [...messages, { ...msg, id: Date.now().toString() }];
-    setMessages(newMessages);
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const res = await fetch(api, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages,
-          ...body
-        })
-      });
-      
-      if (onResponse) onResponse(res);
-      
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      
-      let assistantContent = "";
-      let toolInvocations = [];
-      const assistantId = Date.now().toString();
-      
-      setMessages(prev => [...prev, { id: assistantId, role: "assistant", content: "", toolInvocations: [] }]);
-      
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const text = decoder.decode(value, { stream: true });
-        assistantContent += text;
-        setMessages(prev => prev.map(p => p.id === assistantId ? { ...p, content: assistantContent } : p));
-      }
-    } catch (e) {
-      setError(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  return { messages, append, isLoading, error };
-}
 
 export default function HealthNavigator({ 
   compact = false,
@@ -69,9 +21,9 @@ export default function HealthNavigator({
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   
-  const { messages, append, isLoading, error } = useCustomChat({
+  const { messages, append, isLoading, error } = useChat({
     api: "/api/ai/chat",
-    initialConversationId,
+    id: initialConversationId || undefined,
     initialMessages,
     body: { id: conversationId, personalize },
     onResponse: (response) => {
