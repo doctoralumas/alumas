@@ -377,6 +377,7 @@ enum OrganizationType {
   CLINIC
   PHARMACY
   IMAGING_CENTER
+  LABORATORY
 }
 enum OrganizationStatus {
   PENDING
@@ -419,6 +420,8 @@ model Organization {
   doctors            Doctor[]
   services           OrganizationService[]
   stocks             PharmacyStock[]
+  imagingExams       ImagingExam[]
+  laboratoryTests    LaboratoryTest[]
   hours              OrganizationHours[]
   doctorInvites      OrganizationDoctorInvite[]
   appointments       Appointment[]
@@ -504,6 +507,44 @@ model PharmacyStock {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   @@unique([organizationId, itemName])
   @@index([organizationId, stockStatus])
+}
+
+model ImagingExam {
+  id              String       @id @default(cuid())
+  organizationId  String
+  modality        String
+  name            String
+  bodyRegion      String?
+  preparation     String?
+  durationMinutes Int?
+  reportHours     Int?
+  price           Int?
+  isActive        Boolean      @default(true)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([organizationId, isActive])
+}
+
+model LaboratoryTest {
+  id              String       @id @default(cuid())
+  organizationId  String
+  category        String
+  sampleType      String
+  name            String
+  fastingHours    Int?
+  turnaroundHours Int?
+  preparation     String?
+  price           Int?
+  isActive        Boolean      @default(true)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([organizationId, isActive])
 }
 
 

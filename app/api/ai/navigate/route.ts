@@ -9,7 +9,8 @@ import {buildSafePersonalizationContext, personalizationNote} from "@/lib/ai-per
 
 function organizationTypeFor(facility: string | null) {
   if (facility === "PHARMACY") return "PHARMACY" as const;
-  if (facility === "CLINIC" || facility === "LAB") return "CLINIC" as const;
+  if (facility === "LAB") return "LABORATORY" as const;
+  if (facility === "CLINIC") return "CLINIC" as const;
   if (facility === "HOSPITAL") return "HOSPITAL" as const;
   return null;
 }

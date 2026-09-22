@@ -66,3 +66,7 @@ coverage/
 
 # Project Documentation & Versions
 .docs/
+
+# Generated locally by next dev for coding agents. Not part of the app.
+AGENTS.md
+CLAUDE.md

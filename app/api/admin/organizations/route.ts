@@ -1,2 +1,27 @@
-import {NextResponse} from "next/server";import {currentUser} from "@/lib/auth";import {prisma} from "@/lib/prisma";
-export async function GET(req:Request){const u=await currentUser();if(!u||u.role!=="ADMIN")return NextResponse.json({error:"Yönetici hesabı gerekli"},{status:403});const status=new URL(req.url).searchParams.get("status")||undefined;return NextResponse.json(await prisma.organization.findMany({where:status?{status:status as any}:{},include:{owner:{select:{id:true,name:true,email:true}},_count:{select:{doctors:true,services:true}}},orderBy:{createdAt:"desc"}}))}
+import { NextResponse } from "next/server";
+import { currentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export async function GET(req: Request) {
+  const user = await currentUser();
+  if (!user || user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Yönetici hesabı gerekli" }, { status: 403 });
+  }
+  const requested = new URL(req.url).searchParams.get("status") || "";
+  const statuses = ["PENDING", "APPROVED", "REJECTED", "SUSPENDED"] as const;
+  const status = statuses.find((item) => item === requested);
+  try {
+    const rows = await prisma.organization.findMany({
+      where: status ? { status } : {},
+      include: {
+        owner: { select: { id: true, name: true, email: true } },
+        _count: { select: { doctors: true, services: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error("admin organizations list failed", error);
+    return NextResponse.json({ error: "Kurumlar yüklenemedi." }, { status: 500 });
+  }
+}

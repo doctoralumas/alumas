@@ -17,8 +17,9 @@ export async function POST(req:NextRequest){
     return NextResponse.json({error:"Geçerli konum gerekli."},{status:400});
   }
   const kind=String(body.kind||"hospital");
-  const orgType=kind==="pharmacy"?"PHARMACY":kind==="clinic"?"CLINIC":"HOSPITAL";
+  const orgType=kind==="pharmacy"?"PHARMACY":kind==="clinic"?"CLINIC":kind==="imaging"?"IMAGING_CENTER":kind==="laboratory"?"LABORATORY":"HOSPITAL";
   const googleType=kind==="pharmacy"?"pharmacy":kind==="doctor"?"doctor":"hospital";
+  const skipGoogle=kind==="laboratory"||kind==="imaging";
   const insuranceProviderSlug=typeof body.insuranceProviderSlug==="string"?body.insuranceProviderSlug:null;
 
   const [local,google]=await Promise.all([
@@ -30,7 +31,7 @@ export async function POST(req:NextRequest){
       },
       take:100
     }),
-    searchNearbyHealthPlaces({lat,lng,type:googleType as any,radiusMeters:Number(body.radiusMeters||10000),maxResultCount:20})
+    skipGoogle?Promise.resolve([]):searchNearbyHealthPlaces({lat,lng,type:googleType as any,radiusMeters:Number(body.radiusMeters||10000),maxResultCount:20})
       .catch(()=>[])
   ]);
 

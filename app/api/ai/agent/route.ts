@@ -40,13 +40,13 @@ export async function POST(req: Request) {
           },
         } as any),
         find_organizations: tool({
-          description: 'Hastaneler, klinikler, eczaneler, laboratuvarlar veya GÖRÜNTÜLEME MERKEZLERİNİ (MR, Röntgen vb.) bulmak için bu aracı kullan.',
+          description: 'Hastaneler, klinikler, eczaneler, tıbbi laboratuvarlar veya GÖRÜNTÜLEME MERKEZLERİNİ (MR, Röntgen vb.) bulmak için bu aracı kullan.',
           inputSchema: z.object({
-            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'IMAGING_CENTER']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Görüntüleme merkezi/MR/Röntgen için IMAGING_CENTER seç.'),
+            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'IMAGING_CENTER', 'LABORATORY']).optional().describe('Kurum tipi. Hastane/Acil için HOSPITAL, Görüntüleme merkezi/MR/Röntgen için IMAGING_CENTER, tahlil/kan testi için LABORATORY seç.'),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional().describe('Eğer hasta acil bir durum yaşıyorsa veya gece "nöbetçi" bir yer (eczane vb) arıyorsa true yap.'),
           }),
-          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "IMAGING_CENTER", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
+          execute: async ({ type, city, needsEmergencyOrOnDuty }: { type?: "HOSPITAL" | "CLINIC" | "PHARMACY" | "IMAGING_CENTER" | "LABORATORY", city?: string, needsEmergencyOrOnDuty?: boolean }) => {
             const orgs = await prisma.organization.findMany({
               where: {
                 status: "APPROVED",

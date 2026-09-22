@@ -173,9 +173,9 @@ export async function POST(req: Request) {
           },
         }),
         find_organizations: tool({
-          description: 'Hastaneler, klinikler, eczaneler veya GÖRÜNTÜLEME MERKEZLERİNİ bulmak için bu aracı kullan.',
+          description: 'Hastaneler, klinikler, eczaneler, tıbbi laboratuvarlar veya GÖRÜNTÜLEME MERKEZLERİNİ bulmak için bu aracı kullan.',
           inputSchema: z.object({
-            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'IMAGING_CENTER']).optional(),
+            type: z.enum(['HOSPITAL', 'CLINIC', 'PHARMACY', 'IMAGING_CENTER', 'LABORATORY']).optional(),
             city: z.string().optional().describe('Hastanın bulunduğu şehir (varsa)'),
             needsEmergencyOrOnDuty: z.boolean().optional(),
           }),

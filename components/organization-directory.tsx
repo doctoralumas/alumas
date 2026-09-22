@@ -1,12 +1,13 @@
 "use client";
 import {useEffect,useState} from "react";
 import InteractiveOrganizationMap from '@/components/interactive-organization-map';
-import { MagnifyingGlass, NavigationArrow, MapTrifold, Buildings, Crosshair, Pill, Prescription, FirstAid, CaretRight, Star, ShieldCheck, Moon } from "@phosphor-icons/react";
+import { MagnifyingGlass, NavigationArrow, MapTrifold, Buildings, Crosshair, Pill, Prescription, FirstAid, CaretRight, Star, ShieldCheck, Moon, TestTube } from "@phosphor-icons/react";
 import Link from "next/link";
 
-type Org={id:string;slug:string;type:"HOSPITAL"|"CLINIC"|"PHARMACY"|"IMAGING_CENTER";name:string;city:string;district?:string|null;address:string;phone:string;description?:string|null;latitude?:number|null;longitude?:number|null;distanceKm?:number|null;rating?:number|null;isOnDuty?:boolean;onDutyUntil?:string|null;_count?:{doctors:number;reviews:number};services?:{id:string;name:string}[]};
+type Named={id:string;name:string};
+type Org={id:string;slug:string;type:"HOSPITAL"|"CLINIC"|"PHARMACY"|"IMAGING_CENTER"|"LABORATORY";name:string;city:string;district?:string|null;address:string;phone:string;description?:string|null;latitude?:number|null;longitude?:number|null;distanceKm?:number|null;rating?:number|null;isOnDuty?:boolean;onDutyUntil?:string|null;_count?:{doctors:number;reviews:number};services?:Named[];imagingExams?:Named[];laboratoryTests?:Named[]};
 
-const labels:any = { HOSPITAL:"Hastane", CLINIC:"Klinik", PHARMACY:"Eczane", IMAGING_CENTER:"Görüntüleme Merkezi" };
+const labels:any = { HOSPITAL:"Hastane", CLINIC:"Klinik", PHARMACY:"Eczane", IMAGING_CENTER:"Görüntüleme Merkezi", LABORATORY:"Tıbbi Laboratuvar" };
 
 export default function OrganizationDirectory({ isLoggedIn = false }: { isLoggedIn?: boolean }){
   const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -64,6 +65,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
       case 'CLINIC': return { bg: '#dcfce7', text: '#16a34a', icon: <FirstAid size={24} weight="duotone" /> };
       case 'PHARMACY': return { bg: '#fef3c7', text: '#d97706', icon: <Pill size={24} weight="duotone" /> };
       case 'IMAGING_CENTER': return { bg: '#f3e8ff', text: '#9333ea', icon: <Prescription size={24} weight="duotone" /> };
+      case 'LABORATORY': return { bg: '#ccfbf1', text: '#0f766e', icon: <TestTube size={24} weight="duotone" /> };
       default: return { bg: '#f1f5f9', text: '#64748b', icon: <Buildings size={24} weight="duotone" /> };
     }
   };
@@ -78,7 +80,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
             value={q} 
             onChange={e=>setQ(e.target.value)} 
             onKeyDown={e=>{if(e.key==='Enter')load()}} 
-            placeholder="Kurum adı, il veya ilçe ara..."
+            placeholder="Kurum, tetkik, tahlil, il veya ilçe ara..."
             style={{ width: "100%", padding: "14px 16px 14px 44px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }}
           />
         </div>
@@ -98,7 +100,8 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
           { id: "HOSPITAL", label: "Hastane" },
           { id: "CLINIC", label: "Klinik" },
           { id: "PHARMACY", label: "Eczane" },
-          { id: "IMAGING_CENTER", label: "Görüntüleme Merkezi" }
+          { id: "IMAGING_CENTER", label: "Görüntüleme Merkezi" },
+          { id: "LABORATORY", label: "Tıbbi Laboratuvar" }
         ].map(x => {
           const isSelected = type === x.id && !onDuty;
           return (
@@ -122,7 +125,8 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
       {view === 'list' ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "24px", marginBottom: "48px" }}>
           {rows.map(o => {
-            const style = getOrgStyling(o.type, o.isOnDuty || false);
+            const style = getOrgStyling(o.type, !!o.isOnDuty && o.type === "PHARMACY");
+            const preview = (o.type === "IMAGING_CENTER" ? o.imagingExams : o.type === "LABORATORY" ? o.laboratoryTests : o.type === "PHARMACY" ? [] : o.services)?.map((item) => item.name).slice(0, 3) || [];
             return (
               <div key={o.id} style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", overflow: "hidden", display: "flex", flexDirection: "column", transition: "all 0.2s", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }} className="hover-shadow">
                 <div style={{ padding: "24px", display: "flex", gap: "16px", borderBottom: "1px solid #f1f5f9" }}>
@@ -132,7 +136,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
                       <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", color: style.text }}>{labels[o.type]}</span>
-                      {o.isOnDuty && <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 8px", background: "#ea580c", color: "#fff", borderRadius: "100px" }}>NÖBETÇİ</span>}
+                      {o.type === "PHARMACY" && o.isOnDuty && <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 8px", background: "#ea580c", color: "#fff", borderRadius: "100px" }}>NÖBETÇİ</span>}
                     </div>
                     <h3 style={{ margin: 0, fontSize: "18px", color: "#0f172a", fontWeight: 700, lineHeight: "1.4" }}>
                       <Link href={`/organizations/${o.slug}`} style={{ color: "inherit", textDecoration: "none" }}>{o.name}</Link>
@@ -145,6 +149,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                     <NavigationArrow size={16} /> {o.city}{o.district ? `, ${o.district}` : ""} {o.distanceKm != null ? `• ${o.distanceKm.toFixed(1)} km` : ""}
                   </div>
                   <p style={{ margin: 0, fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>{o.address}</p>
+                  {preview.length > 0 && <div style={{ fontSize: "13px", color: "#334155", lineHeight: "1.45" }}>{preview.join(" · ")}</div>}
                   
                   <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "8px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", fontWeight: 600, color: "#16a34a" }}>
