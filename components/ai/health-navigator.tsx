@@ -159,7 +159,7 @@ export default function HealthNavigator({
          <form onSubmit={handleSubmit} style={{ position: "relative", display: "flex", alignItems: "center" }}>
            <input 
              value={input}
-             onChange={handleInputChange}
+             onChange={e => setInput(e.target.value)}
              placeholder="Mesajınızı Luma'ya iletin..."
              disabled={isLoading}
              style={{ width: "100%", background: "#f1f5f9", border: "1px solid transparent", borderRadius: "100px", padding: "16px 60px 16px 24px", fontSize: "15px", outline: "none", color: "#0f172a", transition: "all 0.2s" }}
