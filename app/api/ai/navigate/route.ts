@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       where:{
         isVerified:true,
         isPublished:true,
+        verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},
         specialty:{contains:intent.specialty,mode:"insensitive"},
         ...(intent.locationHint && ["İstanbul","Ankara","İzmir","Bursa","Antalya"].includes(intent.locationHint)
           ? {city:{contains:intent.locationHint,mode:"insensitive"}}
@@ -67,6 +68,7 @@ export async function POST(req: Request) {
     const rows = await prisma.organization.findMany({
       where:{
         status:"APPROVED", isPublished:true,
+        verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},
         ...(intent.triage === "emergency" ? {} : orgType ? {type:orgType} : {}),
         ...(intent.locationHint ? {OR:[
           {city:{contains:intent.locationHint,mode:"insensitive"}},

@@ -1,12 +1,14 @@
 import SectionVisual from "@/components/section-visual";
 import {prisma} from "@/lib/prisma";
+import { withdrawExpiredCredentials } from "@/lib/verification-documents";
 import { Info } from "@phosphor-icons/react/dist/ssr";
 import DoctorClientList from "@/components/doctor-client-list";
 
 export default async function Page({searchParams}:{searchParams:Promise<{profileId?:string}>}) {
   const {profileId}=await searchParams;
+  await withdrawExpiredCredentials();
   const doctors=await prisma.doctor.findMany({
-    where:{isVerified:true,isPublished:true},
+    where:{isVerified:true,isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}}},
     select:{id:true,slug:true,name:true,specialty:true,presenceStatus:true,city:true,reviewCount:true,rating:true},
     orderBy:[{rating:'desc'},{name:'asc'}],
     take:60

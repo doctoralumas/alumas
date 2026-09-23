@@ -24,7 +24,7 @@ export async function POST(req:NextRequest){
 
   const [local,google]=await Promise.all([
     prisma.organization.findMany({
-      where:{status:"APPROVED",isPublished:true,type:orgType as any},
+      where:{status:"APPROVED",isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},type:orgType as any},
       include:{
         hours:true,
         insuranceContracts:{where:{isActive:true},include:{insuranceProvider:true}}

@@ -1,9 +1,13 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
+
+type AppPrisma = PrismaClient & {
+  verificationDocument: Prisma.VerificationDocumentDelegate;
+};
 
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
+  var prisma: AppPrisma | undefined;
 }
 
-export const prisma = global.prisma ?? new PrismaClient();
+export const prisma: AppPrisma = (global.prisma ?? new PrismaClient()) as AppPrisma;
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;

@@ -140,6 +140,7 @@ model Doctor {
   licenseNumber String?
   isVerified Boolean @default(false)
   isPublished Boolean @default(false)
+  verificationDocuments VerificationDocument[]
   createdAt     DateTime       @default(now())
 
   @@index([isPublished, isVerified])
@@ -432,6 +433,7 @@ model Organization {
   campaigns          OrganizationCampaign[]
   emergencyServices  OrganizationEmergencyService[]
   insuranceContracts  OrganizationInsurance[]
+  verificationDocuments VerificationDocument[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   @@index([ownerUserId, createdAt])
@@ -1227,6 +1229,7 @@ model HealthTourismAgency {
   isActive    Boolean  @default(false)
   packages    HealthTourismPackage[]
   services    HealthTourismAgencyService[]
+  verificationDocuments VerificationDocument[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   @@index([ownerUserId,status])
@@ -1441,6 +1444,53 @@ model UserInsurancePreference {
   @@index([userId, isPrimary])
 }
 
+
+enum VerificationDocumentType {
+  IDENTITY
+  MEDICAL_LICENSE
+  SPECIALTY_CERTIFICATE
+  FACILITY_LICENSE
+  HEALTH_TOURISM_AUTHORIZATION
+  TAX_CERTIFICATE
+  TRADE_REGISTRY
+}
+
+enum VerificationDocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+  SUPERSEDED
+}
+
+model VerificationDocument {
+  id               String                     @id @default(cuid())
+  organizationId   String?
+  doctorId         String?
+  agencyId         String?
+  documentType     VerificationDocumentType
+  documentNumber   String
+  issuer           String
+  issuedAt         DateTime?
+  expiresAt        DateTime?
+  fileStoragePath  String
+  fileName         String
+  mimeType         String
+  status           VerificationDocumentStatus @default(PENDING)
+  reviewerNote     String?
+  reviewedAt       DateTime?
+  reviewedByUserId String?
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+  organization     Organization?              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  doctor           Doctor?                    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  agency           HealthTourismAgency?       @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, documentType, status])
+  @@index([doctorId, documentType, status])
+  @@index([agencyId, documentType, status])
+  @@index([status, expiresAt])
+}
 
 model AiConversation {
   id        String   @id @default(cuid())

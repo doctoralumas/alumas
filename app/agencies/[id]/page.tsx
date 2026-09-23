@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export default async function AgencyProfile({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const agency = await prisma.healthTourismAgency.findFirst({
-    where: { id, status: "APPROVED", isVerified: true, isActive: true },
+    where: { id, status: "APPROVED", isVerified: true, isActive: true, verificationDocuments: { none: { status: "APPROVED", expiresAt: { lt: new Date() } } } },
     include: {
       services: { where: { isActive: true }, orderBy: { kind: "asc" } },
       packages: { where: { isPublished: true }, orderBy: { title: "asc" } },

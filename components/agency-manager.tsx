@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import VerificationDocumentManager from "@/components/verification-document-manager";
 
 const serviceKinds = [
   ["TRANSFER", "Transfer"],
@@ -119,7 +120,8 @@ export default function AgencyManager({ agency }: { agency: any }) {
 
   return (
     <div className="business-manage-grid">
-      {!canPublish && <div className="inline-message form-span">Profil doğrulanmadan hizmetler ve paketler hasta sayfasında görünmez.</div>}
+      {!canPublish && <div className="inline-message form-span">Profil doğrulanmadan hizmetler ve paketler hasta sayfasında görünmez. Zorunlu belgeler onaylı ve süresi geçerli olmalıdır.</div>}
+      <VerificationDocumentManager owner={{ kind: "agency", agencyId: agency.id }} documents={agency.verificationDocuments || []} />
       {msg && <div className="inline-message form-span">{msg}</div>}
       <section className="panel">
         <h2>Seyahat hizmeti ekle</h2>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AdminVerificationDocuments from "@/components/admin-verification-documents";
 
 type Org = {
   id: string;
@@ -13,6 +14,7 @@ type Org = {
   phone: string;
   email: string;
   licenseFileName?: string | null;
+  verificationDocuments?: any[];
   owner?: { name?: string | null; email?: string | null } | null;
 };
 
@@ -55,12 +57,14 @@ export default function AdminOrganizations() {
     const reason = (status === "REJECTED" || status === "SUSPENDED")
       ? prompt("İşlem nedeni (Opsiyonel)") || "Başvuru doğrulanamadı"
       : undefined;
-    await fetch(`/api/admin/organizations/${id}`, {
+    const response = await fetch(`/api/admin/organizations/${id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ status, reason }),
     });
-    load();
+    const data = await response.json().catch(() => ({}));
+    await load();
+    if (!response.ok) setError(data.error || "Kurum durumu güncellenemedi.");
   }
 
   if (error) return <div className="form-error">{error}</div>;
@@ -81,9 +85,8 @@ export default function AdminOrganizations() {
               <span>📞 {org.phone} | ✉️ {org.email}</span>
             </div>
             <div style={{ marginTop: "8px", fontSize: "13px" }}>
-              {org.licenseFileName
-                ? <a href={`/api/admin/organizations/${org.id}/file`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "var(--primary)", fontWeight: 500, padding: "4px 8px", backgroundColor: "var(--primary-light)", borderRadius: "6px", textDecoration: "none" }}>📄 Belgeyi İncele ({org.licenseFileName})</a>
-                : <span style={{ color: "var(--danger)", fontWeight: 500 }}>⚠️ Belge yüklenmemiş</span>}
+              <AdminVerificationDocuments documents={org.verificationDocuments || []} onChanged={load} />
+              {org.licenseFileName && <a href={`/api/admin/organizations/${org.id}/file`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "var(--primary)", fontWeight: 500, padding: "4px 8px", backgroundColor: "var(--primary-light)", borderRadius: "6px", textDecoration: "none" }}>Eski ruhsat dosyası ({org.licenseFileName})</a>}
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "12px" }}>

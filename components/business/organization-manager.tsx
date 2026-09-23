@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { IMAGING_MODALITIES, LAB_CATEGORIES, LAB_SAMPLE_TYPES, imagingModalityLabel, labCategoryLabel, labSampleLabel } from "@/lib/organization-capabilities";
 import ResultDelivery from "@/components/business/result-delivery";
+import VerificationDocumentManager from "@/components/verification-document-manager";
 
 type Props = { org: any };
 const days = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
@@ -340,6 +341,7 @@ export default function OrganizationManager({ org }: Props) {
   return (
     <>
       <p className="muted" style={{ marginTop: 0 }}>{panelCopy[org.type] || "Kurum bilgilerini buradan yönetirsiniz."}</p>
+      <VerificationDocumentManager owner={{ kind: "organization", entityType: org.type, organizationId: org.id }} documents={org.verificationDocuments || []} />
       {imaging && <ResultDelivery organizationId={org.id} kind="imaging" catalog={exams.map((exam) => ({ id: exam.id, name: `${imagingModalityLabel(exam.modality)} · ${exam.name}` }))} />}
       {laboratory && <ResultDelivery organizationId={org.id} kind="laboratory" catalog={tests.map((test) => ({ id: test.id, name: `${labCategoryLabel(test.category)} · ${test.name}` }))} />}
       <div className="business-manage-grid">

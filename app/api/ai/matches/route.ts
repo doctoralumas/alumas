@@ -20,7 +20,7 @@ export async function POST(req:NextRequest){
   const now=new Date();
 
   const doctors=await prisma.doctor.findMany({
-    where:{isVerified:true,isPublished:true},
+    where:{isVerified:true,isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}}},
     include:{
       availabilities:{
         where:{isActive:true,startsAt:{gte:now}},

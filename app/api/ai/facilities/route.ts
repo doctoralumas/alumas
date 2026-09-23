@@ -18,7 +18,7 @@ export async function POST(req:NextRequest){
 
   const rows=await prisma.organization.findMany({
     where:{
-      status:"APPROVED",isPublished:true,
+      status:"APPROVED",isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},
       ...(type?{type:type as any}:{})
     },
     include:{

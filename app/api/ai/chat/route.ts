@@ -154,6 +154,8 @@ export async function POST(req: Request) {
             const doctors = await prisma.doctor.findMany({
               where: {
                 isVerified: true,
+                isPublished: true,
+                verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},
                 specialty: { contains: specialty, mode: 'insensitive' },
                 ...(city ? { city: { contains: city, mode: 'insensitive' } } : {})
               },
@@ -184,6 +186,7 @@ export async function POST(req: Request) {
               where: {
                 status: "APPROVED",
                 isPublished: true,
+                verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},
                 ...(type ? { type } : {}),
                 ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
                 ...(needsEmergencyOrOnDuty ? { isOnDuty: true } : {})
