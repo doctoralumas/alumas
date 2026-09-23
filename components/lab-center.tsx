@@ -4,7 +4,7 @@ import HealthTrendChart from "@/components/health-trend-chart";
 import LabPanelTemplates from "@/components/lab-panel-templates";
 import { ChartLineUp, Flask } from "@phosphor-icons/react";
 
-type Lab={id:string;testName:string;panel?:string;value:string;numericValue?:number|null;unit?:string;reference?:string;referenceLow?:number|null;referenceHigh?:number|null;status:string;measuredAt:string;note?:string};
+type Lab={id:string;testName:string;panel?:string;value:string;numericValue?:number|null;unit?:string;reference?:string;referenceLow?:number|null;referenceHigh?:number|null;status:string;measuredAt:string;note?:string;provider?:string|null};
 
 export default function LabCenter(){
   const [rows,setRows]=useState<Lab[]>([]);
@@ -197,7 +197,7 @@ export default function LabCenter(){
               <div className="lab-row" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 200px' }}>
                   <b style={{ fontSize: '16px', color: '#123f6b' }}>{l.testName}</b>
-                  <span style={{ fontSize: '12px', color: 'rgba(11,37,69,0.6)' }}>{l.panel?l.panel+' • ':''}{new Date(l.measuredAt).toLocaleDateString('tr-TR')}</span>
+                  <span style={{ fontSize: '12px', color: 'rgba(11,37,69,0.6)' }}>{l.panel?l.panel+' • ':''}{l.provider?l.provider+' • ':''}{new Date(l.measuredAt).toLocaleDateString('tr-TR')}</span>
                 </div>
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', flex: '1 1 auto' }}>

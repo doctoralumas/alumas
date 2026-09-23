@@ -22,7 +22,7 @@ return <>{rows.length===0?<div className="empty">Henüz kurum başvurunuz yok.<b
   <>
   <div className="metric" style={{background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px', padding: '16px', color: '#0f172a'}}>
     <span style={{color: '#64748b', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase'}}>Nöbet Durumu</span>
-    <strong style={{fontSize: '1.25rem', color: o.isOnDuty ? '#16a34a' : '#64748b', marginTop: '8px'}}>{o.isOnDuty ? 'Nöbetçi' : 'Kapalı'}</strong>
+    <strong style={{fontSize: '1.25rem', color: o.isOnDuty ? '#16a34a' : '#64748b', marginTop: '8px'}}>{o.isOnDuty ? 'Nöbetçi' : 'Nöbetçi değil'}</strong>
     <small style={{color: '#64748b'}}>{o.isOnDuty ? 'Aktif yayınlanıyor' : 'Normal mesai'}</small>
   </div>
   <div className="metric" style={{background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px', padding: '16px', color: '#0f172a'}}>

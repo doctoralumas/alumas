@@ -98,9 +98,7 @@
     "v46:check": "node scripts/v46-conversation-check.mjs",
     "v48:check": "node scripts/v48-check.mjs",
     "v49:check": "node scripts/v49-check.mjs",
-    "v50:check": "node scripts/v50-check.mjs",
-    "v53:check": "node scripts/v53-check.mjs",
-    "v54:check": "node scripts/v54-check.mjs"
+    "v50:check": "node scripts/v50-check.mjs"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.41",

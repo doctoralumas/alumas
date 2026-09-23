@@ -115,6 +115,9 @@ export default function Page(){
                     <LinkIcon size={16} /> Web
                   </a>
                 )}
+                <Link href={`/agencies/${a.id}`} style={{ flex: 1, padding: "10px", background: "#f8fafc", border: "1px solid #cbd5e1", color: "#0f172a", borderRadius: "12px", textDecoration: "none", fontWeight: 600, fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                  <CaretRight size={16} /> İncele
+                </Link>
               </div>
             </div>
           ))}

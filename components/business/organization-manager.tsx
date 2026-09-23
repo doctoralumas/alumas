@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { IMAGING_MODALITIES, LAB_CATEGORIES, LAB_SAMPLE_TYPES, imagingModalityLabel, labCategoryLabel, labSampleLabel } from "@/lib/organization-capabilities";
+import ResultDelivery from "@/components/business/result-delivery";
 
 type Props = { org: any };
 const days = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
@@ -9,8 +10,8 @@ const panelCopy: Record<string, string> = {
   HOSPITAL: "Departmanları, uzman kadroyu, acil birimleri ve klinik hizmetleri buradan yönetirsiniz. Yayınlanan profil bu kayıtları gösterir.",
   CLINIC: "Uzman kadroyu, muayene ve işlemleri buradan yönetirsiniz. Yayınlanan profil bu kayıtları gösterir.",
   PHARMACY: "Nöbet durumunu ve stok görünürlüğünü buradan yönetirsiniz. Hastalar adet yerine stok durumunu görür.",
-  IMAGING_CENTER: "MR, BT, röntgen ve diğer tetkikleri buradan yönetirsiniz. Hasta sayfası bu kataloğu gösterir.",
-  LABORATORY: "Kan, idrar ve diğer numune tahlillerini buradan yönetirsiniz. Hasta sayfası bu kataloğu gösterir.",
+  IMAGING_CENTER: "MR, BT, röntgen ve diğer tetkikleri buradan yönetirsiniz. Raporu, ilişkili hastanın görüntüleme geçmişine işlersiniz.",
+  LABORATORY: "Kan, idrar ve diğer numune tahlillerini buradan yönetirsiniz. Sonucu, ilişkili hastanın tahlil geçmişine işlersiniz.",
 };
 
 const emptyExam = {
@@ -21,6 +22,14 @@ const emptyExam = {
   durationMinutes: "",
   reportHours: "",
   price: "",
+};
+
+const stockLabels: Record<string, string> = { in_stock: "Stokta var", limited: "Sınırlı", out_of_stock: "Yok" };
+const emergencyLabels: Record<string, string> = {
+  EMERGENCY_DEPARTMENT: "Acil servis",
+  EMERGENCY_CONSULT: "Acil danışmanlık",
+  AMBULANCE_COORDINATION: "Ambulans koordinasyonu",
+  EMERGENCY: "Acil",
 };
 
 const emptyTest = {
@@ -40,17 +49,17 @@ export default function OrganizationManager({ org }: Props) {
   const imaging = org.type === "IMAGING_CENTER";
   const laboratory = org.type === "LABORATORY";
 
-  const [services, setServices] = useState<any[]>(org.services || []);
+  const [services, setServices] = useState<any[]>((org.services || []).filter((item: any) => item.isActive !== false));
   const [hours, setHours] = useState<any[]>(org.hours || []);
   const [invites, setInvites] = useState<any[]>(org.doctorInvites || []);
   const [msg, setMsg] = useState("");
   const [stock, setStock] = useState<any[]>(org.stocks || []);
   const [onDuty, setOnDuty] = useState(!!org.isOnDuty);
   const [onDutyUntil, setOnDutyUntil] = useState(org.onDutyUntil ? new Date(org.onDutyUntil).toISOString().slice(0, 16) : "");
-  const [departments, setDepartments] = useState<any[]>(org.departments || []);
+  const [departments, setDepartments] = useState<any[]>((org.departments || []).filter((item: any) => item.isActive !== false));
   const [campaigns, setCampaigns] = useState<any[]>(org.campaigns || []);
   const [doctors, setDoctors] = useState<any[]>(org.doctors || []);
-  const [emergencyServices, setEmergencyServices] = useState<any[]>(org.emergencyServices || []);
+  const [emergencyServices, setEmergencyServices] = useState<any[]>((org.emergencyServices || []).filter((item: any) => item.isActive !== false));
   const [exams, setExams] = useState<any[]>(org.imagingExams || []);
   const [examForm, setExamForm] = useState(emptyExam);
   const [editingExamId, setEditingExamId] = useState<string | null>(null);
@@ -223,28 +232,116 @@ export default function OrganizationManager({ org }: Props) {
     if (editingTestId === id) { setEditingTestId(null); setTestForm(emptyTest); }
     setMsg("Tahlil yayından kaldırıldı");
   }
+  async function updateService(event: React.FormEvent<HTMLFormElement>, serviceId: string) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const response = await fetch(`/api/organizations/${org.id}/services`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ serviceId, name: form.get("name"), description: form.get("description"), price: form.get("price") }),
+    });
+    const data = await response.json();
+    if (!response.ok) { setMsg(data.error || "Hizmet güncellenemedi"); return; }
+    setServices((current) => current.map((item) => item.id === data.id ? { ...item, ...data } : item));
+    setMsg("Hizmet güncellendi");
+  }
+  async function hideService(serviceId: string) {
+    const response = await fetch(`/api/organizations/${org.id}/services`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ serviceId, isActive: false }),
+    });
+    if (!response.ok) { setMsg("Hizmet kaldırılamadı"); return; }
+    setServices((current) => current.filter((item) => item.id !== serviceId));
+    setMsg("Hizmet yayından kaldırıldı");
+  }
+  async function hideVariant(serviceId: string, variantId: string) {
+    const response = await fetch(`/api/organizations/${org.id}/service-variants`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ variantId, isActive: false }),
+    });
+    if (!response.ok) { setMsg("Varyant kaldırılamadı"); return; }
+    setServices((current) => current.map((item) => item.id === serviceId ? { ...item, variants: (item.variants || []).filter((variant: any) => variant.id !== variantId) } : item));
+    setMsg("Varyant kaldırıldı");
+  }
+  async function updateDepartment(event: React.FormEvent<HTMLFormElement>, departmentId: string) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const response = await fetch(`/api/organizations/${org.id}/departments`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ departmentId, name: form.get("name"), floor: form.get("floor"), phone: form.get("phone"), description: form.get("description") }),
+    });
+    const data = await response.json();
+    if (!response.ok) { setMsg(data.error || "Departman güncellenemedi"); return; }
+    setDepartments((current) => current.map((item) => item.id === data.id ? data : item));
+    setMsg("Departman güncellendi");
+  }
+  async function hideDepartment(departmentId: string) {
+    const response = await fetch(`/api/organizations/${org.id}/departments`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ departmentId, isActive: false }),
+    });
+    if (!response.ok) { setMsg("Departman kaldırılamadı"); return; }
+    setDepartments((current) => current.filter((item) => item.id !== departmentId));
+    setDoctors((current) => current.map((doctor) => doctor.departmentId === departmentId ? { ...doctor, departmentId: null } : doctor));
+    setMsg("Departman yayından kaldırıldı");
+  }
+  async function updateEmergency(event: React.FormEvent<HTMLFormElement>, emergencyId: string) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const response = await fetch(`/api/organizations/${org.id}/emergency-services`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        emergencyId,
+        name: form.get("name"),
+        kind: form.get("kind"),
+        phone: form.get("phone"),
+        is24Hours: form.get("is24Hours") === "on",
+        description: form.get("description"),
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok) { setMsg(data.error || "Acil hizmet güncellenemedi"); return; }
+    setEmergencyServices((current) => current.map((item) => item.id === data.id ? data : item));
+    setMsg("Acil hizmet güncellendi");
+  }
+  async function hideEmergency(emergencyId: string) {
+    const response = await fetch(`/api/organizations/${org.id}/emergency-services`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ emergencyId, isActive: false }),
+    });
+    if (!response.ok) { setMsg("Acil hizmet kaldırılamadı"); return; }
+    setEmergencyServices((current) => current.filter((item) => item.id !== emergencyId));
+    setMsg("Acil hizmet yayından kaldırıldı");
+  }
+  async function updateStock(stockId: string, stockStatus: string) {
+    const response = await fetch(`/api/organizations/${org.id}/stock`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ stockId, stockStatus }),
+    });
+    const data = await response.json();
+    if (!response.ok) { setMsg(data.error || "Stok güncellenemedi"); return; }
+    setStock((current) => current.map((item) => item.id === data.id ? data : item));
+    setMsg("Stok durumu güncellendi");
+  }
+  async function removeStock(stockId: string) {
+    const response = await fetch(`/api/organizations/${org.id}/stock?stockId=${stockId}`, { method: "DELETE" });
+    if (!response.ok) { setMsg("Stok kaydı kaldırılamadı"); return; }
+    setStock((current) => current.filter((item) => item.id !== stockId));
+    setMsg("Stok kaydı kaldırıldı");
+  }
 
   return (
     <>
       <p className="muted" style={{ marginTop: 0 }}>{panelCopy[org.type] || "Kurum bilgilerini buradan yönetirsiniz."}</p>
-      {imaging && (
-        <div style={{ background: "linear-gradient(to right, #0f172a, #1e293b)", color: "white", padding: "20px 24px", borderRadius: "16px", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: "1.05rem" }}>Dijital sonuç teslimi</h3>
-            <p style={{ margin: "6px 0 0", color: "#cbd5e1", maxWidth: 640 }}>Çekim raporlarını mesajlar panelinden hastaya iletebilirsiniz. Tetkik listesi ise aşağıdaki katalogdan yayınlanır.</p>
-          </div>
-          <a href="/messages" style={{ background: "white", color: "#0f172a", padding: "12px 20px", borderRadius: "10px", fontWeight: 600, textDecoration: "none" }}>Mesajlara git</a>
-        </div>
-      )}
-      {laboratory && (
-        <div style={{ background: "linear-gradient(to right, #134e4a, #0f766e)", color: "white", padding: "20px 24px", borderRadius: "16px", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: "1.05rem" }}>Numune sonucu teslimi</h3>
-            <p style={{ margin: "6px 0 0", color: "#ccfbf1", maxWidth: 640 }}>Tahlil sonuçlarını mesajlar panelinden hastaya iletebilirsiniz. Yayınlanan liste aşağıdaki tahlil kataloğudur.</p>
-          </div>
-          <a href="/messages" style={{ background: "white", color: "#134e4a", padding: "12px 20px", borderRadius: "10px", fontWeight: 600, textDecoration: "none" }}>Mesajlara git</a>
-        </div>
-      )}
+      {imaging && <ResultDelivery organizationId={org.id} kind="imaging" catalog={exams.map((exam) => ({ id: exam.id, name: `${imagingModalityLabel(exam.modality)} · ${exam.name}` }))} />}
+      {laboratory && <ResultDelivery organizationId={org.id} kind="laboratory" catalog={tests.map((test) => ({ id: test.id, name: `${labCategoryLabel(test.category)} · ${test.name}` }))} />}
       <div className="business-manage-grid">
         <section className="panel form-span">
           <div className="row between">
@@ -267,8 +364,13 @@ export default function OrganizationManager({ org }: Props) {
             <div className="slot-list">
               {services.map((s) => (
                 <div className="slot-row" key={s.id}>
-                  <div><b>{s.name}</b><span>{s.description || "Açıklama yok"}</span></div>
-                  <strong>{s.price ? `${s.price.toLocaleString("tr-TR")} ₺` : "Fiyat sorunuz"}</strong>
+                  <form onSubmit={(event) => updateService(event, s.id)} style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", width: "100%" }}>
+                    <input name="name" defaultValue={s.name} required />
+                    <input name="price" type="number" min="0" defaultValue={s.price ?? ""} placeholder="Fiyat (₺)" />
+                    <input name="description" defaultValue={s.description || ""} placeholder="Kısa açıklama" />
+                    <button className="secondary" type="submit">Kaydet</button>
+                    <button className="secondary" type="button" onClick={() => hideService(s.id)}>Kaldır</button>
+                  </form>
                 </div>
               ))}
             </div>
@@ -289,9 +391,10 @@ export default function OrganizationManager({ org }: Props) {
               <button className="primary">Varyant ekle</button>
             </form>
             <div className="slot-list">
-              {services.flatMap((s) => (s.variants || []).map((v: any) => (
+              {services.flatMap((s) => (s.variants || []).filter((variant: any) => variant.isActive !== false).map((v: any) => (
                 <div className="slot-row" key={v.id}>
                   <div><b>{s.name} · {v.label}</b><span>{v.durationMinutes ? `${v.durationMinutes} dk` : ""}{v.priceDelta ? ` · +${v.priceDelta} ₺` : ""}</span></div>
+                  <button type="button" className="secondary" onClick={() => hideVariant(s.id, v.id)}>Kaldır</button>
                 </div>
               )))}
             </div>
@@ -345,8 +448,17 @@ export default function OrganizationManager({ org }: Props) {
               <input name="description" placeholder="Kısa açıklama" />
               <button className="primary">Departman ekle</button>
             </form>
-            <div className="v25-department-grid">
-              {departments.map((d) => <article key={d.id}><b>{d.name}</b><small>{d.floor || "Kat belirtilmedi"} {d.phone ? `· ${d.phone}` : ""}</small></article>)}
+            <div className="slot-list">
+              {departments.map((d) => (
+                <form className="slot-row" key={d.id} onSubmit={(event) => updateDepartment(event, d.id)}>
+                  <input name="name" defaultValue={d.name} required />
+                  <input name="floor" defaultValue={d.floor || ""} placeholder="Kat" />
+                  <input name="phone" defaultValue={d.phone || ""} placeholder="Telefon" />
+                  <input name="description" defaultValue={d.description || ""} placeholder="Açıklama" />
+                  <button className="secondary" type="submit">Kaydet</button>
+                  <button className="secondary" type="button" onClick={() => hideDepartment(d.id)}>Kaldır</button>
+                </form>
+              ))}
             </div>
             {doctors.length > 0 && (
               <div className="slot-list">
@@ -399,7 +511,19 @@ export default function OrganizationManager({ org }: Props) {
             </form>
             <div className="slot-list">
               {emergencyServices.map((item: any) => (
-                <div className="slot-row" key={item.id}><div><b>{item.name}</b><span>{item.kind}{item.is24Hours ? " · 7/24" : ""}</span></div></div>
+                <form className="slot-row" key={item.id} onSubmit={(event) => updateEmergency(event, item.id)}>
+                  <input name="name" defaultValue={item.name} required />
+                  <select name="kind" defaultValue={item.kind}>
+                    <option value="EMERGENCY_DEPARTMENT">Acil servis</option>
+                    <option value="EMERGENCY_CONSULT">Acil danışmanlık</option>
+                    <option value="AMBULANCE_COORDINATION">Ambulans koordinasyonu</option>
+                  </select>
+                  <input name="phone" defaultValue={item.phone || ""} placeholder="Telefon" />
+                  <label className="row"><input name="is24Hours" type="checkbox" defaultChecked={!!item.is24Hours} /> 7/24</label>
+                  <button className="secondary" type="submit">Kaydet</button>
+                  <button className="secondary" type="button" onClick={() => hideEmergency(item.id)}>Kaldır</button>
+                  <small>{emergencyLabels[item.kind] || item.kind}</small>
+                </form>
               ))}
             </div>
           </section>
@@ -431,7 +555,18 @@ export default function OrganizationManager({ org }: Props) {
                 <button className="primary">Güncelle</button>
               </form>
               <div className="slot-list">
-                {stock.map((s) => <div className="slot-row" key={s.id}><b>{s.itemName}</b><span>{s.stockStatus}</span></div>)}
+                {stock.map((s) => (
+                  <div className="slot-row" key={s.id}>
+                    <b>{s.itemName}</b>
+                    <select value={s.stockStatus} onChange={(event) => updateStock(s.id, event.target.value)}>
+                      <option value="in_stock">Stokta var</option>
+                      <option value="limited">Sınırlı</option>
+                      <option value="out_of_stock">Yok</option>
+                    </select>
+                    <span>{stockLabels[s.stockStatus] || s.stockStatus}</span>
+                    <button type="button" className="secondary" onClick={() => removeStock(s.id)}>Kaldır</button>
+                  </div>
+                ))}
               </div>
             </section>
           </>

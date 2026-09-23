@@ -237,6 +237,7 @@ model LabResult {
   referenceHigh Float?
   status        String   @default("normal")
   note          String?
+  provider      String?
   measuredAt    DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments      LabResultComment[]
@@ -1438,119 +1439,6 @@ model UserInsurancePreference {
 
   @@unique([userId, insuranceProviderId])
   @@index([userId, isPrimary])
-}
-
-
-enum ProfessionalAccountType {
-  DOCTOR
-  HOSPITAL
-  CLINIC
-  PRACTICE
-  PHARMACY
-  LABORATORY
-  IMAGING_CENTER
-  HOME_HEALTH
-  HEALTH_TOURISM_AGENCY
-  OTHER_HEALTH_ORGANIZATION
-}
-
-enum ProfessionalVerificationStatus {
-  DRAFT
-  PENDING
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  SUSPENDED
-  EXPIRED
-}
-
-enum VerificationDocumentType {
-  IDENTITY
-  MEDICAL_LICENSE
-  SPECIALTY_CERTIFICATE
-  FACILITY_LICENSE
-  HEALTH_TOURISM_AUTHORIZATION
-  TAX_CERTIFICATE
-  TRADE_REGISTRY
-  OTHER
-}
-
-model ProfessionalAccount {
-  id                 String                         @id @default(cuid())
-  ownerUserId        String
-  accountType        ProfessionalAccountType
-  displayName        String
-  organizationId     String?
-  doctorId           String?
-  verificationStatus ProfessionalVerificationStatus @default(DRAFT)
-  verifiedAt         DateTime?
-  verifiedByUserId   String?
-  suspensionReason   String?
-  createdAt          DateTime                       @default(now())
-  updatedAt          DateTime                       @updatedAt
-  documents          ProfessionalVerificationDocument[]
-  memberships        ProfessionalMembership[]
-  healthTourism      HealthTourismAuthorization?
-
-  @@index([ownerUserId, accountType])
-  @@index([verificationStatus])
-}
-
-model ProfessionalVerificationDocument {
-  id                    String                   @id @default(cuid())
-  professionalAccountId String
-  documentType          VerificationDocumentType
-  documentNumber        String?
-  issuer                String?
-  issuedAt              DateTime?
-  expiresAt             DateTime?
-  fileStorageKey        String?
-  fileName              String?
-  mimeType              String?
-  status                ProfessionalVerificationStatus @default(PENDING)
-  reviewerNote          String?
-  reviewedAt            DateTime?
-  reviewedByUserId      String?
-  createdAt             DateTime                 @default(now())
-  updatedAt             DateTime                 @updatedAt
-  professionalAccount   ProfessionalAccount      @relation(fields: [professionalAccountId], references: [id], onDelete: Cascade)
-
-  @@index([professionalAccountId, documentType])
-  @@index([status])
-}
-
-model HealthTourismAuthorization {
-  id                    String                   @id @default(cuid())
-  professionalAccountId String                   @unique
-  authorizationNumber   String
-  issuer                String
-  issuedAt              DateTime?
-  expiresAt             DateTime?
-  documentId            String?
-  status                ProfessionalVerificationStatus @default(PENDING)
-  checkedAt             DateTime?
-  checkedByUserId       String?
-  reviewerNote          String?
-  createdAt             DateTime                 @default(now())
-  updatedAt             DateTime                 @updatedAt
-  professionalAccount   ProfessionalAccount      @relation(fields: [professionalAccountId], references: [id], onDelete: Cascade)
-
-  @@index([authorizationNumber])
-  @@index([status])
-}
-
-model ProfessionalMembership {
-  id                    String              @id @default(cuid())
-  professionalAccountId String
-  userId                String
-  role                   String
-  isActive               Boolean             @default(true)
-  createdAt              DateTime            @default(now())
-  updatedAt              DateTime            @updatedAt
-  professionalAccount    ProfessionalAccount @relation(fields: [professionalAccountId], references: [id], onDelete: Cascade)
-
-  @@unique([professionalAccountId, userId])
-  @@index([userId, isActive])
 }
 
 
