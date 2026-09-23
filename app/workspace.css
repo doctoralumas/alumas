@@ -1,0 +1,367 @@
+/* Premium Workspace Surfaces */
+
+.workspace .panel {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -2px rgba(0,0,0,0.03);
+  margin-bottom: 24px;
+}
+
+.workspace .panel h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.workspace .panel > p,
+.workspace .panel .muted {
+  margin: 0 0 20px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.workspace .page-title {
+  margin-bottom: 32px;
+}
+
+.workspace .page-title h1 {
+  font-size: clamp(28px, 5vw, 36px);
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.workspace .page-title p {
+  color: #64748b;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.workspace .compact-form,
+.workspace .availability-form,
+.workspace .panel-fields,
+.workspace .doc-fields,
+.workspace .care-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: end;
+  margin: 20px 0 12px;
+}
+
+.workspace .compact-form > *,
+.workspace .availability-form > *,
+.workspace .panel-fields > *,
+.workspace .doc-fields > *,
+.workspace .care-form > * {
+  min-width: 0;
+  width: auto;
+  flex: initial;
+}
+
+.workspace .compact-form textarea,
+.workspace .panel-fields textarea,
+.workspace .doc-fields textarea,
+.workspace .care-form textarea,
+.workspace .compact-form > label,
+.workspace .field-span,
+.workspace .panel-fields > .row,
+.workspace .doc-fields > .row {
+  grid-column: 1 / -1;
+}
+
+.workspace .compact-form button,
+.workspace .availability-form button,
+.workspace .panel-fields button,
+.workspace .doc-fields button,
+.workspace .care-form button {
+  width: auto;
+  justify-self: start;
+  align-self: end;
+  min-height: 44px;
+  padding: 0 24px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.workspace .field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workspace .field > span,
+.workspace .field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.workspace .compact-form input,
+.workspace .compact-form select,
+.workspace .compact-form textarea,
+.workspace .availability-form input,
+.workspace .availability-form select,
+.workspace .panel-fields input,
+.workspace .panel-fields select,
+.workspace .panel-fields textarea,
+.workspace .doc-fields input,
+.workspace .doc-fields select,
+.workspace .slot-row input,
+.workspace .slot-row select,
+.workspace .slot-row textarea,
+.workspace .hours-row input,
+.workspace .care-form input,
+.workspace .care-form select,
+.workspace .care-form textarea,
+.workspace .field input,
+.workspace .field select,
+.workspace .field textarea {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  padding: 10px 16px;
+  color: #0f172a;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.workspace .compact-form input:focus,
+.workspace .compact-form select:focus,
+.workspace .compact-form textarea:focus,
+.workspace .availability-form input:focus,
+.workspace .availability-form select:focus,
+.workspace .field input:focus,
+.workspace .field select:focus,
+.workspace .field textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff;
+}
+
+.workspace .field textarea,
+.workspace textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.workspace input[type="file"] {
+  min-height: 52px;
+  padding: 8px;
+  border: 1px dashed #94a3b8;
+  background: #f8fafc;
+  border-radius: 14px;
+}
+
+.workspace input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #0f172a;
+  color: white;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.workspace input[type="file"]::file-selector-button:hover {
+  opacity: 0.9;
+}
+
+.workspace .check-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.workspace .check-line input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #3b82f6;
+}
+
+/* Slot Lists (Appointments, patients, etc.) */
+.workspace .slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.workspace .slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.workspace a.slot-row:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.workspace .slot-row > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 200px;
+}
+
+.workspace .slot-row b {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.workspace .slot-row span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.workspace .slot-row > .row,
+.workspace .slot-row > form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.workspace .slot-row button,
+.workspace .slot-row .secondary,
+.workspace .slot-row .primary {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.workspace .hours-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace .hours-row {
+  display: grid;
+  grid-template-columns: 140px 120px 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.workspace .hours-row b {
+  color: #0f172a;
+}
+
+/* Document Cards */
+.workspace .doc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.workspace .doc-card header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.workspace .doc-card header b {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.workspace .doc-card header p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.workspace .doc-card a {
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.workspace .doc-card a:hover {
+  text-decoration: underline;
+}
+
+.workspace .empty {
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  background: #f8fafc;
+  color: #64748b;
+  padding: 32px 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.workspace .status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 100px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.workspace .status.org-approved { background: #f0fdf4; color: #16a34a; }
+.workspace .status.org-pending { background: #fff7ed; color: #ea580c; }
+.workspace .status.org-rejected { background: #fef2f2; color: #ef4444; }
+.workspace .status.org-suspended { background: #f8fafc; color: #64748b; }
+
+.workspace .dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 800px) {
+  .workspace .panel {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .workspace .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace .hours-row {
+    grid-template-columns: 1fr;
+  }
+}
