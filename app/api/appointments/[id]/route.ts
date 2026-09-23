@@ -22,6 +22,7 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if(apt.userId!==user.id&&user.role!=="ADMIN")return NextResponse.json({error:"Ertelemeyi hasta veya admin yapabilir."},{status:403});
   const startsAt=new Date(body.startsAt); const slot=await prisma.availability.findUnique({where:{doctorId_startsAt:{doctorId:apt.doctorId,startsAt}}});
   if(!slot||!slot.isActive)return NextResponse.json({error:"Yeni saat müsait değil."},{status:409});
+  if(apt.type==="home"?slot.type!=="home":slot.type==="home"||(slot.type!=="both"&&slot.type!==apt.type))return NextResponse.json({error:"Yeni saat bu görüşme türüne uygun değil."},{status:409});
   try{const busy=await prisma.appointment.findFirst({where:{doctorId:apt.doctorId,startsAt,status:{not:"cancelled"},id:{not:id}}});if(busy)return NextResponse.json({error:"Bu saat artık dolu."},{status:409});const row=await prisma.appointment.update({where:{id},data:{startsAt,status:"confirmed"}}); await notifyUser(apt.userId,"Randevu ertelendi",`Yeni saat: ${startsAt.toLocaleString("tr-TR")}`,"appointment",{appointmentId:apt.id}).catch(()=>{}); return NextResponse.json(row)}catch{return NextResponse.json({error:"Bu saat artık dolu."},{status:409})}
  }
  return NextResponse.json({error:"Geçersiz işlem"},{status:400});

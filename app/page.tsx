@@ -5,7 +5,7 @@ const tiles = [
   {href:"/health", kicker:"Kişisel sağlık", title:"SAĞLIĞIM", text:"Tüm sağlık verilerin tek yerde", cls:"home-tile blue span7 row2", image:"/home-visuals/health.webp"},
   {href:"/doctors", kicker:"Uzmanlar", title:"DOKTOR BUL", text:"Uzman doktorları bul ve randevu al", cls:"home-tile blue2 span5 row2", image:"/home-visuals/doctor.webp"},
   {href:"/nearby", kicker:"Konum", title:"YAKINIMDAKİLER", text:"Hastane, klinik, eczane, acil ve oteller", cls:"home-tile mint span4 row2", image:"/home-visuals/nearby.webp"},
-  {href:"/home-care", kicker:"Alumas Care", title:"EVDE SAĞLIK", text:"Evde bakım ve sağlık hizmetleri", cls:"home-tile teal span4 row2", image:"/home-visuals/home-care.webp"},
+  {href:"/home-care", kicker:"Alumas Care", title:"EVDE SAĞLIK", text:"Doktor, hemşirelik veya numune alma", cls:"home-tile teal span4 row2", image:"/home-visuals/home-care.webp"},
   {href:"/emergency", kicker:"Acil erişim", title:"ACİL / 112", text:"Acil servis, ambulans ve sağlık kartına hızlı eriş", cls:"home-tile emergency span4 row2", image:"/home-visuals/emergency.webp"},
   {href:"/health-tourism", kicker:"Uluslararası sağlık", title:"SAĞLIK TURİZMİ", text:"Tedavi, konaklama ve ulaşım hizmetleri", cls:"home-tile navy span8 row2", image:"/home-visuals/health-tourism.webp"},
   {href:"/organizations", kicker:"Kurumlar", title:"HASTANE & KLİNİK", text:"Doğrulanmış sağlık kurumlarını keşfet", cls:"home-tile lavender span4 row2", image:"/home-visuals/organizations.webp"},

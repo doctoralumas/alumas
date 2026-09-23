@@ -36,39 +36,58 @@ export default function VerificationDocumentManager({ owner, documents }: { owne
   }
 
   return (
-    <section className="panel form-span" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-      <div>
-        <h2>Doğrulama belgeleri</h2>
-        <p>Zorunlu belgeler onaylanmadan profil yayınlanmaz. Süresi dolan belge yayını durdurur. Yeni dosya, eskisinin yerine incelenmek üzere eklenir.</p>
-      </div>
+    <section className="panel form-span">
+      <h2>Doğrulama belgeleri</h2>
+      <p>Zorunlu belgeler onaylanmadan profil yayınlanmaz. Süresi dolan belge yayını durdurur. Yeni dosya, eskisinin yerine incelenmek üzere eklenir.</p>
       {msg && <div className="inline-message">{msg}</div>}
-      {requirements.map((requirement) => {
-        const current = rows.find((row) => row.documentType === requirement.type && row.status !== "SUPERSEDED");
-        return (
-          <div key={requirement.type} style={{ border: "1px solid #e2e8f0", borderRadius: "12px", padding: "14px" }}>
-            <div className="row between">
-              <b>{requirement.label}</b>
-              <span className="status">{current ? DOCUMENT_STATUS_LABELS[current.status] || current.status : "Eksik"}</span>
-            </div>
-            <small>
-              {requirement.required ? "Zorunlu" : "İsteğe bağlı"}
-              {requirement.expires ? " · Son kullanma tarihi takip edilir" : ""}
-              {current?.documentNumber ? ` · No: ${current.documentNumber}` : ""}
-              {current?.expiresAt ? ` · Bitiş: ${new Date(current.expiresAt).toLocaleDateString("tr-TR")}` : ""}
-              {current?.reviewerNote ? ` · ${current.reviewerNote}` : ""}
-            </small>
-            {current && <div style={{ marginTop: "8px" }}><a href={`/api/verification-documents/${current.id}/file`}>Yüklenen dosyayı aç</a></div>}
-            <form style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }} onSubmit={(event) => upload(event, requirement.type)}>
-              <input name="documentNumber" placeholder="Belge numarası" required defaultValue={current?.documentNumber || ""} />
-              <input name="issuer" placeholder="Veren kurum" required defaultValue={current?.issuer || ""} />
-              <input type="date" name="issuedAt" />
-              {requirement.expires && <input type="date" name="expiresAt" required />}
-              <input type="file" name="file" accept="application/pdf,image/jpeg,image/png" required />
-              <button className="secondary" type="submit">{current ? "Yeni dosya gönder" : "Belge yükle"}</button>
-            </form>
-          </div>
-        );
-      })}
+      <div style={{ display: "grid", gap: 14 }}>
+        {requirements.map((requirement) => {
+          const current = rows.find((row) => row.documentType === requirement.type && row.status !== "SUPERSEDED");
+          return (
+            <article className="doc-card" key={requirement.type}>
+              <header>
+                <div>
+                  <b>{requirement.label}</b>
+                  <p>
+                    {requirement.required ? "Zorunlu" : "İsteğe bağlı"}
+                    {requirement.expires ? " · Son kullanma tarihi takip edilir" : ""}
+                    {current?.documentNumber ? ` · No: ${current.documentNumber}` : ""}
+                    {current?.expiresAt ? ` · Bitiş: ${new Date(current.expiresAt).toLocaleDateString("tr-TR")}` : ""}
+                    {current?.reviewerNote ? ` · ${current.reviewerNote}` : ""}
+                  </p>
+                </div>
+                <span className="status">{current ? DOCUMENT_STATUS_LABELS[current.status] || current.status : "Eksik"}</span>
+              </header>
+              {current && <a href={`/api/verification-documents/${current.id}/file`}>Yüklenen dosyayı aç</a>}
+              <form className="doc-fields" onSubmit={(event) => upload(event, requirement.type)}>
+                <label className="field">
+                  <span>Belge numarası</span>
+                  <input name="documentNumber" placeholder="Örn. 123456" required defaultValue={current?.documentNumber || ""} />
+                </label>
+                <label className="field">
+                  <span>Veren kurum</span>
+                  <input name="issuer" placeholder="Kurum adı" required defaultValue={current?.issuer || ""} />
+                </label>
+                <label className="field">
+                  <span>Düzenlenme tarihi</span>
+                  <input type="date" name="issuedAt" />
+                </label>
+                {requirement.expires && (
+                  <label className="field">
+                    <span>Son kullanma tarihi</span>
+                    <input type="date" name="expiresAt" required />
+                  </label>
+                )}
+                <label className="field field-span">
+                  <span>Belge dosyası</span>
+                  <input type="file" name="file" accept="application/pdf,image/jpeg,image/png" required />
+                </label>
+                <button className="primary" type="submit">{current ? "Yeni dosya gönder" : "Belge yükle"}</button>
+              </form>
+            </article>
+          );
+        })}
+      </div>
     </section>
   );
 }

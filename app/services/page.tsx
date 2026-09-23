@@ -14,7 +14,7 @@ const groups:{title:string;items:Item[]}[]=[
     {href:"/doctors",title:"Doktor & Uzman Bul",desc:"Doktor, diyetisyen ve fizyoterapistleri incele.",tone:"blue",icon:Stethoscope},
     {href:"/organizations",title:"Hastane & Klinik",desc:"Doğrulanmış sağlık kurumlarını keşfet.",tone:"blue2",icon:Hospital},
     {href:"/nearby",title:"Yakınımdakiler",desc:"Hastane, klinik, eczane, acil servis ve otel bul.",tone:"mint",icon:MapPin},
-    {href:"/home-care",title:"Evde Sağlık",desc:"Doktor, hemşire ve evde bakım hizmetleri.",tone:"teal",icon:HouseLine},
+    {href:"/home-care",title:"Evde Sağlık",desc:"Ev ziyaretini doktor, klinik veya laboratuvar üzerinden planla.",tone:"teal",icon:HouseLine},
     {href:"/emergency",title:"Acil / 112",desc:"112, ambulans, acil servis ve sağlık kartı.",tone:"emergency",icon:Ambulance},
     {href:"/health-tourism",title:"Sağlık Turizmi",desc:"Klinik, paket, transfer, konaklama ve tercüman.",tone:"navy",icon:AirplaneTilt},
     {href:"/insurance",title:"Sigortalar",desc:"Sigorta sağlayıcıları ve anlaşmalı kurumlar.",tone:"ice",icon:ShieldCheck},

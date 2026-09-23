@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { IMAGING_MODALITIES, LAB_CATEGORIES, LAB_SAMPLE_TYPES, imagingModalityLabel, labCategoryLabel, labSampleLabel } from "@/lib/organization-capabilities";
 import ResultDelivery from "@/components/business/result-delivery";
+import HomeVisitQueue from "@/components/business/home-visit-queue";
 import VerificationDocumentManager from "@/components/verification-document-manager";
 
 type Props = { org: any };
@@ -41,6 +42,7 @@ const emptyTest = {
   turnaroundHours: "",
   preparation: "",
   price: "",
+  homeCollection: false,
 };
 
 export default function OrganizationManager({ org }: Props) {
@@ -113,7 +115,7 @@ export default function OrganizationManager({ org }: Props) {
     e.preventDefault();
     const form = e.currentTarget;
     const f = new FormData(form);
-    const r = await fetch(`/api/organizations/${org.id}/services`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: f.get("name"), description: f.get("description"), price: f.get("price") }) });
+    const r = await fetch(`/api/organizations/${org.id}/services`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: f.get("name"), description: f.get("description"), price: f.get("price"), homeCareKind: f.get("homeCareKind") }) });
     const j = await r.json();
     if (r.ok) { setServices((x) => [...x, j]); form.reset(); setMsg(clinical && org.type === "CLINIC" ? "İşlem eklendi" : "Hizmet eklendi"); }
     else setMsg(j.error);
@@ -208,6 +210,7 @@ export default function OrganizationManager({ org }: Props) {
       turnaroundHours: test.turnaroundHours ?? "",
       preparation: test.preparation || "",
       price: test.price ?? "",
+      homeCollection: !!test.homeCollection,
     });
   }
   async function saveTest(e: any) {
@@ -239,7 +242,7 @@ export default function OrganizationManager({ org }: Props) {
     const response = await fetch(`/api/organizations/${org.id}/services`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ serviceId, name: form.get("name"), description: form.get("description"), price: form.get("price") }),
+      body: JSON.stringify({ serviceId, name: form.get("name"), description: form.get("description"), price: form.get("price"), homeCareKind: form.get("homeCareKind") }),
     });
     const data = await response.json();
     if (!response.ok) { setMsg(data.error || "Hizmet güncellenemedi"); return; }
@@ -361,6 +364,12 @@ export default function OrganizationManager({ org }: Props) {
               <input name="name" placeholder={org.type === "CLINIC" ? "Muayene veya işlem adı" : "Hizmet adı"} required />
               <input name="price" type="number" min="0" placeholder="Fiyat (₺)" />
               <input name="description" placeholder="Kısa açıklama" />
+              <select name="homeCareKind" defaultValue="">
+                <option value="">Yalnızca kurumda</option>
+                <option value="nurse">Evde hemşirelik</option>
+                <option value="dressing">Evde pansuman</option>
+                <option value="physio">Evde fizyoterapi</option>
+              </select>
               <button className="primary">Ekle</button>
             </form>
             <div className="slot-list">
@@ -370,6 +379,12 @@ export default function OrganizationManager({ org }: Props) {
                     <input name="name" defaultValue={s.name} required />
                     <input name="price" type="number" min="0" defaultValue={s.price ?? ""} placeholder="Fiyat (₺)" />
                     <input name="description" defaultValue={s.description || ""} placeholder="Kısa açıklama" />
+                    <select name="homeCareKind" defaultValue={s.homeCareKind || ""}>
+                      <option value="">Yalnızca kurumda</option>
+                      <option value="nurse">Evde hemşirelik</option>
+                      <option value="dressing">Evde pansuman</option>
+                      <option value="physio">Evde fizyoterapi</option>
+                    </select>
                     <button className="secondary" type="submit">Kaydet</button>
                     <button className="secondary" type="button" onClick={() => hideService(s.id)}>Kaldır</button>
                   </form>
@@ -378,6 +393,8 @@ export default function OrganizationManager({ org }: Props) {
             </div>
           </section>
         )}
+
+        {clinical && <HomeVisitQueue organizationId={org.id} />}
 
         {clinical && (
           <section className="panel">
@@ -481,11 +498,23 @@ export default function OrganizationManager({ org }: Props) {
         <section className="panel form-span">
           <h2>Kampanyalar</h2>
           <p>Onaylı kurum profilinde ve Alumas Kampanyalar sayfasında gösterilir.</p>
-          <form className="v25-campaign-form" onSubmit={addCampaign}>
-            <input name="title" placeholder="Kampanya başlığı" required />
-            <input name="startsAt" type="date" />
-            <input name="endsAt" type="date" />
-            <textarea name="description" placeholder="Kısa açıklama" />
+          <form className="panel-fields" onSubmit={addCampaign}>
+            <label className="field">
+              <span>Kampanya başlığı</span>
+              <input name="title" placeholder="Başlık" required />
+            </label>
+            <label className="field">
+              <span>Başlangıç</span>
+              <input name="startsAt" type="date" />
+            </label>
+            <label className="field">
+              <span>Bitiş</span>
+              <input name="endsAt" type="date" />
+            </label>
+            <label className="field">
+              <span>Kısa açıklama</span>
+              <textarea name="description" placeholder="Hastanın göreceği metin" />
+            </label>
             <button className="primary">Yayınla</button>
           </form>
           <div className="slot-list">
@@ -578,18 +607,41 @@ export default function OrganizationManager({ org }: Props) {
           <section className="panel form-span">
             <h2>Tetkik kataloğu</h2>
             <p>Hasta sayfasında tür, bölge, hazırlık, çekim süresi, rapor süresi ve fiyat görünür.</p>
-            <form className="compact-form" onSubmit={saveExam}>
-              <select value={examForm.modality} onChange={(e) => setExamForm({ ...examForm, modality: e.target.value })}>
-                {IMAGING_MODALITIES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-              </select>
-              <input value={examForm.name} onChange={(e) => setExamForm({ ...examForm, name: e.target.value })} placeholder="Tetkik adı, örn. Beyin MR" required />
-              <input value={examForm.bodyRegion} onChange={(e) => setExamForm({ ...examForm, bodyRegion: e.target.value })} placeholder="Bölge, örn. Baş" />
-              <input value={examForm.preparation} onChange={(e) => setExamForm({ ...examForm, preparation: e.target.value })} placeholder="Hazırlık, örn. 4 saat açlık" />
-              <input value={examForm.durationMinutes} onChange={(e) => setExamForm({ ...examForm, durationMinutes: e.target.value })} type="number" min="0" placeholder="Çekim süresi (dk)" />
-              <input value={examForm.reportHours} onChange={(e) => setExamForm({ ...examForm, reportHours: e.target.value })} type="number" min="0" placeholder="Rapor süresi (saat)" />
-              <input value={examForm.price} onChange={(e) => setExamForm({ ...examForm, price: e.target.value })} type="number" min="0" placeholder="Fiyat (₺)" />
-              <button className="primary">{editingExamId ? "Tetkiği güncelle" : "Kataloğa ekle"}</button>
-              {editingExamId && <button type="button" className="secondary" onClick={() => { setEditingExamId(null); setExamForm(emptyExam); }}>Vazgeç</button>}
+            <form className="panel-fields" onSubmit={saveExam}>
+              <label className="field">
+                <span>Tür</span>
+                <select value={examForm.modality} onChange={(e) => setExamForm({ ...examForm, modality: e.target.value })}>
+                  {IMAGING_MODALITIES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                </select>
+              </label>
+              <label className="field">
+                <span>Tetkik adı</span>
+                <input value={examForm.name} onChange={(e) => setExamForm({ ...examForm, name: e.target.value })} placeholder="Örn. Beyin MR" required />
+              </label>
+              <label className="field">
+                <span>Bölge</span>
+                <input value={examForm.bodyRegion} onChange={(e) => setExamForm({ ...examForm, bodyRegion: e.target.value })} placeholder="Örn. Baş" />
+              </label>
+              <label className="field">
+                <span>Hazırlık</span>
+                <input value={examForm.preparation} onChange={(e) => setExamForm({ ...examForm, preparation: e.target.value })} placeholder="Örn. 4 saat açlık" />
+              </label>
+              <label className="field">
+                <span>Çekim süresi (dk)</span>
+                <input value={examForm.durationMinutes} onChange={(e) => setExamForm({ ...examForm, durationMinutes: e.target.value })} type="number" min="0" />
+              </label>
+              <label className="field">
+                <span>Rapor süresi (saat)</span>
+                <input value={examForm.reportHours} onChange={(e) => setExamForm({ ...examForm, reportHours: e.target.value })} type="number" min="0" />
+              </label>
+              <label className="field">
+                <span>Fiyat (₺)</span>
+                <input value={examForm.price} onChange={(e) => setExamForm({ ...examForm, price: e.target.value })} type="number" min="0" />
+              </label>
+              <div className="row">
+                <button className="primary">{editingExamId ? "Tetkiği güncelle" : "Kataloğa ekle"}</button>
+                {editingExamId && <button type="button" className="secondary" onClick={() => { setEditingExamId(null); setExamForm(emptyExam); }}>Vazgeç</button>}
+              </div>
             </form>
             <div className="slot-list">
               {exams.map((exam) => (
@@ -614,27 +666,51 @@ export default function OrganizationManager({ org }: Props) {
           <section className="panel form-span">
             <h2>Tahlil kataloğu</h2>
             <p>Hasta sayfasında grup, numune, açlık, sonuç süresi ve fiyat görünür.</p>
-            <form className="compact-form" onSubmit={saveTest}>
-              <select value={testForm.category} onChange={(e) => setTestForm({ ...testForm, category: e.target.value })}>
-                {LAB_CATEGORIES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-              </select>
-              <select value={testForm.sampleType} onChange={(e) => setTestForm({ ...testForm, sampleType: e.target.value })}>
-                {LAB_SAMPLE_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-              </select>
-              <input value={testForm.name} onChange={(e) => setTestForm({ ...testForm, name: e.target.value })} placeholder="Tahlil adı, örn. Hemogram" required />
-              <input value={testForm.fastingHours} onChange={(e) => setTestForm({ ...testForm, fastingHours: e.target.value })} type="number" min="0" placeholder="Açlık (saat), boşsa gerekmez" />
-              <input value={testForm.turnaroundHours} onChange={(e) => setTestForm({ ...testForm, turnaroundHours: e.target.value })} type="number" min="0" placeholder="Sonuç süresi (saat)" />
-              <input value={testForm.preparation} onChange={(e) => setTestForm({ ...testForm, preparation: e.target.value })} placeholder="Hazırlık, örn. sabah numunesi" />
-              <input value={testForm.price} onChange={(e) => setTestForm({ ...testForm, price: e.target.value })} type="number" min="0" placeholder="Fiyat (₺)" />
-              <button className="primary">{editingTestId ? "Tahlili güncelle" : "Kataloğa ekle"}</button>
-              {editingTestId && <button type="button" className="secondary" onClick={() => { setEditingTestId(null); setTestForm(emptyTest); }}>Vazgeç</button>}
+            <form className="panel-fields" onSubmit={saveTest}>
+              <label className="field">
+                <span>Grup</span>
+                <select value={testForm.category} onChange={(e) => setTestForm({ ...testForm, category: e.target.value })}>
+                  {LAB_CATEGORIES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                </select>
+              </label>
+              <label className="field">
+                <span>Numune</span>
+                <select value={testForm.sampleType} onChange={(e) => setTestForm({ ...testForm, sampleType: e.target.value })}>
+                  {LAB_SAMPLE_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                </select>
+              </label>
+              <label className="field">
+                <span>Tahlil adı</span>
+                <input value={testForm.name} onChange={(e) => setTestForm({ ...testForm, name: e.target.value })} placeholder="Örn. Hemogram" required />
+              </label>
+              <label className="field">
+                <span>Açlık (saat)</span>
+                <input value={testForm.fastingHours} onChange={(e) => setTestForm({ ...testForm, fastingHours: e.target.value })} type="number" min="0" placeholder="Boşsa gerekmez" />
+              </label>
+              <label className="field">
+                <span>Sonuç süresi (saat)</span>
+                <input value={testForm.turnaroundHours} onChange={(e) => setTestForm({ ...testForm, turnaroundHours: e.target.value })} type="number" min="0" />
+              </label>
+              <label className="field">
+                <span>Hazırlık</span>
+                <input value={testForm.preparation} onChange={(e) => setTestForm({ ...testForm, preparation: e.target.value })} placeholder="Örn. sabah numunesi" />
+              </label>
+              <label className="field">
+                <span>Fiyat (₺)</span>
+                <input value={testForm.price} onChange={(e) => setTestForm({ ...testForm, price: e.target.value })} type="number" min="0" />
+              </label>
+              <label className="check-line"><input type="checkbox" checked={!!testForm.homeCollection} onChange={(e) => setTestForm({ ...testForm, homeCollection: e.target.checked })} /> Evde numune alınır</label>
+              <div className="row">
+                <button className="primary">{editingTestId ? "Tahlili güncelle" : "Kataloğa ekle"}</button>
+                {editingTestId && <button type="button" className="secondary" onClick={() => { setEditingTestId(null); setTestForm(emptyTest); }}>Vazgeç</button>}
+              </div>
             </form>
             <div className="slot-list">
               {tests.map((test) => (
                 <div className="slot-row" key={test.id}>
                   <div>
                     <b>{labCategoryLabel(test.category)} · {test.name}</b>
-                    <span>{[labSampleLabel(test.sampleType), test.fastingHours ? `${test.fastingHours} saat açlık` : "Açlık gerekmez", test.turnaroundHours ? `sonuç ${test.turnaroundHours} sa` : "", test.preparation].filter(Boolean).join(" · ")}</span>
+                    <span>{[labSampleLabel(test.sampleType), test.fastingHours ? `${test.fastingHours} saat açlık` : "Açlık gerekmez", test.turnaroundHours ? `sonuç ${test.turnaroundHours} sa` : "", test.preparation, test.homeCollection ? "Evde numune" : ""].filter(Boolean).join(" · ")}</span>
                   </div>
                   <div className="row">
                     <strong>{test.price ? `${test.price.toLocaleString("tr-TR")} ₺` : "Fiyat sorunuz"}</strong>
@@ -647,6 +723,8 @@ export default function OrganizationManager({ org }: Props) {
             </div>
           </section>
         )}
+
+        {laboratory && <HomeVisitQueue organizationId={org.id} />}
       </div>
     </>
   );

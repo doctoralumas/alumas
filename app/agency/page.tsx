@@ -1,12 +1,50 @@
-import {redirect} from "next/navigation";import {currentUser} from "@/lib/auth";import {prisma} from "@/lib/prisma";import Link from "next/link";export default async function Page(){const u=await currentUser();if(!u)redirect("/login");const rows=await prisma.healthTourismAgency.findMany({where:{ownerUserId:u.id},include:{_count:{select:{packages:{where:{isPublished:true}},services:{where:{isActive:true}}}}},orderBy:{createdAt:"desc"}});return <div className="page"><div className="page-title row between"><div><span className="kicker">Sağlık turizmi paneli</span><h1>Sağlık turizmi hesaplarım</h1></div><Link className="primary" href="/agency/apply" style={{borderRadius: '8px', padding: '10px 24px'}}>+ Profil oluştur</Link></div><div className="business-list">{rows.map(a=><section className="panel" key={a.id} style={{border: '1px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', padding: '24px'}}><div className="row between" style={{alignItems: 'flex-start', marginBottom: '24px'}}><div><span className="kicker" style={{color: '#0369a1', fontWeight: 600, letterSpacing: '0.5px'}}>SAĞLIK TURİZMİ PROFİLİ</span><h2 style={{margin: '4px 0', fontSize: '1.5rem', color: '#0f172a'}}>{a.name}</h2><p style={{color: '#64748b', margin: 0, display: 'flex', alignItems: 'center', gap: '4px'}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> {a.city}</p></div><span className={`status org-${a.status.toLowerCase()}`} style={{padding: '6px 12px', borderRadius: '20px', fontWeight: 500}}>{a.isVerified ? "✓ Doğrulanmış" : "Doğrulama Bekliyor"}</span></div><div className="admin-stats" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginBottom: '24px'}}>
-  <div className="metric" style={{background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px', padding: '16px', color: '#0f172a'}}>
-    <span style={{color: '#64748b', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase'}}>Tedavi Paketleri</span>
-    <strong style={{fontSize: '2rem', color: '#0f172a'}}>{a._count.packages}</strong>
-    <small style={{color: '#64748b'}}>yayındaki paket</small>
-  </div>
-  <div className="metric" style={{background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px', padding: '16px', color: '#0f172a'}}>
-    <span style={{color: '#64748b', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase'}}>Destek Hizmetleri</span>
-    <strong style={{fontSize: '2rem', color: '#0f172a'}}>{a._count.services}</strong>
-    <small style={{color: '#64748b'}}>yayındaki hizmet</small>
-  </div>
-</div><div className="row business-actions" style={{borderTop: '1px solid #f1f5f9', paddingTop: '20px'}}><Link className="primary" href={`/agency/${a.id}`} style={{borderRadius: '8px', padding: '10px 24px'}}>Profili yönet</Link>{a.isVerified&&<Link className="secondary" href={`/agencies/${a.id}`} style={{borderRadius: '8px', padding: '10px 24px'}}>Yayınlanan profili gör</Link>}</div></section>)}</div>{!rows.length&&<div className="empty" style={{background: '#f8fafc', border: '1px dashed #cbd5e1', padding: '40px', borderRadius: '16px'}}>Henüz sağlık turizmi profiliniz yok.</div>}</div>}
+import { redirect } from "next/navigation";
+import { currentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+
+export default async function Page() {
+  const user = await currentUser();
+  if (!user) redirect("/login");
+  const rows = await prisma.healthTourismAgency.findMany({
+    where: { ownerUserId: user.id },
+    include: { _count: { select: { packages: { where: { isPublished: true } }, services: { where: { isActive: true } } } } },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return (
+    <div className="page workspace">
+      <div className="page-title row between">
+        <div>
+          <span className="kicker">Sağlık turizmi paneli</span>
+          <h1>Sağlık turizmi hesaplarım</h1>
+          <p>Paketlerini ve koordinasyon hizmetlerini buradan yönet.</p>
+        </div>
+        <Link className="primary" href="/agency/apply">+ Profil oluştur</Link>
+      </div>
+      <div className="business-list">
+        {rows.map((agency) => (
+          <section className="panel" key={agency.id}>
+            <div className="row between">
+              <div>
+                <span className="kicker">Sağlık turizmi profili</span>
+                <h2>{agency.name}</h2>
+                <p>{agency.city}</p>
+              </div>
+              <span className={`status org-${agency.status.toLowerCase()}`}>{agency.isVerified ? "Doğrulanmış" : "Doğrulama bekliyor"}</span>
+            </div>
+            <div className="admin-stats">
+              <div className="metric"><span>Tedavi paketleri</span><strong>{agency._count.packages}</strong><small>yayındaki paket</small></div>
+              <div className="metric"><span>Destek hizmetleri</span><strong>{agency._count.services}</strong><small>yayındaki hizmet</small></div>
+            </div>
+            <div className="row business-actions">
+              <Link className="primary" href={`/agency/${agency.id}`}>Profili yönet</Link>
+              {agency.isVerified && <Link className="secondary" href={`/agencies/${agency.id}`}>Yayınlanan profili gör</Link>}
+            </div>
+          </section>
+        ))}
+      </div>
+      {!rows.length && <div className="empty">Henüz sağlık turizmi profiliniz yok.</div>}
+    </div>
+  );
+}

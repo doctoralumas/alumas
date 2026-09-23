@@ -8,12 +8,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (u.role !== "ADMIN") redirect('/profile');
 
   return (
-    <>
-      <div className="page" style={{ paddingBottom: '0', minHeight: 'auto' }}>
+    <div className="workspace">
+      <div className="page" style={{ paddingBottom: 0, minHeight: "auto" }}>
         <AdminNav />
       </div>
       {children}
-    </>
+    </div>
   );
 }
 

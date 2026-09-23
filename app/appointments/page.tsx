@@ -4,7 +4,7 @@ import Link from "next/link";
 import SectionVisual from "@/components/section-visual";
 import { CalendarCheck, VideoCamera, FirstAid, CaretLeft, CheckCircle, XCircle, ClockCounterClockwise, Star } from "@phosphor-icons/react";
 
-type Appointment={id:string;doctorId:string;doctorName:string;patientName?:string;specialty:string;startsAt:string;type:"online"|"clinic";status:string;specialProfile?:{id:string;name:string;type:string}|null};
+type Appointment={id:string;doctorId:string;doctorName:string;patientName?:string;specialty:string;startsAt:string;type:"online"|"clinic"|"home";status:string;specialProfile?:{id:string;name:string;type:string}|null;visitCity?:string|null;visitDistrict?:string|null;visitAddress?:string|null};
 type Slot={id:string;startsAt:string;type:string};
 
 export default function Appointments(){
@@ -31,7 +31,8 @@ export default function Appointments(){
     setEditing(a.id);
     setNewTime('');
     const r=await fetch(`/api/doctors/${a.doctorId}/availability`);
-    setSlots(r.ok?await r.json():[]);
+    const list=r.ok?await r.json():[];
+    setSlots(a.type==="home"?list.filter((slot:Slot)=>slot.type==="home"):list.filter((slot:Slot)=>slot.type==="both"||slot.type===a.type));
   }
 
   async function reschedule(id:string){
@@ -105,8 +106,13 @@ export default function Appointments(){
                       </span>
                       <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "14px", color: a.type==='online' ? "#4f46e5" : "#16a34a", background: a.type==='online' ? "#e0e7ff" : "#dcfce7", padding: "6px 12px", borderRadius: "10px", fontWeight: 500 }}>
                         {a.type==='online' ? <VideoCamera size={18} weight="duotone" /> : <FirstAid size={18} weight="duotone" />} 
-                        {a.type==='online' ? 'Online Görüşme' : 'Klinik Ziyareti'}
+                        {a.type==='home' ? 'Evde ziyaret' : a.type==='online' ? 'Online Görüşme' : 'Klinik Ziyareti'}
                       </span>
+                      {a.type==='home' && a.visitAddress && (
+                        <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "14px", color: "#64748b", background: "#f8fafc", padding: "6px 12px", borderRadius: "10px" }}>
+                          {[a.visitDistrict, a.visitAddress].filter(Boolean).join(", ")}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

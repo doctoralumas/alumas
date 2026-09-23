@@ -14,30 +14,31 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (body.status === "APPROVED" && current.expiresAt && current.expiresAt.getTime() < Date.now()) {
     return NextResponse.json({ error: "Süresi dolmuş belge onaylanamaz." }, { status: 400 });
   }
-  const document = await prisma.$transaction(async (tx) => {
-    if (body.status === "APPROVED") {
-      await tx.verificationDocument.updateMany({
-        where: {
-          id: { not: current.id },
-          documentType: current.documentType,
-          status: "APPROVED",
-          organizationId: current.organizationId,
-          doctorId: current.doctorId,
-          agencyId: current.agencyId,
-        },
-        data: { status: "SUPERSEDED" },
-      });
-    }
-    return tx.verificationDocument.update({
-      where: { id: current.id },
-      data: {
-        status: body.status,
-        reviewerNote: body.note ? String(body.note).slice(0, 500) : null,
-        reviewedAt: new Date(),
-        reviewedByUserId: user.id,
-      },
-    });
+  const documentUpdate = prisma.verificationDocument.update({
+    where: { id: current.id },
+    data: {
+      status: body.status,
+      reviewerNote: body.note ? String(body.note).slice(0, 500) : null,
+      reviewedAt: new Date(),
+      reviewedByUserId: user.id,
+    },
   });
+  const document = body.status === "APPROVED"
+    ? (await prisma.$transaction([
+        prisma.verificationDocument.updateMany({
+          where: {
+            id: { not: current.id },
+            documentType: current.documentType,
+            status: "APPROVED",
+            organizationId: current.organizationId,
+            doctorId: current.doctorId,
+            agencyId: current.agencyId,
+          },
+          data: { status: "SUPERSEDED" },
+        }),
+        documentUpdate,
+      ]))[1]
+    : await documentUpdate;
   await audit({ actorUserId: user.id, action: `verification_document.${String(body.status).toLowerCase()}`, entityType: "VerificationDocument", entityId: id, req });
   return NextResponse.json(document);
 }

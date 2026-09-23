@@ -50,6 +50,7 @@ function testInput(body: any) {
       turnaroundHours,
       preparation: optionalText(body.preparation),
       price,
+      homeCollection: body.homeCollection === true || body.homeCollection === "true" || body.homeCollection === "on",
     },
   };
 }

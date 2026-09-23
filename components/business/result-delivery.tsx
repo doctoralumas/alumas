@@ -81,27 +81,54 @@ export default function ResultDelivery({
       {!catalog.length && <div className="empty">Önce kataloğa kayıt ekleyin. Sonuç, yayınlanan katalogdan seçilir.</div>}
       {!!catalog.length && !patients.length && <div className="empty">Henüz bu kurumla mesajlaşan veya randevusu olan hasta yok.</div>}
       {!!catalog.length && !!patients.length && (
-        <form className="compact-form" onSubmit={submit}>
-          <select value={patientId} onChange={(event) => setPatientId(event.target.value)} required>
-            <option value="">Hasta seç</option>
-            {patients.map((patient) => <option key={patient.id} value={patient.id}>{patient.name} · {patient.email}</option>)}
-          </select>
-          <select value={catalogId} onChange={(event) => setCatalogId(event.target.value)} required>
-            <option value="">{imaging ? "Tetkik seç" : "Tahlil seç"}</option>
-            {catalog.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </select>
-          <input type="date" value={when} onChange={(event) => setWhen(event.target.value)} required />
+        <form className="panel-fields" onSubmit={submit}>
+          <label className="field">
+            <span>Hasta</span>
+            <select value={patientId} onChange={(event) => setPatientId(event.target.value)} required>
+              <option value="">Hasta seç</option>
+              {patients.map((patient) => <option key={patient.id} value={patient.id}>{patient.name} · {patient.email}</option>)}
+            </select>
+          </label>
+          <label className="field">
+            <span>{imaging ? "Tetkik" : "Tahlil"}</span>
+            <select value={catalogId} onChange={(event) => setCatalogId(event.target.value)} required>
+              <option value="">{imaging ? "Tetkik seç" : "Tahlil seç"}</option>
+              {catalog.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </select>
+          </label>
+          <label className="field">
+            <span>{imaging ? "Çekim tarihi" : "Numune tarihi"}</span>
+            <input type="date" value={when} onChange={(event) => setWhen(event.target.value)} required />
+          </label>
           {imaging ? (
             <>
-              <textarea value={reportText} onChange={(event) => setReportText(event.target.value)} placeholder="Rapor metni" required />
-              <input value={impression} onChange={(event) => setImpression(event.target.value)} placeholder="Kısa sonuç notu (opsiyonel)" />
+              <label className="field">
+                <span>Rapor metni</span>
+                <textarea value={reportText} onChange={(event) => setReportText(event.target.value)} placeholder="Bulgular" required />
+              </label>
+              <label className="field">
+                <span>Kısa sonuç notu</span>
+                <input value={impression} onChange={(event) => setImpression(event.target.value)} placeholder="İsteğe bağlı" />
+              </label>
             </>
           ) : (
             <>
-              <input value={value} onChange={(event) => setValue(event.target.value)} placeholder="Sonuç değeri" required />
-              <input value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="Birim, örn. mg/dL" />
-              <input value={referenceLow} onChange={(event) => setReferenceLow(event.target.value)} placeholder="Referans alt" />
-              <input value={referenceHigh} onChange={(event) => setReferenceHigh(event.target.value)} placeholder="Referans üst" />
+              <label className="field">
+                <span>Sonuç değeri</span>
+                <input value={value} onChange={(event) => setValue(event.target.value)} required />
+              </label>
+              <label className="field">
+                <span>Birim</span>
+                <input value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="mg/dL" />
+              </label>
+              <label className="field">
+                <span>Referans alt</span>
+                <input value={referenceLow} onChange={(event) => setReferenceLow(event.target.value)} />
+              </label>
+              <label className="field">
+                <span>Referans üst</span>
+                <input value={referenceHigh} onChange={(event) => setReferenceHigh(event.target.value)} />
+              </label>
             </>
           )}
           <button className="primary">Hastanın kaydına işle</button>

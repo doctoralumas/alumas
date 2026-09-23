@@ -15,7 +15,6 @@ enum Role {
   ADMIN
   ORGANIZATION
   AGENCY
-  PARTNER
 }
 
 model User {
@@ -167,6 +166,9 @@ model Appointment {
   type      String   @default("online")
   status    String   @default("confirmed")
   note      String?
+  visitCity String?
+  visitDistrict String?
+  visitAddress String?
   user      User     @relation("PatientAppointments", fields: [userId], references: [id], onDelete: Cascade)
   doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   organizationId String?
@@ -433,6 +435,7 @@ model Organization {
   campaigns          OrganizationCampaign[]
   emergencyServices  OrganizationEmergencyService[]
   insuranceContracts  OrganizationInsurance[]
+  homeCareRequests HomeCareRequest[]
   verificationDocuments VerificationDocument[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -448,11 +451,15 @@ model OrganizationService {
   description    String?
   price          Int?
   isActive       Boolean      @default(true)
+  atHome         Boolean      @default(false)
+  homeCareKind   String?
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   variants       ServiceVariant[]
+  homeCareRequests HomeCareRequest[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   @@index([organizationId, isActive])
+  @@index([atHome, homeCareKind])
 }
 
 model ServiceVariant {
@@ -542,7 +549,9 @@ model LaboratoryTest {
   preparation     String?
   price           Int?
   isActive        Boolean      @default(true)
+  homeCollection  Boolean      @default(false)
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  homeCareRequests HomeCareRequest[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -1191,11 +1200,18 @@ model HomeCareRequest {
   addressNote String?
   preferredAt DateTime?
   note        String?
-  status      String   @default("requested")
+  status      String   @default("REQUESTED")
+  organizationId String?
+  serviceId   String?
+  laboratoryTestId String?
   user        User     @relation(fields:[userId], references:[id], onDelete:Cascade)
+  organization Organization? @relation(fields:[organizationId], references:[id], onDelete:SetNull)
+  service     OrganizationService? @relation(fields:[serviceId], references:[id], onDelete:SetNull)
+  laboratoryTest LaboratoryTest? @relation(fields:[laboratoryTestId], references:[id], onDelete:SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   @@index([userId,status,createdAt])
+  @@index([organizationId, status])
 }
 
 model InsuranceProvider {

@@ -16,7 +16,7 @@ export default function AdminNav() {
   ];
 
   return (
-    <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }} className="hide-scroll">
+    <div className="workspace-nav">
       {links.map(l => (
         <Link 
           key={l.href} 

@@ -28,8 +28,7 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
     { id: "ORGANIZATION", label: "Hastane / Klinik", sub: "Eczane dahil", icon: "🏥" },
     { id: "AGENCY", label: "Sağlık Turizmi", sub: "Acente & Koordinasyon", icon: "✈️" },
     { id: "IMAGING_CENTER", label: "Görüntüleme", sub: "MR, Röntgen vb.", icon: "🩻" },
-    { id: "LABORATORY", label: "Tıbbi Laboratuvar", sub: "Tahlil ve numune", icon: "🧪" },
-    { id: "PARTNER", label: "Çözüm Ortağı", sub: "Aracı Kurum", icon: "🤝" }
+    { id: "LABORATORY", label: "Tıbbi Laboratuvar", sub: "Tahlil ve numune", icon: "🧪" }
   ];
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -65,7 +64,6 @@ function AuthFormContent({ mode, isProfessional }: { mode: "login" | "register",
       if (kind === "DOCTOR") window.location.href = "/onboarding/doctor";
       else if (kind === "ORGANIZATION" || kind === "IMAGING_CENTER" || kind === "LABORATORY") window.location.href = kind === "ORGANIZATION" ? "/business/apply" : `/business/apply?type=${kind}`;
       else if (kind === "AGENCY") window.location.href = "/agency/apply";
-      else if (kind === "PARTNER") window.location.href = "/partner/apply";
       else window.location.href = "/profile";
     } else {
       window.location.href = "/profile";
