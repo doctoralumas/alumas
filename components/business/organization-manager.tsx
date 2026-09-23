@@ -25,6 +25,7 @@ import {
   Heartbeat,
   Flask,
   Info,
+  CaretDown,
 } from "@phosphor-icons/react/dist/ssr";
 
 type Props = { org: any };
@@ -668,7 +669,7 @@ export default function OrganizationManager({ org }: Props) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       <div
         style={{
           background: "#f8fafc",
@@ -678,11 +679,11 @@ export default function OrganizationManager({ org }: Props) {
           alignItems: "center",
           gap: "12px",
           border: "1px solid #e2e8f0",
-          marginBottom: "8px",
+          marginBottom: "24px",
         }}
       >
         <Info size={24} weight="duotone" color="#3b82f6" />
-        <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
+        <p className="muted" style={{ margin: 0, fontSize: "15px" }}>
           {panelCopy[org.type] || "Kurum bilgilerini buradan yönetirsiniz."}
         </p>
       </div>
@@ -696,6 +697,7 @@ export default function OrganizationManager({ org }: Props) {
             border: "1px solid #cbd5e1",
             fontWeight: 500,
             color: "#0f172a",
+            marginBottom: "24px",
           }}
         >
           {msg}
@@ -732,416 +734,258 @@ export default function OrganizationManager({ org }: Props) {
         />
       )}
 
-      <div
-        className="business-manage-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
-          gap: "24px",
-          alignItems: "start",
-        }}
-      >
-        <section
-          className="panel form-span"
-          style={{ gridColumn: "1 / -1", padding: "24px" }}
-        >
+      <details className="premium-accordion" open>
+        <summary className="premium-accordion-summary">
+          <div className="premium-accordion-header">
+            <div
+              className="premium-accordion-icon"
+              style={{ background: "#fef2f2", color: "#ef4444" }}
+            >
+              <MapPin size={28} weight="duotone" />
+            </div>
+            <div>
+              <h3 className="premium-accordion-title">Konum ve Harita</h3>
+              <p className="premium-accordion-desc">
+                Hastalarınızın kurumunuzu bulabilmesi için konumunuzu
+                doğrulayın.
+              </p>
+            </div>
+          </div>
+          <CaretDown size={24} weight="bold" className="premium-chevron" />
+        </summary>
+        <div className="premium-accordion-content">
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              marginBottom: "16px",
+              flexWrap: "wrap",
+              gap: "16px",
+              background: "#f8fafc",
+              padding: "20px",
+              borderRadius: "16px",
+              border: "1px solid #e2e8f0",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <div
+            <div>
+              <h2
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#fef2f2",
-                  color: "#ef4444",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  margin: 0,
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "#0f172a",
                 }}
               >
-                <MapPin size={24} weight="duotone" />
-              </div>
-              <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Konum
-                </h2>
-                <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                  {org.address} · {org.city}
-                </p>
-              </div>
+                Kayıtlı Adres
+              </h2>
+              <p
+                className="muted"
+                style={{ margin: "4px 0 0", fontSize: "15px" }}
+              >
+                {org.address} · {org.city}
+              </p>
             </div>
-            <button className="secondary" onClick={locate}>
+            <button className="primary" onClick={locate}>
               Adresten harita konumu bul
             </button>
           </div>
-          <small
-            className="muted"
-            style={{
-              display: "block",
-              marginTop: "12px",
-              borderTop: "1px dashed #e2e8f0",
-              paddingTop: "12px",
-            }}
-          >
-            Hastalarınızın kurumunuzu haritada daha kolay bulabilmesi için
-            konumunuzu doğrulayın.
-          </small>
-        </section>
+        </div>
+      </details>
 
-        {clinical && (
-          <section className="panel" style={{ padding: "24px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+      {clinical && (
+        <details className="premium-accordion" open>
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
               <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#eff6ff",
-                  color: "#3b82f6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="premium-accordion-icon"
+                style={{ background: "#eff6ff", color: "#3b82f6" }}
               >
-                <FirstAid size={24} weight="duotone" />
+                <FirstAid size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
+                <h3 className="premium-accordion-title">
                   {org.type === "CLINIC"
-                    ? "Muayene ve işlemler"
-                    : "Klinik hizmetler"}
-                </h2>
+                    ? "Muayene ve İşlemler"
+                    : "Klinik Hizmetler"}
+                </h3>
+                <p className="premium-accordion-desc">
+                  Sunulan sağlık hizmetlerini, fiyat ve evde bakım opsiyonlarını
+                  yönetin.
+                </p>
               </div>
             </div>
-            <form
-              className="compact-form"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-                marginBottom: "20px",
-                background: "#f8fafc",
-                padding: "16px",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-              }}
-              onSubmit={addService}
-            >
-              <div style={{ display: "flex", gap: "12px" }}>
-                <input
-                  name="name"
-                  placeholder={
-                    org.type === "CLINIC"
-                      ? "Muayene veya işlem adı"
-                      : "Hizmet adı"
-                  }
-                  required
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-                <input
-                  name="price"
-                  type="number"
-                  min="0"
-                  placeholder="Fiyat (₺)"
-                  style={{
-                    width: "120px",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
+            <CaretDown size={24} weight="bold" className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
+            <form onSubmit={addService} className="responsive-form-grid">
+              <div className="responsive-form-field">
+                <label>
+                  {org.type === "CLINIC"
+                    ? "Muayene veya işlem adı"
+                    : "Hizmet adı"}
+                </label>
+                <input name="name" required />
               </div>
-              <div style={{ display: "flex", gap: "12px" }}>
-                <input
-                  name="description"
-                  placeholder="Kısa açıklama"
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-                <select
-                  name="homeCareKind"
-                  defaultValue=""
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                >
+              <div className="responsive-form-field">
+                <label>Fiyat (₺)</label>
+                <input name="price" type="number" min="0" />
+              </div>
+              <div className="responsive-form-field">
+                <label>Kısa açıklama</label>
+                <input name="description" />
+              </div>
+              <div className="responsive-form-field">
+                <label>Konum</label>
+                <select name="homeCareKind" defaultValue="">
                   <option value="">Yalnızca kurumda</option>
                   <option value="nurse">Evde hemşirelik</option>
                   <option value="dressing">Evde pansuman</option>
                   <option value="physio">Evde fizyoterapi</option>
                 </select>
               </div>
-              <button
-                className="primary"
-                style={{ width: "100%", padding: "10px", borderRadius: "8px" }}
-              >
+              <button className="primary" style={{ height: "46px" }}>
                 Hizmet Ekle
               </button>
             </form>
-            <div
-              className="slot-list"
-              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
-            >
+
+            <div className="premium-card-list">
               {services.map((s) => (
-                <div
-                  className="slot-row"
+                <form
                   key={s.id}
-                  style={{
-                    padding: "16px",
-                    background: "#ffffff",
-                    borderRadius: "12px",
-                    border: "1px solid #e2e8f0",
-                  }}
+                  onSubmit={(event) => updateService(event, s.id)}
+                  className="premium-card-item"
                 >
-                  <form
-                    onSubmit={(event) => updateService(event, s.id)}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                      width: "100%",
-                    }}
+                  <div
+                    className="responsive-form-field"
+                    style={{ flex: 2, minWidth: "200px" }}
                   >
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <input
-                        name="name"
-                        defaultValue={s.name}
-                        required
-                        style={{
-                          flex: 1,
-                          padding: "8px",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                        }}
-                      />
-                      <input
-                        name="price"
-                        type="number"
-                        min="0"
-                        defaultValue={s.price ?? ""}
-                        placeholder="Fiyat (₺)"
-                        style={{
-                          width: "100px",
-                          padding: "8px",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                        }}
-                      />
-                    </div>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <input
-                        name="description"
-                        defaultValue={s.description || ""}
-                        placeholder="Kısa açıklama"
-                        style={{
-                          flex: 1,
-                          padding: "8px",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                        }}
-                      />
-                      <select
-                        name="homeCareKind"
-                        defaultValue={s.homeCareKind || ""}
-                        style={{
-                          flex: 1,
-                          padding: "8px",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                        }}
-                      >
-                        <option value="">Yalnızca kurumda</option>
-                        <option value="nurse">Evde hemşirelik</option>
-                        <option value="dressing">Evde pansuman</option>
-                        <option value="physio">Evde fizyoterapi</option>
-                      </select>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        justifyContent: "flex-end",
-                        marginTop: "4px",
-                      }}
+                    <input
+                      name="name"
+                      defaultValue={s.name}
+                      required
+                      style={{ fontWeight: 600 }}
+                    />
+                  </div>
+                  <div
+                    className="responsive-form-field"
+                    style={{ flex: 1, minWidth: "120px" }}
+                  >
+                    <input
+                      name="price"
+                      type="number"
+                      min="0"
+                      defaultValue={s.price ?? ""}
+                      placeholder="Fiyat (₺)"
+                    />
+                  </div>
+                  <div
+                    className="responsive-form-field"
+                    style={{ flex: 2, minWidth: "200px" }}
+                  >
+                    <input
+                      name="description"
+                      defaultValue={s.description || ""}
+                      placeholder="Kısa açıklama"
+                    />
+                  </div>
+                  <div
+                    className="responsive-form-field"
+                    style={{ flex: 1, minWidth: "150px" }}
+                  >
+                    <select
+                      name="homeCareKind"
+                      defaultValue={s.homeCareKind || ""}
                     >
-                      <button
-                        className="secondary"
-                        type="button"
-                        onClick={() => hideService(s.id)}
-                        style={{ padding: "6px 12px" }}
-                      >
-                        Kaldır
-                      </button>
-                      <button
-                        className="primary"
-                        type="submit"
-                        style={{ padding: "6px 16px", fontSize: "13px" }}
-                      >
-                        Kaydet
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                      <option value="">Yalnızca kurumda</option>
+                      <option value="nurse">Evde hemşirelik</option>
+                      <option value="dressing">Evde pansuman</option>
+                      <option value="physio">Evde fizyoterapi</option>
+                    </select>
+                  </div>
+                  <div
+                    className="premium-card-item-actions"
+                    style={{ display: "flex", gap: "8px" }}
+                  >
+                    <button
+                      className="secondary"
+                      type="button"
+                      onClick={() => hideService(s.id)}
+                    >
+                      Kaldır
+                    </button>
+                    <button className="primary" type="submit">
+                      Kaydet
+                    </button>
+                  </div>
+                </form>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </details>
+      )}
 
-        {clinical && (
-          <section className="panel" style={{ padding: "24px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+      {clinical && (
+        <details className="premium-accordion">
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
               <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#fdf4ff",
-                  color: "#c026d3",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="premium-accordion-icon"
+                style={{ background: "#fdf4ff", color: "#c026d3" }}
               >
-                <ListDashes size={24} weight="duotone" />
+                <ListDashes size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Hizmet varyantları
-                </h2>
+                <h3 className="premium-accordion-title">Hizmet Varyantları</h3>
+                <p className="premium-accordion-desc">
+                  Hizmetlere süre bazlı veya premium alt seçenekler ekleyin.
+                </p>
               </div>
             </div>
-            <form
-              className="compact-form"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-                marginBottom: "20px",
-                background: "#f8fafc",
-                padding: "16px",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-              }}
-              onSubmit={addVariant}
-            >
-              <select
-                name="serviceId"
-                required
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              >
-                <option value="">Hizmet seç</option>
-                {services.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <div style={{ display: "flex", gap: "12px" }}>
-                <input
-                  name="label"
-                  placeholder="Örn: Premium / 60 dk"
-                  required
-                  style={{
-                    flex: 2,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-                <input
-                  name="priceDelta"
-                  type="number"
-                  placeholder="Ek fiyat (₺)"
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-                <input
-                  name="durationMinutes"
-                  type="number"
-                  placeholder="Süre (dk)"
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
+            <CaretDown size={24} weight="bold" className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
+            <form onSubmit={addVariant} className="responsive-form-grid">
+              <div className="responsive-form-field">
+                <label>Hizmet</label>
+                <select name="serviceId" required>
+                  <option value="">Seçiniz...</option>
+                  {services.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <button
-                className="primary"
-                style={{ width: "100%", padding: "10px", borderRadius: "8px" }}
-              >
-                Varyant ekle
+              <div className="responsive-form-field">
+                <label>Varyant Etiketi (Örn: Premium)</label>
+                <input name="label" required />
+              </div>
+              <div className="responsive-form-field">
+                <label>Ek fiyat (₺)</label>
+                <input name="priceDelta" type="number" />
+              </div>
+              <div className="responsive-form-field">
+                <label>Süre (dk)</label>
+                <input name="durationMinutes" type="number" />
+              </div>
+              <button className="primary" style={{ height: "46px" }}>
+                Ekle
               </button>
             </form>
-            <div
-              className="slot-list"
-              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
-            >
+            <div className="premium-card-list">
               {services.flatMap((s) =>
                 (s.variants || [])
                   .filter((variant: any) => variant.isActive !== false)
                   .map((v: any) => (
-                    <div
-                      className="slot-row"
-                      key={v.id}
-                      style={{
-                        padding: "12px 16px",
-                        background: "#ffffff",
-                        borderRadius: "12px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        border: "1px solid #e2e8f0",
-                      }}
-                    >
+                    <div key={v.id} className="premium-card-item">
                       <div>
-                        <b style={{ color: "#0f172a" }}>{s.name}</b>{" "}
+                        <b style={{ color: "#0f172a", fontSize: "16px" }}>
+                          {s.name}
+                        </b>{" "}
                         <span style={{ color: "#64748b" }}>· {v.label}</span>
                         <div
                           style={{
-                            fontSize: "13px",
+                            fontSize: "14px",
                             color: "#64748b",
                             marginTop: "4px",
                           }}
@@ -1154,7 +998,6 @@ export default function OrganizationManager({ org }: Props) {
                         type="button"
                         className="secondary"
                         onClick={() => hideVariant(s.id, v.id)}
-                        style={{ padding: "6px 12px" }}
                       >
                         Kaldır
                       </button>
@@ -1162,107 +1005,71 @@ export default function OrganizationManager({ org }: Props) {
                   ))
               )}
             </div>
-          </section>
-        )}
+          </div>
+        </details>
+      )}
 
-        {clinical && <HomeVisitQueue organizationId={org.id} />}
-
-        {clinical && (
-          <section className="panel" style={{ padding: "24px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+      {clinical && (
+        <details className="premium-accordion">
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
               <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#f0fdf4",
-                  color: "#16a34a",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="premium-accordion-icon"
+                style={{ background: "#f0fdf4", color: "#16a34a" }}
               >
-                <EnvelopeSimpleOpen size={24} weight="duotone" />
+                <EnvelopeSimpleOpen size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Doktor davetleri
-                </h2>
+                <h3 className="premium-accordion-title">Doktor Davetleri</h3>
+                <p className="premium-accordion-desc">
+                  Kurumunuza uzman doktorları davet edin ve durumlarını izleyin.
+                </p>
               </div>
             </div>
-            <form
-              className="compact-form"
-              style={{ display: "flex", gap: "12px", marginBottom: "20px" }}
-              onSubmit={invite}
-            >
-              <input
-                name="email"
-                type="email"
-                placeholder="doktor@ornek.com"
-                required
-                style={{
-                  flex: 2,
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <input
-                name="specialty"
-                placeholder="Branş"
-                style={{
-                  flex: 1,
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <button
-                className="primary"
-                style={{ padding: "10px 16px", borderRadius: "8px" }}
+            <CaretDown size={24} weight="bold" className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
+            <form onSubmit={invite} className="responsive-form-grid">
+              <div
+                className="responsive-form-field"
+                style={{ gridColumn: "span 2" }}
               >
-                Davet gönder
+                <label>E-posta Adresi</label>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="doktor@ornek.com"
+                  required
+                />
+              </div>
+              <div className="responsive-form-field">
+                <label>Branş (Opsiyonel)</label>
+                <input name="specialty" placeholder="Örn: Kardiyoloji" />
+              </div>
+              <button className="primary" style={{ height: "46px" }}>
+                Davet Gönder
               </button>
             </form>
-            <div
-              className="slot-list"
-              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-            >
+            <div className="premium-card-list">
               {invites.map((i) => (
-                <div
-                  className="slot-row"
-                  key={i.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "12px",
-                    background: "#f8fafc",
-                    borderRadius: "12px",
-                    border: "1px solid #e2e8f0",
-                  }}
-                >
+                <div key={i.id} className="premium-card-item">
                   <div>
-                    <b style={{ display: "block", color: "#0f172a" }}>
+                    <b
+                      style={{
+                        display: "block",
+                        color: "#0f172a",
+                        fontSize: "16px",
+                      }}
+                    >
                       {i.email}
                     </b>
-                    <span style={{ color: "#64748b", fontSize: "13px" }}>
+                    <span style={{ color: "#64748b", fontSize: "14px" }}>
                       {i.specialty || "Doktor"}
                     </span>
                   </div>
                   <span
+                    className="premium-badge"
                     style={{
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      padding: "4px 10px",
-                      borderRadius: "20px",
                       background:
                         i.status === "PENDING" ? "#fff7ed" : "#f0fdf4",
                       color: i.status === "PENDING" ? "#ea580c" : "#16a34a",
@@ -1273,54 +1080,52 @@ export default function OrganizationManager({ org }: Props) {
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </details>
+      )}
 
-        <section
-          className="panel form-span"
-          style={{ gridColumn: "1 / -1", padding: "24px" }}
-        >
+      {clinical && <HomeVisitQueue organizationId={org.id} />}
+
+      <details className="premium-accordion" open>
+        <summary className="premium-accordion-summary">
+          <div className="premium-accordion-header">
+            <div
+              className="premium-accordion-icon"
+              style={{
+                background: "#f8fafc",
+                color: "#64748b",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <Clock size={28} weight="duotone" />
+            </div>
+            <div>
+              <h3 className="premium-accordion-title">Çalışma Saatleri</h3>
+              <p className="premium-accordion-desc">
+                Haftalık açılış ve kapanış saatlerinizi düzenleyin.
+              </p>
+            </div>
+          </div>
+          <CaretDown size={24} weight="bold" className="premium-chevron" />
+        </summary>
+        <div className="premium-accordion-content">
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "24px",
-              borderBottom: "1px solid #e2e8f0",
-              paddingBottom: "16px",
+              justifyContent: "flex-end",
+              marginBottom: "16px",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#f8fafc",
-                  color: "#64748b",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Clock size={24} weight="duotone" />
-              </div>
-              <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Çalışma saatleri
-                </h2>
-                <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                  Kuruma göre haftalık açılış ve kapanış.
-                </p>
-              </div>
-            </div>
             <button className="primary" onClick={saveHours}>
-              Saatleri Kaydet
+              Tüm Saatleri Kaydet
             </button>
           </div>
           <div
-            className="hours-grid"
-            style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            style={{
+              display: "grid",
+              gap: "12px",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            }}
           >
             {days.map((d, weekday) => {
               const h = hours.find((x: any) => x.weekday === weekday) || {
@@ -1335,16 +1140,18 @@ export default function OrganizationManager({ org }: Props) {
                     display: "flex",
                     alignItems: "center",
                     gap: "16px",
-                    padding: "16px",
+                    padding: "20px",
                     background: h.isClosed ? "#f8fafc" : "#ffffff",
                     border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
+                    borderRadius: "16px",
+                    flexWrap: "wrap",
                   }}
                 >
                   <b
                     style={{
                       width: "100px",
                       color: h.isClosed ? "#94a3b8" : "#0f172a",
+                      fontSize: "15px",
                     }}
                   >
                     {d}
@@ -1354,8 +1161,8 @@ export default function OrganizationManager({ org }: Props) {
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
-                      width: "100px",
                       cursor: "pointer",
+                      marginRight: "auto",
                     }}
                   >
                     <input
@@ -1364,12 +1171,16 @@ export default function OrganizationManager({ org }: Props) {
                       onChange={(e) =>
                         updateHour(weekday, "isClosed", e.target.checked)
                       }
-                      style={{ width: "18px", height: "18px" }}
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        accentColor: "#ef4444",
+                      }}
                     />
                     <span
                       style={{
                         color: h.isClosed ? "#ef4444" : "#64748b",
-                        fontWeight: 500,
+                        fontWeight: 600,
                       }}
                     >
                       Kapalı
@@ -1379,10 +1190,11 @@ export default function OrganizationManager({ org }: Props) {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "12px",
-                      flex: 1,
+                      gap: "8px",
                       opacity: h.isClosed ? 0.4 : 1,
                       pointerEvents: h.isClosed ? "none" : "auto",
+                      flex: 1,
+                      minWidth: "150px",
                     }}
                   >
                     <input
@@ -1393,12 +1205,16 @@ export default function OrganizationManager({ org }: Props) {
                       }
                       style={{
                         flex: 1,
-                        padding: "8px 12px",
-                        borderRadius: "8px",
+                        padding: "10px",
+                        borderRadius: "10px",
                         border: "1px solid #cbd5e1",
+                        background: "#fff",
+                        width: "100%",
                       }}
                     />
-                    <span style={{ color: "#94a3b8" }}>-</span>
+                    <span style={{ color: "#94a3b8", fontWeight: "bold" }}>
+                      -
+                    </span>
                     <input
                       type="time"
                       value={h.closesAt || "18:00"}
@@ -1407,9 +1223,11 @@ export default function OrganizationManager({ org }: Props) {
                       }
                       style={{
                         flex: 1,
-                        padding: "8px 12px",
-                        borderRadius: "8px",
+                        padding: "10px",
+                        borderRadius: "10px",
                         border: "1px solid #cbd5e1",
+                        background: "#fff",
+                        width: "100%",
                       }}
                     />
                   </div>
@@ -1417,190 +1235,101 @@ export default function OrganizationManager({ org }: Props) {
               );
             })}
           </div>
-        </section>
+        </div>
+      </details>
 
-        {hospital && (
-          <section
-            className="panel form-span"
-            style={{ gridColumn: "1 / -1", padding: "24px" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+      {hospital && (
+        <details className="premium-accordion">
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
               <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#eff6ff",
-                  color: "#3b82f6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="premium-accordion-icon"
+                style={{ background: "#eff6ff", color: "#3b82f6" }}
               >
-                <UsersThree size={24} weight="duotone" />
+                <UsersThree size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Branşlar ve departmanlar
-                </h2>
-                <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                  Uzmanları hastane departmanlarına bağlayın.
+                <h3 className="premium-accordion-title">
+                  Branşlar ve Departmanlar
+                </h3>
+                <p className="premium-accordion-desc">
+                  Hastane departmanlarını ve uzman doktor atamalarını yönetin.
                 </p>
               </div>
             </div>
-            <form
-              className="compact-form"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "12px",
-                marginBottom: "24px",
-                background: "#f8fafc",
-                padding: "20px",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-              }}
-              onSubmit={addDepartment}
-            >
-              <input
-                name="name"
-                placeholder="Örn: Kardiyoloji"
-                required
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <input
-                name="floor"
-                placeholder="Kat / bölüm"
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <input
-                name="phone"
-                placeholder="Dahili telefon"
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <input
-                name="description"
-                placeholder="Kısa açıklama"
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <button
-                className="primary"
-                style={{
-                  gridColumn: "1 / -1",
-                  padding: "12px",
-                  borderRadius: "8px",
-                }}
-              >
+            <CaretDown size={24} weight="bold" className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
+            <form onSubmit={addDepartment} className="responsive-form-grid">
+              <div className="responsive-form-field">
+                <label>Departman Adı</label>
+                <input name="name" placeholder="Örn: Kardiyoloji" required />
+              </div>
+              <div className="responsive-form-field">
+                <label>Kat / Bölüm</label>
+                <input name="floor" placeholder="1. Kat" />
+              </div>
+              <div className="responsive-form-field">
+                <label>Dahili Telefon</label>
+                <input name="phone" placeholder="105" />
+              </div>
+              <div className="responsive-form-field">
+                <label>Açıklama</label>
+                <input name="description" />
+              </div>
+              <button className="primary" style={{ height: "46px" }}>
                 Departman Ekle
               </button>
             </form>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                gap: "16px",
-              }}
-            >
+            <div className="premium-card-list">
               {departments.map((d) => (
                 <form
                   key={d.id}
                   onSubmit={(event) => updateDepartment(event, d.id)}
-                  style={{
-                    background: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    padding: "16px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                  }}
+                  className="premium-card-item"
                 >
-                  <input
-                    name="name"
-                    defaultValue={d.name}
-                    required
-                    style={{
-                      fontWeight: 600,
-                      fontSize: "15px",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      border: "1px solid #cbd5e1",
-                    }}
-                  />
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div className="responsive-form-field" style={{ flex: 2 }}>
+                    <input
+                      name="name"
+                      defaultValue={d.name}
+                      required
+                      style={{ fontWeight: 600 }}
+                    />
+                  </div>
+                  <div className="responsive-form-field" style={{ flex: 1 }}>
                     <input
                       name="floor"
                       defaultValue={d.floor || ""}
                       placeholder="Kat"
-                      style={{
-                        flex: 1,
-                        padding: "8px",
-                        borderRadius: "6px",
-                        border: "1px solid #cbd5e1",
-                      }}
                     />
+                  </div>
+                  <div className="responsive-form-field" style={{ flex: 1 }}>
                     <input
                       name="phone"
                       defaultValue={d.phone || ""}
                       placeholder="Telefon"
-                      style={{
-                        flex: 1,
-                        padding: "8px",
-                        borderRadius: "6px",
-                        border: "1px solid #cbd5e1",
-                      }}
                     />
                   </div>
-                  <input
-                    name="description"
-                    defaultValue={d.description || ""}
-                    placeholder="Açıklama"
-                    style={{
-                      padding: "8px",
-                      borderRadius: "6px",
-                      border: "1px solid #cbd5e1",
-                    }}
-                  />
+                  <div className="responsive-form-field" style={{ flex: 2 }}>
+                    <input
+                      name="description"
+                      defaultValue={d.description || ""}
+                      placeholder="Açıklama"
+                    />
+                  </div>
                   <div
-                    style={{ display: "flex", gap: "8px", marginTop: "8px" }}
+                    className="premium-card-item-actions"
+                    style={{ display: "flex", gap: "8px" }}
                   >
                     <button
                       className="secondary"
                       type="button"
                       onClick={() => hideDepartment(d.id)}
-                      style={{ flex: 1 }}
                     >
                       Kaldır
                     </button>
-                    <button
-                      className="primary"
-                      type="submit"
-                      style={{ flex: 1 }}
-                    >
+                    <button className="primary" type="submit">
                       Kaydet
                     </button>
                   </div>
@@ -1612,11 +1341,11 @@ export default function OrganizationManager({ org }: Props) {
               <div
                 style={{
                   marginTop: "32px",
-                  borderTop: "1px dashed #e2e8f0",
+                  borderTop: "1px solid #e2e8f0",
                   paddingTop: "24px",
                 }}
               >
-                <h3
+                <h4
                   style={{
                     fontSize: "16px",
                     marginBottom: "16px",
@@ -1624,12 +1353,12 @@ export default function OrganizationManager({ org }: Props) {
                   }}
                 >
                   Doktor Atamaları
-                </h3>
+                </h4>
                 <div
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                    gap: "12px",
+                    gap: "16px",
                   }}
                 >
                   {doctors.map((d) => (
@@ -1641,7 +1370,7 @@ export default function OrganizationManager({ org }: Props) {
                         justifyContent: "space-between",
                         padding: "16px",
                         background: "#f8fafc",
-                        borderRadius: "12px",
+                        borderRadius: "16px",
                         border: "1px solid #e2e8f0",
                       }}
                     >
@@ -1663,10 +1392,10 @@ export default function OrganizationManager({ org }: Props) {
                         value={d.departmentId || ""}
                         onChange={(e) => assignDepartment(d.id, e.target.value)}
                         style={{
-                          padding: "8px 12px",
-                          borderRadius: "8px",
+                          padding: "10px 14px",
+                          borderRadius: "10px",
                           border: "1px solid #cbd5e1",
-                          fontSize: "13px",
+                          background: "#fff",
                           fontWeight: 500,
                         }}
                       >
@@ -1682,150 +1411,60 @@ export default function OrganizationManager({ org }: Props) {
                 </div>
               </div>
             )}
-          </section>
-        )}
+          </div>
+        </details>
+      )}
 
-        <section
-          className="panel form-span"
-          style={{ gridColumn: "1 / -1", padding: "24px" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "20px",
-            }}
-          >
+      <details className="premium-accordion">
+        <summary className="premium-accordion-summary">
+          <div className="premium-accordion-header">
             <div
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "12px",
-                background: "#fef9c3",
-                color: "#ca8a04",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="premium-accordion-icon"
+              style={{ background: "#fef9c3", color: "#ca8a04" }}
             >
-              <Megaphone size={24} weight="duotone" />
+              <Megaphone size={28} weight="duotone" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                Kampanyalar
-              </h2>
-              <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                Onaylı kurum profilinde ve Alumas Kampanyalar sayfasında
-                gösterilir.
+              <h3 className="premium-accordion-title">Kampanyalar</h3>
+              <p className="premium-accordion-desc">
+                Özel fırsatları profilinizde ve genel listede yayınlayın.
               </p>
             </div>
           </div>
-
-          <form
-            className="panel-fields"
-            onSubmit={addCampaign}
-            style={{
-              background: "#f8fafc",
-              padding: "20px",
-              borderRadius: "16px",
-              border: "1px solid #e2e8f0",
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "16px",
-            }}
-          >
-            <label className="field" style={{ gridColumn: "1 / -1" }}>
-              <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                Kampanya başlığı
-              </span>
-              <input
-                name="title"
-                placeholder="Başlık"
-                required
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-            </label>
-            <div style={{ display: "flex", gap: "16px", gridColumn: "1 / -1" }}>
-              <label className="field" style={{ flex: 1 }}>
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Başlangıç
-                </span>
-                <input
-                  name="startsAt"
-                  type="date"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                    width: "100%",
-                  }}
-                />
-              </label>
-              <label className="field" style={{ flex: 1 }}>
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>Bitiş</span>
-                <input
-                  name="endsAt"
-                  type="date"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                    width: "100%",
-                  }}
-                />
-              </label>
+          <CaretDown size={24} weight="bold" className="premium-chevron" />
+        </summary>
+        <div className="premium-accordion-content">
+          <form onSubmit={addCampaign} className="responsive-form-grid">
+            <div className="responsive-form-field">
+              <label>Kampanya başlığı</label>
+              <input name="title" required />
             </div>
-            <label className="field" style={{ gridColumn: "1 / -1" }}>
-              <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                Kısa açıklama
-              </span>
-              <textarea
-                name="description"
-                placeholder="Hastanın göreceği metin"
-                style={{
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                  minHeight: "80px",
-                  fontFamily: "inherit",
-                }}
-              />
-            </label>
+            <div className="responsive-form-field">
+              <label>Başlangıç</label>
+              <input name="startsAt" type="date" />
+            </div>
+            <div className="responsive-form-field">
+              <label>Bitiş</label>
+              <input name="endsAt" type="date" />
+            </div>
+            <div
+              className="responsive-form-field"
+              style={{ gridColumn: "1 / -1" }}
+            >
+              <label>Açıklama (Hastanın göreceği metin)</label>
+              <textarea name="description" rows={3}></textarea>
+            </div>
             <button
               className="primary"
-              style={{
-                gridColumn: "1 / -1",
-                padding: "12px",
-                borderRadius: "8px",
-              }}
+              style={{ height: "46px", gridColumn: "1 / -1" }}
             >
-              Yayınla
+              Kampanyayı Yayınla
             </button>
           </form>
 
-          <div
-            className="slot-list"
-            style={{ marginTop: "24px", display: "grid", gap: "12px" }}
-          >
+          <div className="premium-card-list">
             {campaigns.map((c) => (
-              <div
-                className="slot-row"
-                key={c.id}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "16px",
-                  borderRadius: "12px",
-                  border: "1px solid #e2e8f0",
-                  background: "#ffffff",
-                }}
-              >
+              <div key={c.id} className="premium-card-item">
                 <div>
                   <b
                     style={{
@@ -1840,19 +1479,16 @@ export default function OrganizationManager({ org }: Props) {
                     style={{
                       color: "#64748b",
                       fontSize: "14px",
-                      marginTop: "4px",
                       display: "block",
+                      marginTop: "4px",
                     }}
                   >
                     {c.description || "Açıklama yok"}
                   </span>
                 </div>
                 <span
+                  className="premium-badge"
                   style={{
-                    padding: "6px 16px",
-                    borderRadius: "20px",
-                    fontSize: "13px",
-                    fontWeight: 600,
                     background: c.isActive ? "#f0fdf4" : "#f1f5f9",
                     color: c.isActive ? "#16a34a" : "#64748b",
                   }}
@@ -1862,210 +1498,132 @@ export default function OrganizationManager({ org }: Props) {
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </details>
 
-        {hospital && (
-          <section
-            className="panel form-span"
-            style={{ gridColumn: "1 / -1", padding: "24px" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+      {hospital && (
+        <details className="premium-accordion">
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
               <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#fee2e2",
-                  color: "#dc2626",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="premium-accordion-icon"
+                style={{ background: "#fee2e2", color: "#dc2626" }}
               >
-                <Ambulance size={24} weight="duotone" />
+                <Ambulance size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Acil hizmetler
-                </h2>
-                <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                  Acil servis, danışma hattı veya 7/24 birimler.
+                <h3 className="premium-accordion-title">Acil Hizmetler</h3>
+                <p className="premium-accordion-desc">
+                  Acil servis, danışma hattı veya 7/24 hizmet birimleri.
                 </p>
               </div>
             </div>
-
+            <CaretDown size={24} weight="bold" className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
             <form
-              className="compact-form"
-              style={{
-                display: "flex",
-                gap: "12px",
-                alignItems: "center",
-                marginBottom: "24px",
-                flexWrap: "wrap",
-                background: "#f8fafc",
-                padding: "20px",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-              }}
               onSubmit={addEmergencyService}
+              className="responsive-form-grid"
             >
-              <input
-                name="name"
-                placeholder="Acil Servis"
-                required
-                style={{
-                  flex: 1,
-                  minWidth: "150px",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <select
-                name="kind"
-                style={{
-                  flex: 1,
-                  minWidth: "150px",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              >
-                <option value="EMERGENCY_DEPARTMENT">Acil servis</option>
-                <option value="EMERGENCY_CONSULT">Acil danışmanlık</option>
-                <option value="AMBULANCE_COORDINATION">
-                  Ambulans koordinasyonu
-                </option>
-              </select>
-              <input
-                name="phone"
-                placeholder="Telefon"
-                style={{
-                  flex: 1,
-                  minWidth: "150px",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
+              <div className="responsive-form-field">
+                <label>Birim Adı</label>
+                <input name="name" placeholder="Örn: Acil Servis" required />
+              </div>
+              <div className="responsive-form-field">
+                <label>Hizmet Tipi</label>
+                <select name="kind">
+                  <option value="EMERGENCY_DEPARTMENT">Acil servis</option>
+                  <option value="EMERGENCY_CONSULT">Acil danışmanlık</option>
+                  <option value="AMBULANCE_COORDINATION">
+                    Ambulans koordinasyonu
+                  </option>
+                </select>
+              </div>
+              <div className="responsive-form-field">
+                <label>İletişim</label>
+                <input name="phone" placeholder="Telefon" />
+              </div>
+              <div className="responsive-form-field">
+                <label>Ek Bilgi</label>
+                <input name="description" placeholder="Açıklama" />
+              </div>
               <label
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
-                  fontWeight: 600,
+                  fontWeight: 700,
+                  margin: "10px 0",
                 }}
               >
                 <input
                   name="is24Hours"
                   type="checkbox"
-                  style={{ width: "18px", height: "18px" }}
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    accentColor: "#dc2626",
+                  }}
                 />{" "}
-                7/24
+                7/24 Hizmet
               </label>
-              <input
-                name="description"
-                placeholder="Açıklama"
-                style={{
-                  flex: 2,
-                  minWidth: "200px",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                }}
-              />
-              <button
-                className="primary"
-                style={{ padding: "10px 24px", borderRadius: "8px" }}
-              >
+              <button className="primary" style={{ height: "46px" }}>
                 Ekle
               </button>
             </form>
 
-            <div className="slot-list" style={{ display: "grid", gap: "12px" }}>
+            <div className="premium-card-list">
               {emergencyServices.map((item: any) => (
                 <form
-                  className="slot-row"
                   key={item.id}
                   onSubmit={(event) => updateEmergency(event, item.id)}
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "12px",
-                    alignItems: "center",
-                    padding: "16px",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    background: "#ffffff",
-                  }}
+                  className="premium-card-item"
                 >
-                  <input
-                    name="name"
-                    defaultValue={item.name}
-                    required
-                    style={{
-                      flex: 1,
-                      minWidth: "150px",
-                      fontWeight: 600,
-                      padding: "8px",
-                      borderRadius: "6px",
-                      border: "1px solid #cbd5e1",
-                    }}
-                  />
-                  <select
-                    name="kind"
-                    defaultValue={item.kind}
-                    style={{
-                      flex: 1,
-                      minWidth: "150px",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      border: "1px solid #cbd5e1",
-                    }}
-                  >
-                    <option value="EMERGENCY_DEPARTMENT">Acil servis</option>
-                    <option value="EMERGENCY_CONSULT">Acil danışmanlık</option>
-                    <option value="AMBULANCE_COORDINATION">
-                      Ambulans koordinasyonu
-                    </option>
-                  </select>
-                  <input
-                    name="phone"
-                    defaultValue={item.phone || ""}
-                    placeholder="Telefon"
-                    style={{
-                      flex: 1,
-                      minWidth: "120px",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      border: "1px solid #cbd5e1",
-                    }}
-                  />
+                  <div className="responsive-form-field" style={{ flex: 2 }}>
+                    <input
+                      name="name"
+                      defaultValue={item.name}
+                      required
+                      style={{ fontWeight: 600 }}
+                    />
+                  </div>
+                  <div className="responsive-form-field" style={{ flex: 2 }}>
+                    <select name="kind" defaultValue={item.kind}>
+                      <option value="EMERGENCY_DEPARTMENT">Acil servis</option>
+                      <option value="EMERGENCY_CONSULT">
+                        Acil danışmanlık
+                      </option>
+                      <option value="AMBULANCE_COORDINATION">
+                        Ambulans koordinasyonu
+                      </option>
+                    </select>
+                  </div>
+                  <div className="responsive-form-field" style={{ flex: 1 }}>
+                    <input
+                      name="phone"
+                      defaultValue={item.phone || ""}
+                      placeholder="Telefon"
+                    />
+                  </div>
                   <label
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
-                      fontWeight: 600,
+                      fontWeight: 700,
                     }}
                   >
                     <input
                       name="is24Hours"
                       type="checkbox"
                       defaultChecked={!!item.is24Hours}
-                      style={{ width: "18px", height: "18px" }}
+                      style={{ width: "20px", height: "20px" }}
                     />{" "}
                     7/24
                   </label>
                   <div
-                    style={{ display: "flex", gap: "8px", marginLeft: "auto" }}
+                    className="premium-card-item-actions"
+                    style={{ display: "flex", gap: "8px" }}
                   >
                     <button
                       className="secondary"
@@ -2081,58 +1639,31 @@ export default function OrganizationManager({ org }: Props) {
                 </form>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </details>
+      )}
 
-        {pharmacy && (
-          <>
-            <section
-              className="panel form-span"
-              style={{ gridColumn: "1 / -1", padding: "24px" }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "20px",
-                }}
-              >
+      {pharmacy && (
+        <>
+          <details className="premium-accordion" open>
+            <summary className="premium-accordion-summary">
+              <div className="premium-accordion-header">
                 <div
-                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                  className="premium-accordion-icon"
+                  style={{ background: "#fef2f2", color: "#ef4444" }}
                 >
-                  <div
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "12px",
-                      background: "#fef2f2",
-                      color: "#ef4444",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FirstAid size={24} weight="duotone" />
-                  </div>
-                  <div>
-                    <h2
-                      style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}
-                    >
-                      Nöbetçi eczane
-                    </h2>
-                    <p
-                      className="muted"
-                      style={{ margin: 0, fontSize: "14px" }}
-                    >
-                      Bu bilgi nöbetçi eczane filtresinde görünür.
-                    </p>
-                  </div>
+                  <FirstAid size={28} weight="duotone" />
                 </div>
-                <button className="primary" onClick={saveDuty}>
-                  Durumu Kaydet
-                </button>
+                <div>
+                  <h3 className="premium-accordion-title">Nöbetçi Durumu</h3>
+                  <p className="premium-accordion-desc">
+                    Nöbetçi eczane listelerinde yer almak için güncelleyin.
+                  </p>
+                </div>
               </div>
+              <CaretDown size={24} weight="bold" className="premium-chevron" />
+            </summary>
+            <div className="premium-accordion-content">
               <div
                 style={{
                   display: "flex",
@@ -2142,6 +1673,7 @@ export default function OrganizationManager({ org }: Props) {
                   padding: "24px",
                   borderRadius: "16px",
                   border: "1px solid #e2e8f0",
+                  flexWrap: "wrap",
                 }}
               >
                 <label
@@ -2173,6 +1705,8 @@ export default function OrganizationManager({ org }: Props) {
                     gap: "12px",
                     opacity: onDuty ? 1 : 0.5,
                     transition: "0.2s",
+                    flex: 1,
+                    minWidth: "250px",
                   }}
                 >
                   <span style={{ fontWeight: 600, color: "#64748b" }}>
@@ -2184,142 +1718,82 @@ export default function OrganizationManager({ org }: Props) {
                     value={onDutyUntil}
                     onChange={(e) => setOnDutyUntil(e.target.value)}
                     style={{
-                      padding: "10px 16px",
-                      borderRadius: "8px",
+                      padding: "12px 16px",
+                      borderRadius: "10px",
                       border: "1px solid #cbd5e1",
                       fontSize: "15px",
                       fontWeight: 500,
+                      flex: 1,
                     }}
                   />
                 </div>
-              </div>
-            </section>
-
-            <section
-              className="panel form-span"
-              style={{ gridColumn: "1 / -1", padding: "24px" }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  marginBottom: "20px",
-                }}
-              >
-                <div
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "12px",
-                    background: "#eff6ff",
-                    color: "#3b82f6",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                <button
+                  className="primary"
+                  onClick={saveDuty}
+                  style={{ height: "46px" }}
                 >
-                  <Pill size={24} weight="duotone" />
+                  Durumu Kaydet
+                </button>
+              </div>
+            </div>
+          </details>
+
+          <details className="premium-accordion">
+            <summary className="premium-accordion-summary">
+              <div className="premium-accordion-header">
+                <div
+                  className="premium-accordion-icon"
+                  style={{ background: "#eff6ff", color: "#3b82f6" }}
+                >
+                  <Pill size={28} weight="duotone" />
                 </div>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                    Eczane stok yönetimi
-                  </h2>
-                  <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                    Kullanıcılara adet yerine yalnızca stok durumu gösterilir.
+                  <h3 className="premium-accordion-title">Stok Yönetimi</h3>
+                  <p className="premium-accordion-desc">
+                    İlaç/ürün stok görünürlüğünü hastalara yansıtın.
                   </p>
                 </div>
               </div>
-
-              <form
-                className="compact-form"
-                style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "center",
-                  marginBottom: "24px",
-                  background: "#f8fafc",
-                  padding: "20px",
-                  borderRadius: "12px",
-                  border: "1px solid #e2e8f0",
-                }}
-                onSubmit={addStock}
-              >
-                <input
-                  name="itemName"
-                  placeholder="Ürün / ilaç adı"
-                  required
-                  style={{
-                    flex: 2,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-                <select
-                  name="stockStatus"
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
+              <CaretDown size={24} weight="bold" className="premium-chevron" />
+            </summary>
+            <div className="premium-accordion-content">
+              <form onSubmit={addStock} className="responsive-form-grid">
+                <div
+                  className="responsive-form-field"
+                  style={{ gridColumn: "span 2" }}
                 >
-                  <option value="in_stock">Stokta var</option>
-                  <option value="limited">Sınırlı</option>
-                  <option value="out_of_stock">Yok</option>
-                </select>
-                <input
-                  name="quantity"
-                  type="number"
-                  min="0"
-                  placeholder="Adet (kurum içi)"
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-                <button
-                  className="primary"
-                  style={{ padding: "10px 24px", borderRadius: "8px" }}
-                >
-                  Güncelle
+                  <label>Ürün / İlaç Adı</label>
+                  <input name="itemName" required />
+                </div>
+                <div className="responsive-form-field">
+                  <label>Stok Durumu</label>
+                  <select name="stockStatus">
+                    <option value="in_stock">Stokta var</option>
+                    <option value="limited">Sınırlı</option>
+                    <option value="out_of_stock">Yok</option>
+                  </select>
+                </div>
+                <div className="responsive-form-field">
+                  <label>İç Miktar (Görünmez)</label>
+                  <input name="quantity" type="number" min="0" />
+                </div>
+                <button className="primary" style={{ height: "46px" }}>
+                  Ekle
                 </button>
               </form>
 
-              <div
-                className="slot-list"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                  gap: "12px",
-                }}
-              >
+              <div className="premium-card-list">
                 {stock.map((s) => (
-                  <div
-                    className="slot-row"
-                    key={s.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "16px",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "12px",
-                      background: "#ffffff",
-                    }}
-                  >
-                    <b style={{ flex: 1, fontSize: "15px" }}>{s.itemName}</b>
+                  <div key={s.id} className="premium-card-item">
+                    <b style={{ flex: 1, fontSize: "16px" }}>{s.itemName}</b>
                     <select
                       value={s.stockStatus}
                       onChange={(event) =>
                         updateStock(s.id, event.target.value)
                       }
                       style={{
-                        padding: "8px",
-                        borderRadius: "8px",
+                        padding: "10px",
+                        borderRadius: "10px",
                         border: "1px solid #cbd5e1",
                         fontWeight: 600,
                         color:
@@ -2344,73 +1818,39 @@ export default function OrganizationManager({ org }: Props) {
                   </div>
                 ))}
               </div>
-            </section>
-          </>
-        )}
+            </div>
+          </details>
+        </>
+      )}
 
-        {imaging && (
-          <section
-            className="panel form-span"
-            style={{ gridColumn: "1 / -1", padding: "24px" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+      {imaging && (
+        <details className="premium-accordion">
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
               <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#f3e8ff",
-                  color: "#9333ea",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="premium-accordion-icon"
+                style={{ background: "#f3e8ff", color: "#9333ea" }}
               >
-                <Heartbeat size={24} weight="duotone" />
+                <Heartbeat size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Tetkik kataloğu
-                </h2>
-                <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                  Hasta sayfasında tür, bölge, hazırlık, çekim süresi, rapor
-                  süresi ve fiyat görünür.
+                <h3 className="premium-accordion-title">Tetkik Kataloğu</h3>
+                <p className="premium-accordion-desc">
+                  Görüntüleme hizmetleri, hazırlık şartları ve ücretleri.
                 </p>
               </div>
             </div>
-
-            <form
-              className="panel-fields"
-              onSubmit={saveExam}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "16px",
-                background: "#f8fafc",
-                padding: "24px",
-                borderRadius: "16px",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>Tür</span>
+            <CaretDown size={24} weight="bold" className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
+            <form onSubmit={saveExam} className="responsive-form-grid">
+              <div className="responsive-form-field">
+                <label>Kategori</label>
                 <select
                   value={examForm.modality}
                   onChange={(e) =>
                     setExamForm({ ...examForm, modality: e.target.value })
                   }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 >
                   {IMAGING_MODALITIES.map((item) => (
                     <option key={item.id} value={item.id}>
@@ -2418,61 +1858,40 @@ export default function OrganizationManager({ org }: Props) {
                     </option>
                   ))}
                 </select>
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Tetkik adı
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Tetkik Adı</label>
                 <input
                   value={examForm.name}
                   onChange={(e) =>
                     setExamForm({ ...examForm, name: e.target.value })
                   }
-                  placeholder="Örn. Beyin MR"
+                  placeholder="Örn: Beyin MR"
                   required
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>Bölge</span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Bölge</label>
                 <input
                   value={examForm.bodyRegion}
                   onChange={(e) =>
                     setExamForm({ ...examForm, bodyRegion: e.target.value })
                   }
-                  placeholder="Örn. Baş"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
+                  placeholder="Örn: Baş"
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Hazırlık
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Hazırlık</label>
                 <input
                   value={examForm.preparation}
                   onChange={(e) =>
                     setExamForm({ ...examForm, preparation: e.target.value })
                   }
-                  placeholder="Örn. 4 saat açlık"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
+                  placeholder="4 saat açlık"
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Çekim süresi (dk)
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Süre (dk)</label>
                 <input
                   value={examForm.durationMinutes}
                   onChange={(e) =>
@@ -2482,63 +1901,33 @@ export default function OrganizationManager({ org }: Props) {
                     })
                   }
                   type="number"
-                  min="0"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Rapor süresi (saat)
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Rapor (Saat)</label>
                 <input
                   value={examForm.reportHours}
                   onChange={(e) =>
                     setExamForm({ ...examForm, reportHours: e.target.value })
                   }
                   type="number"
-                  min="0"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Fiyat (₺)
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Fiyat (₺)</label>
                 <input
                   value={examForm.price}
                   onChange={(e) =>
                     setExamForm({ ...examForm, price: e.target.value })
                   }
                   type="number"
-                  min="0"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
+              </div>
               <div
-                style={{
-                  gridColumn: "1 / -1",
-                  display: "flex",
-                  gap: "12px",
-                  marginTop: "8px",
-                }}
+                style={{ display: "flex", gap: "12px", gridColumn: "1 / -1" }}
               >
-                <button
-                  className="primary"
-                  style={{ padding: "12px 24px", borderRadius: "8px" }}
-                >
-                  {editingExamId ? "Tetkiği güncelle" : "Kataloğa ekle"}
+                <button className="primary" style={{ height: "46px", flex: 1 }}>
+                  {editingExamId ? "Güncelle" : "Kataloğa Ekle"}
                 </button>
                 {editingExamId && (
                   <button
@@ -2555,24 +1944,9 @@ export default function OrganizationManager({ org }: Props) {
               </div>
             </form>
 
-            <div
-              className="slot-list"
-              style={{ marginTop: "24px", display: "grid", gap: "12px" }}
-            >
+            <div className="premium-card-list">
               {exams.map((exam) => (
-                <div
-                  className="slot-row"
-                  key={exam.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "16px",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    background: "#ffffff",
-                  }}
-                >
+                <div key={exam.id} className="premium-card-item">
                   <div>
                     <b style={{ fontSize: "16px", color: "#0f172a" }}>
                       {imagingModalityLabel(exam.modality)} · {exam.name}
@@ -2597,10 +1971,11 @@ export default function OrganizationManager({ org }: Props) {
                     </div>
                   </div>
                   <div
+                    className="premium-card-item-actions"
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "12px",
+                      gap: "16px",
                     }}
                   >
                     <strong style={{ fontSize: "18px", color: "#16a34a" }}>
@@ -2625,88 +2000,39 @@ export default function OrganizationManager({ org }: Props) {
                   </div>
                 </div>
               ))}
-              {!exams.length && (
-                <div
-                  className="empty"
-                  style={{
-                    padding: "32px",
-                    textAlign: "center",
-                    background: "#f8fafc",
-                    borderRadius: "12px",
-                    color: "#94a3b8",
-                    fontSize: "15px",
-                  }}
-                >
-                  Henüz tetkik yok.
-                </div>
-              )}
             </div>
-          </section>
-        )}
+          </div>
+        </details>
+      )}
 
-        {laboratory && (
-          <section
-            className="panel form-span"
-            style={{ gridColumn: "1 / -1", padding: "24px" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+      {laboratory && (
+        <details className="premium-accordion">
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
               <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "#ecfdf5",
-                  color: "#10b981",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="premium-accordion-icon"
+                style={{ background: "#ecfdf5", color: "#10b981" }}
               >
-                <Flask size={24} weight="duotone" />
+                <Flask size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                  Tahlil kataloğu
-                </h2>
-                <p className="muted" style={{ margin: 0, fontSize: "14px" }}>
-                  Hasta sayfasında grup, numune, açlık, sonuç süresi ve fiyat
-                  görünür.
+                <h3 className="premium-accordion-title">Tahlil Kataloğu</h3>
+                <p className="premium-accordion-desc">
+                  Grup, numune tipi, evde numune alma opsiyonları.
                 </p>
               </div>
             </div>
-
-            <form
-              className="panel-fields"
-              onSubmit={saveTest}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "16px",
-                background: "#f8fafc",
-                padding: "24px",
-                borderRadius: "16px",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>Grup</span>
+            <CaretDown size={24} weight="bold" className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
+            <form onSubmit={saveTest} className="responsive-form-grid">
+              <div className="responsive-form-field">
+                <label>Grup</label>
                 <select
                   value={testForm.category}
                   onChange={(e) =>
                     setTestForm({ ...testForm, category: e.target.value })
                   }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 >
                   {LAB_CATEGORIES.map((item) => (
                     <option key={item.id} value={item.id}>
@@ -2714,21 +2040,14 @@ export default function OrganizationManager({ org }: Props) {
                     </option>
                   ))}
                 </select>
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Numune
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Numune Tipi</label>
                 <select
                   value={testForm.sampleType}
                   onChange={(e) =>
                     setTestForm({ ...testForm, sampleType: e.target.value })
                   }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 >
                   {LAB_SAMPLE_TYPES.map((item) => (
                     <option key={item.id} value={item.id}>
@@ -2736,48 +2055,29 @@ export default function OrganizationManager({ org }: Props) {
                     </option>
                   ))}
                 </select>
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Tahlil adı
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Tahlil Adı</label>
                 <input
                   value={testForm.name}
                   onChange={(e) =>
                     setTestForm({ ...testForm, name: e.target.value })
                   }
-                  placeholder="Örn. Hemogram"
                   required
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Açlık (saat)
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Açlık (Saat)</label>
                 <input
                   value={testForm.fastingHours}
                   onChange={(e) =>
                     setTestForm({ ...testForm, fastingHours: e.target.value })
                   }
                   type="number"
-                  min="0"
-                  placeholder="Boşsa gerekmez"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Sonuç süresi (saat)
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Sonuç (Saat)</label>
                 <input
                   value={testForm.turnaroundHours}
                   onChange={(e) =>
@@ -2787,57 +2087,35 @@ export default function OrganizationManager({ org }: Props) {
                     })
                   }
                   type="number"
-                  min="0"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Hazırlık
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Hazırlık</label>
                 <input
                   value={testForm.preparation}
                   onChange={(e) =>
                     setTestForm({ ...testForm, preparation: e.target.value })
                   }
-                  placeholder="Örn. sabah numunesi"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
-              <label className="field">
-                <span style={{ fontWeight: 600, fontSize: "13px" }}>
-                  Fiyat (₺)
-                </span>
+              </div>
+              <div className="responsive-form-field">
+                <label>Fiyat (₺)</label>
                 <input
                   value={testForm.price}
                   onChange={(e) =>
                     setTestForm({ ...testForm, price: e.target.value })
                   }
                   type="number"
-                  min="0"
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
                 />
-              </label>
+              </div>
               <label
                 style={{
                   gridColumn: "1 / -1",
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
+                  gap: "10px",
                   fontWeight: 700,
-                  marginTop: "8px",
+                  margin: "10px 0",
                 }}
               >
                 <input
@@ -2849,27 +2127,15 @@ export default function OrganizationManager({ org }: Props) {
                       homeCollection: e.target.checked,
                     })
                   }
-                  style={{
-                    width: "20px",
-                    height: "20px",
-                    accentColor: "#0f172a",
-                  }}
+                  style={{ width: "22px", height: "22px" }}
                 />{" "}
                 Evde numune alınır
               </label>
               <div
-                style={{
-                  gridColumn: "1 / -1",
-                  display: "flex",
-                  gap: "12px",
-                  marginTop: "12px",
-                }}
+                style={{ gridColumn: "1 / -1", display: "flex", gap: "12px" }}
               >
-                <button
-                  className="primary"
-                  style={{ padding: "12px 24px", borderRadius: "8px" }}
-                >
-                  {editingTestId ? "Tahlili güncelle" : "Kataloğa ekle"}
+                <button className="primary" style={{ height: "46px", flex: 1 }}>
+                  {editingTestId ? "Güncelle" : "Kataloğa Ekle"}
                 </button>
                 {editingTestId && (
                   <button
@@ -2886,24 +2152,9 @@ export default function OrganizationManager({ org }: Props) {
               </div>
             </form>
 
-            <div
-              className="slot-list"
-              style={{ marginTop: "24px", display: "grid", gap: "12px" }}
-            >
+            <div className="premium-card-list">
               {tests.map((test) => (
-                <div
-                  className="slot-row"
-                  key={test.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "16px",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    background: "#ffffff",
-                  }}
-                >
+                <div key={test.id} className="premium-card-item">
                   <div>
                     <b style={{ fontSize: "16px", color: "#0f172a" }}>
                       {labCategoryLabel(test.category)} · {test.name}
@@ -2931,10 +2182,11 @@ export default function OrganizationManager({ org }: Props) {
                     </div>
                   </div>
                   <div
+                    className="premium-card-item-actions"
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "12px",
+                      gap: "16px",
                     }}
                   >
                     <strong style={{ fontSize: "18px", color: "#16a34a" }}>
@@ -2959,25 +2211,10 @@ export default function OrganizationManager({ org }: Props) {
                   </div>
                 </div>
               ))}
-              {!tests.length && (
-                <div
-                  className="empty"
-                  style={{
-                    padding: "32px",
-                    textAlign: "center",
-                    background: "#f8fafc",
-                    borderRadius: "12px",
-                    color: "#94a3b8",
-                    fontSize: "15px",
-                  }}
-                >
-                  Henüz tahlil yok.
-                </div>
-              )}
             </div>
-          </section>
-        )}
-      </div>
+          </div>
+        </details>
+      )}
     </div>
   );
 }
