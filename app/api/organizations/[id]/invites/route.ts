@@ -101,7 +101,7 @@ export async function POST(
   });
 
   // E-posta Gönderimi
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://alumas.com";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://alumas.tr";
   const htmlContent =
     '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #f8fafc;">' +
     '<div style="text-align: center; margin-bottom: 24px;"><h1 style="color: #0f172a; margin: 0;">Alumas Sağlık</h1></div>' +

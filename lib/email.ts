@@ -18,7 +18,7 @@
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Alumas Sağlık <noreply@alumas.com>",
+        from: "Alumas Sağlık <noreply@alumas.tr>",
         to,
         subject,
         html
@@ -32,3 +32,4 @@
 
   throw new Error(Desteklenmeyen EMAIL_PROVIDER: );
 }
+
