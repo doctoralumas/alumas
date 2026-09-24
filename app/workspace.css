@@ -553,3 +553,14 @@
   font-size: 13px;
   font-weight: 600;
 }
+
+.secondary.danger {
+  color: #ef4444;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+.secondary.danger:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
