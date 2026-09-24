@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState, useMemo } from 'react';
 import { PhoneCall, Heart, MagnifyingGlass, Ambulance, UserList } from "@phosphor-icons/react";
 
@@ -10,8 +10,8 @@ export default function HealthPhoneDirectory({ isLoggedIn = false }: { isLoggedI
 
   useEffect(()=>{
     Promise.all([
-      fetch('/api/emergency').then(r=>r.json()),
-      fetch('/api/emergency/favorites').then(r=>r.json())
+      fetch('/api/emergency').then(r => r.ok ? r.json() : []),
+      fetch('/api/emergency/favorites').then(r => r.ok ? r.json() : [])
     ]).then(([a,b])=>{
       setRows(Array.isArray(a)?a:[]);
       setFav(new Set((Array.isArray(b)?b:[]).map((x:any)=>x.directoryItemId)));

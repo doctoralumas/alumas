@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import {useEffect,useState} from "react";
 import Link from "next/link";
 import SectionVisual from "@/components/section-visual";
@@ -23,12 +23,16 @@ export default function Page(){
   const [msg, setMsg] = useState({ text: '', type: '' });
 
   const load=()=>{
-    fetch('/api/health/special-profiles').then(r=>r.json()).then((x:any[])=>{
-      setProfiles(x);
-      if(!profileId&&x[0]) setProfileId(x[0].id);
+    fetch('/api/health/special-profiles').then(r=>r.ok ? r.json() : []).then((x:any[])=>{
+      if (Array.isArray(x)) {
+        setProfiles(x);
+        if(!profileId&&x[0]) setProfileId(x[0].id);
+      } else {
+        setProfiles([]);
+      }
     });
-    fetch('/api/health/family-access/invites').then(r=>r.json()).then(setData);
-    fetch('/api/health/family-access').then(r=>r.json()).then(setAccess);
+    fetch('/api/health/family-access/invites').then(r=>r.ok ? r.json() : {sent:[],received:[]}).then(x => setData(x.sent ? x : {sent:[],received:[]}));
+    fetch('/api/health/family-access').then(r=>r.ok ? r.json() : {owned:[],granted:[]}).then(x => setAccess(x.owned ? x : {owned:[],granted:[]}));
   };
   useEffect(() => { load(); },[]);
 
@@ -208,3 +212,4 @@ export default function Page(){
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import {useEffect,useMemo,useState} from "react";
 import SectionVisual from "@/components/section-visual";
 import { Drop, Plus, Clock, TrendUp } from "@phosphor-icons/react";
@@ -9,7 +9,7 @@ export default function Page(){
   const [rows,setRows]=useState<R[]>([]);
   const [loading,setLoading]=useState(true);
 
-  const load=()=>fetch('/api/health/water?days=7').then(r=>r.json()).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
+  const load=()=>fetch('/api/health/water?days=7').then(r => r.ok ? r.json() : []).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
   useEffect(() => { load(); },[]);
 
   const today=useMemo(()=>rows.filter(x=>new Date(x.consumedAt).toDateString()===new Date().toDateString()).reduce((a,b)=>a+b.amountMl,0),[rows]);
@@ -109,3 +109,4 @@ export default function Page(){
     </div>
   )
 }
+

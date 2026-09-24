@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import {useEffect,useState} from "react";
 import SectionVisual from "@/components/section-visual";
 import { User, Ruler, Scales, Circle, Plus, Clock, TrendUp } from "@phosphor-icons/react";
@@ -9,7 +9,7 @@ export default function Page(){
   const [rows,setRows]=useState<R[]>([]);
   const [loading,setLoading]=useState(true);
 
-  const load=()=>fetch('/api/health/body').then(r=>r.json()).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
+  const load=()=>fetch('/api/health/body').then(r => r.ok ? r.json() : []).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
   useEffect(() => { load(); },[]);
 
   async function submit(e:React.FormEvent<HTMLFormElement>){
@@ -132,3 +132,4 @@ export default function Page(){
     </div>
   )
 }
+

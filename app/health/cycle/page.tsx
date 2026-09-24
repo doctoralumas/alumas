@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import {useEffect,useMemo,useState} from "react";
 import { Drop, CalendarBlank, Heart, Sparkle, Plus, Trash, Info, Heartbeat, ClockCounterClockwise, CaretRight, Textbox } from "@phosphor-icons/react";
 
@@ -11,7 +11,7 @@ export default function Page(){
   const [message,setMessage]=useState("");
   const [loading,setLoading]=useState(true);
   
-  const load=()=>fetch('/api/health/cycle').then(r=>r.json()).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
+  const load=()=>fetch('/api/health/cycle').then(r => r.ok ? r.json() : []).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
   useEffect(()=>{load()},[]);
 
   const stats=useMemo(()=>{
@@ -200,3 +200,4 @@ export default function Page(){
     </div>
   )
 }
+
