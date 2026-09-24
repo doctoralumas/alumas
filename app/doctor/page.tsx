@@ -8,6 +8,7 @@ import DoctorCompletionList from "@/components/doctor-completion-list";
 import CareCalendar from "@/components/care-calendar";
 import ClinicalQuestions from "@/components/clinical-questions";
 import DoctorPresence from "@/components/doctor-presence";
+import DoctorProfileManager from "@/components/doctor-profile-manager";
 import VerificationDocumentManager from "@/components/verification-document-manager";
 import {
   ShieldCheck,
@@ -129,6 +130,8 @@ export default async function DoctorDashboard() {
         </div>
         <DoctorPresence initial={u.doctorProfile.presenceStatus} />
       </section>
+
+      <DoctorProfileManager profile={u.doctorProfile} />
 
       <VerificationDocumentManager
         owner={{ kind: "doctor", doctorId: u.doctorProfile.id }}
