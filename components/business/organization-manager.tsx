@@ -88,6 +88,7 @@ export default function OrganizationManager({ org }: Props) {
   );
 
   const [hours, setHours] = useState<any[]>(org.hours || []);
+  const [hoursSaved, setHoursSaved] = useState(false);
   const [stock, setStock] = useState<any[]>(org.stocks || []);
   const [invites, setInvites] = useState<any[]>(org.doctorInvites || []);
   const [doctors, setDoctors] = useState<any[]>(org.doctors || []);

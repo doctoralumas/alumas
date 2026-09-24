@@ -1,3 +1,6 @@
+const fs = require('fs');
+
+const code = \
 import {notFound} from 'next/navigation';
 import {prisma} from '@/lib/prisma';
 import OrganizationMap from '@/components/organization-map';
@@ -7,8 +10,8 @@ import OrganizationOfferings from '@/components/organization-offerings';
 import {currentUser} from '@/lib/auth';
 import { MapPin, Phone, Globe, Star, Clock, Info, Heartbeat, Pill, Flask, FirstAid, ListDashes, CheckCircle, Warning, ChatCircle } from "@phosphor-icons/react/dist/ssr";
 
-const labels:any={HOSPITAL:'Hastane',CLINIC:'Klinik',PHARMACY:'Eczane',IMAGING_CENTER:'GÃ¶rÃ¼ntÃ¼leme Merkezi',LABORATORY:'TÄ±bbi Laboratuvar'};
-const days=['Pazar','Pazartesi','SalÄ±','Ã‡arÅŸamba','PerÅŸembe','Cuma','Cumartesi'];
+const labels:any={HOSPITAL:'Hastane',CLINIC:'Klinik',PHARMACY:'Eczane',IMAGING_CENTER:'Görüntüleme Merkezi',LABORATORY:'Týbbi Laboratuvar'};
+const days=['Pazar','Pazartesi','Salý','Çarþamba','Perþembe','Cuma','Cumartesi'];
 
 export default async function OrganizationProfile({params}:{params:Promise<{slug:string}>}){
   const {slug}=await params;
@@ -61,20 +64,20 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
                 <span style={{ background: '#eff6ff', color: '#2563eb', padding: '6px 12px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <CheckCircle size={16} weight="fill" />
-                  DoÄŸrulanmÄ±ÅŸ {labels[o.type]}
+                  Doðrulanmýþ {labels[o.type]}
                 </span>
                 {o.isOnDuty && (
                   <span style={{ background: '#fef2f2', color: '#dc2626', padding: '6px 12px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <Warning size={16} weight="fill" />
-                    Åžu An NÃ¶betÃ§i
+                    Þu An Nöbetçi
                   </span>
                 )}
               </div>
               <h1 style={{ margin: '0 0 12px 0', fontSize: '32px', color: '#0f172a', fontWeight: 800 }}>{o.name}</h1>
               
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', color: '#64748b', fontSize: '15px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={18} /> {o.city}{o.district? ` â€¢ ${o.district}`:''} â€¢ {o.address}</span>
-                {o.phone && <a href={`tel:${o.phone}`} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', textDecoration: 'none' }}><Phone size={18} /> {o.phone}</a>}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={18} /> {o.city}{o.district? \ • \\:''} • {o.address}</span>
+                {o.phone && <a href={\	el:\\} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', textDecoration: 'none' }}><Phone size={18} /> {o.phone}</a>}
                 {o.website && <a href={o.website} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#3b82f6', textDecoration: 'none' }}><Globe size={18} /> Web sitesi</a>}
               </div>
             </div>
@@ -84,14 +87,14 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
             <div style={{ display: 'flex', gap: '12px' }}>
               <FavoriteOrganization id={o.id}/>
               {u && u.id !== o.ownerUserId && (
-                <a href={`/messages?userId=${o.ownerUserId}`} className="secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', borderRadius: '12px', background: '#f1f5f9', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}>
+                <a href={\/messages?userId=\\} className="secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', borderRadius: '12px' }}>
                   <ChatCircle size={20} /> Mesaj
                 </a>
               )}
             </div>
             {avg && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fffbeb', padding: '8px 16px', borderRadius: '100px', color: '#b45309', fontWeight: 700 }}>
-                <Star size={18} weight="fill" color="#f59e0b" /> {avg} ({o.reviews.length} deÄŸerlendirme)
+                <Star size={18} weight="fill" color="#f59e0b" /> {avg} ({o.reviews.length} deðerlendirme)
               </div>
             )}
           </div>
@@ -113,17 +116,17 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
           <div style={{ background: '#ffffff', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
             <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '12px' }}><Info size={24} color="#64748b" weight="duotone" /></div>
-              <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>HakkÄ±nda</h2>
+              <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Hakkýnda</h2>
             </div>
             <div style={{ padding: '24px', color: '#475569', fontSize: '16px', lineHeight: '1.6' }}>
-              {o.description || 'Kurum aÃ§Ä±klamasÄ± henÃ¼z eklenmedi.'}
+              {o.description || 'Kurum açýklamasý henüz eklenmedi.'}
             </div>
           </div>
 
           <div style={{ background: '#ffffff', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
             <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '12px' }}><Clock size={24} color="#64748b" weight="duotone" /></div>
-              <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Ã‡alÄ±ÅŸma Saatleri</h2>
+              <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Çalýþma Saatleri</h2>
             </div>
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {days.map((d,i) => {
@@ -140,7 +143,7 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
                       fontSize: '14px', 
                       fontWeight: 600 
                     }}>
-                      {isClosed ? 'KapalÄ±' : `${h.opensAt} â€“ ${h.closesAt}`}
+                      {isClosed ? 'Kapalý' : \\ – \\}
                     </span>
                   </div>
                 );
@@ -148,7 +151,7 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
             </div>
           </div>
 
-          {/* Eczane NÃ¶bet Bilgisi */}
+          {/* Eczane Nöbet Bilgisi */}
           {o.type === 'PHARMACY' && o.isOnDuty && (
             <div style={{ background: '#fef2f2', borderRadius: '24px', border: '1px solid #fecaca', overflow: 'hidden', padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -156,9 +159,9 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
                   <FirstAid size={28} weight="duotone" />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, color: '#991b1b', fontSize: '18px' }}>Åžu an nÃ¶betÃ§i eczane!</h3>
+                  <h3 style={{ margin: 0, color: '#991b1b', fontSize: '18px' }}>Þu an nöbetçi eczane!</h3>
                   <p style={{ margin: '4px 0 0', color: '#b91c1c', fontSize: '14px' }}>
-                    {o.onDutyUntil ? `Bu eczane ${new Date(o.onDutyUntil).toLocaleString('tr-TR')} tarihine kadar nÃ¶betÃ§i.` : 'Bu eczane sistemde nÃ¶betÃ§i olarak kayÄ±tlÄ±.'}
+                    {o.onDutyUntil ? \Bu eczane \ tarihine kadar nöbetçi.\ : 'Bu eczane sistemde nöbetçi olarak kayýtlý.'}
                   </p>
                 </div>
               </div>
@@ -179,7 +182,7 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
                 <div style={{ background: '#eff6ff', padding: '10px', borderRadius: '12px' }}><Pill size={24} color="#3b82f6" weight="duotone" /></div>
                 <div>
                   <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Eczane Stok Durumu</h2>
-                  <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#64748b' }}>Stok durumu eczane tarafÄ±ndan gÃ¼ncellenir; gitmeden Ã¶nce teyit edin.</p>
+                  <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#64748b' }}>Stok durumu eczane tarafýndan güncellenir; gitmeden önce teyit edin.</p>
                 </div>
               </div>
               <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -192,7 +195,7 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
                       background: s.stockStatus === 'in_stock' ? '#f0fdf4' : s.stockStatus === 'limited' ? '#fffbeb' : '#fef2f2',
                       color: s.stockStatus === 'in_stock' ? '#16a34a' : s.stockStatus === 'limited' ? '#d97706' : '#dc2626'
                     }}>
-                      {s.stockStatus === 'in_stock' ? 'Stokta var' : s.stockStatus === 'limited' ? 'SÄ±nÄ±rlÄ± Stok' : 'TÃ¼kendi'}
+                      {s.stockStatus === 'in_stock' ? 'Stokta var' : s.stockStatus === 'limited' ? 'Sýnýrlý Stok' : 'Tükendi'}
                     </span>
                   </div>
                 ))}
@@ -213,11 +216,11 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
                     <div>
                       <b style={{ display: 'block', color: '#0f172a', fontSize: '16px' }}>{e.name}</b>
                       <div style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>
-                        {e.kind} {e.is24Hours ? " â€¢ 7/24 Hizmet" : ""}
+                        {e.kind} {e.is24Hours ? " • 7/24 Hizmet" : ""}
                         {e.description && <span style={{ display: 'block', marginTop: '4px', fontSize: '13px' }}>{e.description}</span>}
                       </div>
                     </div>
-                    {e.phone && <a href={`tel:${e.phone}`} style={{ background: '#ef4444', color: 'white', padding: '8px 16px', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px' }}>Ara</a>}
+                    {e.phone && <a href={\	el:\\} style={{ background: '#ef4444', color: 'white', padding: '8px 16px', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px' }}>Ara</a>}
                   </div>
                 ))}
               </div>
@@ -237,7 +240,7 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
                 {o.departments.map(dep => (
                   <div key={dep.id} style={{ padding: '16px', border: '1px solid #e2e8f0', borderRadius: '16px', background: '#f8fafc' }}>
                     <h3 style={{ margin: '0 0 4px', fontSize: '16px', color: '#0f172a' }}>{dep.name}</h3>
-                    <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>{dep.description || 'Kurum departmanÄ±'}</p>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>{dep.description || 'Kurum departmaný'}</p>
                     <div style={{ marginTop: '12px', fontSize: '12px', fontWeight: 700, color: '#3b82f6', background: '#eff6ff', display: 'inline-block', padding: '4px 8px', borderRadius: '6px' }}>
                       {o.doctors.filter(d => d.departmentId === dep.id).length} uzman
                     </div>
@@ -254,13 +257,13 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
       {o.campaigns.length > 0 && (
         <div style={{ marginTop: '32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-            <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>GÃ¼ncel Kampanyalar</h2>
+            <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Güncel Kampanyalar</h2>
             <div style={{ height: '1px', background: '#e2e8f0', flex: 1 }}></div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
             {o.campaigns.map(c => (
               <div key={c.id} style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '24px', padding: '24px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '64px', opacity: 0.1 }}>ðŸ“£</div>
+                <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '64px', opacity: 0.1 }}>??</div>
                 <h3 style={{ margin: '0 0 12px', fontSize: '20px', color: '#92400e', position: 'relative' }}>{c.title}</h3>
                 <p style={{ margin: 0, color: '#b45309', fontSize: '15px', position: 'relative' }}>{c.description}</p>
               </div>
@@ -273,23 +276,23 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
       {o.doctors.length > 0 && (
         <div style={{ marginTop: '48px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-            <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Bu Kurumda Ã‡alÄ±ÅŸan Uzmanlar</h2>
+            <h2 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Bu Kurumda Çalýþan Uzmanlar</h2>
             <div style={{ height: '1px', background: '#e2e8f0', flex: 1 }}></div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
             {o.doctors.map(d => (
-              <a key={d.id} href={`/doctors/${d.slug}`} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+              <a key={d.id} href={\/doctors/\\} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
                 <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 700 }}>
                   {d.name.split(' ').slice(-2).map(x => x[0]).join('')}
                 </div>
                 <div>
                   <b style={{ display: 'block', color: '#0f172a', fontSize: '16px', marginBottom: '4px' }}>{d.name}</b>
                   <span style={{ color: '#64748b', fontSize: '14px', display: 'block' }}>
-                    {d.specialty}{o.type === 'HOSPITAL' && d.departmentId ? ` Â· ${o.departments.find(x => x.id === d.departmentId)?.name || ''}` : ''}
+                    {d.specialty}{o.type === 'HOSPITAL' && d.departmentId ? \ · \\ : ''}
                   </span>
                   <div style={{ marginTop: '8px', display: 'flex', gap: '12px', fontSize: '13px', fontWeight: 600 }}>
                     <span style={{ color: '#d97706', display: 'flex', alignItems: 'center', gap: '4px' }}><Star size={14} weight="fill" /> {d.rating}</span>
-                    <span style={{ color: '#16a34a' }}>{d.nextSlot || 'MÃ¼sait'}</span>
+                    <span style={{ color: '#16a34a' }}>{d.nextSlot || 'Müsait'}</span>
                   </div>
                 </div>
               </a>
@@ -306,3 +309,6 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
     </div>
   );
 }
+\
+
+fs.writeFileSync('app/organizations/[slug]/page.tsx', code);
