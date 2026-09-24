@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 "use client";
 import ReactMarkdown from "react-markdown";
 import { useState, useRef, useEffect, useMemo } from "react";
@@ -154,7 +154,8 @@ export default function HealthNavigator({
                  <div className="ai-markdown" style={{ margin: 0, fontSize: "15px", lineHeight: "1.6" }}>
                    <ReactMarkdown
                      components={{
-                       p: ({node, ...props}) => <p style={{margin: "0 0 12px 0", whiteSpace: "pre-wrap"}} {...props} />,
+                       a: ({node, ...props}) => <a style={{color: '#2563eb', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: '4px'}} {...props} />
+                        p: ({node, ...props}) => <p style={{margin: "0 0 12px 0", whiteSpace: "pre-wrap"}} {...props} />,
                        ul: ({node, ...props}) => <ul style={{margin: "0 0 12px 0", paddingLeft: "24px"}} {...props} />,
                        li: ({node, ...props}) => <li style={{marginBottom: "4px"}} {...props} />,
                        strong: ({node, ...props}) => <strong style={{fontWeight: 700}} {...props} />
@@ -257,3 +258,4 @@ export default function HealthNavigator({
     </div>
   );
 }
+
