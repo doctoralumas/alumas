@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import {
@@ -484,7 +484,12 @@ export default function OrganizationManager({ org }: Props) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ hours: payload }),
     });
-    setMsg(r.ok ? "Çalışma saatleri kaydedildi" : "Saatler kaydedilemedi");
+    if (r.ok) {
+      setHoursSaved(true);
+      setTimeout(() => setHoursSaved(false), 2000);
+    } else {
+      setMsg("Saatler kaydedilemedi");
+    }
   }
   function updateHour(day: number, key: string, value: any) {
     setHours((prev: any[]) => {
