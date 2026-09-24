@@ -1,9 +1,9 @@
-﻿export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
+export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
   const provider = (process.env.EMAIL_PROVIDER || "console").toLowerCase();
   
   if (provider === "console") {
-    console.log([Alumas Email Mock] To:  | Subject: );
-    console.log([Content]: );
+    console.log(`[Alumas Email Mock] To: ${to} | Subject: ${subject}`);
+    console.log(`[Content]: ${html}`);
     return { success: true, provider: "console" };
   }
 
@@ -14,7 +14,7 @@
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": Bearer ,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -30,6 +30,5 @@
     return { success: true, provider: "resend", id: data.id };
   }
 
-  throw new Error(Desteklenmeyen EMAIL_PROVIDER: );
+  throw new Error(`Desteklenmeyen EMAIL_PROVIDER: ${provider}`);
 }
-
