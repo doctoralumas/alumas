@@ -9,17 +9,14 @@ export async function sendSms(phone: string, body: string) {
   if (provider === "iletimerkezi") {
     const apiKey = process.env.ILETI_MERKEZI_KEY;
     const apiHash = process.env.ILETI_MERKEZI_HASH;
-    const sender = process.env.ILETI_MERKEZI_SENDER || "ALUMAS"; // Default title
+    const sender = process.env.ILETI_MERKEZI_SENDER || "ALUMAS"; 
 
     if (!apiKey || !apiHash) throw new Error("İleti Merkezi API Key veya Hash eksik");
 
-    // İleti Merkezi genellikle 10 haneli (5xxxxxxxxx) veya 12 haneli (905xxxxxxxxx) format bekler.
-    // Başındaki + ve 0'ları temizleyip, 10 haneli hale getirelim.
-    let cleanPhone = phone.replace(/\D/g, ""); // Tüm rakam olmayanları sil (+ dahil)
+    let cleanPhone = phone.replace(/\D/g, ""); 
     if (cleanPhone.startsWith("90") && cleanPhone.length === 12) cleanPhone = cleanPhone.substring(2);
     if (cleanPhone.startsWith("0") && cleanPhone.length === 11) cleanPhone = cleanPhone.substring(1);
     
-    // Eğer numara çok kısaysa hata fırlat ki API'ye gitmeden dursun
     if (cleanPhone.length < 10) throw new Error("Geçersiz telefon numarası formatı");
 
     const payload = {
@@ -43,10 +40,10 @@ export async function sendSms(phone: string, body: string) {
     });
 
     const data = await res.json();
-    if (data.response.status.code !== 200) {
-      throw new Error(`İleti Merkezi Hatası: ${data.response.status.message}`);
+    if (data.response?.status?.code !== 200) {
+      throw new Error(`İleti Merkezi Hatası: ${data.response?.status?.message}`);
     }
-    return { provider: "iletimerkezi", id: data.response.order.id };
+    return { provider: "iletimerkezi", id: data.response?.order?.id };
   }
 
   if (provider === "twilio") {
