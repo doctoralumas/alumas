@@ -1,5 +1,5 @@
-﻿import { initializeApp, getApps } from 'firebase/app';
-import { getMessaging, getToken, isSupported } from 'firebase/messaging';
+import { initializeApp, getApps } from "firebase/app";
+import { getMessaging, getToken, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,18 +11,30 @@ const firebaseConfig = {
 };
 
 export async function registerWebPush(): Promise<string | null> {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   
   try {
     const supported = await isSupported();
     if (!supported) {
-      console.log('Bu tarayıcı Web Push bildirimlerini desteklemiyor.');
+      console.log("Bu tarayıcı Web Push bildirimlerini desteklemiyor.");
       return null;
     }
 
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      console.log('Bildirim izni reddedildi.');
+    if (permission !== "granted") {
+      console.log("Bildirim izni reddedildi.");
+      return null;
+    }
+
+    // Explicitly register the service worker
+    let registration;
+    try {
+      registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+        scope: "/",
+      });
+      console.log("Service Worker başarıyla kaydedildi:", registration.scope);
+    } catch (swError) {
+      console.error("Service Worker kayıt hatası:", swError);
       return null;
     }
 
@@ -32,16 +44,16 @@ export async function registerWebPush(): Promise<string | null> {
     // VAPID anahtarı (.env'den alınacak)
     const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
     
-    const token = await getToken(messaging, { vapidKey });
+    const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
     
     if (token) {
       return token;
     } else {
-      console.log('FCM token alınamadı.');
+      console.log("FCM token alınamadı.");
       return null;
     }
   } catch (err) {
-    console.error('Web Push kayıt hatası:', err);
+    console.error("Web Push kayıt hatası:", err);
     return null;
   }
 }

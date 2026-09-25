@@ -12,28 +12,32 @@ export async function GET() {
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
 
-firebase.initializeApp({
-  apiKey: "${apiKey}",
-  authDomain: "${authDomain}",
-  projectId: "${projectId}",
-  storageBucket: "${storageBucket}",
-  messagingSenderId: "${messagingSenderId}",
-  appId: "${appId}"
-});
+try {
+  firebase.initializeApp({
+    apiKey: "${apiKey}",
+    authDomain: "${authDomain}",
+    projectId: "${projectId}",
+    storageBucket: "${storageBucket}",
+    messagingSenderId: "${messagingSenderId}",
+    appId: "${appId}"
+  });
 
-const messaging = firebase.messaging();
+  const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function(payload) {
-  console.log("[firebase-messaging-sw.js] Arka plan mesajı alındı: ", payload);
-  const notificationTitle = payload.notification?.title || "Yeni Bildirim";
-  const notificationOptions = {
-    body: payload.notification?.body,
-    icon: "/favicon.ico",
-    data: payload.data,
-  };
+  messaging.onBackgroundMessage(function(payload) {
+    console.log("[firebase-messaging-sw.js] Arka plan mesajı alındı: ", payload);
+    const notificationTitle = payload.notification?.title || "Yeni Bildirim";
+    const notificationOptions = {
+      body: payload.notification?.body,
+      icon: "/favicon.ico",
+      data: payload.data,
+    };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
+    self.registration.showNotification(notificationTitle, notificationOptions);
+  });
+} catch (e) {
+  console.error("Firebase SW Init Error:", e);
+}
 `;
 
   return new NextResponse(swContent, {
