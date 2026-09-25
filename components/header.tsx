@@ -3,12 +3,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react"; 
 import { usePathname, useRouter } from "next/navigation";
 import { ShieldCheck } from "./icons";
-import { CaretLeft } from "@phosphor-icons/react/dist/ssr";
+import { CaretLeft, Bell } from "@phosphor-icons/react";
 
 type Me = { name: string; role: "PATIENT" | "DOCTOR" | "ADMIN"; doctorSlug?: string | null } | null;
 
 export default function Header() {
   const [me, setMe] = useState<Me>(null);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -16,18 +17,23 @@ export default function Header() {
     fetch("/api/auth/me").then(r => r.json()).then(setMe).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (me) {
+      fetch("/api/notifications/unread")
+        .then(res => res.ok ? res.json() : { unreadCount: 0 })
+        .then(data => setUnreadNotifications(data.unreadCount || 0))
+        .catch(() => {});
+    }
+  }, [me, pathname]);
+
   const hideBackOn = ["/", "/login", "/register", "/pro/login", "/pro/register"];
   const showBack = pathname && !hideBackOn.includes(pathname);
 
   const handleBack = () => {
-    // SENIOR UX: Prevent the back button from throwing the user out of the app (e.g. to Google) 
-    // if they landed directly on a sub-page via email link or bookmark.
     const isInternal = document.referrer && document.referrer.includes(window.location.host);
-    
     if (isInternal) {
       router.back();
     } else {
-      // Smart Hierarchical Fallbacks
       if (pathname.startsWith('/health/')) router.push('/services');
       else if (pathname.startsWith('/doctor/patients/')) router.push('/doctor');
       else if (pathname.startsWith('/admin/')) router.push('/admin');
@@ -68,9 +74,24 @@ export default function Header() {
         <Link className="secondary compact" href="/services">Tüm Hizmetler</Link>
         <div className="secure"><ShieldCheck size={17} /> Güvenli sağlık alanı</div>
         {me ? (
-          <Link className="account-pill" href="/profile">
-            {me.name.split(" ")[0]}
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <Link href="/notifications" style={{ position: "relative", display: "flex", alignItems: "center", color: "#123f6b" }} title="Bildirimler">
+              <Bell size={24} weight="duotone" />
+              {unreadNotifications > 0 && (
+                <span style={{
+                  position: "absolute", top: "-4px", right: "-4px",
+                  background: "#ef4444", color: "white", fontSize: "10px", fontWeight: "bold",
+                  padding: "2px 5px", borderRadius: "10px", border: "2px solid white",
+                  minWidth: "16px", textAlign: "center", lineHeight: 1
+                }}>
+                  {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                </span>
+              )}
+            </Link>
+            <Link className="account-pill" href="/profile">
+              {me.name.split(" ")[0]}
+            </Link>
+          </div>
         ) : (
           <Link className="secondary compact" href="/login">Giriş yap</Link>
         )}
