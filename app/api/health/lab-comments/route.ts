@@ -3,11 +3,12 @@ import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 async function doctorCanSee(patientId: string, doctorId: string) {
-  const [c, s] = await Promise.all([
+  const [consent, share, appointment] = await Promise.all([
     prisma.healthShareConsent.findUnique({ where: { patientId_doctorId: { patientId, doctorId } } }),
-    prisma.healthReportShare.findFirst({ where: { patientId, doctorId, status: 'active', OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] } })
+    prisma.healthReportShare.findFirst({ where: { patientId, doctorId, status: 'active', OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] } }),
+    prisma.appointment.findFirst({ where: { userId: patientId, doctorId } })
   ]);
-  return (c?.status === 'active' && c.scopes.includes('labs')) || !!s;
+  return Boolean(appointment && ((consent?.status === 'active' && consent.scopes.includes('labs')) || share));
 }
 
 export async function GET(req: Request) {
@@ -18,30 +19,47 @@ export async function GET(req: Request) {
 
   if (asDoctor && u.role === 'DOCTOR' && u.doctorProfile) {
     const patientId = String(url.searchParams.get('patientId') || '');
-    if (!patientId || !(await doctorCanSee(patientId, u.doctorProfile.id))) return NextResponse.json({ error: 'Erişim yok' }, { status: 403 });
-    return NextResponse.json(await prisma.labResultComment.findMany({ where: { patientId }, include: { doctor: { select: { name: true } }, labResult: { select: { testName: true, value: true, unit: true, measuredAt: true } } }, orderBy: { createdAt: 'desc' } }));
+    if (!patientId || !(await doctorCanSee(patientId, u.doctorProfile.id))) {
+      return NextResponse.json({ error: 'Erişim yok' }, { status: 403 });
+    }
+    return NextResponse.json(await prisma.labResultComment.findMany({
+      where: { patientId, doctorId: u.doctorProfile.id },
+      include: { labResult: { select: { testName: true, value: true, unit: true, measuredAt: true } } },
+      orderBy: { createdAt: 'desc' }
+    }));
   }
 
   // Default: Patient fetching their own lab comments
-  return NextResponse.json(await prisma.labResultComment.findMany({ where: { patientId: u.id, patientVisible: true }, include: { doctor: { select: { name: true } }, labResult: { select: { testName: true, value: true, unit: true, measuredAt: true } } }, orderBy: { createdAt: 'desc' } }));
+  return NextResponse.json(await prisma.labResultComment.findMany({
+    where: { patientId: u.id, patientVisible: true },
+    include: { doctor: { select: { name: true } }, labResult: { select: { testName: true, value: true, unit: true, measuredAt: true } } },
+    orderBy: { createdAt: 'desc' }
+  }));
 }
 
 export async function POST(req: Request) {
   const u = await currentUser();
-  if (!u || u.role !== 'DOCTOR' || !u.doctorProfile) return NextResponse.json({ error: 'Yetkisiz' }, { status: 403 });
-  const b = await req.json(), labResultId = String(b.labResultId || ''), text = String(b.text || '').trim();
-  if (!labResultId || !text) return NextResponse.json({ error: 'Eksik bilgi' }, { status: 400 });
-  const lab = await prisma.labResult.findUnique({ where: { id: labResultId } });
-  if (!lab) return NextResponse.json({ error: 'Sonuç yok' }, { status: 404 });
-  if (!(await doctorCanSee(lab.userId, u.doctorProfile.id))) return NextResponse.json({ error: 'Erişim yok' }, { status: 403 });
+  if (!u || u.role !== 'DOCTOR' || !u.doctorProfile) return NextResponse.json({ error: 'Doktor hesabı gerekli' }, { status: 403 });
+  
+  const b = await req.json();
+  const patientId = String(b.patientId || '');
+  const labResultId = String(b.labResultId || '');
+  const body = String(b.body || '').trim();
+  
+  if (!patientId || !labResultId || !body) return NextResponse.json({ error: 'Hasta, sonuç ve yorum gerekli' }, { status: 400 });
+  
+  if (!(await doctorCanSee(patientId, u.doctorProfile.id))) return NextResponse.json({ error: 'Laboratuvar verisine erişim izni yok' }, { status: 403 });
+  
+  const lab = await prisma.labResult.findFirst({ where: { id: labResultId, userId: patientId } });
+  if (!lab) return NextResponse.json({ error: 'Laboratuvar sonucu bulunamadı' }, { status: 404 });
   
   const row = await prisma.labResultComment.create({
-    data: { patientId: lab.userId, doctorId: u.doctorProfile.id, labResultId, text: text.slice(0, 1000), patientVisible: b.patientVisible !== false }
+    data: { labResultId, patientId, doctorId: u.doctorProfile.id, body: body.slice(0, 1500), patientVisible: b.patientVisible !== false }
   });
   
   if (row.patientVisible) {
     await prisma.notification.create({
-      data: { userId: lab.userId, title: 'Laboratuvar sonucuna yorum', body: `${lab.testName} sonucu için uzman yorumu eklendi.`, kind: 'clinical' }
+      data: { userId: patientId, title: 'Laboratuvar sonucuna doktor yorumu', body: `${u.doctorProfile.name}, ${lab.testName} sonucuna bir yorum ekledi.`, kind: 'lab_comment' }
     });
   }
   return NextResponse.json(row, { status: 201 });
