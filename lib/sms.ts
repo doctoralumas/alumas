@@ -13,8 +13,14 @@ export async function sendSms(phone: string, body: string) {
 
     if (!apiKey || !apiHash) throw new Error("İleti Merkezi API Key veya Hash eksik");
 
-    // Clean phone number (remove +)
-    const cleanPhone = phone.replace("+", "");
+    // İleti Merkezi genellikle 10 haneli (5xxxxxxxxx) veya 12 haneli (905xxxxxxxxx) format bekler.
+    // Başındaki + ve 0'ları temizleyip, 10 haneli hale getirelim.
+    let cleanPhone = phone.replace(/\D/g, ""); // Tüm rakam olmayanları sil (+ dahil)
+    if (cleanPhone.startsWith("90") && cleanPhone.length === 12) cleanPhone = cleanPhone.substring(2);
+    if (cleanPhone.startsWith("0") && cleanPhone.length === 11) cleanPhone = cleanPhone.substring(1);
+    
+    // Eğer numara çok kısaysa hata fırlat ki API'ye gitmeden dursun
+    if (cleanPhone.length < 10) throw new Error("Geçersiz telefon numarası formatı");
 
     const payload = {
       request: {
