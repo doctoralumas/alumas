@@ -1,32 +1,59 @@
 "use client";
-import {useEffect,useState} from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import SectionVisual from "@/components/section-visual";
+import { useRouter } from "next/navigation";
 import { BellRinging, CheckCircle, Checks, CaretLeft, CalendarCheck, Pill, Stethoscope, ChatsCircle, Info } from "@phosphor-icons/react";
 
-type N={id:string;title:string;body:string;kind:string;readAt:string|null;createdAt:string};
+type N = { id: string; title: string; body: string; kind: string; readAt: string | null; createdAt: string };
 
-export default function Notifications(){
-  const [items,setItems]=useState<N[]>([]);
+export default function Notifications() {
+  const [items, setItems] = useState<N[]>([]);
+  const router = useRouter();
   
-  const load=()=>fetch('/api/notifications').then(r=>r.ok?r.json():[]).then(setItems);
-  useEffect(()=>{load()},[]);
+  const load = () => fetch('/api/notifications').then(r => r.ok ? r.json() : []).then(setItems);
+  useEffect(() => { load() }, []);
 
-  async function mark(){
-    await fetch('/api/notifications',{method:'PATCH'});
+  async function mark() {
+    await fetch('/api/notifications', { method: 'PATCH' });
     load();
   }
 
   const getIcon = (kind: string, read: boolean) => {
     const color = read ? "#94a3b8" : "#0284c7";
-    switch(kind){
-      case 'appointment': return <CalendarCheck size={24} weight={read?"regular":"duotone"} color={color} />;
-      case 'reminder': return <Pill size={24} weight={read?"regular":"duotone"} color={read?"#94a3b8":"#16a34a"} />;
-      case 'message': return <ChatsCircle size={24} weight={read?"regular":"duotone"} color={read?"#94a3b8":"#8b5cf6"} />;
-      case 'clinical': return <Stethoscope size={24} weight={read?"regular":"duotone"} color={read?"#94a3b8":"#db2777"} />;
-      default: return <Info size={24} weight={read?"regular":"duotone"} color={color} />;
+    switch(kind) {
+      case 'appointment': return <CalendarCheck size={24} weight={read ? "regular" : "duotone"} color={color} />;
+      case 'reminder': return <Pill size={24} weight={read ? "regular" : "duotone"} color={read ? "#94a3b8" : "#16a34a"} />;
+      case 'message': return <ChatsCircle size={24} weight={read ? "regular" : "duotone"} color={read ? "#94a3b8" : "#8b5cf6"} />;
+      case 'clinical': return <Stethoscope size={24} weight={read ? "regular" : "duotone"} color={read ? "#94a3b8" : "#db2777"} />;
+      default: return <Info size={24} weight={read ? "regular" : "duotone"} color={color} />;
     }
-  }
+  };
+
+  const getUrlForKind = (kind: string) => {
+    switch(kind) {
+      case 'message': return '/messages';
+      case 'appointment': return '/appointments';
+      case 'reminder': return '/calendar';
+      case 'clinical': return '/health/timeline';
+      case 'family': return '/health/family-hub';
+      case 'homecare': return '/home-care';
+      default: return '/notifications';
+    }
+  };
+
+  const handleNotificationClick = async (n: N) => {
+    // 1. Mark as read immediately if unread
+    if (!n.readAt) {
+      setItems(prev => prev.map(item => item.id === n.id ? { ...item, readAt: new Date().toISOString() } : item));
+      await fetch(`/api/notifications/${n.id}`, { method: 'PATCH' }).catch(() => null);
+    }
+    
+    // 2. Navigate to appropriate page
+    const url = getUrlForKind(n.kind);
+    if (url !== '/notifications') {
+      router.push(url);
+    }
+  };
 
   return (
     <div className="page" style={{ maxWidth: "800px" }}>
@@ -40,7 +67,7 @@ export default function Notifications(){
             <h1 style={{ fontSize: "28px", color: "#0f172a", margin: "8px 0" }}>Bildirimler</h1>
             <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Randevularınız, mesajlarınız ve diğer önemli güncellemeler.</p>
           </div>
-          {items.some(n=>!n.readAt) && (
+          {items.some(n => !n.readAt) && (
             <button onClick={mark} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "100px", border: "1px solid #cbd5e1", background: "#fff", color: "#475569", fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }} className="hover-shadow">
               <Checks size={18} /> Tümünü Okundu İşaretle
             </button>
@@ -49,8 +76,27 @@ export default function Notifications(){
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {items.map(n=>(
-          <div key={n.id} style={{ display: "flex", gap: "16px", padding: "20px", background: n.readAt ? "#f8fafc" : "#fff", borderRadius: "20px", border: "1px solid", borderColor: n.readAt ? "#e2e8f0" : "#bae6fd", opacity: n.readAt ? 0.7 : 1, position: "relative", overflow: "hidden", transition: "all 0.2s", boxShadow: n.readAt ? "none" : "0 4px 6px -1px rgba(2,132,199,0.05)" }}>
+        {items.map(n => (
+          <div 
+            key={n.id} 
+            onClick={() => handleNotificationClick(n)}
+            style={{ 
+              display: "flex", 
+              gap: "16px", 
+              padding: "20px", 
+              background: n.readAt ? "#f8fafc" : "#fff", 
+              borderRadius: "20px", 
+              border: "1px solid", 
+              borderColor: n.readAt ? "#e2e8f0" : "#bae6fd", 
+              opacity: n.readAt ? 0.7 : 1, 
+              position: "relative", 
+              overflow: "hidden", 
+              transition: "all 0.2s", 
+              boxShadow: n.readAt ? "none" : "0 4px 6px -1px rgba(2,132,199,0.05)",
+              cursor: "pointer"
+            }} 
+            className="hover-scale"
+          >
             {!n.readAt && <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "4px", background: "#0284c7" }} />}
             
             <div style={{ padding: "12px", background: n.readAt ? "#f1f5f9" : "#e0f2fe", borderRadius: "16px", height: "fit-content" }}>
