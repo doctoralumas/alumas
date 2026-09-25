@@ -52,7 +52,7 @@ export default function OtpPanel(){
             <input 
               value={phone} 
               onChange={e=>setPhone(e.target.value)} 
-              placeholder="+90 5xx xxx xx xx"
+              placeholder="555 123 45 67"
               style={{ width: "100%", padding: "14px 16px 14px 48px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }}
             />
           </div>
