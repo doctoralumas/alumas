@@ -1,5 +1,5 @@
 import type {NextConfig} from "next";
-const csp=["default-src 'self'","base-uri 'self'","frame-ancestors 'none'","object-src 'none'","img-src 'self' data: blob: https:","font-src 'self' data: https://fonts.gstatic.com","style-src 'self' 'unsafe-inline' https://fonts.googleapis.com","script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com","connect-src 'self' https: wss:","media-src 'self' blob: https: data:","worker-src 'self' blob:","form-action 'self'"].join('; ');
+const csp=["default-src 'self'","base-uri 'self'","frame-ancestors 'none'","object-src 'none'","img-src 'self' data: blob: https:","font-src 'self' data: https://fonts.gstatic.com","style-src 'self' 'unsafe-inline' https://fonts.googleapis.com","script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://www.gstatic.com","connect-src 'self' https: wss:","media-src 'self' blob: https: data:","worker-src 'self' blob:","form-action 'self'"].join('; ');
 const nextConfig:NextConfig={
   poweredByHeader:false,
   outputFileTracingExcludes: {
