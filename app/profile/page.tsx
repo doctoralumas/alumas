@@ -1,27 +1,32 @@
-import SectionVisual from "@/components/section-visual";
-import {redirect} from "next/navigation";
-import {currentUser} from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import LogoutButton from "@/components/logout-button";
 import OtpPanel from "@/components/otp-panel";
-import PushSettings from "@/components/push-settings";
-import PrivacyCenter from "@/components/privacy-center";
-import AccountControls from "@/components/account-controls";
-import FavoriteOrganizations from "@/components/favorite-organizations";
 import FavoriteDoctors from "@/components/favorite-doctors";
-import {prisma} from "@/lib/prisma";
-import { User, Briefcase, IdentificationCard, ShieldCheck, Heart, Buildings, Info, CaretRight, ShieldStar } from "@phosphor-icons/react/dist/ssr";
-import Link from "next/link";
+import FavoriteOrganizations from "@/components/favorite-organizations";
+import PrivacyCenter from "@/components/privacy-center";
+import PushSettings from "@/components/push-settings";
+import AccountControls from "@/components/account-controls";
+import PersonalInfoEditor from "@/components/personal-info-editor";
+import SectionVisual from "@/components/section-visual";
+import { User, Briefcase, IdentificationCard, ShieldCheck, ShieldStar, Heart, Buildings } from "@phosphor-icons/react/dist/ssr";
 
-export default async function Profile(){
-  const user=await currentUser();
-  if(!user) redirect('/login');
-  
-  const [orgCount,agencyCount]=await Promise.all([
-    prisma.organization.count({where:{ownerUserId:user.id}}),
-    prisma.healthTourismAgency.count({where:{ownerUserId:user.id}})
+export default async function ProfilePage() {
+  const user = await currentUser();
+  if (!user) return redirect("/login");
+
+  const [orgCount, agencyCount] = await Promise.all([
+    prisma.organization.count({ where: { ownerUserId: user.id } }),
+    prisma.healthTourismAgency.count({ where: { ownerUserId: user.id } })
   ]);
 
-  const displayRole = user.role === 'ADMIN' ? 'Yönetici' : user.role === 'DOCTOR' ? 'Uzman' : orgCount > 0 ? 'Kurum Yöneticisi' : agencyCount > 0 ? 'Sağlık Turizmi Yöneticisi' : 'Hasta';
+  const displayRole = user.role === "ADMIN" ? "Sistem Yöneticisi" 
+    : user.role === "DOCTOR" ? "Uzman / Doktor" 
+    : orgCount > 0 ? "Kurum Yöneticisi" 
+    : agencyCount > 0 ? "Sağlık Turizmi Yöneticisi"
+    : "Hasta / Son Kullanıcı";
 
   return (
     <div className="page" style={{ maxWidth: "1000px", margin: "0 auto", paddingBottom: "64px" }}>
@@ -40,7 +45,7 @@ export default async function Profile(){
         </div>
         <div style={{ flex: 1, minWidth: "200px" }}>
           <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", color: "#fff" }}>{user.name}</h2>
-          <p style={{ margin: "0 0 12px 0", color: "#94a3b8", fontSize: "16px" }}>{user.email}</p>
+          <p style={{ margin: "0 0 12px 0", color: "#94a3b8", fontSize: "16px" }}>{user.email.includes("@alumas.local") ? "E-posta adresi eklenmemiş" : user.email}</p>
           <span style={{ display: "inline-block", background: "rgba(56,189,248,0.2)", color: "#38bdf8", padding: "6px 16px", borderRadius: "100px", fontSize: "14px", fontWeight: 700, border: "1px solid rgba(56,189,248,0.3)" }}>
             {displayRole}
           </span>
@@ -55,6 +60,8 @@ export default async function Profile(){
         {/* Sol Kolon */}
         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
           
+          <PersonalInfoEditor initialName={user.name} initialEmail={user.email} />
+
           <section style={{ background: "#fff", padding: "32px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px", color: "#0f172a" }}>
               <Briefcase size={24} weight="duotone" color="#3b82f6" />
@@ -76,13 +83,13 @@ export default async function Profile(){
                 <Link href="/agency/apply" style={{ padding: "10px 20px", background: "#f1f5f9", color: "#475569", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Sağlık Turizmi Başvurusu</Link>
               )}
 
-              {user.role === 'DOCTOR' ? (
+              {user.role === "DOCTOR" ? (
                 <Link href="/doctor" style={{ padding: "10px 20px", background: "#0ea5e9", color: "#fff", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Uzman Paneli</Link>
               ) : (
                 <Link href="/onboarding/doctor" style={{ padding: "10px 20px", background: "#f1f5f9", color: "#475569", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Uzman Başvurusu</Link>
               )}
               
-              {user.role === 'ADMIN' && (
+              {user.role === "ADMIN" && (
                 <Link href="/admin" style={{ padding: "10px 20px", background: "#991b1b", color: "#fff", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Admin Paneli</Link>
               )}
             </div>
