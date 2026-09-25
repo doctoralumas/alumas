@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { registerNativePush } from "@/lib/native-push";
+import { registerWebPush } from "@/lib/web-push";
 import { BellRinging, BellSlash, WarningCircle } from "@phosphor-icons/react";
 
 export default function PushSettings() {
@@ -39,14 +40,12 @@ export default function PushSettings() {
         ({ token, platform } = native);
       } else {
         platform = "web";
-        if ("Notification" in window) {
-          const perm = await Notification.requestPermission();
-          if (perm !== "granted") {
-            setLoading(false);
-            return setMsg("Bildirim izni verilmedi.");
-          }
+        const webToken = await registerWebPush();
+        if (!webToken) {
+          setLoading(false);
+          return setMsg("Bildirim izni verilmedi veya desteklenmiyor.");
         }
-        token = "web-demo-" + crypto.randomUUID();
+        token = webToken;
       }
 
       const r = await fetch("/api/push", {
