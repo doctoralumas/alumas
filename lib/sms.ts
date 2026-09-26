@@ -27,7 +27,7 @@ export async function sendSms(phone: string, body: string) {
           sendDateTime: "",
           message: {
             text: body,
-            recepients: { number: [cleanPhone] }
+            receipents: { number: [cleanPhone] }
           }
         }
       }
