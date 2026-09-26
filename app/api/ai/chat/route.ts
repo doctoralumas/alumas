@@ -81,7 +81,7 @@ export async function POST(req: Request) {
       const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
           include: {
-            healthEntries: { orderBy: { measuredAt: 'desc' }, take: 3 },
+            doctorProfile: true, organizations: { select: { name: true, type: true } }, healthEntries: { orderBy: { measuredAt: 'desc' }, take: 3 },
             bodyMeasurements: { orderBy: { measuredAt: 'desc' }, take: 1 },
             bloodPressureReadings: { orderBy: { measuredAt: 'desc' }, take: 2 },
             glucoseReadings: { orderBy: { measuredAt: 'desc' }, take: 2 },
@@ -96,7 +96,21 @@ export async function POST(req: Request) {
         if (dbUser) {
            const firstName = (dbUser.name || 'Hastamız').split(' ')[0];
            const age = dbUser.birthDate ? Math.floor((new Date().getTime() - dbUser.birthDate.getTime()) / 3.15576e+10) : 'Bilinmiyor';
+
+           let userRoleStr = 'HASTA (Sağlık Takibi Yapan Kullanıcı)';
+           let hitap = firstName + ' Bey/Hanım';
            
+           if (dbUser.role === 'DOCTOR' && dbUser.doctorProfile) {
+              userRoleStr = 'UZMAN / DOKTOR (' + (dbUser.doctorProfile.title || '') + ' ' + (dbUser.doctorProfile.specialty || '') + ')';
+              hitap = (dbUser.doctorProfile.title || 'Doktor') + ' ' + firstName + ' Bey/Hanım';
+           } else if (dbUser.role === 'ORGANIZATION' && dbUser.organizations && dbUser.organizations.length > 0) {
+              userRoleStr = 'KURUM YETKİLİSİ (' + dbUser.organizations.map(o => o.name).join(', ') + ')';
+              hitap = 'Sayın Kurum Yetkilisi';
+           } else if (dbUser.role === 'ADMIN') {
+              userRoleStr = 'SİSTEM YÖNETİCİSİ';
+              hitap = 'Yönetici ' + firstName;
+           }
+
            let boyKiloStr = 'Bilinmiyor';
            if (dbUser.bodyMeasurements && dbUser.bodyMeasurements.length > 0) {
              const b = dbUser.bodyMeasurements[0];
@@ -114,8 +128,8 @@ export async function POST(req: Request) {
            const labsStr = dbUser.labResults?.map((l: any) => `- ${l.testName}: ${l.value} ${l.unit || ''} (Durum: ${l.status})`).join('\n');
            const plansStr = dbUser.carePlans?.map((cp: any) => `- ${cp.title}: ${cp.items.map((i: any) => i.title).join(', ')}`).join('\n');
   
-           personalizedContext = `\n\n--- HASTA SAĞLIK PROFİLİ ---
-  Kullanıcı Adı: ${dbUser.name}
+           personalizedContext = `\n\n--- KULLANICI PROFİLİ ---
+  Kullanıcı Adı: ${dbUser.name}\n    Sistemdeki Rolü: ${userRoleStr}
   Yaş: ${age}
   Vücut Ölçüleri: ${boyKiloStr}
   
@@ -139,7 +153,7 @@ export async function POST(req: Request) {
   Aktif Tedavi Planları:
   ${plansStr || 'Yok'}
   ----------------------------
-  LÜTFEN BU BİLGİLERİ KULLANARAK HASTAYA İSMİYLE (Örn: ${firstName} Bey/Hanım) HİTAP ET VE GEREKİRSE KRONİK HASTALIKLARIYLA, İLAÇLARIYLA VEYA ÖLÇÜMLERİYLE İLGİLİ BAĞLANTI KURARAK EMPATİK BİR YANIT VER. ANCAK KESİNLİKLE TIBBİ TANI KOYMA VEYA İLAÇ ÖNERME! SADECE DOĞRU UZMANLIĞA VEYA KURUMA YÖNLENDİR.`;
+  LÜTFEN BU BİLGİLERİ KULLANARAK KULLANICIYA SİSTEMDEKİ ROLÜNE UYGUN (Örn: ${hitap}) HİTAP ET. EĞER HASTA İSE KRONİK HASTALIKLARIYLA BAĞLANTI KUR. EĞER DOKTOR VEYA KURUM İSE ONLARA MESLEKTAŞ OLARAK YAKLAŞ VE ONLARA KENDİ HASTALARINI/KURUMLARINI YÖNETMELERİ İÇİN YARDIMCI OL, UZMAN GİBİ YAKLAŞ. KESİNLİKLE TIBBİ TANI KOYMA VEYA İLAÇ ÖNERME!`;
         }
       }
 
