@@ -33,7 +33,7 @@ export default function AccountControls(){
           href="/api/account/export"
           style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 24px", background: "#f1f5f9", color: "#0f172a", borderRadius: "100px", textDecoration: "none", fontWeight: 600, fontSize: "14px", border: "1px solid #e2e8f0" }}
         >
-          Tüm verilerimi JSON olarak indir
+          Tüm Sağlık ve Hesap Verilerimi İndir
         </a>
       </div>
 

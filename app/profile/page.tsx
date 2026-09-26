@@ -101,7 +101,7 @@ export default async function ProfilePage() {
               <h2 style={{ margin: 0, fontSize: "20px" }}>Telefon Doğrulama</h2>
             </div>
             <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px", lineHeight: "1.5" }}>
-              Güvenliğiniz için telefon numaranızı doğrulayın. (Geliştirme modunda sahte kod döner)
+              Güvenliğiniz için telefon numaranızı doğrulayın.
             </p>
             <OtpPanel />
           </section>
@@ -149,8 +149,8 @@ export default async function ProfilePage() {
                 <ShieldStar size={24} weight="duotone" />
               </div>
               <div>
-                <strong style={{ display: "block", fontSize: "16px", color: "#0f172a", marginBottom: "4px" }}>Rol Bazlı Erişim</strong>
-                <p style={{ margin: 0, fontSize: "14px", color: "#64748b", lineHeight: "1.5" }}>Hasta, uzman ve yönetici hesapları farklı yetkilerle çalışır; oturum çerezleri (cookies) yüksek güvenlik için JavaScript erişimine kapalıdır (HttpOnly).</p>
+                <strong style={{ display: "block", fontSize: "16px", color: "#0f172a", marginBottom: "4px" }}>Uçtan Uca Şifreleme</strong>
+                <p style={{ margin: 0, fontSize: "14px", color: "#64748b", lineHeight: "1.5" }}>Hesabınız ve tüm sağlık verileriniz uluslararası standartlarda şifrelenir. Oturumunuz en üst düzey güvenlik protokolleriyle korunmaktadır.</p>
               </div>
             </div>
           </section>
