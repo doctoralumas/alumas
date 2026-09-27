@@ -1,72 +1,128 @@
-import Link from "next/link";
-import { Search } from "@/components/icons";
-
-const tiles = [
-  {href:"/health", kicker:"Kişisel sağlık", title:"SAĞLIĞIM", text:"Tüm sağlık verilerin tek yerde", cls:"home-tile span7 row2", image:"/home-visuals/health_watch.webp"},
-  {href:"/doctors", kicker:"Uzmanlar", title:"DOKTOR BUL", text:"Uzman doktorları bul ve randevu al", cls:"home-tile span5 row2", image:"https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80"},
-  {href:"/nearby", kicker:"Konum", title:"YAKINIMDAKİLER", text:"Hastane, klinik, eczane, acil ve oteller", cls:"home-tile span4 row2", image:"https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80"},
-  {href:"/home-care", kicker:"Alumas Care", title:"EVDE SAĞLIK", text:"Doktor, hemşirelik veya numune alma", cls:"home-tile span4 row2", image:"https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=800&q=80"},
-  {href:"/emergency", kicker:"Acil erişim", title:"ACİL / 112", text:"Acil servis, ambulans ve sağlık kartına hızlı eriş", cls:"home-tile emergency span4 row2", image:"/home-visuals/emergency_siren.webp"},
-  {href:"/health-tourism", kicker:"Uluslararası sağlık", title:"SAĞLIK TURİZMİ", text:"Tedavi, konaklama ve ulaşım hizmetleri", cls:"home-tile navy span8 row2", image:"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80"},
-  {href:"/organizations", kicker:"Kurumlar", title:"HASTANE & KLİNİK", text:"Doğrulanmış sağlık kurumlarını keşfet", cls:"home-tile span4 row2", image:"https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=800&q=80"},
-  {href:"/health/cycle", kicker:"Kadın sağlığı", title:"REGL TAKİBİ", text:"Döngünü, akışını ve belirtilerini takip et", cls:"home-tile span4 row2", image:"/home-visuals/pink_cycle.webp"},
-  {href:"/health/medications", kicker:"Takip", title:"İLAÇLARIM", text:"İlaçlarını yönet ve hatırlatıcı kur", cls:"home-tile span4 row2", image:"/home-visuals/colorful_pills.webp"},
-  {href:"/health/labs", kicker:"Sonuçlar", title:"LABORATUVAR", text:"Tahlil sonuçlarını ve trendlerini görüntüle", cls:"home-tile span4 row2", image:"https://images.unsplash.com/photo-1579165466741-7f35e4755660?auto=format&fit=crop&w=800&q=80"},
-  {href:"/insurance", kicker:"Kapsam", title:"SİGORTALARIM", text:"Poliçe ve anlaşmalı kurumlarını yönet", cls:"home-tile span4 row2", image:"https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80"},
-  {href:"/calendar", kicker:"Plan", title:"TAKVİM", text:"Randevu ve hatırlatıcılarını gör", cls:"home-tile span4 row2", image:"https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&w=800&q=80"},
-  {href:"/health-card", kicker:"Acil sağlık özeti", title:"SAĞLIK KARTIM", text:"Önemli sağlık bilgilerini kontrollü paylaş", cls:"home-tile span4 row2", image:"/home-visuals/health_card_neon.webp"},
-  {href:"/profile", kicker:"Hesap", title:"PROFİL & HESAPLAR", text:"Hasta, doktor, kurum ve sağlık turizmi profillerini yönet", cls:"home-tile span4 row2", image:"https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"}
-];
-
-import { currentUser } from "@/lib/auth";
+import Link from 'next/link';
+import { MagnifyingGlass, Sparkle, CaretRight, ArrowRight, ShieldCheck, FileText, LockKey, Stethoscope, Hospital, Shield, HouseLine, MapPin, AirplaneTilt, Heart } from '@phosphor-icons/react/dist/ssr';
+import { currentUser } from '@/lib/auth';
+import LiveSearch from '@/components/live-search';
 
 export default async function Home(){
   const user = await currentUser();
 
-  return <div className="page home-getir">
-    <section className="home-getir-location">
-      <div><span className="home-location-pin">⌖</span><div><small>Konum</small><b>Yakınımdaki sağlık hizmetleri</b></div></div>
-      <div className="home-location-actions"><Link href="/nearby">Değiştir</Link></div>
-    </section>
-
-    <section className="home-getir-hero home-getir-hero-with-image">
-      <div className="home-hero-copy">
-        <span>ALUMAS</span>
-        <h1>Sağlığın için<br/>her şey tek yerde.</h1>
-        <p>Sağlık kayıtların, randevuların ve ihtiyaçların Alumas’ta.</p>
-        <Link className="home-search" href="/ai"><Search/> Asistan ile Keşfet</Link>
-      </div>
-      <img className="home-hero-image" src="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?auto=format&fit=crop&w=1200&q=80" alt="Alumas Health"/>
-    </section>
-
-    <section className="home-tile-grid home-image-grid">
-      {tiles.map(t=>
-        <Link href={t.href} className={t.cls} key={t.href}>
-          <div className="home-tile-copy">
-            <small>{t.kicker}</small>
-            <h2>{t.title}</h2>
-            <p>{t.text}</p>
-          </div>
-          <img className="home-tile-image" src={t.image} alt="" aria-hidden="true"/>
-          <span className="home-tile-arrow" aria-hidden="true">›</span>
-        </Link>
-      )}
-    </section>
-
-    <section className="home-emergency-strip">
-      <Link href="/emergency"><b>ACİL / 112</b><span>Hayati acil durumlarda hızlı erişim</span></Link>
-      <a href="tel:112"><b>112</b><span>Acil Ara</span></a>
-      <Link href="/nearby"><b>📍</b><span>En Yakın Acil</span></Link>
-      <Link href="/health-card"><b>🪪</b><span>Sağlık Kartım</span></Link>
-    </section>
-
-    {!user && (
-      <section className="home-account-row" style={{ marginTop: '24px' }}>
-        <Link href="/register"><b>Hasta hesabı</b><span>Kişisel sağlık profili</span></Link>
-        <Link href="/pro/register?type=doctor"><b>Doktor hesabı</b><span>Alumas Pro</span></Link>
-        <Link href="/pro/register?type=organization"><b>Kurum hesabı</b><span>Hastane · Klinik · Eczane</span></Link>
-        <Link href="/pro/register?type=agency"><b>Sağlık Turizmi</b><span>Acente & Koordinasyon</span></Link>
+  return (
+    <main className="new-home-layout">
+      
+      {/* HERO SECTION */}
+      <section className="new-hero">
+        <div className="new-hero-bg">
+          <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1600&q=80" alt="Alumas Health Platform" />
+        </div>
+        <div className="new-hero-content">
+          <h1>Sağlığın için<br/>doğru adresi bul.</h1>
+          <p>İhtiyacını anlat, sana uygun sağlık hizmetini keşfet.</p>
+          
+          <LiveSearch />
+        </div>
       </section>
-    )}
-  </div>
+
+      {/* QUICK LINKS */}
+      <section className="new-quick-links">
+        <Link href="/doctors" className="ql-card">
+          <div className="ql-icon doctor"><Stethoscope size={28} weight="duotone" /></div>
+          <span>Doktor Bul</span>
+          <CaretRight size={16} weight="bold" className="chevron" />
+        </Link>
+        <Link href="/organizations" className="ql-card">
+          <div className="ql-icon hospital"><Hospital size={28} weight="duotone" /></div>
+          <span>Hastane & Klinik</span>
+          <CaretRight size={16} weight="bold" className="chevron" />
+        </Link>
+        <Link href="/insurance" className="ql-card">
+          <div className="ql-icon insurance"><Shield size={28} weight="duotone" /></div>
+          <span>Sigortama Uygun</span>
+          <CaretRight size={16} weight="bold" className="chevron" />
+        </Link>
+        <Link href="/home-care" className="ql-card">
+          <div className="ql-icon home"><HouseLine size={28} weight="duotone" /></div>
+          <span>Evde Sağlık</span>
+          <CaretRight size={16} weight="bold" className="chevron" />
+        </Link>
+      </section>
+
+      {/* DISCOVER SECTION */}
+      <section className="new-discover">
+        <div className="discover-header">
+          <h2>Sağlık hizmetlerini keşfet</h2>
+          <Link href="/services">Tüm hizmetleri gör <ArrowRight size={16} weight="bold" /></Link>
+        </div>
+        
+        <div className="discover-grid">
+          <Link href="/nearby" className="discover-card">
+            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" alt="Yakınımdakiler" />
+            <div className="dc-content">
+              <div className="dc-icon map"><MapPin size={24} weight="fill" /></div>
+              <div className="dc-text">
+                <b>Yakınımdakiler</b>
+                <span>Sana en yakın doktor, hastane ve klinikleri keşfet.</span>
+              </div>
+              <CaretRight size={18} weight="bold" className="chevron" />
+            </div>
+          </Link>
+
+          <Link href="/health-tourism" className="discover-card">
+            <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" alt="Sağlık Turizmi" />
+            <div className="dc-content">
+              <div className="dc-icon flight"><AirplaneTilt size={24} weight="fill" /></div>
+              <div className="dc-text">
+                <b>Sağlık Turizmi</b>
+                <span>Türkiye'de dünya standartlarında sağlık hizmetleri.</span>
+              </div>
+              <CaretRight size={18} weight="bold" className="chevron" />
+            </div>
+          </Link>
+
+          <Link href="/health" className="discover-card">
+            <img src="/home-visuals/health_watch.webp" alt="Sağlığım" />
+            <div className="dc-content">
+              <div className="dc-icon heart"><Heart size={24} weight="fill" /></div>
+              <div className="dc-text">
+                <b>Sağlığım</b>
+                <span>Kendin ve sevdiklerin için sağlık çözümleri.</span>
+              </div>
+              <CaretRight size={18} weight="bold" className="chevron" />
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* TRUST SECTION */}
+      <section className="new-trust">
+        <div className="trust-main">
+          <h2>Güvenle karar ver</h2>
+          <p>Sağlık yolculuğunda yanında. Doğru bilgi, güvenilir sağlık kurumları ve senin için daha fazla güvenlik.</p>
+        </div>
+        <div className="trust-grid">
+          <div className="trust-item">
+            <ShieldCheck size={32} weight="duotone" className="trust-icon" />
+            <div>
+              <b>Doğrulanmış kurumlar</b>
+              <span>Sadece güvenilir ve onaylı sağlık kuruluşları</span>
+            </div>
+          </div>
+          <div className="trust-item">
+            <FileText size={32} weight="duotone" className="trust-icon" />
+            <div>
+              <b>Şeffaf bilgiler</b>
+              <span>Hizmetler, uzmanlıklar ve olanaklar hakkında net bilgi</span>
+            </div>
+          </div>
+          <div className="trust-item">
+            <LockKey size={32} weight="duotone" className="trust-icon" />
+            <div>
+              <b>Kişisel verilerin güvende</b>
+              <span>Verilerin KVKK standartlarına uygun şekilde korunur</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  );
 }

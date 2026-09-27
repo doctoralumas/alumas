@@ -29,7 +29,8 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
       imagingExams:{where:{isActive:true},orderBy:[{modality:'asc'},{name:'asc'}]},
       laboratoryTests:{where:{isActive:true},orderBy:[{category:'asc'},{name:'asc'}]},
       stocks:{take:20,orderBy:{updatedAt:'desc'}},
-      reviews:{where:{status:'APPROVED'},select:{rating:true}}
+      reviews:{where:{status:'APPROVED'},select:{rating:true}},
+      insuranceContracts:{include:{insuranceProvider:true}}
     }
   });
 
@@ -171,6 +172,32 @@ export default async function OrganizationProfile({params}:{params:Promise<{slug
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           <OrganizationOfferings type={o.type} services={o.services} imagingExams={o.imagingExams} laboratoryTests={o.laboratoryTests} />
+
+          {/* Anlaşmalı Sigortalar */}
+          {o.insuranceContracts && o.insuranceContracts.length > 0 && (
+            <div style={{ background: '#ffffff', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ background: '#f0fdfa', padding: '10px', borderRadius: '12px' }}><Heartbeat size={24} color="#0d9488" weight="duotone" /></div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Anlaşmalı Kurumlar</h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#64748b' }}>Platformumuzdaki onaylı sigorta şirketleri.</p>
+                </div>
+              </div>
+              <div style={{ padding: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+                {o.insuranceContracts.map((contract: any) => (
+                  <div key={contract.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ background: '#0d9488', borderRadius: '50%', padding: '4px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <CheckCircle size={16} weight="bold" />
+                    </div>
+                    <div>
+                      <b style={{ color: '#0f172a', fontSize: '15px', display: 'block' }}>{contract.insuranceProvider.name}</b>
+                      {contract.note && <span style={{ color: '#64748b', fontSize: '12px', marginTop: '2px', display: 'block' }}>{contract.note}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Pharmacy Stocks */}
           {o.type === 'PHARMACY' && (

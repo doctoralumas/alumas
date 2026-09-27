@@ -30,7 +30,7 @@ import {
   Trash,
 } from "@phosphor-icons/react/dist/ssr";
 
-type Props = { org: any };
+type Props = { org: any, globalInsurances?: any[] };
 const days = [
   "Pazar",
   "Pazartesi",
@@ -73,7 +73,7 @@ const emptyTest = {
   homeCollection: false,
 };
 
-export default function OrganizationManager({ org }: Props) {
+export default function OrganizationManager({ org, globalInsurances = [] }: Props) {
   const clinical = org.type === "HOSPITAL" || org.type === "CLINIC";
   const hospital = org.type === "HOSPITAL";
   const pharmacy = org.type === "PHARMACY";
@@ -157,6 +157,35 @@ export default function OrganizationManager({ org }: Props) {
   const [tests, setTests] = useState<any[]>(org.laboratoryTests || []);
   const [testForm, setTestForm] = useState(emptyTest);
   const [editingTestId, setEditingTestId] = useState<string | null>(null);
+
+  const [insuranceContracts, setInsuranceContracts] = useState<any[]>(org.insuranceContracts || []);
+  const [insuranceForm, setInsuranceForm] = useState({ providerId: "", note: "" });
+
+  async function addInsurance(e: any) {
+    e.preventDefault();
+    if (!insuranceForm.providerId) return;
+    const r = await fetch("/api/organizations/" + org.id + "/insurance", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ insuranceProviderId: insuranceForm.providerId, note: insuranceForm.note }),
+    });
+    const j = await r.json();
+    if (!r.ok) return setMsg(j.error || "Sigorta eklenemedi");
+    setInsuranceContracts(x => {
+      const filtered = x.filter(c => c.insuranceProviderId !== j.insuranceProviderId);
+      return [j, ...filtered];
+    });
+    setInsuranceForm({ providerId: "", note: "" });
+    setMsg("Sigorta kuruma eklendi");
+  }
+  async function removeInsurance(providerId: string) {
+    const r = await fetch("/api/organizations/" + org.id + "/insurance?providerId=" + providerId, { method: "DELETE" });
+    if (r.ok) {
+      setInsuranceContracts(x => x.filter(i => i.insuranceProviderId !== providerId));
+      setMsg("Sigorta anlaşması kaldırıldı");
+    }
+  }
+
 
   async function saveDepartment(e: any) {
     e.preventDefault();
@@ -862,6 +891,71 @@ export default function OrganizationManager({ org }: Props) {
           </form>
         </div>
       </details>
+
+      {/* Anlaşmalı Sigortalar */}
+      <details className="premium-accordion">
+        <summary className="premium-accordion-summary">
+          <div className="premium-accordion-header">
+            <div className="premium-accordion-icon" style={{ background: "#e0f2fe", color: "#0ea5e9" }}>
+              <Heartbeat size={28} weight="duotone" />
+            </div>
+            <div>
+              <h3 className="premium-accordion-title">Anlaşmalı Sigortalar</h3>
+              <p className="premium-accordion-desc">
+                Kurumunuzda geçerli olan tamamlayıcı veya özel sağlık sigortalarını buradan yönetin.
+              </p>
+            </div>
+          </div>
+          <CaretDown size={20} className="premium-chevron" />
+        </summary>
+        <div className="premium-accordion-content">
+          <form className="responsive-form-grid" onSubmit={addInsurance}>
+            <div className="responsive-form-field">
+              <label>Sigorta Firması Seçin</label>
+              <select 
+                value={insuranceForm.providerId} 
+                onChange={(e) => setInsuranceForm({ ...insuranceForm, providerId: e.target.value })}
+                required
+              >
+                <option value="">-- Listeden Seçin --</option>
+                {globalInsurances.map((ins: any) => (
+                  <option key={ins.id} value={ins.id}>{ins.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="responsive-form-field">
+              <label>Kuruma Özel Not (Opsiyonel)</label>
+              <input 
+                placeholder="Örn: Sadece Dahiliye bölümünde geçerlidir."
+                value={insuranceForm.note}
+                onChange={(e) => setInsuranceForm({ ...insuranceForm, note: e.target.value })}
+              />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <button className="primary" style={{ height: "46px", width: "100%" }}>Anlaşmalara Ekle</button>
+            </div>
+          </form>
+
+          {insuranceContracts.length > 0 && (
+            <div className="premium-card-list" style={{ marginTop: "20px" }}>
+              {insuranceContracts.map((contract: any) => (
+                <div key={contract.insuranceProviderId} className="premium-card-item">
+                  <div>
+                    <b style={{ fontSize: "16px", color: "#0f172a" }}>{contract.insuranceProvider?.name}</b>
+                    {contract.note && <div style={{ color: "#64748b", fontSize: "14px", marginTop: "4px" }}>{contract.note}</div>}
+                  </div>
+                  <div className="premium-card-item-actions">
+                    <button type="button" className="secondary danger" onClick={() => removeInsurance(contract.insuranceProviderId)}>
+                      <Trash size={16} /> Anlaşmayı İptal Et
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </details>
+
 
       <VerificationDocumentManager
         owner={{

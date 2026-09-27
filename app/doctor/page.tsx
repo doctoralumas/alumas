@@ -6,6 +6,7 @@ import DoctorAvailabilityManager from "@/components/doctor-availability-manager"
 import DoctorCompletionList from "@/components/doctor-completion-list";
 import CarePlanComposer from "@/components/care-plan-composer";
 import CareCalendar from "@/components/care-calendar";
+import DoctorInvites from "@/components/doctor-invites";
 import { Users, ShieldCheck, MapPin, Notepad, CalendarCheck, ChatCircleText, LockKey, VideoCamera, Storefront, FirstAidKit, CaretRight, User, CalendarBlank } from "@phosphor-icons/react/dist/ssr";
 
 export default async function DoctorDashboard() {
@@ -14,7 +15,7 @@ export default async function DoctorDashboard() {
 
   const now = new Date();
   
-  const [appointments, completable, patients] = await Promise.all([
+  const [appointments, completable, patients, invites] = await Promise.all([
     prisma.appointment.findMany({
       where: { doctorId: u.doctorProfile.id, status: "confirmed", startsAt: { gte: now } },
       include: { user: true },
@@ -30,6 +31,10 @@ export default async function DoctorDashboard() {
     prisma.user.findMany({
       where: { appointments: { some: { doctorId: u.doctorProfile.id } } },
       select: { id: true, name: true }
+    }),
+    prisma.organizationDoctorInvite.findMany({
+      where: { email: u.email, status: "PENDING" },
+      include: { organization: true }
     })
   ]);
 
@@ -44,6 +49,7 @@ export default async function DoctorDashboard() {
 
   return (
     <div className="page" style={{ maxWidth: "1100px" }}>
+      <DoctorInvites invites={invites} />
       <div className="page-title" style={{ marginBottom: "32px" }}>
         <span className="kicker">Uzman Paneli</span>
         <h1>Hoş Geldin, {u.name.split(" ")[0]}</h1>
