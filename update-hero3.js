@@ -1,4 +1,6 @@
-"use client";
+﻿const fs = require('fs');
+
+const fullCode = `"use client";
 import SectionVisual from "@/components/section-visual";
 import {useEffect,useState} from "react";
 import { MagnifyingGlass, AirplaneTilt, Suitcase, GlobeHemisphereWest, Buildings, ShieldCheck, Translate, CarProfile, CaretRight, PhoneCall, Link as LinkIcon, Star, Bed, Handshake } from "@phosphor-icons/react";
@@ -51,11 +53,11 @@ export default function Page(){
               onChange={e=>setQ(e.target.value)} 
               placeholder="Tedavi, şehir, klinik veya kategori ara..." 
               style={{ width: "100%", padding: "20px 20px 20px 52px", borderRadius: "20px", border: "2px solid #fff", background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(10px)", color: "#0f172a", fontSize: "16px", outline: "none", transition: "all 0.2s", boxShadow: "0 10px 25px -5px rgba(14, 165, 233, 0.1)" }}
-              onFocus={(e:any) => e.target.style.borderColor = "#38bdf8"}
-              onBlur={(e:any) => e.target.style.borderColor = "#fff"}
+              onFocus={(e) => e.target.style.borderColor = "#38bdf8"}
+              onBlur={(e) => e.target.style.borderColor = "#fff"}
             />
           </div>
-          <button type="submit" style={{ padding: "0 32px", borderRadius: "20px", border: "none", background: "#0ea5e9", color: "#fff", fontWeight: 700, fontSize: "16px", cursor: "pointer", boxShadow: "0 10px 25px -5px rgba(14, 165, 233, 0.3)", transition: "transform 0.2s" }} onMouseOver={(e:any) => e.currentTarget.style.transform = "translateY(-2px)"} onMouseOut={(e:any) => e.currentTarget.style.transform = "translateY(0)"}>
+          <button type="submit" style={{ padding: "0 32px", borderRadius: "20px", border: "none", background: "#0ea5e9", color: "#fff", fontWeight: 700, fontSize: "16px", cursor: "pointer", boxShadow: "0 10px 25px -5px rgba(14, 165, 233, 0.3)", transition: "transform 0.2s" }} onMouseOver={e => e.currentTarget.style.transform = "translateY(-2px)"} onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}>
             Ara
           </button>
         </form>
@@ -71,7 +73,7 @@ export default function Page(){
       </div>
 
       {/* Acenteler Section */}
-      <div style={{ marginBottom: "48px" }}>
+      <div style={{ marginBottom: "64px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
           <div style={{ background: "#e0e7ff", color: "#4f46e5", padding: "12px", borderRadius: "16px" }}><Suitcase size={24} weight="duotone" /></div>
           <div>
@@ -80,9 +82,9 @@ export default function Page(){
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "24px" }}>
+        <div style={{ display: "flex", gap: "24px", overflowX: "auto", paddingBottom: "16px", snapType: "x mandatory" }}>
           {agencies.map(a => (
-            <div key={a.id} style={{ background: "#fff", borderRadius: "24px", padding: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", gap: "16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
+            <div key={a.id} style={{ minWidth: "350px", background: "#fff", borderRadius: "24px", padding: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", gap: "16px", snapAlign: "start", transition: "all 0.2s" }} className="hover-shadow">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <h3 style={{ margin: 0, fontSize: "18px", color: "#0f172a", fontWeight: 700 }}>{a.name}</h3>
                 {a.isVerified && <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 700, padding: "4px 8px", background: "#ecfdf5", color: "#059669", borderRadius: "100px" }}><ShieldCheck size={14} weight="fill"/> Doğrulanmış</span>}
@@ -196,3 +198,6 @@ export default function Page(){
     </div>
   )
 }
+`;
+fs.writeFileSync('app/health-tourism/page.tsx', fullCode, 'utf8');
+console.log('REWRITTEN');
