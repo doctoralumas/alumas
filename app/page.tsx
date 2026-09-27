@@ -66,13 +66,13 @@ export default async function Home(){
             </div>
           </Link>
 
-          <Link href="/emergency" className="discover-card">
-            <img src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=800&q=80" alt="Acil & Nöbetçi" />
+          <Link href="/health-tourism" className="discover-card">
+            <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" alt="Sağlık Turizmi" />
             <div className="dc-content">
-              <div className="dc-icon flight" style={{ background: '#fef2f2', color: '#ef4444' }}><FirstAidKit size={24} weight="fill" /></div>
+              <div className="dc-icon flight" style={{ background: '#e0f2fe', color: '#0ea5e9' }}><AirplaneTilt size={24} weight="fill" /></div>
               <div className="dc-text">
-                <b>Acil & Nöbetçi</b>
-                <span>Nöbetçi eczaneler ve acil sağlık hizmetleri.</span>
+                <b>Sağlık Turizmi</b>
+                <span>Türkiye'de dünya standartlarında sağlık hizmetleri.</span>
               </div>
               <CaretRight size={18} weight="bold" className="chevron" />
             </div>

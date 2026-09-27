@@ -1,33 +1,12 @@
-"use client";
-import SectionVisual from "@/components/section-visual";
-import {useEffect,useState} from "react";
-import { MagnifyingGlass, AirplaneTilt, Suitcase, GlobeHemisphereWest, Buildings, ShieldCheck, Translate, CarProfile, CaretRight, PhoneCall, Link as LinkIcon, Star, Bed, Handshake } from "@phosphor-icons/react";
-import Link from "next/link";
+﻿const fs = require('fs');
+let content = fs.readFileSync('app/health-tourism/page.tsx', 'utf8');
 
-export default function Page(){
-  const [rows,setRows]=useState<any[]>([]);
-  const [agencies,setAgencies]=useState<any[]>([]);
-  const [q,setQ]=useState('');
-  const [loading,setLoading]=useState(true);
+const targetStr = '<div style={{ marginBottom: "40px", background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)"';
+if(content.includes(targetStr)) {
+  const p1 = content.split(targetStr);
+  const p2 = p1[1].split('</form>\n      </div>');
 
-  const load=async ()=>{
-    setLoading(true);
-    fetch('/api/health-tourism?q='+encodeURIComponent(q))
-      .then(r=>r.json())
-      .then(x=>setRows(Array.isArray(x)?x:[]))
-      .finally(()=>setLoading(false));
-  };
-  
-  useEffect(()=>{
-    load();
-    fetch('/api/health-tourism/agencies').then(r=>r.json()).then(x=>setAgencies(Array.isArray(x)?x:[]));
-  },[]);
-
-  return (
-    <div className="page" style={{ maxWidth: "1200px" }}>
-      <SectionVisual slug="health-tourism" alt="Sağlık Turizmi" />
-      
-      <div style={{ marginBottom: "48px", background: "linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%)", border: "1px solid #bae6fd", borderRadius: "32px", padding: "48px", color: "#0f172a", display: "flex", flexDirection: "column", gap: "28px", position: "relative", overflow: "hidden", boxShadow: "0 20px 40px -15px rgba(14, 165, 233, 0.15)" }}>
+  const newHero = `<div style={{ marginBottom: "48px", background: "linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%)", border: "1px solid #bae6fd", borderRadius: "32px", padding: "48px", color: "#0f172a", display: "flex", flexDirection: "column", gap: "28px", position: "relative", overflow: "hidden", boxShadow: "0 20px 40px -15px rgba(14, 165, 233, 0.15)" }}>
         <AirplaneTilt size={300} weight="duotone" color="#0ea5e9" style={{ position: "absolute", right: "-40px", top: "-40px", opacity: 0.08, transform: "rotate(15deg)" }} />
         
         <div style={{ position: "relative", zIndex: 1 }}>
@@ -59,4 +38,11 @@ export default function Page(){
             Ara
           </button>
         </form>
-      </div>undefined
+      </div>`;
+
+  content = p1[0] + newHero + p2[1];
+  fs.writeFileSync('app/health-tourism/page.tsx', content, 'utf8');
+  console.log('SUCCESS');
+} else {
+  console.log('Target string not found!');
+}
