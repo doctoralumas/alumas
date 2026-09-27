@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Buildings, Check, X, EnvelopeSimpleOpen } from "@phosphor-icons/react/dist/ssr";
@@ -11,7 +11,7 @@ export default function DoctorInvites({ invites: initialInvites }: { invites: an
 
   async function handleInvite(id: string, action: "ACCEPT" | "DECLINE") {
     setLoading(id);
-    const r = await fetch(/api/organization-invites/ + id, {
+    const r = await fetch(`/api/organization-invites/${id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ action }),
