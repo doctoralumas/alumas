@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import SectionVisual from "@/components/section-visual";
 import {useEffect,useState} from "react";
 import { MagnifyingGlass, AirplaneTilt, Suitcase, GlobeHemisphereWest, Buildings, ShieldCheck, Translate, CarProfile, CaretRight, PhoneCall, Link as LinkIcon, Star, Bed, Handshake } from "@phosphor-icons/react";
@@ -25,7 +25,7 @@ export default function Page(){
 
   return (
     <div className="page" style={{ maxWidth: "1200px" }}>
-      <SectionVisual slug="health-tourism" alt="Sağlık Turizmi" />
+      <SectionVisual slug="health-tourism" alt="Sa─şl─▒k Turizmi" />
       
       <div style={{ marginBottom: "48px", background: "linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%)", border: "1px solid #bae6fd", borderRadius: "32px", padding: "48px", color: "#0f172a", display: "flex", flexDirection: "column", gap: "28px", position: "relative", overflow: "hidden", boxShadow: "0 20px 40px -15px rgba(14, 165, 233, 0.15)" }}>
         <AirplaneTilt size={300} weight="duotone" color="#0ea5e9" style={{ position: "absolute", right: "-40px", top: "-40px", opacity: 0.08, transform: "rotate(15deg)" }} />
