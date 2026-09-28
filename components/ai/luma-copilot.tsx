@@ -21,11 +21,11 @@ export default function LumaCopilot() {
         onClick={() => setIsOpen(!isOpen)}
         style={{
           position: "fixed",
-          bottom: "84px", // Above mobile bottom nav
-          right: "20px",
-          width: "60px",
-          height: "60px",
-          borderRadius: "30px",
+          bottom: "calc(74px + env(safe-area-inset-bottom, 0px))",
+          right: "10px",
+          width: "42px",
+          height: "42px",
+          borderRadius: "21px",
           background: "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)",
           color: "#fff",
           border: "none",
@@ -39,8 +39,9 @@ export default function LumaCopilot() {
           transform: isOpen ? "scale(0.9)" : "scale(1)",
         }}
         aria-label="Luma Asistanı Aç"
+        className="luma-floating-btn"
       >
-        {isOpen ? <X size={28} weight="bold" /> : <Sparkle size={32} weight="fill" />}
+        {isOpen ? <X size={20} weight="bold" /> : <Sparkle size={22} weight="fill" />}
       </button>
 
       {/* The Popover Window */}
@@ -92,9 +93,16 @@ export default function LumaCopilot() {
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @media (min-width: 768px) {
-          button[aria-label="Luma Asistanı Aç"] {
+          .luma-floating-btn {
             bottom: 40px !important;
             right: 40px !important;
+            width: 60px !important;
+            height: 60px !important;
+            border-radius: 30px !important;
+          }
+          .luma-floating-btn svg {
+            width: 32px !important;
+            height: 32px !important;
           }
           div[style*="bottom: 160px"] {
             bottom: 120px !important;

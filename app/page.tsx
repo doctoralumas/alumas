@@ -1,128 +1,513 @@
 import Link from 'next/link';
-import { MagnifyingGlass, Sparkle, CaretRight, ArrowRight, ShieldCheck, FileText, LockKey, Stethoscope, Hospital, Shield, HouseLine, MapPin, AirplaneTilt, Heart, FirstAidKit } from '@phosphor-icons/react/dist/ssr';
+import { ShieldCheck, FileText, LockKey } from '@phosphor-icons/react/dist/ssr';
 import { currentUser } from '@/lib/auth';
 import LiveSearch from '@/components/live-search';
+import CampaignCarousel from '@/components/ui/campaign-carousel';
 
-export default async function Home(){
+export default async function Home() {
   const user = await currentUser();
 
   return (
-    <main className="new-home-layout">
+    <main className="superapp-home">
       
-      {/* HERO SECTION */}
-      <section className="new-hero">
-        <div className="new-hero-bg">
-          <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1600&q=80" alt="Alumas Health Platform" />
-        </div>
-        <div className="new-hero-content">
-          <h1>Sağlığın için<br/>doğru adresi bul.</h1>
-          <p>İhtiyacını anlat, sana uygun sağlık hizmetini keşfet.</p>
-          
+      {/* 
+        1. CAMPAIGN HERO CAROUSEL 
+        Premium data-driven slide component
+      */}
+      <CampaignCarousel />
+
+      {/* 
+        2. SEARCH MODULE (DESKTOP ONLY)
+        Hidden on mobile to preserve app-like hierarchy
+      */}
+      <section className="superapp-search-section desktop-only-search">
+        <div className="superapp-container">
           <LiveSearch />
         </div>
       </section>
 
-      {/* QUICK LINKS */}
-      <section className="new-quick-links">
-        <Link href="/doctors" className="ql-card">
-          <div className="ql-icon doctor"><Stethoscope size={28} weight="duotone" /></div>
-          <span>Doktor Bul</span>
-          <CaretRight size={16} weight="bold" className="chevron" />
-        </Link>
-        <Link href="/organizations" className="ql-card">
-          <div className="ql-icon hospital"><Hospital size={28} weight="duotone" /></div>
-          <span>Hastane & Klinik</span>
-          <CaretRight size={16} weight="bold" className="chevron" />
-        </Link>
-        <Link href="/insurance" className="ql-card">
-          <div className="ql-icon insurance"><Shield size={28} weight="duotone" /></div>
-          <span>Sigortama Uygun</span>
-          <CaretRight size={16} weight="bold" className="chevron" />
-        </Link>
-        <Link href="/home-care" className="ql-card">
-          <div className="ql-icon home"><HouseLine size={28} weight="duotone" /></div>
-          <span>Evde Sağlık</span>
-          <CaretRight size={16} weight="bold" className="chevron" />
-        </Link>
+      {/* 
+        3. SERVICE TILE SYSTEM
+        Unified 2-column grid, tall cards, white backgrounds, large cutout imagery
+      */}
+      <section className="superapp-services-section">
+        <div className="superapp-container">
+          
+          <div className="superapp-unified-grid">
+            
+            <Link href="/doctors" className="superapp-card">
+              <div className="card-text-area">
+                <h2>Doktor Bul</h2>
+              </div>
+              <div className="card-visual-area">
+                <img src="/assets/services/3.jpg?v=2" alt="Doktor Bul" className="doctor-visual" />
+              </div>
+            </Link>
+
+            <Link href="/organizations" className="superapp-card">
+              <div className="card-text-area">
+                <h2>Hastane & Klinik</h2>
+              </div>
+              <div className="card-visual-area">
+                <img src="/assets/services/hospital.jpg" alt="Hastane ve Klinik İçi" className="env-visual hospital-visual" />
+              </div>
+            </Link>
+
+            <Link href="/nearby" className="superapp-card">
+              <div className="card-text-area">
+                <h2>Yakınımdakiler</h2>
+              </div>
+              <div className="card-visual-area">
+                <img src="/assets/services/nearby.jpg" alt="Yakınımdakiler Harita" className="nearby-visual" />
+              </div>
+            </Link>
+
+            <Link href="/health-tourism" className="superapp-card">
+              <div className="card-text-area">
+                <h2>Sağlık Turizmi</h2>
+              </div>
+              <div className="card-visual-area">
+                <img src="/assets/services/2.jpg?v=2" alt="Sağlık Turizmi Seyahat" className="env-visual tourism-visual" />
+              </div>
+            </Link>
+
+            <Link href="/health" className="superapp-card">
+              <div className="card-text-area">
+                <h2>Sağlığım</h2>
+              </div>
+              <div className="card-visual-area">
+                <img src="/assets/services/my-health.jpg" alt="Sağlık takibi için akıllı saat" className="health-visual" />
+              </div>
+            </Link>
+
+            <Link href="/insurance" className="superapp-card">
+              <div className="card-text-area">
+                <h2>Sigortama Uygun</h2>
+              </div>
+              <div className="card-visual-area">
+                <img src="/assets/services/1.jpg?v=2" alt="Sigorta Uygulaması" className="insurance-visual" />
+              </div>
+            </Link>
+
+            <Link href="/home-care" className="superapp-card">
+              <div className="card-text-area">
+                <h2>Evde Sağlık</h2>
+              </div>
+              <div className="card-visual-area">
+                <img src="/assets/services/home-health.jpg" alt="Evde Sağlık Bakımı" className="env-visual home-health-visual" />
+              </div>
+            </Link>
+
+          </div>
+
+        </div>
       </section>
 
-      {/* DISCOVER SECTION */}
-      <section className="new-discover">
-        <div className="discover-header">
-          <h2>Sağlık hizmetlerini keşfet</h2>
-          <Link href="/services">Tüm hizmetleri gör <ArrowRight size={16} weight="bold" /></Link>
+      {/* 
+        4. TRUST SECTION 
+      */}
+      <section className="superapp-trust-section">
+        <div className="superapp-container">
+          <div className="superapp-trust-module">
+            <div className="trust-header">
+              <h2>Güvenle Karar Ver</h2>
+            </div>
+            
+            <div className="trust-grid">
+              <div className="trust-item">
+                <div className="trust-icon-box"><ShieldCheck size={24} weight="fill" /></div>
+                <div className="trust-content">
+                  <h4>Doğrulanmış kurumlar</h4>
+                  <p>Sadece güvenilir onaylı kuruluşlar</p>
+                </div>
+              </div>
+              <div className="trust-item">
+                <div className="trust-icon-box"><FileText size={24} weight="fill" /></div>
+                <div className="trust-content">
+                  <h4>Şeffaf bilgiler</h4>
+                  <p>Hizmetler hakkında net bilgi</p>
+                </div>
+              </div>
+              <div className="trust-item">
+                <div className="trust-icon-box"><LockKey size={24} weight="fill" /></div>
+                <div className="trust-content">
+                  <h4>Kişisel veriler güvende</h4>
+                  <p>KVKK standartlarına uygun</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* BASE SYSTEM */
+        .superapp-home {
+          background-color: #f8fafc; /* Very light cool gray */
+          min-height: 100vh;
+          padding-bottom: 100px;
+          font-family: system-ui, -apple-system, sans-serif;
+        }
+        .superapp-container {
+          max-width: 1360px;
+          margin: 0 auto;
+          padding: 0 24px;
+        }
+        @media (min-width: 1600px) {
+          .superapp-container {
+            max-width: 1400px;
+          }
+        }
+        @media (max-width: 768px) {
+          .superapp-container {
+            padding: 0 16px;
+          }
+        }
+
+        /* 1. CAMPAIGN CAROUSEL */
+
+        /* 2. SEARCH MODULE (Desktop Only) */
+        .superapp-search-section {
+          margin-bottom: 40px;
+        }
+        .desktop-only-search {
+          display: block;
+        }
+
+        /* 3. SERVICE TILES */
+        .superapp-services-section {
+          margin-bottom: 48px;
+        }
+        .superapp-unified-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+        }
+
+        /* TILE ARCHITECTURE */
+        .superapp-card {
+          background: white;
+          border-radius: 20px;
+          position: relative;
+          overflow: hidden;
+          text-decoration: none;
+          box-shadow: 0 4px 16px rgba(15,23,42,0.03);
+          display: flex;
+          flex-direction: column;
+          aspect-ratio: 1 / 1; /* Pure squares on desktop too for density */
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .superapp-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 24px rgba(15,23,42,0.06);
+        }
         
-        <div className="discover-grid">
-          <Link href="/nearby" className="discover-card">
-            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" alt="Yakınımdakiler" />
-            <div className="dc-content">
-              <div className="dc-icon map"><MapPin size={24} weight="fill" /></div>
-              <div className="dc-text">
-                <b>Yakınımdakiler</b>
-                <span>Sana en yakın doktor, hastane ve klinikleri keşfet.</span>
-              </div>
-              <CaretRight size={18} weight="bold" className="chevron" />
-            </div>
-          </Link>
+        /* EXPLICIT TILE TERRITORIES */
+        .card-text-area {
+          padding: 20px 20px 0 20px;
+          position: relative;
+          z-index: 2;
+          flex: 0 0 auto;
+          height: 25%; /* Reserve upper 25% */
+        }
+        .card-visual-area {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 75%; /* Dominant visual area 75% */
+          z-index: 1;
+        }
+        
+        /* TEXT STYLING */
+        .superapp-card h2 {
+          margin: 0;
+          font-size: 20px;
+          font-weight: 800;
+          color: #0b2545;
+          letter-spacing: -0.3px;
+          line-height: 1.1;
+        }
 
-          <Link href="/health-tourism" className="discover-card">
-            <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" alt="Sağlık Turizmi" />
-            <div className="dc-content">
-              <div className="dc-icon flight" style={{ background: '#e0f2fe', color: '#0ea5e9' }}><AirplaneTilt size={24} weight="fill" /></div>
-              <div className="dc-text">
-                <b>Sağlık Turizmi</b>
-                <span>Türkiye'de dünya standartlarında sağlık hizmetleri.</span>
-              </div>
-              <CaretRight size={18} weight="bold" className="chevron" />
-            </div>
-          </Link>
+        /* IMAGE STYLING: OBJECT-BASED COMPOSITION */
+        .card-visual-area img {
+          position: absolute;
+          bottom: 0;
+          right: -5%;
+          width: 110%; /* Scale up significantly */
+          height: 110%;
+          object-fit: contain; 
+          object-position: bottom right;
+          mix-blend-mode: darken; /* Makes white background invisible */
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-visual-area img.env-visual {
+          width: 100%;
+          height: 100%;
+          right: 0;
+          object-fit: cover;
+          object-position: bottom center;
+          mix-blend-mode: normal; /* Env visuals do not darken */
+          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
+          mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
+          border-bottom-left-radius: 20px;
+          border-bottom-right-radius: 20px;
+        }
 
-          <Link href="/health" className="discover-card">
-            <img src="/home-visuals/health_watch.webp" alt="Sağlığım" />
-            <div className="dc-content">
-              <div className="dc-icon heart"><Heart size={24} weight="fill" /></div>
-              <div className="dc-text">
-                <b>Sağlığım</b>
-                <span>Kendin ve sevdiklerin için sağlık çözümleri.</span>
-              </div>
-              <CaretRight size={18} weight="bold" className="chevron" />
-            </div>
-          </Link>
-        </div>
-      </section>
+        /* SPECIFIC IMAGE CROPPING & INTEGRATION TO REMOVE INNER-CARD FEELING */
+        
+        .card-visual-area img.doctor-visual {
+          width: 165%;
+          height: 165%;
+          right: -25%;
+          bottom: -15%;
+          object-position: center bottom;
+          filter: contrast(1.04) brightness(1.02); /* Very subtle to protect natural skin tones */
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
+          mask-image: linear-gradient(to right, transparent 0%, black 20%);
+        }
 
-      {/* TRUST SECTION */}
-      <section className="new-trust">
-        <div className="trust-main">
-          <h2>Güvenle karar ver</h2>
-          <p>Sağlık yolculuğunda yanında. Doğru bilgi, güvenilir sağlık kurumları ve senin için daha fazla güvenlik.</p>
-        </div>
-        <div className="trust-grid">
-          <div className="trust-item">
-            <ShieldCheck size={32} weight="duotone" className="trust-icon" />
-            <div>
-              <b>Doğrulanmış kurumlar</b>
-              <span>Sadece güvenilir ve onaylı sağlık kuruluşları</span>
-            </div>
-          </div>
-          <div className="trust-item">
-            <FileText size={32} weight="duotone" className="trust-icon" />
-            <div>
-              <b>Şeffaf bilgiler</b>
-              <span>Hizmetler, uzmanlıklar ve olanaklar hakkında net bilgi</span>
-            </div>
-          </div>
-          <div className="trust-item">
-            <LockKey size={32} weight="duotone" className="trust-icon" />
-            <div>
-              <b>Kişisel verilerin güvende</b>
-              <span>Verilerin KVKK standartlarına uygun şekilde korunur</span>
-            </div>
-          </div>
-        </div>
-      </section>
+        .card-visual-area img.insurance-visual {
+          width: 165%; /* Extreme zoom to push baked-in JPEG frame out of view */
+          height: 165%;
+          right: -28%;
+          bottom: -22%;
+          object-position: center center;
+        }
 
+        .card-visual-area img.nearby-visual {
+          width: 140%; /* Reduced slightly from 150% to prevent cramping */
+          height: 140%;
+          right: -8%; /* Shifted ~12% left for optical centering */
+          bottom: -10%; /* Comfortable bottom anchor */
+          filter: contrast(1.04) brightness(1.02);
+          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
+          mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
+        }
+
+        .card-visual-area img.health-visual {
+          width: 125%;
+          height: 125%;
+          right: -10%;
+          bottom: -5%;
+        }
+        
+        /* Hospital and Home-Health have baked-in rounded frames in the JPEG. Zoom in heavily to crop them out. */
+        .card-visual-area img.hospital-visual {
+          width: 155%; /* Safe scale to crop frame but retain architectural context */
+          height: 155%;
+          right: -27.5%;
+          left: auto;
+          bottom: -25%;
+          object-position: center bottom;
+          -webkit-mask-image: linear-gradient(to bottom, transparent 15%, black 40%);
+          mask-image: linear-gradient(to bottom, transparent 15%, black 40%);
+        }
+
+        .card-visual-area img.home-health-visual {
+          width: 125%;
+          height: 125%;
+          right: -12.5%;
+          left: auto;
+          bottom: -12.5%;
+          object-position: center bottom;
+        }
+
+        .superapp-card:hover .card-visual-area img {
+          transform: scale(1.04) translateY(-2%);
+        }
+
+        /* 4. TRUST SECTION */
+        .superapp-trust-section {
+          margin-bottom: 40px;
+        }
+        .superapp-trust-module {
+          background: white;
+          border-radius: 24px;
+          padding: 32px;
+          box-shadow: 0 4px 16px rgba(15,23,42,0.03);
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+        .trust-header h2 {
+          margin: 0;
+          font-size: 20px;
+          font-weight: 800;
+          color: #0b2545;
+        }
+        .trust-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+        }
+        .trust-item {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .trust-icon-box {
+          background: #f8fafc;
+          color: #0ea5e9;
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .trust-content h4 {
+          margin: 0 0 2px 0;
+          font-size: 14px;
+          font-weight: 700;
+          color: #0f172a;
+        }
+        .trust-content p {
+          margin: 0;
+          font-size: 13px;
+          color: #64748b;
+          line-height: 1.4;
+        }
+
+        /* RESPONSIVENESS */
+        @media (max-width: 1024px) {
+          .superapp-unified-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .desktop-only-search {
+            display: none !important;
+          }
+
+          .superapp-unified-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+          .superapp-card {
+            border-radius: 18px;
+            aspect-ratio: 1 / 1.1; /* Slightly taller than square */
+          }
+          .card-text-area {
+            padding: 14px 14px 0 14px;
+            height: 25%;
+          }
+          .superapp-card h2 { 
+            font-size: 15px; 
+          }
+          
+          /* Visual dominance in mobile tiles */
+          .card-visual-area {
+            height: 75%;
+          }
+          .card-visual-area img {
+            width: 110%;
+            height: 110%;
+            right: -5%;
+            bottom: 0;
+            object-fit: contain;
+            mix-blend-mode: darken;
+          }
+          .card-visual-area img.env-visual {
+            width: 100%;
+            height: 100%;
+            right: 0;
+            left: 0;
+            object-fit: cover;
+            mix-blend-mode: normal;
+          }
+          
+          /* MOBILE-SPECIFIC COLLISION & INTEGRATION FIXES */
+          
+          .card-visual-area img.doctor-visual {
+            width: 155%;
+            height: 155%;
+            right: -25%;
+            bottom: -25%; /* Pulled down to avoid text collision on taller mobile card */
+          }
+          
+          .card-visual-area img.insurance-visual {
+            width: 160%;
+            height: 160%;
+            right: -30%;
+            bottom: -30%; /* Protects title area while keeping scale large enough to hide frame */
+          }
+          
+          .card-visual-area img.nearby-visual {
+            width: 130%;
+            height: 130%;
+            right: -5%;
+            bottom: -15%;
+          }
+          
+          /* MOBILE STRUCTURAL FIX FOR ENVIRONMENTAL CARDS */
+          .superapp-card:has(.hospital-visual) .card-visual-area,
+          .superapp-card:has(.home-health-visual) .card-visual-area {
+            height: 100%; /* Full bleed architectural change */
+          }
+          
+          /* Subtle white scrim layered between image and title */
+          .superapp-card:has(.hospital-visual) .card-visual-area::after,
+          .superapp-card:has(.home-health-visual) .card-visual-area::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0) 45%);
+            z-index: 1;
+            pointer-events: none;
+          }
+
+          /* Ensure text area stays above the scrim */
+          .superapp-card:has(.hospital-visual) .card-text-area,
+          .superapp-card:has(.home-health-visual) .card-text-area {
+            position: relative;
+            z-index: 2;
+          }
+          
+          /* Remove previous massive hacks, use full-bleed structure */
+          .card-visual-area img.hospital-visual,
+          .card-visual-area img.home-health-visual {
+            width: 125%; /* Small zoom only to crop the drawn frame inside the original JPEG */
+            height: 125%;
+            right: -12.5%;
+            bottom: -12.5%;
+            left: auto;
+            object-fit: cover;
+            mix-blend-mode: normal;
+            -webkit-mask-image: none;
+            mask-image: none;
+            filter: none;
+            z-index: 0;
+          }
+          
+          .card-visual-area img.hospital-visual {
+            object-position: 50% 80%; /* Keeps architectural context and reception visible */
+          }
+          
+          .card-visual-area img.home-health-visual {
+            object-position: 50% 65%; /* Keeps both faces and interaction perfectly visible */
+          }
+          
+          .card-visual-area img.health-visual {
+            width: 120%;
+            height: 120%;
+            right: -10%;
+            bottom: -10%;
+          }
+          
+          /* Trust */
+          .superapp-trust-module {
+            padding: 24px 16px;
+            border-radius: 20px;
+          }
+          .trust-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+        }
+      `}} />
     </main>
   );
 }

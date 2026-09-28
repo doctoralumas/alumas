@@ -1,9 +1,9 @@
 "use client";
+
 import Link from "next/link"; 
 import { useEffect, useState } from "react"; 
 import { usePathname, useRouter } from "next/navigation";
-import { ShieldCheck } from "./icons";
-import { CaretLeft, Bell } from "@phosphor-icons/react";
+import { CaretLeft, Bell, User, ShieldCheck } from "@phosphor-icons/react";
 
 type Me = { name: string; role: "PATIENT" | "DOCTOR" | "ADMIN"; doctorSlug?: string | null } | null;
 
@@ -29,73 +29,198 @@ export default function Header() {
   const hideBackOn = ["/", "/login", "/register", "/pro/login", "/pro/register"];
   const showBack = pathname && !hideBackOn.includes(pathname);
 
-  const handleBack = () => {
-    const isInternal = document.referrer && document.referrer.includes(window.location.host);
-    if (isInternal) {
-      router.back();
-    } else {
-      if (pathname.startsWith('/health/')) router.push('/services');
-      else if (pathname.startsWith('/doctor/patients/')) router.push('/doctor');
-      else if (pathname.startsWith('/admin/')) router.push('/admin');
-      else router.push('/');
-    }
-  };
-
   return (
-    <header className="site-header">
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        {showBack && (
-          <button 
-            onClick={handleBack} 
-            className="back-btn"
-            style={{ 
-              display: "flex", alignItems: "center", justifyContent: "center", 
-              width: "36px", height: "36px", borderRadius: "10px", 
-              border: "1px solid rgba(18,63,107,0.1)", cursor: "pointer", 
-              background: "#fff", color: "#123f6b", transition: "all 0.2s ease",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.background = "#f0f4f8"; e.currentTarget.style.borderColor = "rgba(18,63,107,0.2)"; }}
-            onMouseOut={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = "rgba(18,63,107,0.1)"; }}
-            aria-label="Geri"
-            title="Geri Dön"
-          >
-            <CaretLeft size={20} weight="bold" />
-          </button>
-        )}
-        <Link href="/" className="brand brand-with-logo">
-          <img src="/brand/alumas-logo.png" alt="Alumas" />
-          <span>ALUMAS</span>
-        </Link>
+    <header className="superapp-header">
+      <div className="superapp-header-container">
+        <div className="superapp-header-left">
+          {showBack && (
+            <button onClick={() => router.back()} className="superapp-back-btn" aria-label="Geri">
+              <CaretLeft size={22} weight="bold" />
+            </button>
+          )}
+          <Link href="/" className="superapp-brand">
+            {/* Using text logo for pure branded look, or we can use img if it's white */}
+            <span className="superapp-brand-text">ALUMAS</span>
+          </Link>
+        </div>
+
+        <div className="superapp-header-right">
+          <div className="superapp-desktop-only">
+             <Link className="superapp-pill-light" href="/ai">Luma Asistan</Link>
+             <Link className="superapp-pill-light" href="/services">Tüm Hizmetler</Link>
+             <div className="superapp-secure-badge"><ShieldCheck size={16} weight="fill" /> Güvenli Alan</div>
+          </div>
+
+          {me ? (
+            <div className="superapp-user-actions">
+              <Link href="/notifications" className="superapp-notification-btn" title="Bildirimler">
+                <Bell size={22} weight="fill" />
+                {unreadNotifications > 0 && (
+                  <span className="superapp-notification-badge">
+                    {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                  </span>
+                )}
+              </Link>
+              <Link className="superapp-profile-btn" href="/profile">
+                <User size={18} weight="bold" className="superapp-mobile-icon" />
+                <span className="superapp-desktop-text">{me.name.split(" ")[0]}</span>
+              </Link>
+            </div>
+          ) : (
+            <Link className="superapp-profile-btn" href="/login">Giriş Yap</Link>
+          )}
+        </div>
       </div>
 
-      <div className="header-actions">
-        <Link className="secondary compact" href="/ai">Luma Asistan</Link>
-        <Link className="secondary compact" href="/services">Tüm Hizmetler</Link>
-        <div className="secure"><ShieldCheck size={17} /> Güvenli sağlık alanı</div>
-        {me ? (
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <Link href="/notifications" style={{ position: "relative", display: "flex", alignItems: "center", color: "#123f6b" }} title="Bildirimler">
-              <Bell size={24} weight="duotone" />
-              {unreadNotifications > 0 && (
-                <span style={{
-                  position: "absolute", top: "-4px", right: "-4px",
-                  background: "#ef4444", color: "white", fontSize: "10px", fontWeight: "bold",
-                  padding: "2px 5px", borderRadius: "10px", border: "2px solid white",
-                  minWidth: "16px", textAlign: "center", lineHeight: 1
-                }}>
-                  {unreadNotifications > 99 ? "99+" : unreadNotifications}
-                </span>
-              )}
-            </Link>
-            <Link className="account-pill" href="/profile">
-              {me.name.split(" ")[0]}
-            </Link>
-          </div>
-        ) : (
-          <Link className="secondary compact" href="/login">Giriş yap</Link>
-        )}
-      </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .superapp-header {
+          background: #0b2545; /* Deep brand blue, like Getir's purple */
+          color: white;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          width: 100%;
+        }
+        .superapp-header-container {
+          max-width: 1360px;
+          margin: 0 auto;
+          padding: 12px 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 64px;
+        }
+        @media (min-width: 1600px) {
+          .superapp-header-container {
+            max-width: 1400px;
+          }
+        }
+        .superapp-header-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .superapp-back-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255,255,255,0.1);
+          color: white;
+          cursor: pointer;
+          transition: background 0.2s ease;
+        }
+        .superapp-back-btn:hover {
+          background: rgba(255,255,255,0.2);
+        }
+        .superapp-brand {
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+        }
+        .superapp-brand-text {
+          font-weight: 900;
+          font-size: 24px;
+          color: white;
+          letter-spacing: -0.5px;
+        }
+        .superapp-header-right {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .superapp-desktop-only {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .superapp-pill-light {
+          padding: 8px 16px;
+          background: rgba(255,255,255,0.1);
+          color: white;
+          border-radius: 100px;
+          font-size: 14px;
+          font-weight: 700;
+          text-decoration: none;
+          transition: background 0.2s;
+        }
+        .superapp-pill-light:hover {
+          background: rgba(255,255,255,0.2);
+        }
+        .superapp-secure-badge {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 8px 16px;
+          background: rgba(14, 165, 233, 0.2);
+          color: #bae6fd;
+          border-radius: 100px;
+          font-size: 13px;
+          font-weight: 700;
+        }
+        .superapp-profile-btn {
+          padding: 8px 20px;
+          background: white;
+          color: #0b2545;
+          border-radius: 100px;
+          font-size: 14px;
+          font-weight: 800;
+          text-decoration: none;
+          transition: transform 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .superapp-profile-btn:hover {
+          transform: translateY(-1px);
+        }
+        .superapp-user-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .superapp-notification-btn {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.1);
+          color: white;
+          transition: background 0.2s;
+        }
+        .superapp-notification-btn:hover {
+          background: rgba(255,255,255,0.2);
+        }
+        .superapp-notification-badge {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          background: #ef4444;
+          color: white;
+          font-size: 10px;
+          font-weight: 800;
+          padding: 2px 6px;
+          border-radius: 100px;
+          border: 2px solid #0b2545;
+        }
+        .superapp-mobile-icon {
+          display: none;
+        }
+        @media (max-width: 820px) {
+          .superapp-desktop-only { display: none; }
+          .superapp-profile-btn { padding: 8px 12px; }
+          .superapp-desktop-text { display: none; }
+          .superapp-mobile-icon { display: block; }
+          .superapp-header-container { padding: 8px 16px; height: 56px; }
+          .superapp-brand-text { font-size: 22px; }
+        }
+      `}} />
     </header>
   );
 }
