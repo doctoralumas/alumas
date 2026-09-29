@@ -37,7 +37,8 @@ export default async function Home() {
             
             <Link href="/doctors" className="superapp-card">
               <div className="card-text-area">
-                <h2 className="doctor-card-title">Doktor & Uzman</h2>
+                <h2 className="doctor-card-title">Uzmanlar</h2>
+                <p className="doctor-card-title">Doktor ve uzmanlar</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/3.jpg?v=2" alt="Doktor ve Uzman" className="doctor-visual" />
@@ -46,7 +47,8 @@ export default async function Home() {
 
             <Link href="/organizations" className="superapp-card">
               <div className="card-text-area">
-                <h2>Hastane & Klinik</h2>
+                <h2>Kurumlar</h2>
+                <p>Hastane, klinik, eczane</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/hospital.jpg" alt="Hastane ve Klinik İçi" className="env-visual hospital-visual" />
@@ -56,7 +58,7 @@ export default async function Home() {
             <Link href="/nearby" className="superapp-card">
               <div className="card-text-area">
                 <h2>Yakınımdakiler</h2>
-                <p>Yakınında keşfet</p>
+                <p>Konuma göre keşfet</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/nearby.jpg" alt="Yakınımdakiler Harita" className="nearby-visual" />
@@ -85,8 +87,8 @@ export default async function Home() {
 
             <Link href="/insurance" className="superapp-card">
               <div className="card-text-area">
-                <h2>Sigortama Uygun</h2>
-                <p>Poliçene göre</p>
+                <h2>Sigorta</h2>
+                <p>Poliçene uygun</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/1.jpg?v=2" alt="Sigorta Uygulaması" className="insurance-visual" />
@@ -96,6 +98,7 @@ export default async function Home() {
             <Link href="/home-care" className="superapp-card">
               <div className="card-text-area">
                 <h2>Evde Sağlık</h2>
+                <p>Bakım ve destek</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/home-health.jpg" alt="Evde Sağlık Bakımı" className="env-visual home-health-visual" />

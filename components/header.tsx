@@ -38,9 +38,15 @@ export default function Header() {
               <CaretLeft size={22} weight="bold" />
             </button>
           )}
-          <Link href="/" className="superapp-brand">
-            {/* Using text logo for pure branded look, or we can use img if it's white */}
-            <span className="superapp-brand-text">ALUMAS</span>
+          <Link href="/" className="superapp-brand" aria-label="ALUMAS Ana Sayfa">
+            <div className="alumas-logo-lockup">
+              <img 
+                src="/assets/alumas-symbol.png" 
+                alt="ALUMAS" 
+                className="alumas-symbol-img"
+              />
+              <span className="alumas-wordmark">ALUMAS</span>
+            </div>
           </Link>
         </div>
 
@@ -121,11 +127,23 @@ export default function Header() {
           align-items: center;
           text-decoration: none;
         }
-        .superapp-brand-text {
-          font-weight: 900;
-          font-size: 24px;
+        .alumas-logo-lockup {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .alumas-symbol-img {
+          width: auto;
+          height: 32px;
+          object-fit: contain;
+          display: block;
+          flex-shrink: 0;
+        }
+        .alumas-wordmark {
+          font-weight: 800;
+          font-size: 22px;
           color: white;
-          letter-spacing: -0.5px;
+          letter-spacing: 0.5px;
         }
         .superapp-header-right {
           display: flex;
@@ -218,7 +236,14 @@ export default function Header() {
           .superapp-desktop-text { display: none; }
           .superapp-mobile-icon { display: block; }
           .superapp-header-container { padding: 8px 16px; height: 56px; }
-          .superapp-brand-text { font-size: 22px; }
+          
+          .alumas-logo-lockup { gap: 7px; }
+          .alumas-symbol-img {
+            height: 27px;
+          }
+          .alumas-wordmark {
+            font-size: 18px;
+          }
         }
       `}} />
     </header>

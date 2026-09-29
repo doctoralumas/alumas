@@ -72,7 +72,7 @@ export const carouselSlides = [
   },
   {
     id: 5,
-    title: "Lumya’ya anlat, doğru hizmeti bul.",
+    title: "Luma’ya anlat, doğru hizmeti bul.",
     subtitle: "İhtiyacını doğal şekilde anlat, uygun hizmetlere yönel.",
     desktopImage: "/assets/services/hero-05-desktop.png",
     mobileImage: "/assets/services/hero-05-mobile.png",
