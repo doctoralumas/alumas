@@ -30,9 +30,6 @@ function textFromMessage(message: any) {
 export async function POST(req: Request) {
   try {
     const user = await currentUser();
-    if (!user) {
-      return new Response('Unauthorized', { status: 401 });
-    }
 
     const body = await req.json();
     const rawMessages = normalizeUIMessages(body.messages);
@@ -45,39 +42,41 @@ export async function POST(req: Request) {
 
     // Ensure conversation exists or create one
     let convId = conversationId;
-    if (!convId) {
-      const conv = await prisma.aiConversation.create({
-        data: {
-          userId: user.id,
-          title: "Yeni Sohbet"
-        }
-      });
-      convId = conv.id;
-    } else {
-      // Validate conversation belongs to user
-      const exists = await prisma.aiConversation.findFirst({ where: { id: convId, userId: user.id } });
-      if (!exists) {
-        const conv = await prisma.aiConversation.create({ data: { id: convId, userId: user.id, title: "Yeni Sohbet" } });
+    if (user) {
+      if (!convId) {
+        const conv = await prisma.aiConversation.create({
+          data: {
+            userId: user!.id,
+            title: "Yeni Sohbet"
+          }
+        });
         convId = conv.id;
+      } else {
+        // Validate conversation belongs to user
+        const exists = await prisma.aiConversation.findFirst({ where: { id: convId, userId: user!.id } });
+        if (!exists) {
+          const conv = await prisma.aiConversation.create({ data: { id: convId, userId: user!.id, title: "Yeni Sohbet" } });
+          convId = conv.id;
+        }
+      }
+
+      const latestRaw = rawMessages[rawMessages.length - 1];
+      if (latestRaw && latestRaw.role === 'user') {
+         const userText = textFromMessage(latestRaw);
+         if (userText) {
+           await prisma.aiMessage.create({
+             data: {
+               conversationId: convId,
+               role: 'user',
+               content: userText,
+             }
+           });
+         }
       }
     }
 
-    const latestRaw = rawMessages[rawMessages.length - 1];
-    if (latestRaw && latestRaw.role === 'user') {
-       const userText = textFromMessage(latestRaw);
-       if (userText) {
-         await prisma.aiMessage.create({
-           data: {
-             conversationId: convId,
-             role: 'user',
-             content: userText,
-           }
-         });
-       }
-    }
-
     let personalizedContext = "";
-    if (personalize) {
+    if (personalize && user) {
       const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
           include: {
@@ -235,7 +234,7 @@ export async function POST(req: Request) {
           }),
           execute: async ({ systolic, diastolic, pulse }) => {
             await prisma.bloodPressureReading.create({
-              data: { userId: user.id, systolic, diastolic, pulse }
+              data: { userId: user!.id, systolic, diastolic, pulse }
             });
             return { success: true, message: 'Tansiyon ölçümü kaydedildi.' };
           }
@@ -248,7 +247,7 @@ export async function POST(req: Request) {
           }),
           execute: async ({ weightKg, heightCm }) => {
             await prisma.bodyMeasurement.create({
-              data: { userId: user.id, weightKg, heightCm }
+              data: { userId: user!.id, weightKg, heightCm }
             });
             return { success: true, message: 'Beden ölçüleri başarıyla güncellendi.' };
           }
@@ -262,7 +261,7 @@ export async function POST(req: Request) {
           }),
           execute: async ({ name, dose, instructions }) => {
             await prisma.medication.create({
-              data: { userId: user.id, name, dose: dose || '', instructions, times: [] }
+              data: { userId: user!.id, name, dose: dose || '', instructions, times: [] }
             });
             return { success: true, message: name + ' ilacı sağlık profiline eklendi.' };
           }
@@ -313,7 +312,7 @@ export async function POST(req: Request) {
       messages,
       tools,
       async onFinish({ text, toolResults }) {
-         if (text && messages.length <= 2) {
+         if (text && messages.length <= 2 && user && convId) {
             const titleMatch = text.slice(0, 30).split('.')[0];
             if (titleMatch) {
                await prisma.aiConversation.update({
@@ -332,21 +331,23 @@ export async function POST(req: Request) {
              }))))
            : undefined;
 
-         await prisma.aiMessage.create({
-           data: {
-             conversationId: convId,
-             role: 'assistant',
-             content: text || "",
-             ...(uiState ? { uiState } : {}),
-           }
-         });
+         if (user && convId) {
+           await prisma.aiMessage.create({
+             data: {
+               conversationId: convId,
+               role: 'assistant',
+               content: text || "",
+               ...(uiState ? { uiState } : {}),
+             }
+           });
+         }
       }
     });
 
     return result.toUIMessageStreamResponse({
       originalMessages: rawMessages,
       headers: {
-        'x-conversation-id': convId
+        'x-conversation-id': convId || ""
       }
     });
   } catch (error: any) {

@@ -1,18 +1,19 @@
-﻿import AiLayout from "@/components/ai/ai-layout";
+import AiLayout from "@/components/ai/ai-layout";
 import Link from "next/link";
 import { ShieldCheck, ChatText } from "@phosphor-icons/react/dist/ssr";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
+import LockedOverlay from "@/components/locked-overlay";
+
 export default async function AiPage({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
   const user = await currentUser();
-  if (!user) redirect("/login?next=/ai");
   
   const q = await searchParams;
   let initialMessages: any[] = [];
   
-  if (q.c) {
+  if (user && q.c) {
     const conv = await prisma.aiConversation.findFirst({
       where: { id: q.c, userId: user.id },
       include: { messages: { orderBy: { createdAt: 'asc' } } }
@@ -45,11 +46,11 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
   }
 
   // Fetch recent conversations for sidebar
-  const history = await prisma.aiConversation.findMany({
+  const history = user ? await prisma.aiConversation.findMany({
     where: { userId: user.id },
     orderBy: { updatedAt: 'desc' },
     take: 10
-  });
+  }) : [];
 
   return (
     <>
@@ -60,11 +61,18 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
         @media (max-width: 820px) { :root { --ai-top: 60px; } }
       `}} />
       <div style={{ position: "fixed", top: "var(--ai-top)", left: 0, right: 0, bottom: 0, backgroundColor: "#f8fafc", zIndex: 40, display: "flex", flexDirection: "column" }}>
-         <AiLayout 
-           history={history} 
-           currentConversationId={q.c || null} 
-           initialMessages={initialMessages} 
-         />
+         {!user && (
+           <div style={{ padding: '16px 16px 0 16px', background: 'white' }}>
+             <LockedOverlay />
+           </div>
+         )}
+         <div style={{ flex: 1, position: 'relative' }}>
+           <AiLayout 
+             history={history} 
+             currentConversationId={q.c || null} 
+             initialMessages={initialMessages} 
+           />
+         </div>
       </div>
     </>
   );

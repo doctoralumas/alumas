@@ -1,17 +1,15 @@
 import SectionVisual from "@/components/section-visual";
 import GoogleNearbyPlaces from "@/components/google-nearby-places";
 import { currentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import LockedOverlay from "@/components/locked-overlay";
 
 export default async function Page({searchParams}:{searchParams:Promise<{category?:string}>}) {
   const user = await currentUser();
-  if (!user) {
-    redirect("/login?next=/nearby");
-  }
   const q=await searchParams;
   return (
     <div className="page" style={{ maxWidth: "1200px" }}>
+      {!user && <LockedOverlay />}
       <SectionVisual slug="nearby" alt="Küresel Keşif Haritası" />
       
       <div style={{ marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
@@ -31,7 +29,7 @@ export default async function Page({searchParams}:{searchParams:Promise<{categor
         </p>
       </div>
 
-      <GoogleNearbyPlaces initial={q?.category} isLoggedIn={!!user} />
+      <GoogleNearbyPlaces initial={q?.category} isLoggedIn={true} />
     </div>
   );
 }
