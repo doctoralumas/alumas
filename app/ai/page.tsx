@@ -62,8 +62,10 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<{
       `}} />
       <div style={{ position: "fixed", top: "var(--ai-top)", left: 0, right: 0, bottom: 0, backgroundColor: "#f8fafc", zIndex: 40, display: "flex", flexDirection: "column" }}>
          {!user && (
-           <div style={{ padding: '16px 16px 0 16px', background: 'white' }}>
-             <LockedOverlay />
+           <div style={{ background: '#fff', borderTop: '1px solid #f1f5f9' }}>
+             <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 24px 0 24px' }}>
+               <LockedOverlay />
+             </div>
            </div>
          )}
          <div style={{ flex: 1, position: 'relative' }}>
