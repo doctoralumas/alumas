@@ -87,7 +87,7 @@ export const carouselSlides = [
   },
 ];
 
-const AUTOPLAY_INTERVAL = 5500;
+const AUTOPLAY_INTERVAL = 4000;
 const TRANSITION_DURATION = 600;
 
 export default function CampaignCarousel() {

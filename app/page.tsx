@@ -37,10 +37,10 @@ export default async function Home() {
             
             <Link href="/doctors" className="superapp-card">
               <div className="card-text-area">
-                <h2>Doktor Bul</h2>
+                <h2 className="doctor-card-title">Doktor & Uzman</h2>
               </div>
               <div className="card-visual-area">
-                <img src="/assets/services/3.jpg?v=2" alt="Doktor Bul" className="doctor-visual" />
+                <img src="/assets/services/3.jpg?v=2" alt="Doktor ve Uzman" className="doctor-visual" />
               </div>
             </Link>
 
@@ -56,6 +56,7 @@ export default async function Home() {
             <Link href="/nearby" className="superapp-card">
               <div className="card-text-area">
                 <h2>Yakınımdakiler</h2>
+                <p>Yakınında keşfet</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/nearby.jpg" alt="Yakınımdakiler Harita" className="nearby-visual" />
@@ -65,6 +66,7 @@ export default async function Home() {
             <Link href="/health-tourism" className="superapp-card">
               <div className="card-text-area">
                 <h2>Sağlık Turizmi</h2>
+                <p>Uluslararası seçenekler</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/2.jpg?v=2" alt="Sağlık Turizmi Seyahat" className="env-visual tourism-visual" />
@@ -74,6 +76,7 @@ export default async function Home() {
             <Link href="/health" className="superapp-card">
               <div className="card-text-area">
                 <h2>Sağlığım</h2>
+                <p>Sağlık takibi</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/my-health.jpg" alt="Sağlık takibi için akıllı saat" className="health-visual" />
@@ -83,6 +86,7 @@ export default async function Home() {
             <Link href="/insurance" className="superapp-card">
               <div className="card-text-area">
                 <h2>Sigortama Uygun</h2>
+                <p>Poliçene göre</p>
               </div>
               <div className="card-visual-area">
                 <img src="/assets/services/1.jpg?v=2" alt="Sigorta Uygulaması" className="insurance-visual" />
@@ -204,11 +208,10 @@ export default async function Home() {
         
         /* EXPLICIT TILE TERRITORIES */
         .card-text-area {
-          padding: 20px 20px 0 20px;
+          padding: 18px 20px 0 18px;
           position: relative;
           z-index: 2;
           flex: 0 0 auto;
-          height: 25%; /* Reserve upper 25% */
         }
         .card-visual-area {
           position: absolute;
@@ -222,11 +225,22 @@ export default async function Home() {
         /* TEXT STYLING */
         .superapp-card h2 {
           margin: 0;
-          font-size: 20px;
+          font-size: 18px;
           font-weight: 800;
-          color: #0b2545;
+          color: #0b2d50;
           letter-spacing: -0.3px;
-          line-height: 1.1;
+          line-height: 1.15;
+        }
+        .doctor-card-title {
+          max-width: 42%;
+        }
+        
+        .superapp-card p {
+          margin: 4px 0 0;
+          font-size: 12px;
+          line-height: 1.35;
+          color: #64778a;
+          font-weight: 500;
         }
 
         /* IMAGE STYLING: OBJECT-BASED COMPOSITION */
@@ -259,10 +273,10 @@ export default async function Home() {
         .card-visual-area img.doctor-visual {
           width: 165%;
           height: 165%;
-          right: -25%;
-          bottom: -15%;
+          right: -32%;
+          bottom: -20%;
           object-position: center bottom;
-          filter: contrast(1.04) brightness(1.02); /* Very subtle to protect natural skin tones */
+          filter: contrast(1.04) brightness(1.02);
           -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
           mask-image: linear-gradient(to right, transparent 0%, black 20%);
         }
@@ -391,11 +405,19 @@ export default async function Home() {
             aspect-ratio: 1 / 1.1; /* Slightly taller than square */
           }
           .card-text-area {
-            padding: 14px 14px 0 14px;
-            height: 25%;
+            padding: 12px 12px 0 12px;
           }
           .superapp-card h2 { 
-            font-size: 15px; 
+            font-size: 13.5px;
+            line-height: 1.15;
+          }
+          .doctor-card-title {
+            max-width: 60%; /* Allow wider area on mobile for clean 2-line wrap */
+          }
+          .superapp-card p {
+            font-size: 10.5px;
+            line-height: 1.25;
+            margin-top: 4px;
           }
           
           /* Visual dominance in mobile tiles */
@@ -424,8 +446,8 @@ export default async function Home() {
           .card-visual-area img.doctor-visual {
             width: 155%;
             height: 155%;
-            right: -25%;
-            bottom: -25%; /* Pulled down to avoid text collision on taller mobile card */
+            right: -32%;
+            bottom: -32%; /* Pulled further down to avoid text collision */
           }
           
           .card-visual-area img.insurance-visual {
