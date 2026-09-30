@@ -54,12 +54,12 @@ export default function Header() {
             </button>
           )}
           <Link href="/" className="home-brand" aria-label="ALUMAS Ana Sayfa">
-            <svg className="home-brand-mark" width="34" height="18" viewBox="0 0 36 18" aria-hidden="true">
+            <svg className="home-brand-mark" width="36" height="24" viewBox="0 0 36 24" aria-hidden="true">
               <path
-                d="M1 10h6.2l2.2-6.2L13 16l3.1-9.2L18.4 10H35"
+                d="M2 15h6l3 5 7-17 7 17 3-5h6 M16 12h4 M18 10v4"
                 fill="none"
                 stroke="white"
-                strokeWidth="2.2"
+                strokeWidth="2.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
