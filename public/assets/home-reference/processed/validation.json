@@ -1,0 +1,543 @@
+[
+  {
+    "file": "hero-doctor.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1312,
+      1199
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\hero-doctor.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1312,
+        1199
+      ],
+      "transparent_px": 864681,
+      "transparent_frac": 0.5496710927805691,
+      "partial_alpha_px": 11566,
+      "opaque_frac": 0.4429764895543034,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 33.24014336917563,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        876,
+        1185
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.00777642445940723,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "hero-medical-kit.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1774,
+      887
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\hero-medical-kit.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1774,
+        887
+      ],
+      "transparent_px": 902730,
+      "transparent_frac": 0.5736944389013802,
+      "partial_alpha_px": 26917,
+      "opaque_frac": 0.40919952362129164,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 36.275272453964675,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        1601,
+        875
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.00712280224564008,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "experts-female-doctor.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1312,
+      1199
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "note": "byte-identical to another source; same matte reused",
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\experts-female-doctor.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1312,
+        1199
+      ],
+      "transparent_px": 864681,
+      "transparent_frac": 0.5496710927805691,
+      "partial_alpha_px": 11566,
+      "opaque_frac": 0.4429764895543034,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 33.24014336917563,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        876,
+        1185
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.00777642445940723,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "institutions-hospital.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1536,
+      1024
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\institutions-hospital.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1536,
+        1024
+      ],
+      "transparent_px": 904734,
+      "transparent_frac": 0.5752143859863281,
+      "partial_alpha_px": 14428,
+      "opaque_frac": 0.41561253865559894,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 0.0,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        1177,
+        793
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.002562840779622396,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "nearby-location.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1536,
+      1024
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\nearby-location.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1536,
+        1024
+      ],
+      "transparent_px": 1252246,
+      "transparent_frac": 0.7961565653483073,
+      "partial_alpha_px": 13783,
+      "opaque_frac": 0.19508043924967447,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 0.0,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        597,
+        822
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.01834551493326823,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "health-tourism.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1536,
+      1024
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\health-tourism.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1536,
+        1024
+      ],
+      "transparent_px": 1143619,
+      "transparent_frac": 0.7270933787027994,
+      "partial_alpha_px": 20872,
+      "opaque_frac": 0.2596365610758464,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 0.0,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        1180,
+        917
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.012592951456705729,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "my-health-watch.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1362,
+      1155
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\my-health-watch.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1362,
+        1155
+      ],
+      "transparent_px": 867387,
+      "transparent_frac": 0.5513835650399527,
+      "partial_alpha_px": 14969,
+      "opaque_frac": 0.43910088932115365,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 0.0,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        881,
+        1039
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.09358404688801164,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "insurance-document.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1536,
+      1024
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\insurance-document.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1536,
+        1024
+      ],
+      "transparent_px": 906440,
+      "transparent_frac": 0.5762990315755209,
+      "partial_alpha_px": 11352,
+      "opaque_frac": 0.4164835611979167,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 0.0,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        1033,
+        922
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.00010363260904947917,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "home-health.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1536,
+      1024
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\home-health.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1536,
+        1024
+      ],
+      "transparent_px": 681517,
+      "transparent_frac": 0.4332968393961589,
+      "partial_alpha_px": 14592,
+      "opaque_frac": 0.5574258168538412,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 62.066015625,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        1249,
+        1007
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.003750483194986979,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "promo-expert-doctor.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1304,
+      1206
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\promo-expert-doctor.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1304,
+        1206
+      ],
+      "transparent_px": 861136,
+      "transparent_frac": 0.5475790780250079,
+      "partial_alpha_px": 10825,
+      "opaque_frac": 0.4455375220014447,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 34.594422310756975,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        989,
+        1149
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.0030560388242834905,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "promo-hospital.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1536,
+      1024
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\promo-hospital.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1536,
+        1024
+      ],
+      "transparent_px": 766680,
+      "transparent_frac": 0.4874420166015625,
+      "partial_alpha_px": 18009,
+      "opaque_frac": 0.5011081695556641,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 0.0,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        1428,
+        864
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 0.0074545542399088545,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  },
+  {
+    "file": "promo-insurance.jpeg",
+    "original_format": "JPEG",
+    "original_mode": "RGB",
+    "original_size": [
+      1536,
+      1024
+    ],
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "had_true_alpha": false,
+    "background_baked": true,
+    "processed": true,
+    "output": "C:\\active_projects\\alumas\\alumas.com\\public\\assets\\home-reference\\processed\\promo-insurance.png",
+    "validation": {
+      "mode": "RGBA",
+      "size": [
+        1536,
+        1024
+      ],
+      "transparent_px": 916094,
+      "transparent_frac": 0.5824368794759115,
+      "partial_alpha_px": 11348,
+      "opaque_frac": 0.41034825642903644,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "border_alpha_mean": 0.0,
+      "solid_color_drift": 0.0,
+      "opaque_bbox": [
+        1049,
+        879
+      ],
+      "full_frame_opaque": false,
+      "near_black_opaque_frac": 7.120768229166667e-05,
+      "dims_match": true,
+      "png_format": "PNG"
+    }
+  }
+]

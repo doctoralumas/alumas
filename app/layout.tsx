@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./workspace.css";
+import "./home-visual.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Header from "@/components/header";
 import BottomNav from "@/components/bottom-nav";

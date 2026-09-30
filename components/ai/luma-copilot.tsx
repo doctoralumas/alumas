@@ -21,15 +21,15 @@ export default function LumaCopilot() {
         onClick={() => setIsOpen(!isOpen)}
         style={{
           position: "fixed",
-          bottom: "calc(74px + env(safe-area-inset-bottom, 0px))",
-          right: "10px",
-          width: "42px",
-          height: "42px",
-          borderRadius: "21px",
-          background: "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)",
+          bottom: pathname === "/" ? "28px" : "calc(74px + env(safe-area-inset-bottom, 0px))",
+          right: pathname === "/" ? "28px" : "10px",
+          width: pathname === "/" ? "62px" : "42px",
+          height: pathname === "/" ? "62px" : "42px",
+          borderRadius: "50%",
+          background: pathname === "/" ? "#0bbec5" : "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)",
           color: "#fff",
           border: "none",
-          boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.3)",
+          boxShadow: pathname === "/" ? "0 8px 18px rgba(10, 140, 150, 0.28)" : "0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.3)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -41,7 +41,15 @@ export default function LumaCopilot() {
         aria-label="Luma Asistanı Aç"
         className="luma-floating-btn"
       >
-        {isOpen ? <X size={20} weight="bold" /> : <Sparkle size={22} weight="fill" />}
+        {isOpen ? <X size={20} weight="bold" /> : pathname === "/" ? (
+          <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+            <path fill="#fff" d="M7.2 8.2h13.2a3.6 3.6 0 0 1 3.6 3.6v6.2a3.6 3.6 0 0 1-3.6 3.6h-6.1l-3.8 2.8c-.7.5-1.7 0-1.7-.8v-2A3.6 3.6 0 0 1 3.6 18V11.8a3.6 3.6 0 0 1 3.6-3.6z" />
+            <circle cx="11.2" cy="14.8" r="1.15" fill="#0bbec5" />
+            <circle cx="14.8" cy="14.8" r="1.15" fill="#0bbec5" />
+            <circle cx="18.4" cy="14.8" r="1.15" fill="#0bbec5" />
+            <path fill="#fff" d="M24.2 7.2l.55 1.35 1.35.55-1.35.55-.55 1.35-.55-1.35-1.35-.55 1.35-.55z" />
+          </svg>
+        ) : <Sparkle size={22} weight="fill" />}
       </button>
 
       {/* The Popover Window */}
@@ -92,13 +100,21 @@ export default function LumaCopilot() {
           from { opacity: 0; transform: translateY(20px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        @media (min-width: 768px) {
+        @media (max-width: 820px) {
           .luma-floating-btn {
-            bottom: 40px !important;
-            right: 40px !important;
-            width: 60px !important;
-            height: 60px !important;
-            border-radius: 30px !important;
+            bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+            right: 12px !important;
+            width: 52px !important;
+            height: 52px !important;
+          }
+        }
+        @media (min-width: 821px) {
+          .luma-floating-btn {
+            bottom: 28px !important;
+            right: 28px !important;
+            width: 62px !important;
+            height: 62px !important;
+            border-radius: 31px !important;
           }
           .luma-floating-btn svg {
             width: 32px !important;
