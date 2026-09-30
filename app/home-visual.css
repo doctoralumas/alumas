@@ -344,18 +344,18 @@ body:has(.home-page) {
   position: absolute;
   width: auto;
   object-fit: contain;
-  height: 104%;
+  height: 109%;
   bottom: -2px;
-  left: 54%;
+  left: 52%;
   z-index: 2;
 }
 .home-hero-kit {
   position: absolute;
   width: auto;
   object-fit: contain;
-  height: 85%;
-  right: 32px;
-  top: 18px;
+  height: 84%;
+  right: 28px;
+  top: 20px;
   z-index: 3;
 }
 

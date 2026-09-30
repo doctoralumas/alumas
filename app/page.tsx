@@ -104,12 +104,12 @@ export default function Home() {
           <div className="home-hero-gradient"></div>
           <img
             className="home-hero-doctor"
-            src="/assets/home-reference/processed/hero-doctor.png"
+            src="/assets/home-reference/processed/hero-doctor-cutout.png"
             alt=""
           />
           <img
             className="home-hero-kit"
-            src="/assets/home-reference/processed/hero-medical-kit-only.png"
+            src="/assets/home-reference/processed/hero-medical-kit-cutout.png"
             alt=""
           />
           <div className="home-hero-copy">
