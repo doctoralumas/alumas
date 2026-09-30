@@ -65,7 +65,7 @@ export default function LiveSearch() {
 
       <Link href="/ai" className="home-search-luma">
         <Sparkle size={16} weight="fill" color="#0bbec5" />
-        Luma&apos;ya anlat
+        <span className="home-search-luma-text">Luma&apos;ya anlat</span>
       </Link>
 
       {isOpen && (
