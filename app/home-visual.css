@@ -437,12 +437,17 @@ body:has(.home-page) {
   display: flex;
   flex-direction: column;
   height: 188px;
-  background: #fff;
+  background: transparent;
   border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(20, 70, 100, 0.06);
+  box-shadow: none;
   text-decoration: none;
-  overflow: hidden;
-  color: #12243f;
+  overflow: visible;
+  color: #0b2447;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-cat:hover {
+  transform: translateY(-6px);
 }
 
 .home-cat-visual {
@@ -466,7 +471,7 @@ body:has(.home-page) {
   object-position: center -30%;
 }
 .home-cat[data-id="experts"] .home-cat-visual img {
-  transform: scale(1.1);
+  transform: scale(1.0);
 }
 .home-cat[data-id="home"] .home-cat-visual img {
   transform: scale(1.05);
@@ -503,11 +508,11 @@ body:has(.home-page) {
 .home-cat-label {
   display: block;
   text-align: center;
-  font-size: 16.5px;
-  font-weight: 750;
+  font-size: 17px;
+  font-weight: 800;
   line-height: 1.2;
-  padding: 10px 6px 12px;
-  color: #12243f;
+  padding: 12px 6px 4px;
+  color: #0b2447;
 }
 
 .home-promos {
