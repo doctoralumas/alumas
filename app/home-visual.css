@@ -348,14 +348,16 @@ body:has(.home-page) {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    90deg,
-    #075466 0%,
-    #0B6673 22%,
-    #168B96 40%,
-    #55BAC2 58%,
-    #92D9DE 76%,
-    #C8EFF1 100%
-  );
+      90deg,
+      #0B5966 0%,
+      #0B5966 24%,
+      #0D6671 34%,
+      #287F89 46%,
+      #559FA7 58%,
+      #84BEC4 69%,
+      #A9DADD 82%,
+      #CDEEEF 100%
+    );
   z-index: 1;
 }
 .home-hero-doctor {
