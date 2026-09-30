@@ -26,10 +26,10 @@ export default function LumaCopilot() {
           width: pathname === "/" ? "62px" : "42px",
           height: pathname === "/" ? "62px" : "42px",
           borderRadius: "50%",
-          background: pathname === "/" ? "#0bbec5" : "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)",
+          background: pathname === "/" ? "#0bbec5" : "linear-gradient(135deg, #0bbec5 0%, #0a9aa3 100%)",
           color: "#fff",
           border: "none",
-          boxShadow: pathname === "/" ? "0 8px 18px rgba(10, 140, 150, 0.28)" : "0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.3)",
+          boxShadow: pathname === "/" ? "0 8px 18px rgba(10, 140, 150, 0.28)" : "0 10px 25px -5px rgba(11, 190, 197, 0.5), 0 8px 10px -6px rgba(11, 190, 197, 0.3)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -75,7 +75,7 @@ export default function LumaCopilot() {
           }}
         >
           {/* Header */}
-          <div style={{ background: "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)", padding: "20px", color: "#fff", display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ background: "linear-gradient(135deg, #0bbec5 0%, #0a9aa3 100%)", padding: "20px", color: "#fff", display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ background: "rgba(255,255,255,0.2)", padding: "8px", borderRadius: "12px" }}>
               <Sparkle size={24} weight="fill" />
             </div>

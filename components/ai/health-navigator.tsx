@@ -117,7 +117,7 @@ export default function HealthNavigator({
       <div ref={chatContainerRef} style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "24px" }}>
         {messages.length === 0 && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", height: "100%", padding: "20px" }}>
-             <div style={{ width: "64px", height: "64px", borderRadius: "20px", background: "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", marginBottom: "20px", boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.4)" }}>
+             <div style={{ width: "64px", height: "64px", borderRadius: "20px", background: "linear-gradient(135deg, #0bbec5 0%, #0a9aa3 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", marginBottom: "20px", boxShadow: "0 10px 25px -5px rgba(11, 190, 197, 0.4)" }}>
               <Sparkle size={32} weight="fill" />
             </div>
             <h1 style={{ fontSize: "24px", color: "#0f172a", margin: "0 0 12px 0", fontWeight: 800 }}>Ben Luma. Nasıl yardımcı olabilirim?</h1>
@@ -135,7 +135,7 @@ export default function HealthNavigator({
           <div key={m.id} style={{ display: "flex", gap: "16px", alignSelf: m.role === 'user' ? "flex-end" : "flex-start", maxWidth: m.role === 'user' ? "85%" : "100%" }}>
             
             {m.role === 'assistant' && (
-              <div style={{ width: "36px", height: "36px", borderRadius: "12px", background: "linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}>
+              <div style={{ width: "36px", height: "36px", borderRadius: "12px", background: "linear-gradient(135deg, #0bbec5 0%, #0a9aa3 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}>
                 <Sparkle size={18} weight="fill" />
               </div>
             )}
@@ -167,18 +167,18 @@ export default function HealthNavigator({
                )}
 
                {tools.map((ti: any) => {
-                  if (ti.pending) return <div key={ti.toolCallId} style={{ marginTop: text ? "12px" : "0", color: "#64748b", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}><Sparkle className="spinner" size={14} color="#3b82f6" /> Luma araştırıyor...</div>;
+                  if (ti.pending) return <div key={ti.toolCallId} style={{ marginTop: text ? "12px" : "0", color: "#64748b", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}><Sparkle className="spinner" size={14} color="#0bbec5" /> Luma araştırıyor...</div>;
                   
                   if (ti.toolName === 'find_doctors') {
                      const docs = ti.result;
                      if (!Array.isArray(docs)) return null;
                      return (
                         <div key={ti.toolCallId} style={{ marginTop: text ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
-                          <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#3b82f6" }}><Stethoscope size={16} /> Önerilen Uzmanlar</strong>
+                          <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#0bbec5" }}><Stethoscope size={16} /> Önerilen Uzmanlar</strong>
                           <div style={{ display: "flex", flexDirection: compact ? "column" : "row", gap: "8px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "none" }}>
                             {docs.map((d: any) => (
-                              <Link key={d.id} href={`/doctors/${d.slug}`} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "12px", borderRadius: "12px", minWidth: compact ? "100%" : "240px", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.2s" }} onMouseOver={e => e.currentTarget.style.borderColor = "#3b82f6"} onMouseOut={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
-                                 <div style={{ width: "40px", height: "40px", background: "#eff6ff", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", color: "#3b82f6", fontWeight: "bold", fontSize: "14px" }}>{String(d.name || "?").split(" ").filter(Boolean).slice(-2).map((x: string) => x[0]).join("").slice(0, 2)}</div>
+                              <Link key={d.id} href={`/doctors/${d.slug}`} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "12px", borderRadius: "12px", minWidth: compact ? "100%" : "240px", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.2s" }} onMouseOver={e => e.currentTarget.style.borderColor = "#0bbec5"} onMouseOut={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
+                                 <div style={{ width: "40px", height: "40px", background: "#e4f7fc", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", color: "#0bbec5", fontWeight: "bold", fontSize: "14px" }}>{String(d.name || "?").split(" ").filter(Boolean).slice(-2).map((x: string) => x[0]).join("").slice(0, 2)}</div>
                                  <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{d.name}</div>
                                     <div style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{d.specialty}</div>
@@ -243,8 +243,8 @@ export default function HealthNavigator({
          </form>
          
          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "0 8px" }}>
-           <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: 600, color: personalize ? "#0ea5e9" : "#64748b", cursor: "pointer" }}>
-              <input type="checkbox" checked={personalize} onChange={e => setPersonalize(e.target.checked)} style={{ accentColor: "#0ea5e9", cursor: "pointer", width: "14px", height: "14px" }} />
+           <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: 600, color: personalize ? "#0a9aa3" : "#64748b", cursor: "pointer" }}>
+              <input type="checkbox" checked={personalize} onChange={e => setPersonalize(e.target.checked)} style={{ accentColor: "#0a9aa3", cursor: "pointer", width: "14px", height: "14px" }} />
               Sağlık profilimi kullan
            </label>
            <span style={{ fontSize: "11px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}><ShieldCheck size={14} /> Şifreli Bağlantı</span>
