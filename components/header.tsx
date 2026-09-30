@@ -54,9 +54,9 @@ export default function Header() {
             </button>
           )}
           <Link href="/" className="home-brand" aria-label="ALUMAS Ana Sayfa">
-            <svg className="home-brand-mark" width="36" height="24" viewBox="0 0 36 24" aria-hidden="true">
+            <svg className="home-brand-mark" width="40" height="24" viewBox="0 0 40 24" aria-hidden="true">
               <path
-                d="M2 15h6l3 5 7-17 7 17 3-5h6 M16 12h4 M18 10v4"
+                d="M2 14 L10 14 L14 22 L20 2 L26 22 L30 14 L38 14 M17.5 14 h5 M20 11.5 v5"
                 fill="none"
                 stroke="white"
                 strokeWidth="2.4"
