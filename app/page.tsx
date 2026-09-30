@@ -4,6 +4,59 @@ import { currentUser } from '@/lib/auth';
 import LiveSearch from '@/components/live-search';
 import CampaignCarousel from '@/components/ui/campaign-carousel';
 
+
+const SERVICES = [
+  {
+    href: '/doctors',
+    title: 'Uzmanlar',
+    desc: 'Doktor ve uzmanlar',
+    image: '/assets/services/experts.png',
+    id: 'experts'
+  },
+  {
+    href: '/organizations',
+    title: 'Kurumlar',
+    desc: 'Hastane, klinik, eczane',
+    image: '/assets/services/institutions.png',
+    id: 'institutions'
+  },
+  {
+    href: '/nearby',
+    title: 'Yakınımdakiler',
+    desc: 'Konuma göre keşfet',
+    image: '/assets/services/nearby.png',
+    id: 'nearby'
+  },
+  {
+    href: '/health-tourism',
+    title: 'Sağlık Turizmi',
+    desc: 'Uluslararası seçenekler',
+    image: '/assets/services/health-tourism.png',
+    id: 'tourism'
+  },
+  {
+    href: '/health',
+    title: 'Sağlığım',
+    desc: 'Sağlık takibi',
+    image: '/assets/services/my-health.png',
+    id: 'health'
+  },
+  {
+    href: '/insurance',
+    title: 'Sigorta',
+    desc: 'Poliçene uygun',
+    image: '/assets/services/insurance.png',
+    id: 'insurance'
+  },
+  {
+    href: '/home-care',
+    title: 'Evde Sağlık',
+    desc: 'Bakım ve destek',
+    image: '/assets/services/home-health.png',
+    id: 'home'
+  }
+];
+
 export default async function Home() {
   const user = await currentUser();
 
@@ -33,78 +86,18 @@ export default async function Home() {
       <section className="superapp-services-section">
         <div className="superapp-container">
           
-          <div className="superapp-unified-grid">
-            
-            <Link href="/doctors" className="superapp-card">
-              <div className="card-text-area">
-                <h2 className="doctor-card-title">Uzmanlar</h2>
-                <p className="doctor-card-title">Doktor ve uzmanlar</p>
-              </div>
-              <div className="card-visual-area">
-                <img src="/assets/services/3.jpg?v=2" alt="Doktor ve Uzman" className="doctor-visual" />
-              </div>
-            </Link>
-
-            <Link href="/organizations" className="superapp-card">
-              <div className="card-text-area">
-                <h2>Kurumlar</h2>
-                <p>Hastane, klinik, eczane</p>
-              </div>
-              <div className="card-visual-area">
-                <img src="/assets/services/hospital.jpg" alt="Hastane ve Klinik İçi" className="env-visual hospital-visual" />
-              </div>
-            </Link>
-
-            <Link href="/nearby" className="superapp-card">
-              <div className="card-text-area">
-                <h2>Yakınımdakiler</h2>
-                <p>Konuma göre keşfet</p>
-              </div>
-              <div className="card-visual-area">
-                <img src="/assets/services/nearby.jpg" alt="Yakınımdakiler Harita" className="nearby-visual" />
-              </div>
-            </Link>
-
-            <Link href="/health-tourism" className="superapp-card">
-              <div className="card-text-area">
-                <h2>Sağlık Turizmi</h2>
-                <p>Uluslararası seçenekler</p>
-              </div>
-              <div className="card-visual-area">
-                <img src="/assets/services/2.jpg?v=2" alt="Sağlık Turizmi Seyahat" className="env-visual tourism-visual" />
-              </div>
-            </Link>
-
-            <Link href="/health" className="superapp-card">
-              <div className="card-text-area">
-                <h2>Sağlığım</h2>
-                <p>Sağlık takibi</p>
-              </div>
-              <div className="card-visual-area">
-                <img src="/assets/services/my-health.jpg" alt="Sağlık takibi için akıllı saat" className="health-visual" />
-              </div>
-            </Link>
-
-            <Link href="/insurance" className="superapp-card">
-              <div className="card-text-area">
-                <h2>Sigorta</h2>
-                <p>Poliçene uygun</p>
-              </div>
-              <div className="card-visual-area">
-                <img src="/assets/services/1.jpg?v=2" alt="Sigorta Uygulaması" className="insurance-visual" />
-              </div>
-            </Link>
-
-            <Link href="/home-care" className="superapp-card">
-              <div className="card-text-area">
-                <h2>Evde Sağlık</h2>
-                <p>Bakım ve destek</p>
-              </div>
-              <div className="card-visual-area">
-                <img src="/assets/services/home-health.jpg" alt="Evde Sağlık Bakımı" className="env-visual home-health-visual" />
-              </div>
-            </Link>
-
+                    <div className="superapp-unified-grid">
+            {SERVICES.map((s, i) => (
+              <Link href={s.href} className={`superapp-card service-card-${s.id}`} key={s.id}>
+                <div className="card-text-area">
+                  <h2 className={s.id === 'experts' ? 'doctor-card-title' : ''}>{s.title}</h2>
+                  <p className={s.id === 'experts' ? 'doctor-card-title' : ''}>{s.desc}</p>
+                </div>
+                <div className="card-visual-area">
+                  <img src={s.image} alt={s.title} className={`service-img visual-${s.id}`} />
+                </div>
+              </Link>
+            ))}
           </div>
 
         </div>
@@ -218,10 +211,10 @@ export default async function Home() {
         }
         .card-visual-area {
           position: absolute;
-          bottom: 0;
+          top: 0;
           left: 0;
           width: 100%;
-          height: 75%; /* Dominant visual area 75% */
+          height: 100%;
           z-index: 1;
         }
         
@@ -247,91 +240,49 @@ export default async function Home() {
         }
 
         /* IMAGE STYLING: OBJECT-BASED COMPOSITION */
-        .card-visual-area img {
-          position: absolute;
-          bottom: 0;
-          right: -5%;
-          width: 110%; /* Scale up significantly */
-          height: 110%;
-          object-fit: contain; 
-          object-position: bottom right;
-          mix-blend-mode: darken; /* Makes white background invisible */
-          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-visual-area img.env-visual {
+        .service-img {
           width: 100%;
           height: 100%;
-          right: 0;
           object-fit: cover;
-          object-position: bottom center;
-          mix-blend-mode: normal; /* Env visuals do not darken */
-          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
-          mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
-          border-bottom-left-radius: 20px;
-          border-bottom-right-radius: 20px;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* SPECIFIC IMAGE CROPPING & INTEGRATION TO REMOVE INNER-CARD FEELING */
-        
-        .card-visual-area img.doctor-visual {
-          width: 165%;
-          height: 165%;
-          right: -32%;
-          bottom: -20%;
-          object-position: center bottom;
-          filter: contrast(1.04) brightness(1.02);
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
-          mask-image: linear-gradient(to right, transparent 0%, black 20%);
+        .superapp-card:hover .service-img {
+          transform: scale(1.03);
         }
 
-        .card-visual-area img.insurance-visual {
-          width: 165%; /* Extreme zoom to push baked-in JPEG frame out of view */
-          height: 165%;
-          right: -28%;
-          bottom: -22%;
-          object-position: center center;
+        /* PER-CARD ART DIRECTION */
+        .visual-experts {
+          object-position: 70% 85%;
         }
-
-        .card-visual-area img.nearby-visual {
-          width: 140%; /* Reduced slightly from 150% to prevent cramping */
-          height: 140%;
-          right: -8%; /* Shifted ~12% left for optical centering */
-          bottom: -10%; /* Comfortable bottom anchor */
-          filter: contrast(1.04) brightness(1.02);
-          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
-          mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
-        }
-
-        .card-visual-area img.health-visual {
-          width: 125%;
-          height: 125%;
-          right: -10%;
-          bottom: -5%;
-        }
-        
-        /* Hospital and Home-Health have baked-in rounded frames in the JPEG. Zoom in heavily to crop them out. */
-        .card-visual-area img.hospital-visual {
-          width: 155%; /* Safe scale to crop frame but retain architectural context */
-          height: 155%;
-          right: -27.5%;
-          left: auto;
-          bottom: -25%;
-          object-position: center bottom;
-          -webkit-mask-image: linear-gradient(to bottom, transparent 15%, black 40%);
-          mask-image: linear-gradient(to bottom, transparent 15%, black 40%);
-        }
-
-        .card-visual-area img.home-health-visual {
-          width: 125%;
-          height: 125%;
-          right: -12.5%;
-          left: auto;
-          bottom: -12.5%;
+        .visual-institutions {
           object-position: center bottom;
         }
+        .visual-nearby {
+          object-position: center bottom;
+        }
+        .visual-tourism {
+          object-position: center 60%;
+        }
+        .visual-health {
+          object-position: 70% 80%;
+        }
+        .visual-insurance {
+          object-position: 80% 80%;
+        }
+        .visual-home {
+          object-position: center 80%;
+        }
 
-        .superapp-card:hover .card-visual-area img {
-          transform: scale(1.04) translateY(-2%);
+        /* MOBILE ART DIRECTION */
+        @media (max-width: 768px) {
+          .visual-experts { object-position: 70% 90%; }
+          .visual-institutions { object-position: center bottom; }
+          .visual-nearby { object-position: center bottom; }
+          .visual-tourism { object-position: center 70%; }
+          .visual-health { object-position: 70% 80%; }
+          .visual-insurance { object-position: 80% 80%; }
+          .visual-home { object-position: center 90%; }
         }
 
         /* 4. TRUST SECTION */
