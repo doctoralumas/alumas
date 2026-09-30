@@ -1,1 +1,23 @@
 export async function geocodeAddress(query:string){const token=process.env.MAPBOX_ACCESS_TOKEN;if(!token)return null;const url=`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${encodeURIComponent(token)}&limit=1&language=tr`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)return null;const j=await r.json();const c=j?.features?.[0]?.center;return Array.isArray(c)&&c.length>=2?{longitude:Number(c[0]),latitude:Number(c[1])}:null}
+
+export async function reverseGeocodeAddress(lat: number, lng: number) {
+  const token = process.env.MAPBOX_ACCESS_TOKEN;
+  if (!token) return null;
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${encodeURIComponent(token)}&types=place,locality,neighborhood&limit=1&language=tr`;
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) return null;
+  const j = await r.json();
+  const feature = j?.features?.[0];
+  if (!feature) return null;
+  
+  // Extract a readable name like "Kadıköy, İstanbul" or just "Kadıköy"
+  let placeName = feature.text;
+  const context = feature.context || [];
+  const city = context.find((c: any) => c.id.startsWith('place'))?.text;
+  
+  if (city && city !== placeName) {
+    placeName = `${city}, ${placeName}`;
+  }
+  
+  return placeName; // e.g. "İstanbul, Kadıköy"
+}

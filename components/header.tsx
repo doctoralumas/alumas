@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import LocationSelector from "@/components/location-selector";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -65,11 +66,7 @@ export default function Header() {
             </svg>
             <span className="home-wordmark">ALUMAS</span>
           </Link>
-          <button className="home-location" type="button" aria-label="Konum: İstanbul, Kadıköy">
-            <MapPin size={16} weight="fill" color="#0bbec5" />
-            <span>İstanbul, Kadıköy</span>
-            <CaretDown size={12} weight="bold" />
-          </button>
+          <LocationSelector />
         </div>
 
         <div className="home-header-right">

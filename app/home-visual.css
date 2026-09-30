@@ -344,23 +344,23 @@ body:has(.home-page) {
   position: absolute;
   width: auto;
   object-fit: contain;
-  object-position: bottom center;
-  height: 97%;
-  bottom: 0;
-  right: 27%;
+  object-position: top center;
+  height: 160%;
+  top: 2px;
+  right: 25%;
   z-index: 2;
-  filter: drop-shadow(-8px 10px 24px rgba(10, 45, 60, 0.18));
+  filter: drop-shadow(-4px 6px 18px rgba(10, 45, 60, 0.12));
 }
 .home-hero-kit {
   position: absolute;
   width: auto;
   object-fit: contain;
   object-position: center right;
-  height: 68%;
-  right: 3%;
-  top: 12%;
+  height: 85%;
+  right: 10%;
+  top: 5%;
   z-index: 3;
-  filter: drop-shadow(-6px 14px 20px rgba(10, 45, 60, 0.2));
+  filter: drop-shadow(-3px 8px 16px rgba(10, 45, 60, 0.13));
 }
 
 
@@ -431,6 +431,7 @@ body:has(.home-page) {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  overflow: hidden;
 }
 
 .home-cat-visual img {
@@ -442,7 +443,7 @@ body:has(.home-page) {
 
 .home-cat[data-fit="cover"] .home-cat-visual img {
   object-fit: cover;
-  object-position: center 16%;
+  object-position: center -30%;
 }
 .home-cat[data-id="experts"] .home-cat-visual img {
   transform: scale(1.1);
@@ -485,7 +486,7 @@ body:has(.home-page) {
   font-size: 16.5px;
   font-weight: 750;
   line-height: 1.2;
-  padding: 4px 6px 12px;
+  padding: 10px 6px 12px;
   color: #12243f;
 }
 
@@ -556,7 +557,7 @@ body:has(.home-page) {
   height: 130%;
   width: 65%;
   right: -5px;
-  bottom: -5px;
+  bottom: -40px;
 }
 
 .home-promo[data-id="hospital"] img {
@@ -677,10 +678,10 @@ body:has(.home-page) {
     grid-area: brand;
   }
 
-  .home-location {
-    grid-area: location;
-    width: 100%;
-    max-width: none;
+  .home-location-wrapper, .home-location {
+      grid-area: location;
+      width: 100%;
+      max-width: none;
   }
 
   .home-header-right {
