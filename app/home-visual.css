@@ -347,7 +347,15 @@ body:has(.home-page) {
 .home-hero-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #0f5a66 0%, #1f7f90 38%, #5bbfca 68%, #bfe8ec 100%);
+  background: linear-gradient(
+    90deg,
+    #075466 0%,
+    #0B6673 22%,
+    #168B96 40%,
+    #55BAC2 58%,
+    #92D9DE 76%,
+    #C8EFF1 100%
+  );
   z-index: 1;
 }
 .home-hero-doctor {
