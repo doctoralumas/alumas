@@ -2,13 +2,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, HeartPulse, House, UserRound, MessageCircle } from "./icons";
+import { CalendarDays, HeartPulse, House, UserRound, MessageCircle, Grid } from "./icons";
 
 const items = [
   { href: "/", label: "Ana Sayfa", Icon: House },
   { href: "/health", label: "Sağlığım", Icon: HeartPulse },
+  { href: "/services", label: "Hizmetler", Icon: Grid },
   { href: "/messages", label: "Mesajlar", Icon: MessageCircle },
-  { href: "/appointments", label: "Randevular", Icon: CalendarDays },
   { href: "/profile", label: "Profil", Icon: UserRound }
 ];
 

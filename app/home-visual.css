@@ -682,10 +682,10 @@ body:has(.home-page) {
     min-height: 64px;
     padding: 10px 0;
     display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "brand account"
-      "location location";
+    grid-template-columns: auto 1fr auto;
+      grid-template-areas:
+        "back brand account"
+        "location location location";
     align-items: center;
     gap: 8px 12px;
   }
@@ -694,9 +694,12 @@ body:has(.home-page) {
     display: contents;
   }
 
-  .home-brand {
-    grid-area: brand;
-  }
+  .home-back-btn {
+      grid-area: back;
+    }
+    .home-brand {
+      grid-area: brand;
+    }
 
   .home-location-wrapper, .home-location {
       grid-area: location;
