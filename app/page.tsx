@@ -77,6 +77,13 @@ const PROMOS = [
     description: "Anlaşmalı kurumları keşfet.",
     image: "/assets/home-reference/processed/promo-insurance.png",
   },
+  {
+    id: "family",
+    href: "https://alumas.vercel.app/health/family-hub",
+    title: "Aile Sağlığı Paneli",
+    description: "Ailenizin sağlık sürecini yönetin.",
+    image: "/assets/home-reference/processed/family.png",
+  },
 ];
 
 function FooterMark() {
@@ -145,18 +152,22 @@ export default function Home() {
         <div className="home-promos">
           {PROMOS.map((item) => (
             <Link key={item.id} href={item.href} className="home-promo" data-id={item.id}>
-              <h3>
-                {item.title.split("\n").map((line) => (
-                  <span key={line} style={{ display: "block" }}>
-                    {line}
-                  </span>
-                ))}
-              </h3>
-              <p>{item.description}</p>
-              <span className="home-promo-arrow" aria-hidden="true">
-                <ArrowRight size={16} weight="bold" />
-              </span>
-              <img src={item.image} alt="" />
+              <div className="home-promo-content">
+                <h3>
+                  {item.title.split("\n").map((line) => (
+                    <span key={line} style={{ display: "block" }}>
+                      {line}
+                    </span>
+                  ))}
+                </h3>
+                <p>{item.description}</p>
+                <span className="home-promo-arrow" aria-hidden="true">
+                  <ArrowRight size={16} weight="bold" />
+                </span>
+              </div>
+              <div className="home-promo-visual">
+                <img src={item.image} alt="" />
+              </div>
             </Link>
           ))}
         </div>

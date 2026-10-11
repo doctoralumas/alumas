@@ -517,21 +517,43 @@ body:has(.home-page) {
 
 .home-promos {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   margin-top: 16px;
 }
 
 .home-promo {
   position: relative;
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 48%) minmax(0, 52%);
   height: 172px;
-  padding: 24px 48% 24px 24px;
   border-radius: 16px;
   background: #e4f7fc;
   text-decoration: none;
   overflow: hidden;
   color: #12243f;
+  padding: 0;
+}
+
+.home-promo[data-id="insurance"] {
+  grid-template-columns: minmax(0, 52%) minmax(0, 48%);
+}
+
+.home-promo-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px 8px 18px 24px;
+  z-index: 2;
+  position: relative;
+  height: 100%;
+}
+
+.home-promo-visual {
+  position: relative;
+  min-width: 0;
+  overflow: visible;
+  z-index: 1;
 }
 
 .home-promo h3 {
@@ -553,9 +575,9 @@ body:has(.home-page) {
 
 .home-promo-arrow {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  margin-top: 14px;
+  width: 38px;
+  height: 38px;
+  margin-top: auto;
   border-radius: 50%;
   background: #d4f3f8;
   color: #0c8f98;
@@ -568,36 +590,39 @@ body:has(.home-page) {
   height: 20px;
 }
 
-.home-promo img {
+.home-promo-visual img {
   position: absolute;
-  right: -10px;
-  bottom: -10px;
-  height: 125%;
-  width: 60%;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
-  object-position: right bottom;
   pointer-events: none;
 }
 
-.home-promo[data-id="doctor"] img {
-  height: 130%;
-  width: 65%;
-  right: -5px;
-  bottom: -40px;
+.home-promo[data-id="doctor"] .home-promo-visual img {
+  max-height: 100%;
+  right: 2;
+  bottom: -2px;
 }
 
-.home-promo[data-id="hospital"] img {
-  height: 110%;
-  width: 62%;
-  right: -8px;
+.home-promo[data-id="hospital"] .home-promo-visual img {
+  width: 100%;
+  max-height: 110%;
+  object-position: right bottom;
   bottom: -5px;
 }
 
-.home-promo[data-id="insurance"] img {
-  height: 120%;
-  width: 65%;
-  right: -10px;
-  bottom: -15px;
+.home-promo[data-id="insurance"] .home-promo-visual img {
+  max-height: 95%;
+  bottom: 0px;
+  right: -20;
+}
+
+.home-promo[data-id="family"] .home-promo-visual img {
+  max-height: 95%;
 }
 
 .home-footer {
@@ -662,10 +687,6 @@ body:has(.home-page) {
 
   .home-promos {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .home-promos .home-promo:last-child {
-    grid-column: 1 / -1;
   }
 
   .home-hero h1 {
@@ -805,20 +826,60 @@ body:has(.home-page) {
     font-size: 15px;
   }
 
-  .home-promos,
-  .home-promos .home-promo:last-child {
+  .home-promos {
     grid-template-columns: 1fr;
-    grid-column: auto;
   }
 
   .home-promo {
-      height: auto;
-      min-height: 168px;
-      padding: 24px 35% 24px 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
+    grid-template-columns: minmax(0, 54%) minmax(0, 46%);
+    height: 145px;
+    min-height: auto;
+  }
+
+  .home-promo[data-id="insurance"] {
+    grid-template-columns: minmax(0, 56%) minmax(0, 44%);
+  }
+
+  .home-promo-content {
+    padding: 16px 4px 14px 16px;
+  }
+
+  .home-promo h3 {
+    font-size: 19px;
+    line-height: 1.1;
+  }
+
+  .home-promo p {
+    font-size: 13px;
+    line-height: 1.35;
+    margin-top: 6px;
+  }
+
+  .home-promo-arrow {
+    width: 32px;
+    height: 32px;
+  }
+
+  .home-promo-arrow svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .home-promo[data-id="doctor"] .home-promo-visual img {
+    max-height: 105%;
+  }
+
+  .home-promo[data-id="hospital"] .home-promo-visual img {
+    max-height: 90%;
+  }
+
+  .home-promo[data-id="insurance"] .home-promo-visual img {
+    max-height: 85%;
+  }
+
+  .home-promo[data-id="family"] .home-promo-visual img {
+    max-height: 85%;
+  }
 
   .home-heading {
     font-size: 24px;
