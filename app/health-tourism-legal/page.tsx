@@ -1,1 +1,21 @@
-export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Yasal & Uyum</span><h1>Uluslararası Sağlık Turizmi Bilgilendirmesi</h1><p>Son Güncelleme: 26 Eylül 2026. Alumas Sağlık Teknolojileri A.Ş. tarafından uluslararası güvenlik standartlarına ve KVKK/GDPR regülasyonlarına tam uyumlu olarak düzenlenmiştir.</p></div><section className="panel legal-copy" dangerouslySetInnerHTML={{__html:`<h2>Yetkilendirme</h2><p>Alumas’ın veya platformdaki bir acentenin uluslararası sağlık turizmi “aracı kuruluş” faaliyeti yürütmesi halinde ilgili yetki belgesi ve güncel Bakanlık şartları canlıya çıkmadan önce doğrulanmalıdır.</p><h2>Profil ve internet sitesi</h2><p>Yetki belgesi, unvan, yabancı dil, akreditasyon/sertifika ve tanıtım yükümlülükleri ilgili kuruluş türüne göre kontrol edilir. Platform, yetkisiz kuruluşu sağlık turizmi yetkili kuruluşu gibi göstermemelidir.</p>`}} /></div>}
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const t = await getTranslations("legal");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("legalKicker")}</span>
+        <h1>{t("healthTourismTitle")}</h1>
+        <p>{t("lastUpdatedNotice")}</p>
+      </div>
+      <section
+        className="panel legal-copy"
+        dangerouslySetInnerHTML={{
+          __html: t.raw("healthTourismHtml"),
+        }}
+      />
+    </div>
+  );
+}

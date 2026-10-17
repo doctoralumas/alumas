@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   DOCUMENT_STATUS_LABELS,
   requiredDocuments,
@@ -31,9 +32,18 @@ export default function VerificationDocumentManager({
   owner: Owner;
   documents: any[];
 }) {
+  const t = useTranslations("professional.verificationManager");
   const [rows, setRows] = useState(documents || []);
   const [msg, setMsg] = useState("");
   const requirements = requiredDocuments(owner.kind, owner.entityType);
+
+  const statusLabels: Record<string, string> = {
+    PENDING: t("statusPending"),
+    APPROVED: t("statusApproved"),
+    REJECTED: t("statusRejected"),
+    EXPIRED: t("statusExpired"),
+    SUPERSEDED: t("statusSuperseded"),
+  };
 
   async function upload(event: React.FormEvent<HTMLFormElement>, type: string) {
     event.preventDefault();
@@ -41,7 +51,7 @@ export default function VerificationDocumentManager({
     const file = (form.querySelector('input[type="file"]') as HTMLInputElement)
       ?.files?.[0];
     if (file && file.size > 4.5 * 1024 * 1024) {
-      setMsg("Dosya 4.5 MB'dan küçük olmalı.");
+      setMsg(t("fileTooLarge"));
       return;
     }
     const body = new FormData(form);
@@ -49,14 +59,14 @@ export default function VerificationDocumentManager({
     if (owner.organizationId) body.set("organizationId", owner.organizationId);
     if (owner.doctorId) body.set("doctorId", owner.doctorId);
     if (owner.agencyId) body.set("agencyId", owner.agencyId);
-    setMsg("Belge gönderiliyor...");
+    setMsg(t("uploading"));
     const response = await fetch("/api/verification-documents", {
       method: "POST",
       body,
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setMsg(data.error || "Belge yüklenemedi.");
+      setMsg(data.error || t("uploadFailed"));
       return;
     }
     setRows(
@@ -68,7 +78,7 @@ export default function VerificationDocumentManager({
         )
         .concat(data)
     );
-    setMsg("Belge incelemeye gönderildi.");
+    setMsg(t("uploadedSuccess"));
     form.reset();
   }
 
@@ -112,10 +122,9 @@ export default function VerificationDocumentManager({
             <ShieldCheck size={28} weight="duotone" />
           </div>
           <div>
-            <h3 className="premium-accordion-title">Doğrulama belgeleri</h3>
+            <h3 className="premium-accordion-title">{t("title")}</h3>
             <p className="premium-accordion-desc">
-              Zorunlu belgeler onaylanmadan profil yayınlanmaz. Süresi dolan
-              belge yayını durdurur.
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -214,7 +223,9 @@ export default function VerificationDocumentManager({
                           color: "#0f172a",
                         }}
                       >
-                        {requirement.label}
+                        {t.has("docTypes." + requirement.type)
+                          ? t("docTypes." + requirement.type)
+                          : requirement.label}
                       </h3>
                       <div
                         style={{
@@ -232,7 +243,7 @@ export default function VerificationDocumentManager({
                             color: requirement.required ? "#0f172a" : "#64748b",
                           }}
                         >
-                          {requirement.required ? "Zorunlu" : "İsteğe bağlı"}
+                          {requirement.required ? t("required") : t("optional")}
                         </span>
                         {requirement.expires && (
                           <span
@@ -242,18 +253,17 @@ export default function VerificationDocumentManager({
                               gap: "4px",
                             }}
                           >
-                            • Son kullanma tarihi takip edilir
+                            • {t("expiresNotice")}
                           </span>
                         )}
                         {current?.documentNumber && (
-                          <span>• No: {current.documentNumber}</span>
+                          <span>• {t("docNumber", { number: current.documentNumber })}</span>
                         )}
                         {current?.expiresAt && (
                           <span>
-                            • Bitiş:{" "}
-                            {new Date(current.expiresAt).toLocaleDateString(
-                              "tr-TR"
-                            )}
+                            • {t("expiresAt", {
+                              date: new Date(current.expiresAt).toLocaleDateString(),
+                            })}
                           </span>
                         )}
                       </div>
@@ -266,7 +276,7 @@ export default function VerificationDocumentManager({
                             fontWeight: 500,
                           }}
                         >
-                          Not: {current.reviewerNote}
+                          {t("reviewerNote", { note: current.reviewerNote })}
                         </div>
                       )}
                     </div>
@@ -287,8 +297,10 @@ export default function VerificationDocumentManager({
                   >
                     {statusStyle.icon}
                     {current
-                      ? DOCUMENT_STATUS_LABELS[current.status] || current.status
-                      : "Eksik"}
+                      ? statusLabels[current.status] ||
+                        DOCUMENT_STATUS_LABELS[current.status] ||
+                        current.status
+                      : t("missing")}
                   </span>
                 </header>
 
@@ -317,11 +329,11 @@ export default function VerificationDocumentManager({
                         color: "#475569",
                       }}
                     >
-                      Belge numarası
+                      {t("docNumberLabel")}
                     </span>
                     <input
                       name="documentNumber"
-                      placeholder="Örn. 123456"
+                      placeholder={t("docNumberPlaceholder")}
                       required
                       defaultValue={current?.documentNumber || ""}
                       style={{
@@ -346,11 +358,11 @@ export default function VerificationDocumentManager({
                         color: "#475569",
                       }}
                     >
-                      Veren kurum
+                      {t("issuerLabel")}
                     </span>
                     <input
                       name="issuer"
-                      placeholder="Kurum adı"
+                      placeholder={t("issuerPlaceholder")}
                       required
                       defaultValue={current?.issuer || ""}
                       style={{
@@ -375,7 +387,7 @@ export default function VerificationDocumentManager({
                         color: "#475569",
                       }}
                     >
-                      Düzenlenme tarihi
+                      {t("issuedAtLabel")}
                     </span>
                     <input
                       type="date"
@@ -403,7 +415,7 @@ export default function VerificationDocumentManager({
                           color: "#475569",
                         }}
                       >
-                        Son kullanma tarihi
+                        {t("expiresAtLabel")}
                       </span>
                       <input
                         type="date"
@@ -439,7 +451,7 @@ export default function VerificationDocumentManager({
                       className="muted"
                       style={{ fontSize: "12px", whiteSpace: "nowrap" }}
                     >
-                      Max 4.5 MB
+                      {t("maxSize")}
                     </span>
                   </div>
 
@@ -467,7 +479,7 @@ export default function VerificationDocumentManager({
                         cursor: "pointer",
                       }}
                     >
-                      <UploadSimple size={18} weight="bold" /> Belge Yükle
+                      <UploadSimple size={18} weight="bold" /> {t("uploadDoc")}
                     </button>
                     {current && (
                       <a
@@ -486,8 +498,8 @@ export default function VerificationDocumentManager({
                           background: "#eff6ff",
                         }}
                       >
-                        <DownloadSimple size={18} weight="bold" /> Mevcut
-                        Belgeyi Görüntüle
+                        <DownloadSimple size={18} weight="bold" />{" "}
+                        {t("viewCurrentDoc")}
                       </a>
                     )}
                   </div>

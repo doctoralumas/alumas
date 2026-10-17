@@ -1,1 +1,23 @@
-import {redirect} from "next/navigation";import {currentUser} from "@/lib/auth";import AdminAgencyList from "@/components/admin-agency-list";export default async function Page(){const u=await currentUser();if(!u)redirect("/login");if(u.role!=="ADMIN")redirect("/profile");return <div className="page"><div className="page-title"><span className="kicker">Doğrulama</span><h1>Sağlık turizmi acenteleri</h1></div><section className="panel"><AdminAgencyList/></section></div>}
+import { redirect } from "next/navigation";
+import { currentUser } from "@/lib/auth";
+import AdminAgencyList from "@/components/admin-agency-list";
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const u = await currentUser();
+  if (!u) redirect("/login");
+  if (u.role !== "ADMIN") redirect("/profile");
+  const t = await getTranslations("admin.agenciesPage");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("kicker")}</span>
+        <h1>{t("title")}</h1>
+      </div>
+      <section className="panel">
+        <AdminAgencyList />
+      </section>
+    </div>
+  );
+}

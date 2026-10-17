@@ -1,0 +1,18 @@
+{
+  "contact": {
+    "kicker": "Support",
+    "title": "Contact Us",
+    "subtitle": "Reach out to Alumas regarding product feedback, institutional accounts, or support inquiries.",
+    "namePlaceholder": "Full name",
+    "emailPlaceholder": "Email address",
+    "phonePlaceholder": "Phone number (optional)",
+    "subjectPlaceholder": "Subject",
+    "messagePlaceholder": "Your message",
+    "sendButton": "Send Message",
+    "success": "Your message has been received ✓",
+    "error": "Failed to send message",
+    "emergencyTitle": "Emergency Notice",
+    "emergencyDesc": "This contact form is not an emergency response channel. In Turkey, call 112 immediately for emergency medical assistance.",
+    "emergencyCall": "Call 112"
+  }
+}

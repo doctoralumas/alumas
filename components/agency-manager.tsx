@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import VerificationDocumentManager from "@/components/verification-document-manager";
 import {
   Info,
@@ -15,21 +16,22 @@ import {
   MapPin,
 } from "@phosphor-icons/react/dist/ssr";
 
-const serviceKinds = [
-  ["TRANSFER", "Transfer"],
-  ["ACCOMMODATION", "Konaklama"],
-  ["TRANSLATION", "Tercüman"],
-  ["COORDINATION", "Koordinasyon"],
-  ["REFERRAL", "Partner yönlendirme"],
-] as const;
-const kindLabel = Object.fromEntries(serviceKinds) as Record<string, string>;
-
 export default function AgencyManager({ agency }: { agency: any }) {
+  const t = useTranslations("professional.agencyDetail");
   const [services, setServices] = useState<any[]>(agency.services || []);
   const [packages, setPackages] = useState<any[]>(agency.packages || []);
   const [msg, setMsg] = useState("");
   const canPublish =
     agency.isVerified && agency.status === "APPROVED" && agency.isActive;
+
+  const serviceKinds = [
+    ["TRANSFER", t("kinds.TRANSFER")],
+    ["ACCOMMODATION", t("kinds.ACCOMMODATION")],
+    ["TRANSLATION", t("kinds.TRANSLATION")],
+    ["COORDINATION", t("kinds.COORDINATION")],
+    ["REFERRAL", t("kinds.REFERRAL")],
+  ] as const;
+  const kindLabel = Object.fromEntries(serviceKinds) as Record<string, string>;
 
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
   const [serviceForm, setServiceForm] = useState({
@@ -75,10 +77,10 @@ export default function AgencyManager({ agency }: { agency: any }) {
       body: JSON.stringify(payload),
     });
     if (r.ok) {
-      setMsg("Genel bilgiler güncellendi");
+      setMsg(t("infoUpdated"));
       setTimeout(() => window.location.reload(), 1000);
     } else {
-      setMsg("Bilgiler güncellenemedi");
+      setMsg(t("infoUpdateFailed"));
     }
   }
 
@@ -92,7 +94,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setMsg(data.error || "Hizmet kaydedilemedi");
+      setMsg(data.error || t("serviceSaveFailed"));
       return;
     }
 
@@ -100,10 +102,10 @@ export default function AgencyManager({ agency }: { agency: any }) {
       setServices((current) =>
         current.map((item) => (item.id === data.id ? data : item))
       );
-      setMsg("Hizmet güncellendi");
+      setMsg(t("serviceUpdated"));
     } else {
       setServices((current) => [data, ...current]);
-      setMsg("Hizmet eklendi");
+      setMsg(t("serviceAdded"));
     }
     setEditingServiceId(null);
     setServiceForm({
@@ -138,13 +140,13 @@ export default function AgencyManager({ agency }: { agency: any }) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setMsg(data.error || "Hizmet durumu değişmedi");
+      setMsg(data.error || t("serviceStatusNoChange"));
       return;
     }
     setServices((current) =>
       current.map((item) => (item.id === data.id ? data : item))
     );
-    setMsg(data.isActive ? "Hizmet yayında" : "Hizmet yayından kaldırıldı");
+    setMsg(data.isActive ? t("published") : t("passive"));
   }
 
   async function handlePackageSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -157,7 +159,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setMsg(data.error || "Paket kaydedilemedi");
+      setMsg(data.error || t("packageSaveFailed"));
       return;
     }
 
@@ -165,10 +167,10 @@ export default function AgencyManager({ agency }: { agency: any }) {
       setPackages((current) =>
         current.map((item) => (item.id === data.id ? data : item))
       );
-      setMsg("Paket güncellendi");
+      setMsg(t("packageUpdated"));
     } else {
       setPackages((current) => [data, ...current]);
-      setMsg("Paket eklendi");
+      setMsg(t("packageAdded"));
     }
     setEditingPackageId(null);
     setPackageForm({
@@ -219,13 +221,13 @@ export default function AgencyManager({ agency }: { agency: any }) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setMsg(data.error || "Paket durumu değişmedi");
+      setMsg(data.error || t("packageStatusNoChange"));
       return;
     }
     setPackages((current) =>
       current.map((row) => (row.id === data.id ? data : row))
     );
-    setMsg(data.isPublished ? "Paket yayında" : "Paket yayından kaldırıldı");
+    setMsg(data.isPublished ? t("published") : t("draft"));
   }
 
   return (
@@ -252,8 +254,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               fontWeight: 500,
             }}
           >
-            Profil doğrulanmadan hizmetler ve paketler hasta sayfasında
-            görünmez. Zorunlu belgeler onaylı ve süresi geçerli olmalıdır.
+            {t("unverifiedNotice")}
           </p>
         </div>
       )}
@@ -264,7 +265,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
         </div>
       )}
 
-      {/* Genel Bilgiler */}
+      {/* General Information */}
       <details className="premium-accordion" open>
         <summary className="premium-accordion-summary">
           <div className="premium-accordion-header">
@@ -275,9 +276,9 @@ export default function AgencyManager({ agency }: { agency: any }) {
               <Globe size={28} weight="duotone" />
             </div>
             <div>
-              <h3 className="premium-accordion-title">Genel Bilgiler</h3>
+              <h3 className="premium-accordion-title">{t("generalInfo")}</h3>
               <p className="premium-accordion-desc">
-                Acente profilinizi ve iletişim bilgilerinizi düzenleyin.
+                {t("generalInfoDesc")}
               </p>
             </div>
           </div>
@@ -286,11 +287,11 @@ export default function AgencyManager({ agency }: { agency: any }) {
         <div className="premium-accordion-content">
           <form className="responsive-form-grid" onSubmit={saveGenelBilgiler}>
             <div className="responsive-form-field">
-              <label>Acente Adı</label>
+              <label>{t("agencyName")}</label>
               <input name="name" defaultValue={agency.name} required />
             </div>
             <div className="responsive-form-field">
-              <label>Telefon</label>
+              <label>{t("phone")}</label>
               <input
                 name="phone"
                 defaultValue={agency.phone || ""}
@@ -298,7 +299,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               />
             </div>
             <div className="responsive-form-field">
-              <label>Web Sitesi</label>
+              <label>{t("website")}</label>
               <input
                 name="website"
                 defaultValue={agency.website || ""}
@@ -306,7 +307,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               />
             </div>
             <div className="responsive-form-field">
-              <label>İl</label>
+              <label>{t("city")}</label>
               <input name="city" defaultValue={agency.city || ""} required />
             </div>
 
@@ -314,7 +315,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Açık Adres</label>
+              <label>{t("address")}</label>
               <input
                 name="address"
                 defaultValue={agency.address || ""}
@@ -325,12 +326,12 @@ export default function AgencyManager({ agency }: { agency: any }) {
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Hakkında (Açıklama)</label>
+              <label>{t("about")}</label>
               <textarea
                 name="description"
                 defaultValue={agency.description || ""}
                 rows={4}
-                placeholder="Acentenizi ve vizyonunuzu tanıtın..."
+                placeholder={t("aboutPlaceholder")}
               />
             </div>
             <div
@@ -342,7 +343,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               }}
             >
               <button className="primary" type="submit">
-                Bilgileri Güncelle
+                {t("updateInfo")}
               </button>
             </div>
           </form>
@@ -365,9 +366,9 @@ export default function AgencyManager({ agency }: { agency: any }) {
               <Handshake size={28} weight="duotone" />
             </div>
             <div>
-              <h3 className="premium-accordion-title">Destek Hizmetleri</h3>
+              <h3 className="premium-accordion-title">{t("servicesTitle")}</h3>
               <p className="premium-accordion-desc">
-                Transfer, konaklama, tercüman gibi bağımsız hizmetler ekleyin.
+                {t("servicesDesc")}
               </p>
             </div>
           </div>
@@ -386,7 +387,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
             }}
           >
             <div className="responsive-form-field">
-              <label>Hizmet Türü</label>
+              <label>{t("serviceType")}</label>
               <select
                 value={serviceForm.kind}
                 onChange={(e) =>
@@ -401,28 +402,28 @@ export default function AgencyManager({ agency }: { agency: any }) {
               </select>
             </div>
             <div className="responsive-form-field">
-              <label>Hizmet Başlığı</label>
+              <label>{t("serviceTitle")}</label>
               <input
                 value={serviceForm.title}
                 onChange={(e) =>
                   setServiceForm({ ...serviceForm, title: e.target.value })
                 }
-                placeholder="Örn: VIP Havalimanı Transferi"
+                placeholder={t("serviceTitlePlaceholder")}
                 required
               />
             </div>
             <div className="responsive-form-field">
-              <label>Şehir</label>
+              <label>{t("city")}</label>
               <input
                 value={serviceForm.city}
                 onChange={(e) =>
                   setServiceForm({ ...serviceForm, city: e.target.value })
                 }
-                placeholder="Örn: İstanbul"
+                placeholder={t("serviceCityPlaceholder")}
               />
             </div>
             <div className="responsive-form-field">
-              <label>Fiyat (Opsiyonel)</label>
+              <label>{t("priceLabel")}</label>
               <input
                 value={serviceForm.price}
                 onChange={(e) =>
@@ -437,7 +438,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Kısa Açıklama</label>
+              <label>{t("shortDesc")}</label>
               <input
                 value={serviceForm.description}
                 onChange={(e) =>
@@ -446,7 +447,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     description: e.target.value,
                   })
                 }
-                placeholder="Hizmet detayları..."
+                placeholder={t("serviceDescPlaceholder")}
               />
             </div>
             <div
@@ -473,11 +474,11 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     });
                   }}
                 >
-                  İptal
+                  {t("cancel")}
                 </button>
               )}
               <button className="primary" type="submit">
-                {editingServiceId ? "Hizmeti Güncelle" : "Hizmet Ekle"}
+                {editingServiceId ? t("updateService") : t("addService")}
               </button>
             </div>
           </form>
@@ -540,7 +541,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                       color: s.isActive ? "#10b981" : "#64748b",
                     }}
                   >
-                    {s.isActive ? "Yayında" : "Pasif"}
+                    {s.isActive ? t("published") : t("passive")}
                   </span>
                 </div>
                 {s.description && (
@@ -565,7 +566,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                   }}
                 >
                   <strong style={{ color: "#0284c7" }}>
-                    {s.price ? s.price + " ₺" : "Fiyat Sorunuz"}
+                    {s.price ? s.price + " ₺" : t("priceOnRequest")}
                   </strong>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button
@@ -581,7 +582,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                         padding: "4px 8px",
                       }}
                     >
-                      {s.isActive ? "Gizle" : "Yayınla"}
+                      {s.isActive ? t("hide") : t("publish")}
                     </button>
                     <button
                       type="button"
@@ -616,7 +617,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                   borderRadius: "16px",
                 }}
               >
-                Eklenmiş destek hizmeti yok.
+                {t("noServices")}
               </div>
             )}
           </div>
@@ -635,11 +636,10 @@ export default function AgencyManager({ agency }: { agency: any }) {
             </div>
             <div>
               <h3 className="premium-accordion-title">
-                Tedavi ve Seyahat Paketleri
+                {t("packagesTitle")}
               </h3>
               <p className="premium-accordion-desc">
-                Sağlık turizmi hastalarına sunduğunuz kapsamlı paketleri
-                yönetin.
+                {t("packagesDesc")}
               </p>
             </div>
           </div>
@@ -661,35 +661,35 @@ export default function AgencyManager({ agency }: { agency: any }) {
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Paket Adı</label>
+              <label>{t("packageName")}</label>
               <input
                 value={packageForm.title}
                 onChange={(e) =>
                   setPackageForm({ ...packageForm, title: e.target.value })
                 }
-                placeholder="Örn: Saç Ekimi ve Konaklama Paketi"
+                placeholder={t("packageNamePlaceholder")}
                 required
               />
             </div>
             <div className="responsive-form-field">
-              <label>Kategori</label>
+              <label>{t("category")}</label>
               <input
                 value={packageForm.category}
                 onChange={(e) =>
                   setPackageForm({ ...packageForm, category: e.target.value })
                 }
-                placeholder="Örn: Estetik"
+                placeholder={t("categoryPlaceholder")}
                 required
               />
             </div>
             <div className="responsive-form-field">
-              <label>Şehir</label>
+              <label>{t("city")}</label>
               <input
                 value={packageForm.city}
                 onChange={(e) =>
                   setPackageForm({ ...packageForm, city: e.target.value })
                 }
-                placeholder="Örn: İstanbul"
+                placeholder={t("serviceCityPlaceholder")}
                 required
               />
             </div>
@@ -697,7 +697,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Sağlık Kurumu / Sağlayıcı</label>
+              <label>{t("providerName")}</label>
               <input
                 value={packageForm.providerName}
                 onChange={(e) =>
@@ -706,7 +706,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     providerName: e.target.value,
                   })
                 }
-                placeholder="Anlaşmalı hastane veya klinik adı"
+                placeholder={t("providerPlaceholder")}
                 required
               />
             </div>
@@ -714,7 +714,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Paket Açıklaması</label>
+              <label>{t("packageDesc")}</label>
               <textarea
                 value={packageForm.description}
                 onChange={(e) =>
@@ -724,32 +724,32 @@ export default function AgencyManager({ agency }: { agency: any }) {
                   })
                 }
                 rows={4}
-                placeholder="Paketin kapsamını detaylıca anlatın..."
+                placeholder={t("packageDescPlaceholder")}
                 required
               />
             </div>
             <div className="responsive-form-field">
-              <label>Diller (Virgülle ayırın)</label>
+              <label>{t("languagesLabel")}</label>
               <input
                 value={packageForm.languages}
                 onChange={(e) =>
                   setPackageForm({ ...packageForm, languages: e.target.value })
                 }
-                placeholder="Türkçe, English, Arabic"
+                placeholder={t("languagesPlaceholder")}
               />
             </div>
             <div className="responsive-form-field">
-              <label>Dahil Olanlar (Virgülle ayırın)</label>
+              <label>{t("includesLabel")}</label>
               <input
                 value={packageForm.includes}
                 onChange={(e) =>
                   setPackageForm({ ...packageForm, includes: e.target.value })
                 }
-                placeholder="Muayene, 3 Gece Otel, VIP Transfer"
+                placeholder={t("includesPlaceholder")}
               />
             </div>
             <div className="responsive-form-field">
-              <label>Başlangıç Fiyatı</label>
+              <label>{t("startingPrice")}</label>
               <input
                 value={packageForm.startingPrice}
                 onChange={(e) =>
@@ -760,11 +760,11 @@ export default function AgencyManager({ agency }: { agency: any }) {
                 }
                 type="number"
                 min="0"
-                placeholder="Fiyat"
+                placeholder={t("priceLabel")}
               />
             </div>
             <div className="responsive-form-field">
-              <label>Para Birimi</label>
+              <label>{t("currency")}</label>
               <select
                 value={packageForm.currency}
                 onChange={(e) =>
@@ -780,7 +780,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label style={{ marginBottom: "12px" }}>Ekstra İmkanlar</label>
+              <label style={{ marginBottom: "12px" }}>{t("extraAmenities")}</label>
               <div
                 style={{
                   display: "flex",
@@ -812,7 +812,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     }
                     style={{ width: "20px", height: "20px" }}
                   />{" "}
-                  Şehir İçi Transfer
+                  {t("cityTransfer")}
                 </label>
                 <label
                   style={{
@@ -834,7 +834,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     }
                     style={{ width: "20px", height: "20px" }}
                   />{" "}
-                  Konaklama (Otel)
+                  {t("hotelStay")}
                 </label>
                 <label
                   style={{
@@ -856,7 +856,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     }
                     style={{ width: "20px", height: "20px" }}
                   />{" "}
-                  Havalimanı Karşılama
+                  {t("airportPickup")}
                 </label>
                 <label
                   style={{
@@ -878,7 +878,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     }
                     style={{ width: "20px", height: "20px" }}
                   />{" "}
-                  7/24 Koordinatör
+                  {t("coordinatorSupport")}
                 </label>
               </div>
             </div>
@@ -914,11 +914,11 @@ export default function AgencyManager({ agency }: { agency: any }) {
                     });
                   }}
                 >
-                  İptal
+                  {t("cancel")}
                 </button>
               )}
               <button className="primary" type="submit">
-                {editingPackageId ? "Paketi Güncelle" : "Paket Ekle"}
+                {editingPackageId ? t("updatePackage") : t("addPackage")}
               </button>
             </div>
           </form>
@@ -967,7 +967,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                         fontWeight: 700,
                       }}
                     >
-                      {p.isPublished ? "Yayında" : "Taslak"}
+                      {p.isPublished ? t("published") : t("draft")}
                     </span>
                   </div>
                   <h4
@@ -1012,7 +1012,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                           border: "1px solid #e2e8f0",
                         }}
                       >
-                        Transfer
+                        {t("cityTransfer")}
                       </span>
                     )}
                     {p.accommodationIncluded && (
@@ -1029,7 +1029,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                           border: "1px solid #e2e8f0",
                         }}
                       >
-                        Konaklama
+                        {t("hotelStay")}
                       </span>
                     )}
                     {p.airportPickup && (
@@ -1046,7 +1046,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                           border: "1px solid #e2e8f0",
                         }}
                       >
-                        Havalimanı
+                        {t("airportPickup")}
                       </span>
                     )}
                     {p.coordinatorSupport && (
@@ -1063,7 +1063,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                           border: "1px solid #e2e8f0",
                         }}
                       >
-                        Koordinatör
+                        {t("coordinatorSupport")}
                       </span>
                     )}
                   </div>
@@ -1085,12 +1085,12 @@ export default function AgencyManager({ agency }: { agency: any }) {
                         fontSize: "12px",
                       }}
                     >
-                      Başlangıç Fiyatı
+                      {t("startingPrice")}
                     </span>
                     <strong style={{ color: "#0284c7", fontSize: "20px" }}>
                       {p.startingPrice
                         ? p.startingPrice + " " + p.currency
-                        : "Fiyat Sorunuz"}
+                        : t("priceOnRequest")}
                     </strong>
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
@@ -1108,7 +1108,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                         cursor: "pointer",
                       }}
                     >
-                      {p.isPublished ? "Gizle" : "Yayınla"}
+                      {p.isPublished ? t("hide") : t("publish")}
                     </button>
                     <button
                       type="button"
@@ -1142,7 +1142,7 @@ export default function AgencyManager({ agency }: { agency: any }) {
                   borderRadius: "16px",
                 }}
               >
-                Eklenmiş paket yok.
+                {t("noPackages")}
               </div>
             )}
           </div>

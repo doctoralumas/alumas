@@ -1,1 +1,31 @@
-import Link from "next/link";export default function AboutPage(){return <div className="page"><div className="page-title"><span className="kicker">Alumas</span><h1>Hakkımızda</h1><p>Alumas; kişisel sağlık takibini, sağlık profesyonellerini ve doğrulanmış sağlık kurumlarını tek dijital deneyimde bir araya getirmeyi amaçlayan bir sağlık teknolojisi platformudur.</p></div><div className="profile-columns"><section className="panel"><h2>Ne yapıyoruz?</h2><p>Randevu, sağlık takibi, aile sağlığı, kurum keşfi, evde sağlık, sağlık turizmi ve güvenli sağlık verisi paylaşımı için ortak bir kullanıcı deneyimi oluşturuyoruz.</p><h2>Yaklaşımımız</h2><p>Alumas tıbbi tanı koyan bir sistem değildir. Sağlık verilerinin düzenlenmesi, takip edilmesi ve kullanıcının izin verdiği sağlık profesyonelleriyle paylaşılması için araçlar sunar.</p></section><section className="panel"><h2>Güven ve gizlilik</h2><p>Sağlık verileri hassas veri olarak ele alınır. Erişim izinleri rol ve kapsam bazında kontrol edilir; kullanıcı paylaşım tercihlerini yönetebilir.</p><Link className="secondary" href="/privacy">Gizlilik Merkezi</Link></section></div></div>}
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+
+export default async function AboutPage() {
+  const t = await getTranslations("about");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("kicker")}</span>
+        <h1>{t("title")}</h1>
+        <p>{t("intro")}</p>
+      </div>
+      <div className="profile-columns">
+        <section className="panel">
+          <h2>{t("whatWeDoTitle")}</h2>
+          <p>{t("whatWeDoDesc")}</p>
+          <h2>{t("approachTitle")}</h2>
+          <p>{t("approachDesc")}</p>
+        </section>
+        <section className="panel">
+          <h2>{t("trustTitle")}</h2>
+          <p>{t("trustDesc")}</p>
+          <Link className="secondary" href="/privacy">
+            {t("privacyCenter")}
+          </Link>
+        </section>
+      </div>
+    </div>
+  );
+}

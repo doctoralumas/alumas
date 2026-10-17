@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import LocationSelector from "@/components/location-selector";
+import LanguageSwitcher from "@/components/language-switcher";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
-  CaretDown,
   CaretLeft,
   Bell,
-  MapPin,
   Sparkle,
   SquaresFour,
   User,
@@ -18,6 +18,7 @@ import { homeFont } from "@/lib/home-font";
 type Me = { name: string; role: "PATIENT" | "DOCTOR" | "ADMIN"; doctorSlug?: string | null } | null;
 
 export default function Header() {
+  const t = useTranslations("header");
   const [me, setMe] = useState<Me>(null);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const pathname = usePathname();
@@ -48,12 +49,12 @@ export default function Header() {
               onClick={() => router.back()}
               className="home-back-btn"
               type="button"
-              aria-label="Geri"
+              aria-label={t("backAria")}
             >
               <CaretLeft size={20} weight="bold" />
             </button>
           )}
-          <Link href="/" className="home-brand" aria-label="ALUMAS Ana Sayfa">
+          <Link href="/" className="home-brand" aria-label={t("brandAria")}>
             <svg className="home-brand-mark" width="40" height="24" viewBox="0 0 40 24" aria-hidden="true">
               <path
                 d="M2 14 L10 14 L14 22 L20 2 L26 22 L30 14 L38 14 M17.5 14 h5 M20 11.5 v5"
@@ -73,16 +74,19 @@ export default function Header() {
           <div className="home-nav-links">
             <Link className="home-nav-link" href="/ai">
               <Sparkle size={16} weight="fill" />
-              Luma Asistan
+              {t("lumaAssistant")}
             </Link>
             <Link className="home-nav-link" href="/services">
               <SquaresFour size={16} weight="fill" />
-              Tüm Hizmetler
+              {t("allServices")}
             </Link>
           </div>
+
+          <LanguageSwitcher />
+
           {me ? (
             <>
-              <Link href="/notifications" className="home-bell" title="Bildirimler" aria-label="Bildirimler">
+              <Link href="/notifications" className="home-bell" title={t("notifications")} aria-label={t("notifications")}>
                 <Bell size={20} weight="fill" />
                 {unreadNotifications > 0 && (
                   <span className="home-bell-badge">
@@ -92,13 +96,13 @@ export default function Header() {
               </Link>
               <Link className="home-login" href="/profile">
                 <User size={16} weight="fill" />
-                {me.name.split(" ")[0]}
+                <span className="home-login-name">{me.name.split(" ")[0]}</span>
               </Link>
             </>
           ) : (
             <Link className="home-login" href="/login">
               <User size={16} weight="fill" />
-              Giriş Yap
+              <span className="home-login-name">{t("login")}</span>
             </Link>
           )}
         </div>

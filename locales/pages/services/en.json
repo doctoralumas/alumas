@@ -1,0 +1,170 @@
+{
+  "services": {
+    "kicker": "Alumas",
+    "title": "All Services",
+    "subtitle": "Access all core healthcare modules in one centralized directory.",
+    "searchPlaceholder": "Search services... (e.g. Vaccine, Blood Pressure)",
+    "noResults": "No services found matching your search.",
+    "noResultsTitle": "No results found",
+    "noResultsDesc": "No service matches \"{query}\".",
+    "groups": {
+      "healthServices": "Healthcare Services",
+      "personalHealth": "Personal Health",
+      "familyAndCommunication": "Family & Care Collaboration"
+    },
+    "items": {
+      "doctors": {
+        "title": "Find Doctors & Specialists",
+        "desc": "Discover physicians, specialists, dietitians, and physiotherapists."
+      },
+      "organizations": {
+        "title": "Hospitals & Clinics",
+        "desc": "Explore verified healthcare institutions and centers."
+      },
+      "nearby": {
+        "title": "Nearby Healthcare",
+        "desc": "Locate nearest hospitals, clinics, pharmacies, and emergency rooms."
+      },
+      "homeCare": {
+        "title": "Home Healthcare",
+        "desc": "Schedule home visits with physicians, nurses, or diagnostic labs."
+      },
+      "emergency": {
+        "title": "Emergency / 112",
+        "desc": "Emergency ambulance dispatch, critical care, and emergency health card."
+      },
+      "healthTourism": {
+        "title": "Health Tourism",
+        "desc": "Accredited clinics, medical packages, transfers, and medical interpreters."
+      },
+      "insurance": {
+        "title": "Insurance Networks",
+        "desc": "Contracted healthcare facilities and supported insurance policies."
+      },
+      "campaigns": {
+        "title": "Health Campaigns",
+        "desc": "Promotions and clinical packages from partner healthcare institutions."
+      },
+      "phoneDirectory": {
+        "title": "Phone Directory",
+        "desc": "Emergency numbers and priority health hotlines."
+      },
+      "health": {
+        "title": "My Health",
+        "desc": "Access your personal health management center."
+      },
+      "bloodPressure": {
+        "title": "Blood Pressure",
+        "desc": "Systolic, diastolic, and resting heart rate monitoring."
+      },
+      "glucose": {
+        "title": "Blood Glucose",
+        "desc": "Fasting and postprandial blood glucose logs."
+      },
+      "sleep": {
+        "title": "Sleep Tracking",
+        "desc": "Sleep duration, quality scores, and recovery trends."
+      },
+      "water": {
+        "title": "Water Tracking",
+        "desc": "Log and monitor your daily hydration targets."
+      },
+      "body": {
+        "title": "Weight & Height",
+        "desc": "Anthropometric measurements, BMI, and body composition."
+      },
+      "cycle": {
+        "title": "Period & Cycle Tracking",
+        "desc": "Menstrual cycles, flow intensity, symptoms, and fertile windows."
+      },
+      "medications": {
+        "title": "My Medications",
+        "desc": "Prescriptions, dosing schedules, and intake adherence reminders."
+      },
+      "labs": {
+        "title": "Laboratory Results",
+        "desc": "Diagnostic blood tests, reference ranges, and trend charts."
+      },
+      "imaging": {
+        "title": "Medical Imaging",
+        "desc": "Radiology reports, MRI, CT scans, X-rays, and ultrasounds."
+      },
+      "vaccinations": {
+        "title": "Vaccination Schedule",
+        "desc": "Immunization history and scheduled booster doses."
+      },
+      "allergies": {
+        "title": "Allergies",
+        "desc": "Known medical, food, and environmental allergy records."
+      },
+      "medicalHistory": {
+        "title": "Medical History",
+        "desc": "Chronic illnesses, surgeries, and family medical background."
+      },
+      "timeline": {
+        "title": "Clinical Timeline",
+        "desc": "All medical encounters, diagnoses, and tests in one timeline."
+      },
+      "goals": {
+        "title": "Health Goals",
+        "desc": "Personal health milestones and doctor-prescribed objectives."
+      },
+      "tasks": {
+        "title": "My Tasks",
+        "desc": "Physician care plans, tests to complete, and follow-ups."
+      },
+      "reports": {
+        "title": "Health Reports",
+        "desc": "Consolidated medical summaries and exportable PDF reports."
+      },
+      "summary": {
+        "title": "Health Summary",
+        "desc": "Active medications, allergies, vaccines, and vital summary."
+      },
+      "healthCard": {
+        "title": "Health Card",
+        "desc": "Emergency card with critical medical information and emergency contacts."
+      },
+      "calendar": {
+        "title": "Calendar & Alarms",
+        "desc": "Appointments, medication times, and clinical reminder alerts."
+      },
+      "familyHub": {
+        "title": "Family Health",
+        "desc": "Unified care portal for children, dependents, and elder care."
+      },
+      "growthPregnancy": {
+        "title": "Growth & Pregnancy",
+        "desc": "Pediatric growth curves and gestational pregnancy milestones."
+      },
+      "familyAccess": {
+        "title": "Family Access",
+        "desc": "Manage medical records sharing permissions with family members."
+      },
+      "familyProfiles": {
+        "title": "Dependent Profiles",
+        "desc": "Manage specialized profiles for infants, children, or pregnancies."
+      },
+      "appointments": {
+        "title": "My Appointments",
+        "desc": "Upcoming, rescheduled, and past medical consultations."
+      },
+      "careCalendar": {
+        "title": "Shared Care Calendar",
+        "desc": "Collaborative calendar with your physician and care team."
+      },
+      "messages": {
+        "title": "Messages",
+        "desc": "Secure, HIPAA/GDPR-compliant communication with providers."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "desc": "Follow-up reminders, test availability, and status updates."
+      },
+      "healthCircle": {
+        "title": "Health Circle",
+        "desc": "Caregiver collaboration and shared family health management."
+      }
+    }
+  }
+}

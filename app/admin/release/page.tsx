@@ -1,1 +1,23 @@
-import {redirect} from "next/navigation";import {currentUser} from "@/lib/auth";import ReleaseDashboard from "@/components/release-dashboard-client";export default async function Page(){const u=await currentUser();if(!u)redirect("/login");if(u.role!=="ADMIN")redirect("/profile");return <div className="page"><div className="page-title"><span className="kicker">Release Ops</span><h1>Go / No-Go Dashboard</h1><p>Çalışan build, veritabanı readiness, bakım modu ve feature flag görünümü.</p></div><ReleaseDashboard/></div>}
+import { redirect } from "next/navigation";
+import { currentUser } from "@/lib/auth";
+import ReleaseDashboard from "@/components/release-dashboard-client";
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const u = await currentUser();
+  if (!u) redirect("/login");
+  if (u.role !== "ADMIN") redirect("/profile");
+  const t = await getTranslations("admin.releasePage");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("kicker")}</span>
+        <h1>{t("title")}</h1>
+        <p>{t("subtitle")}</p>
+      </div>
+      <ReleaseDashboard />
+    </div>
+  );
+}
+

@@ -1,28 +1,38 @@
-﻿"use client";
-import {useEffect,useMemo,useState} from "react";
-import SectionVisual from "@/components/section-visual";
-import { Drop, Plus, Clock, TrendUp } from "@phosphor-icons/react";
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import { Drop, Plus, Clock } from "@phosphor-icons/react";
+import { useTranslations, useLocale } from "next-intl";
 
-type R={id:string;amountMl:number;consumedAt:string};
+type R = { id: string; amountMl: number; consumedAt: string };
 
-export default function Page(){
-  const [rows,setRows]=useState<R[]>([]);
-  const [loading,setLoading]=useState(true);
+export default function Page() {
+  const t = useTranslations("health.healthWater");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
 
-  const load=()=>fetch('/api/health/water?days=7').then(r => r.ok ? r.json() : []).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
-  useEffect(() => { load(); },[]);
+  const [rows, setRows] = useState<R[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const today=useMemo(()=>rows.filter(x=>new Date(x.consumedAt).toDateString()===new Date().toDateString()).reduce((a,b)=>a+b.amountMl,0),[rows]);
-  const todayCount=useMemo(()=>rows.filter(x=>new Date(x.consumedAt).toDateString()===new Date().toDateString()).length,[rows]);
+  const load = () => fetch('/api/health/water?days=7').then(r => r.ok ? r.json() : []).then(x => setRows(Array.isArray(x) ? x : [])).finally(() => setLoading(false));
+  useEffect(() => { load(); }, []);
 
-  async function add(amountMl:number){
-    await fetch('/api/health/water',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amountMl})});
+  const today = useMemo(() => rows.filter(x => new Date(x.consumedAt).toDateString() === new Date().toDateString()).reduce((a, b) => a + b.amountMl, 0), [rows]);
+  const todayCount = useMemo(() => rows.filter(x => new Date(x.consumedAt).toDateString() === new Date().toDateString()).length, [rows]);
+
+  async function add(amountMl: number) {
+    await fetch('/api/health/water', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amountMl }) });
     load();
   }
 
-  // Varsayılan hedef 2500ml
   const target = 2500;
   const progress = Math.min((today / target) * 100, 100);
+
+  const presets = [
+    { v: 200, label: t("units.glass") },
+    { v: 330, label: t("units.can") },
+    { v: 500, label: t("units.smallBottle") },
+    { v: 1000, label: t("units.largeBottle") }
+  ];
 
   return (
     <div className="page" style={{ maxWidth: "800px" }}>
@@ -33,16 +43,16 @@ export default function Page(){
             <Drop size={32} weight="duotone" color="#0284c7" />
           </div>
           <div>
-            <span className="kicker" style={{ color: "#0284c7" }}>Günlük Takip</span>
-            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>Su Tüketimi</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Günlük su tüketiminizi takip edin ve hedefinize ulaşın.</p>
+            <span className="kicker" style={{ color: "#0284c7" }}>{t("kicker")}</span>
+            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{t("title")}</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>{t("subtitle")}</p>
           </div>
         </div>
       </div>
 
       <div style={{ background: "#fff", borderRadius: "32px", padding: "40px", border: "1px solid #e2e8f0", marginBottom: "40px", display: "flex", flexDirection: "column", alignItems: "center", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
-        <div style={{ fontSize: "64px", fontWeight: 800, color: "#0284c7", lineHeight: 1 }}>{(today/1000).toFixed(2)}<span style={{ fontSize: "32px", color: "#7dd3fc" }}>L</span></div>
-        <div style={{ fontSize: "15px", color: "#64748b", marginTop: "12px", fontWeight: 500 }}>Bugün {todayCount} kez su içtiniz</div>
+        <div style={{ fontSize: "64px", fontWeight: 800, color: "#0284c7", lineHeight: 1 }}>{(today / 1000).toFixed(2)}<span style={{ fontSize: "32px", color: "#7dd3fc" }}>L</span></div>
+        <div style={{ fontSize: "15px", color: "#64748b", marginTop: "12px", fontWeight: 500 }}>{t("todaySummary", { count: todayCount })}</div>
 
         {/* Progress Bar */}
         <div style={{ width: "100%", height: "16px", background: "#f1f5f9", borderRadius: "100px", marginTop: "32px", overflow: "hidden", position: "relative" }}>
@@ -50,22 +60,17 @@ export default function Page(){
         </div>
         <div style={{ width: "100%", display: "flex", justifyContent: "space-between", marginTop: "12px", fontSize: "13px", color: "#94a3b8", fontWeight: 600 }}>
           <span>0 L</span>
-          <span>Hedef: {(target/1000).toFixed(1)} L</span>
+          <span>{t("targetLabel", { target: (target / 1000).toFixed(1) })}</span>
         </div>
       </div>
 
       <section style={{ marginBottom: "40px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
           <div style={{ background: "#f0fdf4", color: "#16a34a", padding: "10px", borderRadius: "14px" }}><Plus size={20} weight="bold" /></div>
-          <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>Hızlı Ekle</h2>
+          <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>{t("quickAdd")}</h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "16px" }}>
-          {[
-            { v: 200, label: 'Bardak' },
-            { v: 330, label: 'Kutu' },
-            { v: 500, label: 'Küçük Şişe' },
-            { v: 1000, label: 'Büyük Şişe' }
-          ].map(x => (
+          {presets.map(x => (
             <button 
               key={x.v} 
               onClick={() => add(x.v)} 
@@ -75,7 +80,7 @@ export default function Page(){
               <Drop size={28} weight="fill" color="#7dd3fc" />
               <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                 <strong style={{ fontSize: "18px", color: "#0f172a" }}>{x.v}</strong>
-                <small style={{ fontSize: "12px", color: "#64748b", fontWeight: 600 }}>ml</small>
+                <small style={{ fontSize: "12px", color: "#64748b", fontWeight: 600 }}>ml • {x.label}</small>
               </div>
             </button>
           ))}
@@ -85,7 +90,7 @@ export default function Page(){
       <section style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
           <div style={{ background: "#f1f5f9", color: "#475569", padding: "10px", borderRadius: "14px" }}><Clock size={20} weight="duotone" /></div>
-          <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>Geçmiş (Son 7 Gün)</h2>
+          <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>{t("historyTitle")}</h2>
         </div>
         
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -96,17 +101,13 @@ export default function Page(){
                 <strong style={{ fontSize: "16px", color: "#0f172a" }}>{r.amountMl} ml</strong>
               </div>
               <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 500 }}>
-                {new Date(r.consumedAt).toLocaleDateString('tr-TR', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
+                {new Date(r.consumedAt).toLocaleDateString(dateLocale, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
           ))}
-          {!loading && rows.length === 0 && (
-            <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", fontSize: "14px", background: "#f8fafc", borderRadius: "16px" }}>Henüz su tüketimi kaydedilmedi.</div>
-          )}
         </div>
       </section>
 
     </div>
-  )
+  );
 }
-

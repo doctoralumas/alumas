@@ -1,1 +1,14 @@
-import SectionVisual from "@/components/section-visual";import ImagingCenter from '@/components/imaging-center';export default function Page(){return <div className="page"><SectionVisual slug="imaging" alt="Görüntüleme"/><div className="page-title"><span className="kicker">Görüntüleme</span><h1>Görüntüleme Sonuçlarım</h1><p>Raporlarını ve görüntüleme geçmişini kişisel sağlık alanında sakla.</p></div><ImagingCenter/></div>}
+import SectionVisual from "@/components/section-visual";
+import ImagingCenter from "@/components/imaging-center";
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const t = await getTranslations("health.healthImaging");
+  return (
+    <div className="page">
+      <SectionVisual slug="imaging" alt={t("visualAlt")} />
+      <ImagingCenter />
+    </div>
+  );
+}
+

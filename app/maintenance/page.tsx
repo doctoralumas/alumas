@@ -1,1 +1,24 @@
-export default function MaintenancePage(){return <div className="page"><section className="panel maintenance-card"><span className="kicker">Alumas</span><h1>Kısa bir bakımdayız.</h1><p>Hizmeti daha güvenli ve kararlı hale getirmek için planlı bakım yapıyoruz. Lütfen biraz sonra tekrar deneyin.</p><p className="muted">Acil sağlık ihtiyacında uygulamayı beklemeyin; Türkiye’de 112’yi arayın.</p><div className="row wrap"><a className="primary" href="/">Tekrar dene</a><a className="secondary" href="tel:112">112’yi ara</a></div></section></div>}
+import { getTranslations } from "next-intl/server";
+
+export default async function MaintenancePage() {
+  const t = await getTranslations("maintenance");
+
+  return (
+    <div className="page">
+      <section className="panel maintenance-card">
+        <span className="kicker">{t("kicker")}</span>
+        <h1>{t("title")}</h1>
+        <p>{t("desc")}</p>
+        <p className="muted">{t("emergencyNotice")}</p>
+        <div className="row wrap">
+          <a className="primary" href="/">
+            {t("tryAgain")}
+          </a>
+          <a className="secondary" href="tel:112">
+            {t("call112")}
+          </a>
+        </div>
+      </section>
+    </div>
+  );
+}

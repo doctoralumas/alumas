@@ -1,1 +1,21 @@
-export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Yasal & Uyum</span><h1>Veri Saklama ve İmha Politikası Özeti</h1><p>Son güncelleme: 24 Ağustos 2026. Bu metin ürün uyum taslağıdır; canlıya çıkmadan önce Alumas’ın gerçek şirket, veri akışı ve yetki yapısına göre hukuk danışmanı tarafından onaylanmalıdır.</p></div><section className="panel legal-copy" dangerouslySetInnerHTML={{__html:`<h2>Temel kural</h2><p>Her veri kategorisi için amaç, hukuki sebep, başlangıç olayı, saklama süresi ve imha yöntemi belirlenir. “Süresiz saklama” varsayılanı kullanılmaz.</p><h2>Hesap silme</h2><p>Kullanıcının silme talebi, yasal saklama zorunluluğu olmayan veriler için silme akışını başlatır. Yasal zorunluluk bulunan kayıtlar erişimi kısıtlanmış ayrı saklama statüsüne alınmalıdır.</p>`}} /></div>}
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const t = await getTranslations("legal");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("legalKicker")}</span>
+        <h1>{t("retentionTitle")}</h1>
+        <p>{t("lastUpdatedNotice")}</p>
+      </div>
+      <section
+        className="panel legal-copy"
+        dangerouslySetInnerHTML={{
+          __html: t.raw("retentionHtml"),
+        }}
+      />
+    </div>
+  );
+}

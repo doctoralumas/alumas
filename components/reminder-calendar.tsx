@@ -1,12 +1,17 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import {scheduleLocalReminder} from "@/lib/local-reminders";
-import { Calendar, Bell, Plus, X, CaretLeft, CaretRight, User, Stethoscope, Target, Question, Syringe, Baby, Heartbeat, Pill, Drop, Moon, FirstAid } from "@phosphor-icons/react";
+import { Calendar, Bell, Plus, X, CaretLeft, CaretRight, User, Stethoscope, Target, Syringe, Baby, Heartbeat, Pill, Drop, Moon, FirstAid } from "@phosphor-icons/react";
+import { useTranslations, useLocale } from "next-intl";
 
 const iso=(d:Date)=>d.toISOString().slice(0,10);
-const labels=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
 
 export default function ReminderCalendar(){
+  const t = useTranslations('health.reminderCalendar');
+  const locale = useLocale();
+  const dateLocale = locale === 'en' ? 'en-US' : 'tr-TR';
+  const labels = [t('daySun'), t('dayMon'), t('dayTue'), t('dayWed'), t('dayThu'), t('dayFri'), t('daySat')];
+
   const [date,setDate]=useState(iso(new Date()));
   const [data,setData]=useState<any>({appointments:[],reminders:[],careEvents:[],goals:[],questions:[],labComments:[],diagnostics:[],vaccinations:[],pregnancyEvents:[]});
   const [all,setAll]=useState<any[]>([]);
@@ -37,11 +42,11 @@ export default function ReminderCalendar(){
     const r=await fetch('/api/reminders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const j=await r.json();
     if(!r.ok){
-      setMsg(j.error||'Kaydedilemedi');
+      setMsg(j.error||t('saveFailed'));
       return;
     }
     const native=await scheduleLocalReminder(j);
-    setMsg(native.scheduled?'Hatırlatıcı kaydedildi ve cihaz alarmı planlandı.':'Hatırlatıcı kaydedildi. Cihaz bildirimi açık.');
+    setMsg(native.scheduled ? t('saveSuccessAlarm') : t('saveSuccessNotification'));
     setTimeout(() => { setOpen(false); setMsg(""); load(); }, 1500);
   }
 
@@ -56,15 +61,15 @@ export default function ReminderCalendar(){
     setDate(iso(d));
   };
 
-  const getEventIcon = (type: string, kind?: string) => {
-    if(type.includes('Randevu')) return <User size={24} weight="duotone" color="#2563eb" />;
-    if(type.includes('Tetkik')) return <FirstAid size={24} weight="duotone" color="#ef4444" />;
-    if(type.includes('Aşı')) return <Syringe size={24} weight="duotone" color="#10b981" />;
-    if(type.includes('Hedef')) return <Target size={24} weight="duotone" color="#d97706" />;
-    if(type.includes('Soru') || type.includes('Doktor')) return <Stethoscope size={24} weight="duotone" color="#8b5cf6" />;
-    if(type.includes('Gebelik')) return <Baby size={24} weight="duotone" color="#ec4899" />;
+  const getEventIcon = (category: string, kind?: string) => {
+    if(category === 'APPOINTMENT') return <User size={24} weight="duotone" color="#2563eb" />;
+    if(category === 'DIAGNOSTIC') return <FirstAid size={24} weight="duotone" color="#ef4444" />;
+    if(category === 'VACCINATION') return <Syringe size={24} weight="duotone" color="#10b981" />;
+    if(category === 'GOAL') return <Target size={24} weight="duotone" color="#d97706" />;
+    if(category === 'QUESTION' || category === 'LAB') return <Stethoscope size={24} weight="duotone" color="#8b5cf6" />;
+    if(category === 'PREGNANCY') return <Baby size={24} weight="duotone" color="#ec4899" />;
     
-    // Hatırlatıcı kinds
+    // Reminder category
     if(kind === 'BLOOD_PRESSURE') return <Heartbeat size={24} weight="duotone" color="#ef4444" />;
     if(kind === 'GLUCOSE') return <Drop size={24} weight="duotone" color="#f59e0b" />;
     if(kind === 'MEDICATION') return <Pill size={24} weight="duotone" color="#db2777" />;
@@ -73,17 +78,32 @@ export default function ReminderCalendar(){
     return <Bell size={24} weight="duotone" color="#64748b" />;
   };
 
+  const kindLabel = (k: string) => {
+    switch (k) {
+      case 'BLOOD_PRESSURE': return t('catBloodPressure');
+      case 'GLUCOSE': return t('catGlucose');
+      case 'MEDICATION': return t('catMedication');
+      case 'SLEEP': return t('catSleep');
+      case 'WATER': return t('catWater');
+      case 'VACCINATION': return t('catVaccination');
+      case 'PREGNANCY': return t('catPregnancy');
+      default: return t('catCustom');
+    }
+  };
+
   const events=[
-    ...(data.reminders||[]).filter((r:any)=>r.kind!=='VACCINATION').map((r:any)=>({time:r.timeOfDay,title:r.title,type:'Hatırlatıcı',kind:r.kind})),
-    ...(data.appointments||[]).map((a:any)=>({time:new Date(a.startsAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),title:a.doctor?.name||'Randevu',type:'Randevu'})),
-    ...(data.careEvents||[]).map((x:any)=>({time:new Date(x.startsAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),title:x.title,type:'Bakım Görevi'})),
-    ...(data.goals||[]).map((g:any)=>({time:'12:00',title:`Hedef: ${g.title}`,type:'Hedef'})),
-    ...(data.questions||[]).map((q:any)=>({time:new Date(q.answeredAt||q.createdAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),title:q.answeredAt?`Yanıt: ${q.subject}`:`Soru: ${q.subject}`,type:'Doktor Sorusu'})),
-    ...(data.labComments||[]).map((c:any)=>({time:new Date(c.createdAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),title:`${c.labResult?.testName}: doktor yorumu`,type:'Laboratuvar'})),
-    ...(data.diagnostics||[]).map((d:any)=>({time:'12:00',title:`Tetkik: ${d.title}`,type:'Tetkik İsteği'})),
-    ...(data.vaccinations||[]).map((v:any)=>({time:'09:00',title:`Aşı: ${v.vaccineName}${v.doseLabel?' • '+v.doseLabel:''}`,type:'Aşı Hatırlatması'})),
-    ...(data.pregnancyEvents||[]).map((x:any)=>({time:new Date(x.startsAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),title:x.title,type:`Gebelik • ${x.profile?.name||'Takvim'}`}))
+    ...(data.reminders||[]).filter((r:any)=>r.kind!=='VACCINATION').map((r:any)=>({time:r.timeOfDay,title:r.title,type:t('typeReminder'),kind:r.kind,category:'REMINDER'})),
+    ...(data.appointments||[]).map((a:any)=>({time:new Date(a.startsAt).toLocaleTimeString(dateLocale,{hour:'2-digit',minute:'2-digit'}),title:a.doctor?.name||t('typeAppointment'),type:t('typeAppointment'),category:'APPOINTMENT'})),
+    ...(data.careEvents||[]).map((x:any)=>({time:new Date(x.startsAt).toLocaleTimeString(dateLocale,{hour:'2-digit',minute:'2-digit'}),title:x.title,type:t('typeCareTask'),category:'CARE_TASK'})),
+    ...(data.goals||[]).map((g:any)=>({time:'12:00',title:t('goalPrefix', { title: g.title }),type:t('typeGoal'),category:'GOAL'})),
+    ...(data.questions||[]).map((q:any)=>({time:new Date(q.answeredAt||q.createdAt).toLocaleTimeString(dateLocale,{hour:'2-digit',minute:'2-digit'}),title:q.answeredAt?t('responsePrefix', { subject: q.subject }):t('questionPrefix', { subject: q.subject }),type:t('typeDoctorQuestion'),category:'QUESTION'})),
+    ...(data.labComments||[]).map((c:any)=>({time:new Date(c.createdAt).toLocaleTimeString(dateLocale,{hour:'2-digit',minute:'2-digit'}),title:t('labDoctorComment', { testName: c.labResult?.testName||'' }),type:t('typeLab'),category:'LAB'})),
+    ...(data.diagnostics||[]).map((d:any)=>({time:'12:00',title:t('diagnosticPrefix', { title: d.title }),type:t('typeDiagnostic'),category:'DIAGNOSTIC'})),
+    ...(data.vaccinations||[]).map((v:any)=>({time:'09:00',title:t('vaccinationPrefix', { name: `${v.vaccineName}${v.doseLabel?' • '+v.doseLabel:''}` }),type:t('typeVaccination'),category:'VACCINATION'})),
+    ...(data.pregnancyEvents||[]).map((x:any)=>({time:new Date(x.startsAt).toLocaleTimeString(dateLocale,{hour:'2-digit',minute:'2-digit'}),title:x.title,type:t('pregnancyEventPrefix', { name: x.profile?.name||t('title') }),category:'PREGNANCY'}))
   ].sort((a,b)=>a.time.localeCompare(b.time));
+
+  const isSuccessMsg = msg === t('saveSuccessAlarm') || msg === t('saveSuccessNotification');
 
   return (
     <div style={{ maxWidth: "1000px", margin: "0 auto", paddingBottom: "48px" }}>
@@ -94,13 +114,13 @@ export default function ReminderCalendar(){
             <Calendar size={32} weight="duotone" color="#4f46e5" />
           </div>
           <div>
-            <span className="kicker" style={{ color: "#4f46e5" }}>Zaman Planlaması</span>
-            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>Sağlık Takvimi</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Randevu, alarm, görev ve takiplerin tek ekranda gün bazlı görünümü.</p>
+            <span className="kicker" style={{ color: "#4f46e5" }}>{t('kicker')}</span>
+            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{t('title')}</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>{t('subtitle')}</p>
           </div>
         </div>
         <button onClick={()=>setOpen(!open)} style={{ padding: "12px 24px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
-          {open ? <X size={20} /> : <Plus size={20} />} {open ? "İptal" : "Alarm Kur"}
+          {open ? <X size={20} /> : <Plus size={20} />} {open ? t('cancel') : t('setAlarm')}
         </button>
       </div>
 
@@ -108,33 +128,33 @@ export default function ReminderCalendar(){
         <form onSubmit={add} style={{ background: "#fff", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0", marginBottom: "40px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Hatırlatıcı Başlığı <span style={{ color: "#ef4444" }}>*</span></label>
-              <input name="title" required placeholder="Örn. Tansiyon Ölçümü" defaultValue="Tansiyon Ölçümü" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t('titleLabel')} <span style={{ color: "#ef4444" }}>*</span></label>
+              <input name="title" required placeholder={t('titlePlaceholder')} defaultValue={t('titleDefault')} style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }} />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Kategori</label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t('categoryLabel')}</label>
               <select name="kind" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }}>
-                <option value="BLOOD_PRESSURE">Tansiyon</option>
-                <option value="GLUCOSE">Kan Şekeri</option>
-                <option value="MEDICATION">İlaç</option>
-                <option value="SLEEP">Uyku</option>
-                <option value="WATER">Su İçme</option>
-                <option value="VACCINATION">Aşı</option>
-                <option value="PREGNANCY">Gebelik</option>
-                <option value="CUSTOM">Diğer</option>
+                <option value="BLOOD_PRESSURE">{t('catBloodPressure')}</option>
+                <option value="GLUCOSE">{t('catGlucose')}</option>
+                <option value="MEDICATION">{t('catMedication')}</option>
+                <option value="SLEEP">{t('catSleep')}</option>
+                <option value="WATER">{t('catWater')}</option>
+                <option value="VACCINATION">{t('catVaccination')}</option>
+                <option value="PREGNANCY">{t('catPregnancy')}</option>
+                <option value="CUSTOM">{t('catCustom')}</option>
               </select>
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Zamanı <span style={{ color: "#ef4444" }}>*</span></label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t('timeLabel')} <span style={{ color: "#ef4444" }}>*</span></label>
               <input name="timeOfDay" type="time" required defaultValue="09:00" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#475569" }} />
             </div>
           </div>
-          <button style={{ padding: "16px", background: "#4f46e5", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", marginTop: "20px" }}>Alarmı Oluştur</button>
-          {msg && <div style={{ background: msg.includes('başarı')||msg.includes('kaydedildi') ? '#e0e7ff' : '#fef2f2', color: msg.includes('başarı')||msg.includes('kaydedildi') ? '#4338ca' : '#b91c1c', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center", marginTop: "16px" }}>{msg}</div>}
+          <button style={{ padding: "16px", background: "#4f46e5", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", marginTop: "20px" }}>{t('createAlarm')}</button>
+          {msg && <div style={{ background: isSuccessMsg ? '#e0e7ff' : '#fef2f2', color: isSuccessMsg ? '#4338ca' : '#b91c1c', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center", marginTop: "16px" }}>{msg}</div>}
         </form>
       )}
 
-      {/* Haftalık Şerit Takvim */}
+      {/* Weekly Date Strip */}
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px", background: "#fff", padding: "16px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
         <button onClick={() => shiftDate(-1)} style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#f1f5f9", border: "none", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", cursor: "pointer", flexShrink: 0 }}><CaretLeft size={20} weight="bold" /></button>
         
@@ -164,14 +184,14 @@ export default function ReminderCalendar(){
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: "32px", marginBottom: "48px" }}>
         
-        {/* Günlük Ajanda */}
+        {/* Daily Agenda */}
         <section style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
           <h2 style={{ margin: "0 0 24px", fontSize: "20px", color: "#0f172a" }}>
-            {new Date(date+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})} Planı
+            {t('agendaTitle', { date: new Date(date+'T12:00:00').toLocaleDateString(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' }) })}
           </h2>
           
           {loading ? (
-            <div style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>Ajanda yükleniyor...</div>
+            <div style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>{t('agendaLoading')}</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               {events.map((x:any, i:number) => (
@@ -180,7 +200,7 @@ export default function ReminderCalendar(){
                     {x.time}
                   </div>
                   <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#fff", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    {getEventIcon(x.type, x.kind)}
+                    {getEventIcon(x.category, x.kind)}
                   </div>
                   <div>
                     <h3 style={{ margin: "0 0 4px", fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>{x.title}</h3>
@@ -189,7 +209,7 @@ export default function ReminderCalendar(){
                 </div>
               ))}
               {!events.length && (
-                <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", background: "#f8fafc", borderRadius: "16px" }}>Bu gün için planlı aktiviteniz bulunmuyor.</div>
+                <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", background: "#f8fafc", borderRadius: "16px" }}>{t('noActivities')}</div>
               )}
             </div>
           )}
@@ -199,7 +219,7 @@ export default function ReminderCalendar(){
         <section style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
             <div style={{ background: "#f1f5f9", color: "#475569", padding: "8px", borderRadius: "12px" }}><Bell size={20} weight="fill" /></div>
-            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Tüm Hatırlatıcılar / Alarmlar</h2>
+            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>{t('allRemindersTitle')}</h2>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -207,11 +227,11 @@ export default function ReminderCalendar(){
               <div key={r.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: r.enabled ? "#fff" : "#f8fafc", borderRadius: "20px", border: "1px solid #e2e8f0", opacity: r.enabled ? 1 : 0.6 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                   <div style={{ width: "48px", height: "48px", borderRadius: "16px", background: r.enabled ? "#e0e7ff" : "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {getEventIcon('Hatırlatıcı', r.kind)}
+                    {getEventIcon('REMINDER', r.kind)}
                   </div>
                   <div>
                     <b style={{ display: "block", fontSize: "16px", color: "#0f172a", textDecoration: r.enabled ? 'none' : 'line-through' }}>{r.title}</b>
-                    <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>{r.timeOfDay} • {r.kind}</span>
+                    <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>{r.timeOfDay} • {kindLabel(r.kind)}</span>
                   </div>
                 </div>
                 
@@ -224,7 +244,7 @@ export default function ReminderCalendar(){
               </div>
             ))}
             {all.length === 0 && (
-               <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", background: "#f8fafc", borderRadius: "16px" }}>Kurulu alarmınız yok.</div>
+               <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", background: "#f8fafc", borderRadius: "16px" }}>{t('noAlarms')}</div>
             )}
           </div>
         </section>

@@ -1,4 +1,7 @@
+"use client";
+
 import { imagingModalityLabel, labCategoryLabel, labSampleLabel } from "@/lib/organization-capabilities";
+import { useLocale, useTranslations } from "next-intl";
 
 type Service = {
   id: string;
@@ -30,11 +33,26 @@ type LabTest = {
   price?: number | null;
 };
 
-function money(value?: number | null) {
-  return value ? `${value.toLocaleString("tr-TR")} ₺` : "Fiyat sorunuz";
+function formatPrice(value: number | null | undefined, locale: string, fallbackText: string) {
+  const numberLocale = locale === "en" ? "en-US" : "tr-TR";
+  return value ? `${value.toLocaleString(numberLocale)} ₺` : fallbackText;
 }
 
-function ServiceList({ title, intro, services }: { title: string; intro: string; services: Service[] }) {
+function ServiceList({
+  title,
+  intro,
+  services,
+  t,
+  locale,
+}: {
+  title: string;
+  intro: string;
+  services: Service[];
+  t: any;
+  locale: string;
+}) {
+  const numberLocale = locale === "en" ? "en-US" : "tr-TR";
+
   return (
     <section className="panel">
       <h2>{title}</h2>
@@ -47,14 +65,18 @@ function ServiceList({ title, intro, services }: { title: string; intro: string;
               <span>{service.description || ""}</span>
             </div>
             <div>
-              <strong>{money(service.price)}</strong>
+              <strong>{formatPrice(service.price, locale, t("askPrice"))}</strong>
               {!!service.variants?.length && (
                 <div className="v26-variants">
                   {service.variants.map((variant) => (
                     <small key={variant.id}>
                       {variant.label}
-                      {variant.priceDelta ? ` · +${variant.priceDelta.toLocaleString("tr-TR")} ₺` : ""}
-                      {variant.durationMinutes ? ` · ${variant.durationMinutes} dk` : ""}
+                      {variant.priceDelta
+                        ? ` · +${variant.priceDelta.toLocaleString(numberLocale)} ₺`
+                        : ""}
+                      {variant.durationMinutes
+                        ? ` · ${variant.durationMinutes} ${t("minuteShort")}`
+                        : ""}
                     </small>
                   ))}
                 </div>
@@ -62,23 +84,24 @@ function ServiceList({ title, intro, services }: { title: string; intro: string;
             </div>
           </div>
         ))}
-        {!services.length && <div className="empty">Henüz hizmet eklenmemiş.</div>}
+        {!services.length && <div className="empty">{t("emptyServices")}</div>}
       </div>
     </section>
   );
 }
 
-function ImagingCatalog({ exams }: { exams: Exam[] }) {
+function ImagingCatalog({ exams, t, locale }: { exams: Exam[]; t: any; locale: string }) {
   const groups = exams.reduce<Record<string, Exam[]>>((acc, exam) => {
     acc[exam.modality] = acc[exam.modality] || [];
     acc[exam.modality].push(exam);
     return acc;
   }, {});
+
   return (
     <section className="panel">
-      <h2>Tetkikler</h2>
-      <p>Görüntüleme türü, hazırlık, çekim süresi ve rapor süresini merkez belirler.</p>
-      {!exams.length && <div className="empty">Henüz tetkik yayınlanmamış.</div>}
+      <h2>{t("imagingTitle")}</h2>
+      <p>{t("imagingSubtitle")}</p>
+      {!exams.length && <div className="empty">{t("emptyExams")}</div>}
       {Object.entries(groups).map(([modality, rows]) => (
         <div key={modality} style={{ marginTop: 16 }}>
           <h3 style={{ margin: "0 0 8px", fontSize: 16 }}>{imagingModalityLabel(modality)}</h3>
@@ -92,12 +115,18 @@ function ImagingCatalog({ exams }: { exams: Exam[] }) {
                   </span>
                   <small>
                     {[
-                      exam.durationMinutes ? `${exam.durationMinutes} dk çekim` : "",
-                      exam.reportHours ? `rapor ${exam.reportHours} saat` : "",
-                    ].filter(Boolean).join(" · ")}
+                      exam.durationMinutes
+                        ? t("durationScan", { min: exam.durationMinutes })
+                        : "",
+                      exam.reportHours
+                        ? t("reportHours", { hours: exam.reportHours })
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </small>
                 </div>
-                <strong>{money(exam.price)}</strong>
+                <strong>{formatPrice(exam.price, locale, t("askPrice"))}</strong>
               </div>
             ))}
           </div>
@@ -107,17 +136,18 @@ function ImagingCatalog({ exams }: { exams: Exam[] }) {
   );
 }
 
-function LaboratoryCatalog({ tests }: { tests: LabTest[] }) {
+function LaboratoryCatalog({ tests, t, locale }: { tests: LabTest[]; t: any; locale: string }) {
   const groups = tests.reduce<Record<string, LabTest[]>>((acc, test) => {
     acc[test.category] = acc[test.category] || [];
     acc[test.category].push(test);
     return acc;
   }, {});
+
   return (
     <section className="panel">
-      <h2>Tahliller</h2>
-      <p>Numune türü, açlık koşulu ve sonuç süresini laboratuvar belirler.</p>
-      {!tests.length && <div className="empty">Henüz tahlil yayınlanmamış.</div>}
+      <h2>{t("labTitle")}</h2>
+      <p>{t("labSubtitle")}</p>
+      {!tests.length && <div className="empty">{t("emptyTests")}</div>}
       {Object.entries(groups).map(([category, rows]) => (
         <div key={category} style={{ marginTop: 16 }}>
           <h3 style={{ margin: "0 0 8px", fontSize: 16 }}>{labCategoryLabel(category)}</h3>
@@ -127,16 +157,24 @@ function LaboratoryCatalog({ tests }: { tests: LabTest[] }) {
                 <div>
                   <b>{test.name}</b>
                   <span>
-                    {[labSampleLabel(test.sampleType), test.preparation].filter(Boolean).join(" · ")}
+                    {[labSampleLabel(test.sampleType), test.preparation]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </span>
                   <small>
                     {[
-                      test.fastingHours ? `${test.fastingHours} saat açlık` : "Açlık gerekmez",
-                      test.turnaroundHours ? `sonuç ${test.turnaroundHours} saat` : "",
-                    ].filter(Boolean).join(" · ")}
+                      test.fastingHours
+                        ? t("fastingHours", { hours: test.fastingHours })
+                        : t("noFastingRequired"),
+                      test.turnaroundHours
+                        ? t("turnaroundHours", { hours: test.turnaroundHours })
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </small>
                 </div>
-                <strong>{money(test.price)}</strong>
+                <strong>{formatPrice(test.price, locale, t("askPrice"))}</strong>
               </div>
             ))}
           </div>
@@ -157,15 +195,20 @@ export default function OrganizationOfferings({
   imagingExams?: Exam[];
   laboratoryTests?: LabTest[];
 }) {
+  const t = useTranslations("search.organizationProfile.offerings");
+  const locale = useLocale();
+
   if (type === "LABORATORY") {
     return (
       <>
-        <LaboratoryCatalog tests={laboratoryTests || []} />
+        <LaboratoryCatalog tests={laboratoryTests || []} t={t} locale={locale} />
         {!!services.length && (
           <ServiceList
-            title="Diğer kayıtlı hizmetler"
-            intro="Laboratuvarın daha önce yayınladığı genel hizmet kayıtları."
+            title={t("otherServices")}
+            intro={t("labOtherIntro")}
             services={services}
+            t={t}
+            locale={locale}
           />
         )}
       </>
@@ -174,12 +217,14 @@ export default function OrganizationOfferings({
   if (type === "IMAGING_CENTER") {
     return (
       <>
-        <ImagingCatalog exams={imagingExams || []} />
+        <ImagingCatalog exams={imagingExams || []} t={t} locale={locale} />
         {!!services.length && (
           <ServiceList
-            title="Diğer kayıtlı hizmetler"
-            intro="Merkezin daha önce yayınladığı genel hizmet kayıtları."
+            title={t("otherServices")}
+            intro={t("imagingOtherIntro")}
             services={services}
+            t={t}
+            locale={locale}
           />
         )}
       </>
@@ -189,26 +234,32 @@ export default function OrganizationOfferings({
     if (!services.length) return null;
     return (
       <ServiceList
-        title="Eczane hizmetleri"
-        intro="Eczanenin yayınladığı ek hizmetler."
+        title={t("pharmacyServicesTitle")}
+        intro={t("pharmacyServicesIntro")}
         services={services}
+        t={t}
+        locale={locale}
       />
     );
   }
   if (type === "CLINIC") {
     return (
       <ServiceList
-        title="Muayene ve işlemler"
-        intro="Kliniğin sunduğu muayene ve işlemler."
+        title={t("clinicServicesTitle")}
+        intro={t("clinicServicesIntro")}
         services={services}
+        t={t}
+        locale={locale}
       />
     );
   }
   return (
     <ServiceList
-      title="Sunulan hizmetler"
-      intro="Hastanenin yayınladığı klinik hizmetler."
+      title={t("hospitalServicesTitle")}
+      intro={t("hospitalServicesIntro")}
       services={services}
+      t={t}
+      locale={locale}
     />
   );
 }

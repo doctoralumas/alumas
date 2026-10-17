@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Buildings, Check, X, EnvelopeSimpleOpen } from "@phosphor-icons/react/dist/ssr";
+import { Check, X, EnvelopeSimpleOpen } from "@phosphor-icons/react/dist/ssr";
+import { useTranslations } from "next-intl";
 
 export default function DoctorInvites({ invites: initialInvites }: { invites: any[] }) {
+  const t = useTranslations("professional.doctorInvites");
   const [invites, setInvites] = useState(initialInvites);
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -20,12 +22,11 @@ export default function DoctorInvites({ invites: initialInvites }: { invites: an
     if (r.ok) {
       setInvites(invites.filter((inv) => inv.id !== id));
       if (action === "ACCEPT") {
-        // Optional: reload the page to refresh the dashboard if the doctor needs to see changes
         window.location.reload();
       }
     } else {
       const data = await r.json().catch(() => ({}));
-      alert(data.error || "Bir hata oluştu");
+      alert(data.error || t("error"));
       setLoading(null);
     }
   }
@@ -51,10 +52,10 @@ export default function DoctorInvites({ invites: initialInvites }: { invites: an
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: "16px", color: "#0c4a6e", fontWeight: 700 }}>
-                {inv.organization.name} sizi kadrosuna davet ediyor
+                {t("inviteTitle", { name: inv.organization.name })}
               </h3>
               <p style={{ margin: "4px 0 0", fontSize: "14px", color: "#0369a1" }}>
-                Bu daveti kabul ettiğinizde kurumun profilinde uzman olarak görüneceksiniz.
+                {t("inviteDesc")}
               </p>
             </div>
           </div>
@@ -70,7 +71,7 @@ export default function DoctorInvites({ invites: initialInvites }: { invites: an
                 cursor: loading === inv.id ? "not-allowed" : "pointer"
               }}
             >
-              <X size={16} weight="bold" /> Reddet
+              <X size={16} weight="bold" /> {t("decline")}
             </button>
             <button 
               onClick={() => handleInvite(inv.id, "ACCEPT")}
@@ -83,7 +84,7 @@ export default function DoctorInvites({ invites: initialInvites }: { invites: an
                 boxShadow: "0 2px 4px rgba(14, 165, 233, 0.3)"
               }}
             >
-              <Check size={16} weight="bold" /> Kabul Et
+              <Check size={16} weight="bold" /> {t("accept")}
             </button>
           </div>
         </div>

@@ -4,8 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MagnifyingGlass, Sparkle, Stethoscope, Hospital, CaretRight, SpinnerGap } from "@phosphor-icons/react";
 import { performLiveSearch } from "@/lib/search-actions";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function LiveSearch() {
+  const t = useTranslations("liveSearch");
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<{doctors: any[], organizations: any[], services: any[]}>({ doctors: [], organizations: [], services: [] });
@@ -50,38 +53,38 @@ export default function LiveSearch() {
         <MagnifyingGlass size={20} className="home-search-icon" />
         <input
           type="text"
-          placeholder="Doktor, hastane veya hizmet ara..."
+          placeholder={t("placeholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => { if (query.length >= 2) setIsOpen(true); }}
-          aria-label="Doktor, hastane veya hizmet ara"
+          aria-label={t("ariaLabel")}
         />
         {loading ? <SpinnerGap size={18} className="home-search-spinner" weight="bold" /> : null}
         <button className="home-search-go" type="button">
           <MagnifyingGlass size={16} weight="bold" />
-          Ara
+          {t("searchButton")}
         </button>
       </div>
 
       <Link href="/ai" className="home-search-luma">
         <Sparkle size={16} weight="fill" color="#0bbec5" />
-        <span className="home-search-luma-text">Luma&apos;ya anlat</span>
+        <span className="home-search-luma-text">{t("askLuma")}</span>
       </Link>
 
       {isOpen && (
         <div className="home-search-dropdown">
           {!loading && !hasResults && (
             <div className="home-search-empty">
-              &quot;{query}&quot; için sonuç bulunamadı. Luma&apos;ya sorabilirsiniz.
+              {t("emptyMessage", { query })}
             </div>
           )}
 
           {results.services.length > 0 && (
             <div className="home-search-group">
-              <span className="home-sg-title">Hizmetler</span>
+              <span className="home-sg-title">{t("groupServices")}</span>
               {results.services.map(s => (
                 <Link href={s.url} key={s.name} className="home-sg-result">
-                  <span>{s.name}</span>
+                  <span>{locale === "en" ? (s.nameEn || s.name) : s.name}</span>
                   <CaretRight size={16} />
                 </Link>
               ))}
@@ -90,7 +93,7 @@ export default function LiveSearch() {
 
           {results.doctors.length > 0 && (
             <div className="home-search-group">
-              <span className="home-sg-title">Doktorlar</span>
+              <span className="home-sg-title">{t("groupDoctors")}</span>
               {results.doctors.map(d => (
                 <Link href={`/doctors/${d.slug}`} key={d.id} className="home-sg-result">
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -105,14 +108,14 @@ export default function LiveSearch() {
 
           {results.organizations.length > 0 && (
             <div className="home-search-group">
-              <span className="home-sg-title">Kurumlar</span>
+              <span className="home-sg-title">{t("groupOrganizations")}</span>
               {results.organizations.map(o => (
                 <Link href={`/organizations/${o.slug}`} key={o.id} className="home-sg-result">
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <Hospital size={20} color="#94a3b8" />
                     <span style={{ fontWeight: 600 }}>{o.name}</span>
                   </div>
-                  <em style={{ fontSize: "12px", color: "#64748b", fontStyle: "normal" }}>{o.city}</em>
+                  <em style={{ fontSize: "12px", color: "#64748b", fontStyle: "normal" }}>{o.type}</em>
                 </Link>
               ))}
             </div>

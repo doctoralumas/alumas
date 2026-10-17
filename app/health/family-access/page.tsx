@@ -1,19 +1,11 @@
-﻿"use client";
+"use client";
 import {useEffect,useState} from "react";
 import Link from "next/link";
-import SectionVisual from "@/components/section-visual";
 import { UserPlus, ShieldCheck, Handshake, Users, Eye, Pill, CalendarCheck, Ruler, PencilSimple, EnvelopeSimple, PaperPlaneRight, Check, X, CaretRight, CaretLeft } from "@phosphor-icons/react";
-
-const perms=[
-  { id: 'VIEW', label: 'Görüntüleme', icon: Eye, desc: 'Temel sağlık özetine salt okunur erişim' },
-  { id: 'APPOINTMENTS', label: 'Randevular', icon: CalendarCheck, desc: 'Randevu ve etkinlikleri görebilme' },
-  { id: 'REMINDERS', label: 'Hatırlatıcılar', icon: Pill, desc: 'İlaç ve görev hatırlatıcılarına erişim' },
-  { id: 'VACCINATIONS', label: 'Aşılar', icon: ShieldCheck, desc: 'Aşı takvimi ve kayıtlarına erişim' },
-  { id: 'GROWTH', label: 'Büyüme', icon: Ruler, desc: 'Boy, kilo ve baş çevresi kayıtları' },
-  { id: 'EDIT_PROFILE', label: 'Düzenleme', icon: PencilSimple, desc: 'Profil bilgilerini değiştirebilme yetkisi' }
-];
+import { useTranslations } from "next-intl";
 
 export default function Page(){
+  const t = useTranslations('health.familyAccess');
   const [profiles,setProfiles]=useState<any[]>([]);
   const [data,setData]=useState<any>({sent:[],received:[]});
   const [access,setAccess]=useState<any>({owned:[],granted:[]});
@@ -21,6 +13,15 @@ export default function Page(){
   const [email,setEmail]=useState('');
   const [selected,setSelected]=useState<string[]>(['VIEW','APPOINTMENTS','REMINDERS']);
   const [msg, setMsg] = useState({ text: '', type: '' });
+
+  const perms = [
+    { id: 'VIEW', label: t('permView'), icon: Eye, desc: t('permViewDesc') },
+    { id: 'APPOINTMENTS', label: t('permAppointments'), icon: CalendarCheck, desc: t('permAppointmentsDesc') },
+    { id: 'REMINDERS', label: t('permReminders'), icon: Pill, desc: t('permRemindersDesc') },
+    { id: 'VACCINATIONS', label: t('permVaccinations'), icon: ShieldCheck, desc: t('permVaccinationsDesc') },
+    { id: 'GROWTH', label: t('permGrowth'), icon: Ruler, desc: t('permGrowthDesc') },
+    { id: 'EDIT_PROFILE', label: t('permEdit'), icon: PencilSimple, desc: t('permEditDesc') }
+  ];
 
   const load=()=>{
     fetch('/api/health/special-profiles').then(r=>r.ok ? r.json() : []).then((x:any[])=>{
@@ -43,11 +44,11 @@ export default function Page(){
     });
     if(r.ok){
       setEmail('');
-      setMsg({ text: 'Davet başarıyla gönderildi!', type: 'success' });
+      setMsg({ text: t('inviteSuccess'), type: 'success' });
       load();
     }else{
       const j = await r.json();
-      setMsg({ text: j.error||'Davet gönderilemedi', type: 'error' });
+      setMsg({ text: j.error||t('inviteFailed'), type: 'error' });
     }
     setTimeout(() => setMsg({ text: '', type: '' }), 4000);
   }
@@ -61,49 +62,53 @@ export default function Page(){
     <div className="page" style={{ maxWidth: "900px" }}>
       <div style={{ marginBottom: "32px" }}>
         <Link href="/health/family-hub" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", textDecoration: "none", fontSize: "14px", fontWeight: 500, marginBottom: "16px" }}>
-          <CaretLeft size={16} /> Aile Paneline Dön
+          <CaretLeft size={16} /> {t('backToFamilyHub')}
         </Link>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <span className="kicker">Güvenli Paylaşım</span>
-            <h1 style={{ fontSize: "28px", color: "#0f172a", margin: "8px 0" }}>Aile Erişimleri</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Yakınlarınızı davet edin, her aile profilinin erişim yetkilerini detaylıca belirleyin.</p>
+            <span className="kicker">{t('kicker')}</span>
+            <h1 style={{ fontSize: "28px", color: "#0f172a", margin: "8px 0" }}>{t('title')}</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>{t('subtitle')}</p>
           </div>
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }}>
         
-        {/* Davet Gönder */}
+        {/* Send Invite */}
         <section className="panel" style={{ padding: "32px", borderRadius: "24px", background: "#f8fafc", border: "1px solid #e2e8f0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
             <div style={{ background: "#e0f2fe", color: "#0284c7", padding: "10px", borderRadius: "12px" }}>
               <UserPlus size={24} weight="duotone" />
             </div>
             <div>
-              <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>Yakın Davet Et</h2>
-              <span style={{ fontSize: "13px", color: "#64748b" }}>Bir yakınınızı e-posta üzerinden ailenize dahil edin.</span>
+              <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>{t('inviteTitle')}</h2>
+              <span style={{ fontSize: "13px", color: "#64748b" }}>{t('inviteSubtitle')}</span>
             </div>
           </div>
           
           <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "16px", marginBottom: "24px" }}>
             <div>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Profil Seçimi</label>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t('profileSelectLabel')}</label>
               <select value={profileId} onChange={e=>setProfileId(e.target.value)} style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a" }}>
-                {profiles.map(p=><option key={p.id} value={p.id}>{p.name} ({p.type==='CHILD'?'Çocuk':'Gebelik'})</option>)}
-                {!profiles.length && <option value="">Profil bulunamadı</option>}
+                {profiles.map(p=>(
+                  <option key={p.id} value={p.id}>
+                    {p.type==='CHILD' ? t('profileChild', { name: p.name }) : t('profilePregnancy', { name: p.name })}
+                  </option>
+                ))}
+                {!profiles.length && <option value="">{t('noProfilesFound')}</option>}
               </select>
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Davet Edilecek E-posta</label>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t('emailLabel')}</label>
               <div style={{ position: "relative" }}>
                 <EnvelopeSimple size={18} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
-                <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="yakininiz@example.com" style={{ width: "100%", padding: "12px 12px 12px 40px", borderRadius: "12px", border: "1px solid #cbd5e1", color: "#0f172a" }} />
+                <input value={email} onChange={e=>setEmail(e.target.value)} placeholder={t('emailPlaceholder')} style={{ width: "100%", padding: "12px 12px 12px 40px", borderRadius: "12px", border: "1px solid #cbd5e1", color: "#0f172a" }} />
               </div>
             </div>
           </div>
 
-          <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "12px" }}>Yetkilendirmeler</label>
+          <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "12px" }}>{t('permissionsLabel')}</label>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", marginBottom: "24px" }}>
             {perms.map((p) => {
               const active = selected.includes(p.id);
@@ -122,7 +127,7 @@ export default function Page(){
 
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button className="primary" onClick={invite} disabled={!profileId||!email} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 24px", borderRadius: "12px" }}>
-              <PaperPlaneRight size={18} weight="bold" /> Daveti Gönder
+              <PaperPlaneRight size={18} weight="bold" /> {t('sendInvite')}
             </button>
             {msg.text && (
               <span style={{ fontSize: "14px", fontWeight: 500, color: msg.type === 'success' ? '#16a34a' : '#dc2626' }}>{msg.text}</span>
@@ -130,13 +135,13 @@ export default function Page(){
           </div>
         </section>
 
-        {/* Gelen Davetler */}
+        {/* Received Invites */}
         <section className="panel" style={{ padding: "32px", borderRadius: "24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
             <div style={{ background: "#fef08a", color: "#a16207", padding: "10px", borderRadius: "12px" }}>
               <Handshake size={24} weight="duotone" />
             </div>
-            <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>Bana Gelen Davetler</h2>
+            <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>{t('receivedInvitesTitle')}</h2>
           </div>
           
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -144,25 +149,25 @@ export default function Page(){
               <div key={i.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "#f8fafc", borderRadius: "16px", border: "1px solid #e2e8f0" }}>
                 <div>
                   <strong style={{ display: "block", fontSize: "16px", color: "#0f172a", marginBottom: "4px" }}>{i.profile.name}</strong>
-                  <span style={{ fontSize: "13px", color: "#64748b" }}>Gönderen: {i.sender.name} • İzinler: {i.permissions.length} adet</span>
+                  <span style={{ fontSize: "13px", color: "#64748b" }}>{t('senderLabel', { name: i.sender.name, count: i.permissions.length })}</span>
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
-                  <button onClick={()=>act(i.id,'accept')} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", borderRadius: "100px", background: "#16a34a", color: "#fff", border: "none", fontWeight: 600, cursor: "pointer" }}><Check size={16} /> Kabul</button>
-                  <button onClick={()=>act(i.id,'reject')} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", borderRadius: "100px", background: "#f1f5f9", color: "#475569", border: "none", fontWeight: 600, cursor: "pointer" }}><X size={16} /> Red</button>
+                  <button onClick={()=>act(i.id,'accept')} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", borderRadius: "100px", background: "#16a34a", color: "#fff", border: "none", fontWeight: 600, cursor: "pointer" }}><Check size={16} /> {t('accept')}</button>
+                  <button onClick={()=>act(i.id,'reject')} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", borderRadius: "100px", background: "#f1f5f9", color: "#475569", border: "none", fontWeight: 600, cursor: "pointer" }}><X size={16} /> {t('reject')}</button>
                 </div>
               </div>
-            )) : <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "16px", border: "1px dashed #cbd5e1", color: "#64748b" }}>Bekleyen bir davetiniz bulunmuyor.</div>}
+            )) : <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "16px", border: "1px dashed #cbd5e1", color: "#64748b" }}>{t('noPendingInvites')}</div>}
           </div>
         </section>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-          {/* Benim Paylaştıklarım */}
+          {/* Shared By Me */}
           <section className="panel" style={{ padding: "32px", borderRadius: "24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
               <div style={{ background: "#dcfce7", color: "#16a34a", padding: "10px", borderRadius: "12px" }}>
                 <Users size={24} weight="duotone" />
               </div>
-              <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>Paylaştığım Profiller</h2>
+              <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>{t('sharedProfilesTitle')}</h2>
             </div>
             
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -173,23 +178,23 @@ export default function Page(){
                     <div key={a.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "8px" }}>
                       <div>
                         <strong style={{ display: "block", fontSize: "14px", color: "#0f172a", marginBottom: "2px" }}>{a.user.name}</strong>
-                        <span style={{ fontSize: "12px", color: "#64748b" }}>Rol: {a.role === 'CAREGIVER' ? 'Bakım Sağlayıcı' : a.role}</span>
+                        <span style={{ fontSize: "12px", color: "#64748b" }}>{t('roleDisplay', { role: a.role === 'CAREGIVER' ? t('roleCaregiver') : a.role })}</span>
                       </div>
-                      <span style={{ fontSize: "11px", fontWeight: 600, background: "#dcfce7", color: "#16a34a", padding: "4px 8px", borderRadius: "10px" }}>Aktif</span>
+                      <span style={{ fontSize: "11px", fontWeight: 600, background: "#dcfce7", color: "#16a34a", padding: "4px 8px", borderRadius: "10px" }}>{t('badgeActive')}</span>
                     </div>
-                  )) : <span style={{ fontSize: "13px", color: "#94a3b8" }}>Paylaşım yapılmamış.</span>}
+                  )) : <span style={{ fontSize: "13px", color: "#94a3b8" }}>{t('noShares')}</span>}
                 </div>
-              )) : <div style={{ fontSize: "14px", color: "#64748b" }}>Oluşturduğunuz profil bulunmuyor.</div>}
+              )) : <div style={{ fontSize: "14px", color: "#64748b" }}>{t('noOwnedProfiles')}</div>}
             </div>
           </section>
 
-          {/* Bana Paylaşılanlar */}
+          {/* Shared With Me */}
           <section className="panel" style={{ padding: "32px", borderRadius: "24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
               <div style={{ background: "#fce7f3", color: "#db2777", padding: "10px", borderRadius: "12px" }}>
                 <ShieldCheck size={24} weight="duotone" />
               </div>
-              <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>Bana Paylaşılan Profiller</h2>
+              <h2 style={{ fontSize: "18px", color: "#0f172a", margin: 0 }}>{t('grantedProfilesTitle')}</h2>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -197,13 +202,13 @@ export default function Page(){
                 <Link key={a.id} href={`/health/family?profile=${a.specialProfileId}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "#fff", borderRadius: "16px", border: "1px solid #e2e8f0", textDecoration: "none", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", transition: "all 0.2s" }} className="hover-shadow">
                   <div>
                     <strong style={{ display: "block", fontSize: "15px", color: "#0f172a", marginBottom: "4px" }}>{a.profile.name}</strong>
-                    <span style={{ fontSize: "13px", color: "#64748b" }}>Sahibi: {a.profile.user.name}</span>
+                    <span style={{ fontSize: "13px", color: "#64748b" }}>{t('ownerLabel', { name: a.profile.user.name })}</span>
                   </div>
                   <div style={{ color: "#0284c7", background: "#e0f2fe", padding: "6px", borderRadius: "50%" }}>
                     <CaretRight size={16} weight="bold" />
                   </div>
                 </Link>
-              )) : <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "16px", border: "1px dashed #cbd5e1", color: "#64748b" }}>Size paylaşılan profil bulunmuyor.</div>}
+              )) : <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "16px", border: "1px dashed #cbd5e1", color: "#64748b" }}>{t('noGrantedProfiles')}</div>}
             </div>
           </section>
         </div>
@@ -212,4 +217,3 @@ export default function Page(){
     </div>
   )
 }
-

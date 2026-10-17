@@ -1,0 +1,10 @@
+{
+  "maintenance": {
+    "kicker": "Alumas",
+    "title": "Under Scheduled Maintenance",
+    "desc": "We are performing planned maintenance to improve security, performance, and platform stability. Please check back shortly.",
+    "emergencyNotice": "For urgent medical needs, do not wait for the platform; dial 112 in Turkey immediately.",
+    "tryAgain": "Try Again",
+    "call112": "Call 112"
+  }
+}

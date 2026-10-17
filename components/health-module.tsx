@@ -3,25 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import HealthTrendChart from "@/components/health-trend-chart";
 import HealthTargetEditor from "@/components/health-target-editor";
 import { Heartbeat, Drop, Moon, Plus, X, Trash, WarningCircle, ChartLineUp, Clock, Info } from "@phosphor-icons/react";
+import { useTranslations, useFormatter } from "next-intl";
 
 type Mode = "blood-pressure" | "glucose" | "sleep";
 
-const modeDefs: Record<Mode, any[]> = {
-  "blood-pressure": [
-    { metric: "bp-systolic", label: "Sistolik hedefi", unit: "mmHg" },
-    { metric: "bp-diastolic", label: "Diyastolik hedefi", unit: "mmHg" }
-  ],
-  glucose: [
-    { metric: "glucose", label: "Kan şekeri hedefi", unit: "mg/dL" }
-  ],
-  sleep: [
-    { metric: "sleep-hours", label: "Uyku süresi hedefi", unit: "saat" }
-  ],
-};
-
-const fmt = (d: string) => new Date(d).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-
 export default function HealthModule({ mode }: { mode: Mode }) {
+  const t = useTranslations("healthModule");
+  const format = useFormatter();
+
   const [rows, setRows] = useState<any[]>([]);
   const [targets, setTargets] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -31,6 +20,25 @@ export default function HealthModule({ mode }: { mode: Mode }) {
   
   const endpoint = `/api/health/${mode}`;
   
+  const fmt = (d: string) => format.dateTime(new Date(d), { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+  const defs = useMemo(() => {
+    if (mode === "blood-pressure") {
+      return [
+        { metric: "bp-systolic", label: t("targetDefs.bpSystolic"), unit: "mmHg" },
+        { metric: "bp-diastolic", label: t("targetDefs.bpDiastolic"), unit: "mmHg" }
+      ];
+    }
+    if (mode === "glucose") {
+      return [
+        { metric: "glucose", label: t("targetDefs.glucose"), unit: "mg/dL" }
+      ];
+    }
+    return [
+      { metric: "sleep-hours", label: t("targetDefs.sleepHours"), unit: t("unitHours") }
+    ];
+  }, [mode, t]);
+
   const load = () => {
     const q = new URLSearchParams();
     if (from) q.set("from", from);
@@ -42,24 +50,24 @@ export default function HealthModule({ mode }: { mode: Mode }) {
   
   useEffect(() => { load(); loadTargets(); }, [endpoint]);
   
-  const title = mode === "blood-pressure" ? "Tansiyon & Nabız" : mode === "glucose" ? "Kan Şekeri Takibi" : "Uyku Düzeni";
-  const desc = mode === "blood-pressure" ? "Tansiyon ölçümlerinizi düzenli takip edin." : mode === "glucose" ? "Açlık ve tokluk kan şekeri ölçümleriniz." : "Günlük uyku süresi ve kaliteniz.";
+  const title = mode === "blood-pressure" ? t("bloodPressure.title") : mode === "glucose" ? t("glucose.title") : t("sleep.title");
+  const desc = mode === "blood-pressure" ? t("bloodPressure.desc") : mode === "glucose" ? t("glucose.desc") : t("sleep.desc");
   const icon = mode === "blood-pressure" ? <Heartbeat size={32} weight="duotone" color="#ef4444" /> : mode === "glucose" ? <Drop size={32} weight="duotone" color="#ea580c" /> : <Moon size={32} weight="duotone" color="#4f46e5" />;
   const color = mode === "blood-pressure" ? "#ef4444" : mode === "glucose" ? "#ea580c" : "#4f46e5";
   const bg = mode === "blood-pressure" ? "#fef2f2" : mode === "glucose" ? "#fff7ed" : "#e0e7ff";
   
   const latest = rows[0];
   const seriesRows = useMemo(() => rows.slice(0, 14).reverse(), [rows]);
-  const targetMap = useMemo(() => new Map(targets.map(t => [t.metric, t])), [targets]);
+  const targetMap = useMemo(() => new Map(targets.map(trg => [trg.metric, trg])), [targets]);
   
   const glucoseMg = (r: any) => String(r?.unit || "mg/dL").toLowerCase() === "mmol/l" ? Number(r.value) * 18.0182 : Number(r?.value);
   
   function warningFor(r: any) {
     if (!r) return null;
-    const outside = (metric: string, value: number) => { const t: any = targetMap.get(metric); return !!t && t.enabled && ((t.minValue != null && value < t.minValue) || (t.maxValue != null && value > t.maxValue)); };
-    if (mode === "blood-pressure" && (outside("bp-systolic", r.systolic) || outside("bp-diastolic", r.diastolic))) return "Hedef aralığı dışında";
-    if (mode === "glucose" && outside("glucose", glucoseMg(r))) return "Hedef aralığı dışında";
-    if (mode === "sleep") { const h = (new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime()) / 3600000; if (outside("sleep-hours", h)) return "Hedef sürenin dışında"; }
+    const outside = (metric: string, value: number) => { const trg: any = targetMap.get(metric); return !!trg && trg.enabled && ((trg.minValue != null && value < trg.minValue) || (trg.maxValue != null && value > trg.maxValue)); };
+    if (mode === "blood-pressure" && (outside("bp-systolic", r.systolic) || outside("bp-diastolic", r.diastolic))) return t("outsideTargetRange");
+    if (mode === "glucose" && outside("glucose", glucoseMg(r))) return t("outsideTargetRange");
+    if (mode === "sleep") { const h = (new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime()) / 3600000; if (outside("sleep-hours", h)) return t("outsideTargetDuration"); }
     return null;
   }
   
@@ -79,17 +87,29 @@ export default function HealthModule({ mode }: { mode: Mode }) {
     if (body.endedAt) body.endedAt = new Date(body.endedAt).toISOString();
 
     const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const j = await r.json();
-    if (!r.ok) { setMsg(j.error || "Kaydedilemedi"); return; }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { setMsg(j.error || t("saveFailed")); return; }
     setOpen(false); form.reset(); load();
   }
   
   async function remove(id: string) {
-    if (!confirm("Bu kaydı silmek istiyor musun?")) return;
+    if (!confirm(t("deleteConfirmation"))) return;
     await fetch(`${endpoint}?id=${encodeURIComponent(id)}`, { method: "DELETE" }); load();
   }
   
-  const chart = mode === "blood-pressure" ? { labels: seriesRows.map(r => new Date(r.measuredAt).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })), series: [{ name: 'Sistolik', values: seriesRows.map(r => r.systolic) }, { name: 'Diyastolik', values: seriesRows.map(r => r.diastolic) }] } : mode === "glucose" ? { labels: seriesRows.map(r => new Date(r.measuredAt).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })), series: [{ name: 'Kan Şekeri (mg/dL)', values: seriesRows.map(r => Number(glucoseMg(r).toFixed(1))) }] } : { labels: seriesRows.map(r => new Date(r.startedAt).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })), series: [{ name: 'Uyku (saat)', values: seriesRows.map(r => Number(((new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime()) / 3600000).toFixed(1))) }] };
+  const chart = mode === "blood-pressure" ? {
+    labels: seriesRows.map(r => format.dateTime(new Date(r.measuredAt), { day: '2-digit', month: '2-digit' })),
+    series: [
+      { name: t('bloodPressure.chartSystolic'), values: seriesRows.map(r => r.systolic) },
+      { name: t('bloodPressure.chartDiastolic'), values: seriesRows.map(r => r.diastolic) }
+    ]
+  } : mode === "glucose" ? {
+    labels: seriesRows.map(r => format.dateTime(new Date(r.measuredAt), { day: '2-digit', month: '2-digit' })),
+    series: [{ name: t('glucose.chartSeries'), values: seriesRows.map(r => Number(glucoseMg(r).toFixed(1))) }]
+  } : {
+    labels: seriesRows.map(r => format.dateTime(new Date(r.startedAt), { day: '2-digit', month: '2-digit' })),
+    series: [{ name: t('sleep.chartSeries'), values: seriesRows.map(r => Number(((new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime()) / 3600000).toFixed(1))) }]
+  };
 
   return (
     <div className="page" style={{ maxWidth: "1200px" }}>
@@ -101,13 +121,13 @@ export default function HealthModule({ mode }: { mode: Mode }) {
             {icon}
           </div>
           <div>
-            <span className="kicker" style={{ color: color }}>Günlük Takip</span>
+            <span className="kicker" style={{ color: color }}>{t("dailyTracking")}</span>
             <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{title}</h1>
             <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>{desc}</p>
           </div>
         </div>
         <button onClick={() => setOpen(!open)} style={{ padding: "12px 24px", background: "#0f172a", color: "#fff", borderRadius: "100px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
-          {open ? <X size={20} /> : <Plus size={20} />} {open ? "Kapat" : "Yeni Kayıt Ekle"}
+          {open ? <X size={20} /> : <Plus size={20} />} {open ? t("close") : t("addNewRecord")}
         </button>
       </div>
 
@@ -118,19 +138,19 @@ export default function HealthModule({ mode }: { mode: Mode }) {
             {mode === "blood-pressure" && (
               <>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Sistolik (Büyük)</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("bloodPressure.systolicLabel")}</label>
                   <input name="systolic" type="number" defaultValue="120" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Diyastolik (Küçük)</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("bloodPressure.diastolicLabel")}</label>
                   <input name="diastolic" type="number" defaultValue="80" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Nabız (BPM)</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("bloodPressure.pulseLabel")}</label>
                   <input name="pulse" type="number" defaultValue="72" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Ölçüm Zamanı</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("bloodPressure.measuredAtLabel")}</label>
                   <input name="measuredAt" type="datetime-local" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", color: "#475569" }} />
                 </div>
               </>
@@ -138,19 +158,24 @@ export default function HealthModule({ mode }: { mode: Mode }) {
             {mode === "glucose" && (
               <>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Ölçüm Değeri</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("glucose.valueLabel")}</label>
                   <input name="value" type="number" step="0.1" defaultValue="95" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Birim</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("glucose.unitLabel")}</label>
                   <select name="unit" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }}><option>mg/dL</option><option>mmol/L</option></select>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Durum (Açlık/Tokluk)</label>
-                  <select name="context" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }}><option value="FASTING">Açlık</option><option value="POSTPRANDIAL">Tokluk</option><option value="RANDOM">Rastgele</option><option value="BEDTIME">Gece</option></select>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("glucose.contextLabel")}</label>
+                  <select name="context" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }}>
+                    <option value="FASTING">{t("glucose.contextFasting")}</option>
+                    <option value="POSTPRANDIAL">{t("glucose.contextPostprandial")}</option>
+                    <option value="RANDOM">{t("glucose.contextRandom")}</option>
+                    <option value="BEDTIME">{t("glucose.contextBedtime")}</option>
+                  </select>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Ölçüm Zamanı</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("glucose.measuredAtLabel")}</label>
                   <input name="measuredAt" type="datetime-local" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", color: "#475569" }} />
                 </div>
               </>
@@ -158,27 +183,33 @@ export default function HealthModule({ mode }: { mode: Mode }) {
             {mode === "sleep" && (
               <>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Uyku Başlangıcı</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("sleep.startedAtLabel")}</label>
                   <input name="startedAt" type="datetime-local" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", color: "#475569" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Uyanış</label>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("sleep.endedAtLabel")}</label>
                   <input name="endedAt" type="datetime-local" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", color: "#475569" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Uyku Kalitesi</label>
-                  <select name="quality" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }}><option value="5">Çok İyi (5)</option><option value="4">İyi (4)</option><option value="3">Orta (3)</option><option value="2">Zayıf (2)</option><option value="1">Kötü (1)</option></select>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("sleep.qualityLabel")}</label>
+                  <select name="quality" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }}>
+                    <option value="5">{t("sleep.quality5")}</option>
+                    <option value="4">{t("sleep.quality4")}</option>
+                    <option value="3">{t("sleep.quality3")}</option>
+                    <option value="2">{t("sleep.quality2")}</option>
+                    <option value="1">{t("sleep.quality1")}</option>
+                  </select>
                 </div>
               </>
             )}
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Notunuz (Opsiyonel)</label>
-            <input name="note" placeholder="Ölçümle ilgili notlarınız..." style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }} />
+            <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("optionalNote")}</label>
+            <input name="note" placeholder={t("notePlaceholder")} style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none" }} />
           </div>
           <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-            <button type="submit" style={{ padding: "14px 32px", background: color, color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer" }}>Kaydet</button>
-            <button type="button" onClick={() => setOpen(false)} style={{ padding: "14px 32px", background: "#f1f5f9", color: "#475569", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer" }}>İptal</button>
+            <button type="submit" style={{ padding: "14px 32px", background: color, color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer" }}>{t("save")}</button>
+            <button type="button" onClick={() => setOpen(false)} style={{ padding: "14px 32px", background: "#f1f5f9", color: "#475569", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer" }}>{t("cancel")}</button>
           </div>
           {msg && <div style={{ color: "#ef4444", fontWeight: 600, fontSize: "14px" }}>{msg}</div>}
         </form>
@@ -189,40 +220,40 @@ export default function HealthModule({ mode }: { mode: Mode }) {
         <div style={{ background: "#fef2f2", borderLeft: "4px solid #ef4444", padding: "16px 20px", borderRadius: "0 16px 16px 0", display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px", color: "#b91c1c" }}>
           <WarningCircle size={24} weight="duotone" />
           <div>
-            <strong style={{ display: "block", fontSize: "14px", marginBottom: "2px" }}>Hedef Bildirimi</strong>
-            <span style={{ fontSize: "13px" }}>{latestWarning}. Bu sistem bir tıbbi tanı aracı değildir; endişeniz varsa sağlık profesyoneline danışın.</span>
+            <strong style={{ display: "block", fontSize: "14px", marginBottom: "2px" }}>{t("targetNotification")}</strong>
+            <span style={{ fontSize: "13px" }}>{latestWarning}. {t("medicalDisclaimer")}</span>
           </div>
         </div>
       )}
 
-      {/* Hero Stats (Son Ölçüm) */}
+      {/* Hero Stats (Latest Measurement) */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "24px", marginBottom: "40px" }}>
         
         <div style={{ background: bg, padding: "32px", borderRadius: "32px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <span style={{ fontSize: "14px", fontWeight: 600, color: color, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>Son Ölçüm</span>
+          <span style={{ fontSize: "14px", fontWeight: 600, color: color, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>{t("latestMeasurement")}</span>
           
           {mode === "blood-pressure" ? (
             <>
               <strong style={{ fontSize: "42px", color: "#0f172a", lineHeight: 1, fontWeight: 800 }}>{latest ? `${latest.systolic}/${latest.diastolic}` : "--"}</strong>
-              <small style={{ fontSize: "15px", color: "#475569", marginTop: "8px", fontWeight: 500 }}>mmHg {latest?.pulse ? `• Nabız ${latest.pulse}` : ""}</small>
+              <small style={{ fontSize: "15px", color: "#475569", marginTop: "8px", fontWeight: 500 }}>mmHg {latest?.pulse ? `• ${t("bloodPressure.pulseLabel").split(" ")[0]} ${latest.pulse}` : ""}</small>
             </>
           ) : mode === "glucose" ? (
             <>
               <strong style={{ fontSize: "42px", color: "#0f172a", lineHeight: 1, fontWeight: 800 }}>{latest ? latest.value : "--"}</strong>
-              <small style={{ fontSize: "15px", color: "#475569", marginTop: "8px", fontWeight: 500 }}>{latest?.unit || "mg/dL"} • {latest?.context === "FASTING" ? "Açlık" : latest?.context === "POSTPRANDIAL" ? "Tokluk" : "Ölçüm"}</small>
+              <small style={{ fontSize: "15px", color: "#475569", marginTop: "8px", fontWeight: 500 }}>{latest?.unit || "mg/dL"} • {latest?.context === "FASTING" ? t("glucose.contextFasting") : latest?.context === "POSTPRANDIAL" ? t("glucose.contextPostprandial") : t("measurementFallback")}</small>
             </>
           ) : (
             <>
-              <strong style={{ fontSize: "42px", color: "#0f172a", lineHeight: 1, fontWeight: 800 }}>{latest ? `${((new Date(latest.endedAt).getTime() - new Date(latest.startedAt).getTime()) / 3600000).toFixed(1)}s` : "--"}</strong>
-              <small style={{ fontSize: "15px", color: "#475569", marginTop: "8px", fontWeight: 500 }}>Kalite {latest?.quality || "?"}/5</small>
+              <strong style={{ fontSize: "42px", color: "#0f172a", lineHeight: 1, fontWeight: 800 }}>{latest ? `${((new Date(latest.endedAt).getTime() - new Date(latest.startedAt).getTime()) / 3600000).toFixed(1)}${t("unitHours")}` : "--"}</strong>
+              <small style={{ fontSize: "15px", color: "#475569", marginTop: "8px", fontWeight: 500 }}>{t("qualityPrefix")} {latest?.quality || "?"}/5</small>
             </>
           )}
         </div>
 
         <div style={{ background: "#f8fafc", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <span style={{ fontSize: "14px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>Toplam Kayıt</span>
+          <span style={{ fontSize: "14px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>{t("totalRecords")}</span>
           <strong style={{ fontSize: "42px", color: "#0f172a", lineHeight: 1, fontWeight: 800 }}>{rows.length}</strong>
-          <small style={{ fontSize: "15px", color: "#94a3b8", marginTop: "8px", fontWeight: 500 }}>Sistemdeki genel geçmişiniz</small>
+          <small style={{ fontSize: "15px", color: "#94a3b8", marginTop: "8px", fontWeight: 500 }}>{t("historySubtitle")}</small>
         </div>
 
       </div>
@@ -233,15 +264,15 @@ export default function HealthModule({ mode }: { mode: Mode }) {
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ background: "#f1f5f9", padding: "12px", borderRadius: "16px", color: "#475569" }}><ChartLineUp size={24} weight="duotone" /></div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Trend Analizi</h2>
-              <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>Seçilen tarih aralığındaki grafikleriniz.</p>
+              <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>{t("trendAnalysis")}</h2>
+              <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>{t("trendSubtitle")}</p>
             </div>
           </div>
           
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <input type="date" value={from} onChange={e=>setFrom(e.target.value)} style={{ padding: "10px 16px", borderRadius: "12px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#475569", outline: "none" }} />
             <input type="date" value={to} onChange={e=>setTo(e.target.value)} style={{ padding: "10px 16px", borderRadius: "12px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#475569", outline: "none" }} />
-            <button onClick={load} style={{ padding: "10px 24px", background: "#0f172a", color: "#fff", borderRadius: "12px", border: "none", fontWeight: 600, cursor: "pointer" }}>Filtrele</button>
+            <button onClick={load} style={{ padding: "10px 24px", background: "#0f172a", color: "#fff", borderRadius: "12px", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("filter")}</button>
           </div>
         </div>
         <div style={{ padding: "16px 0" }}>
@@ -251,7 +282,7 @@ export default function HealthModule({ mode }: { mode: Mode }) {
 
       {/* Targets */}
       <div style={{ marginBottom: "40px" }}>
-        <HealthTargetEditor defs={modeDefs[mode]} onChange={loadTargets} />
+        <HealthTargetEditor defs={defs} onChange={loadTargets} />
       </div>
 
       {/* History */}
@@ -259,8 +290,8 @@ export default function HealthModule({ mode }: { mode: Mode }) {
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
           <div style={{ background: "#f1f5f9", padding: "12px", borderRadius: "16px", color: "#475569" }}><Clock size={24} weight="duotone" /></div>
           <div>
-            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Geçmiş Ölçümler</h2>
-            <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>Tüm kayıtlarınız ters kronolojik sırada.</p>
+            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>{t("pastMeasurements")}</h2>
+            <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>{t("pastSubtitle")}</p>
           </div>
         </div>
 
@@ -271,7 +302,7 @@ export default function HealthModule({ mode }: { mode: Mode }) {
               <div key={r.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: warning ? "#fef2f2" : "#f8fafc", borderRadius: "16px", border: `1px solid ${warning ? '#fecaca' : '#e2e8f0'}` }}>
                 <div style={{ flex: 1 }}>
                   <b style={{ display: "block", fontSize: "16px", color: warning ? "#b91c1c" : "#0f172a", marginBottom: "4px" }}>
-                    {mode === "blood-pressure" ? `${r.systolic}/${r.diastolic} mmHg` : mode === "glucose" ? `${r.value} ${r.unit}` : `${((new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime()) / 3600000).toFixed(1)} saat`}
+                    {mode === "blood-pressure" ? `${r.systolic}/${r.diastolic} mmHg` : mode === "glucose" ? `${r.value} ${r.unit}` : `${((new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime()) / 3600000).toFixed(1)} ${t("unitHours")}`}
                   </b>
                   <span style={{ fontSize: "13px", color: warning ? "#dc2626" : "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
                     <Info size={14} />
@@ -285,7 +316,7 @@ export default function HealthModule({ mode }: { mode: Mode }) {
               </div>
             )
           }) : (
-            <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", fontSize: "14px", background: "#f8fafc", borderRadius: "16px" }}>Henüz ölçüm kaydınız bulunmuyor.</div>
+            <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", fontSize: "14px", background: "#f8fafc", borderRadius: "16px" }}>{t("noRecordsYet")}</div>
           )}
         </div>
       </section>

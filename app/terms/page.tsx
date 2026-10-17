@@ -1,1 +1,21 @@
-export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Yasal & Uyum</span><h1>Kullanım Koşulları</h1><p>Son Güncelleme: 26 Eylül 2026. Alumas Sağlık Teknolojileri A.Ş. tarafından uluslararası güvenlik standartlarına ve KVKK/GDPR regülasyonlarına tam uyumlu olarak düzenlenmiştir.</p></div><section className="panel legal-copy" dangerouslySetInnerHTML={{__html:`<h2>Platformun rolü</h2><p>Alumas; sağlık hizmetlerine erişimi, doktor/kurum keşfini, randevu ve kullanıcı tarafından seçilen sağlık yönetimi araçlarını kolaylaştıran bir teknoloji platformudur. Sağlık kuruluşu, acil çağrı merkezi veya tanı/tedavi sağlayıcısı değildir.</p><h2>Sonuç sıralaması</h2><p>Eşleştirme; branş uyumu, konum, müsaitlik, doğrulama, kurum durumu ve kullanıcı tercihi gibi açıklanabilir sinyaller kullanabilir. Sıralama tıbbi sonuç garantisi değildir.</p><h2>Kullanıcı sorumluluğu</h2><p>Acil veya ciddi sağlık durumlarında uygulama sonucuna dayanarak gecikme yaşanmamalıdır. Sağlık profesyonelinin değerlendirmesi esastır.</p><h2>Üçüncü taraf hizmetleri</h2><p>Harita, barındırma, veritabanı, bildirim ve diğer entegrasyonlar kendi koşullarına tabi olabilir; kişisel veri aktarımı ayrıca KVKK uyum sürecine tabidir.</p>`}} /></div>}
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const t = await getTranslations("legal");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("legalKicker")}</span>
+        <h1>{t("termsTitle")}</h1>
+        <p>{t("lastUpdatedNotice")}</p>
+      </div>
+      <section
+        className="panel legal-copy"
+        dangerouslySetInnerHTML={{
+          __html: t.raw("termsHtml"),
+        }}
+      />
+    </div>
+  );
+}

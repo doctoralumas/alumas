@@ -3,17 +3,19 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Star, MapPin, Stethoscope, CaretRight, VideoCamera, ChatCircleText, MagnifyingGlass, Funnel } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function DoctorClientList({ doctors, profileId }: { doctors: any[], profileId?: string }) {
+  const t = useTranslations("discovery");
   const [search, setSearch] = useState("");
   const [filterSpecialty, setFilterSpecialty] = useState("");
 
   const getPresenceColor = (status: string) => {
     switch (status) {
-      case 'AVAILABLE': return { bg: '#dcfce7', text: '#16a34a', label: 'Müsait', dot: '#22c55e' };
-      case 'ONLINE': return { bg: '#e0f2fe', text: '#0284c7', label: 'Çevrimiçi', dot: '#0ea5e9' };
-      case 'BUSY': return { bg: '#fee2e2', text: '#dc2626', label: 'Meşgul', dot: '#ef4444' };
-      default: return { bg: '#f1f5f9', text: '#64748b', label: 'Çevrimdışı', dot: '#94a3b8' };
+      case 'AVAILABLE': return { bg: '#dcfce7', text: '#16a34a', label: t('statusAvailable'), dot: '#22c55e' };
+      case 'ONLINE': return { bg: '#e0f2fe', text: '#0284c7', label: t('statusOnline'), dot: '#0ea5e9' };
+      case 'BUSY': return { bg: '#fee2e2', text: '#dc2626', label: t('statusBusy'), dot: '#ef4444' };
+      default: return { bg: '#f1f5f9', text: '#64748b', label: t('statusOffline'), dot: '#94a3b8' };
     }
   };
 
@@ -38,7 +40,7 @@ export default function DoctorClientList({ doctors, profileId }: { doctors: any[
           <input 
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Doktor, uzmanlık veya hastalık ara..." 
+            placeholder={t("searchDoctorPlaceholder")} 
             style={{ width: "100%", padding: "16px 16px 16px 48px", borderRadius: "16px", border: "1px solid #cbd5e1", fontSize: "15px", outline: "none", transition: "all 0.2s", background: "#fff", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}
             onFocus={e => e.target.style.borderColor = "#3b82f6"}
             onBlur={e => e.target.style.borderColor = "#cbd5e1"}
@@ -52,7 +54,7 @@ export default function DoctorClientList({ doctors, profileId }: { doctors: any[
             onChange={e => setFilterSpecialty(e.target.value)}
             style={{ appearance: "none", padding: "16px 40px 16px 42px", borderRadius: "16px", border: "1px solid #cbd5e1", fontSize: "15px", outline: "none", background: "#fff", color: filterSpecialty ? "#0f172a" : "#64748b", cursor: "pointer", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}
           >
-            <option value="">Tüm Uzmanlıklar</option>
+            <option value="">{t("allSpecialties")}</option>
             {specialties.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
@@ -92,7 +94,7 @@ export default function DoctorClientList({ doctors, profileId }: { doctors: any[
                   {d.reviewCount > 0 ? (
                     <>{d.rating.toFixed(1)} <span style={{ color: "#94a3b8", fontWeight: 500 }}>({d.reviewCount})</span></>
                   ) : (
-                    <span style={{ color: "#64748b" }}>Yeni</span>
+                    <span style={{ color: "#64748b" }}>{t("ratingNew")}</span>
                   )}
                 </div>
               </div>
@@ -104,7 +106,7 @@ export default function DoctorClientList({ doctors, profileId }: { doctors: any[
                   <div style={{ width: "36px", height: "36px", borderRadius: "12px", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><ChatCircleText size={18} /></div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#0f172a", color: "#fff", padding: "10px 16px", borderRadius: "12px", fontSize: "14px", fontWeight: 600 }}>
-                  Randevu <CaretRight size={14} weight="bold" />
+                  {t("bookAppointment")} <CaretRight size={14} weight="bold" />
                 </div>
               </div>
             </Link>
@@ -114,8 +116,8 @@ export default function DoctorClientList({ doctors, profileId }: { doctors: any[
           <div style={{ gridColumn: "1 / -1", padding: "64px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", color: "#64748b", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
             <MagnifyingGlass size={48} color="#cbd5e1" weight="duotone" />
             <div>
-              <strong style={{ display: "block", color: "#334155", fontSize: "18px", marginBottom: "4px" }}>Sonuç Bulunamadı</strong>
-              Aradığınız kriterlere uygun uzman bulunmuyor. Farklı kelimelerle veya filtrelerle tekrar deneyin.
+              <strong style={{ display: "block", color: "#334155", fontSize: "18px", marginBottom: "4px" }}>{t("noResultsFoundTitle")}</strong>
+              {t("noResultsFoundDesc")}
             </div>
           </div>
         )}

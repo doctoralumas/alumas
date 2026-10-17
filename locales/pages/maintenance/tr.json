@@ -1,0 +1,10 @@
+{
+  "maintenance": {
+    "kicker": "Alumas",
+    "title": "Kısa bir bakımdayız.",
+    "desc": "Hizmeti daha güvenli ve kararlı hale getirmek için planlı bakım yapıyoruz. Lütfen biraz sonra tekrar deneyin.",
+    "emergencyNotice": "Acil sağlık ihtiyacında uygulamayı beklemeyin; Türkiye’de 112’yi arayın.",
+    "tryAgain": "Tekrar dene",
+    "call112": "112’yi ara"
+  }
+}

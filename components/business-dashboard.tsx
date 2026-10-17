@@ -16,6 +16,7 @@ import {
   Gear,
   ArrowSquareOut,
 } from "@phosphor-icons/react/dist/ssr";
+import { useTranslations } from "next-intl";
 
 type Org = {
   id: string;
@@ -35,23 +36,24 @@ type Org = {
   _count?: { doctors?: number };
 };
 
-const label: Record<string, string> = {
-  PENDING: "Doğrulama bekliyor",
-  APPROVED: "Doğrulanmış ve yayında",
-  REJECTED: "Başvuru reddedildi",
-  SUSPENDED: "Yayın durduruldu",
-};
-
-const ORG_TYPES: Record<string, string> = {
-  HOSPITAL: "Hastane",
-  CLINIC: "Klinik",
-  PHARMACY: "Eczane",
-  IMAGING_CENTER: "Görüntüleme Merkezi",
-  LABORATORY: "Tıbbi Laboratuvar",
-};
-
 export default function BusinessDashboard() {
+  const t = useTranslations("professional.businessDashboard");
   const [rows, setRows] = useState<Org[]>([]);
+
+  const label: Record<string, string> = {
+    PENDING: t("statusPending"),
+    APPROVED: t("statusApproved"),
+    REJECTED: t("statusRejected"),
+    SUSPENDED: t("statusSuspended"),
+  };
+
+  const ORG_TYPES: Record<string, string> = {
+    HOSPITAL: t("orgHospital"),
+    CLINIC: t("orgClinic"),
+    PHARMACY: t("orgPharmacy"),
+    IMAGING_CENTER: t("orgImaging"),
+    LABORATORY: t("orgLab"),
+  };
 
   useEffect(() => {
     fetch("/api/organizations/me")
@@ -88,7 +90,7 @@ export default function BusinessDashboard() {
         </div>
         <div style={{ textAlign: "center", maxWidth: "320px" }}>
           <h2 style={{ margin: "0 0 8px", fontSize: "18px", color: "#0f172a" }}>
-            Kurum hesabınız yok
+            {t("emptyTitle")}
           </h2>
           <p
             style={{
@@ -98,8 +100,7 @@ export default function BusinessDashboard() {
               lineHeight: "1.5",
             }}
           >
-            Platformda hizmet vermek için kurum profilinizi oluşturun ve
-            doğrulama sürecini başlatın.
+            {t("emptyDesc")}
           </p>
         </div>
         <Link
@@ -117,7 +118,7 @@ export default function BusinessDashboard() {
             marginTop: "8px",
           }}
         >
-          <PlusCircle size={20} weight="fill" /> Kurumsal hesap oluştur
+          <PlusCircle size={20} weight="fill" /> {t("createAccount")}
         </Link>
       </div>
     );
@@ -264,7 +265,7 @@ export default function BusinessDashboard() {
                     >
                       <Stethoscope size={18} />
                       <span style={{ fontSize: "13px", fontWeight: 600 }}>
-                        Uzman Kadrosu
+                        {t("staffCount")}
                       </span>
                     </div>
                     <div
@@ -298,7 +299,7 @@ export default function BusinessDashboard() {
                     >
                       <FirstAid size={18} />
                       <span style={{ fontSize: "13px", fontWeight: 600 }}>
-                        Tanımlı Hizmetler
+                        {t("servicesCount")}
                       </span>
                     </div>
                     <div
@@ -336,7 +337,7 @@ export default function BusinessDashboard() {
                     >
                       <Clock size={18} />
                       <span style={{ fontSize: "13px", fontWeight: 600 }}>
-                        Nöbet Durumu
+                        {t("dutyStatus")}
                       </span>
                     </div>
                     <div
@@ -346,7 +347,7 @@ export default function BusinessDashboard() {
                         color: org.isOnDuty ? "#1d4ed8" : "#0f172a",
                       }}
                     >
-                      {org.isOnDuty ? "Nöbetçi" : "Normal Mesai"}
+                      {org.isOnDuty ? t("dutyOn") : t("dutyNormal")}
                     </div>
                   </div>
                   <div
@@ -370,7 +371,7 @@ export default function BusinessDashboard() {
                     >
                       <Pill size={18} />
                       <span style={{ fontSize: "13px", fontWeight: 600 }}>
-                        Stok Takibi
+                        {t("stockTracking")}
                       </span>
                     </div>
                     <div
@@ -407,7 +408,7 @@ export default function BusinessDashboard() {
                   >
                     <Heartbeat size={18} />
                     <span style={{ fontSize: "13px", fontWeight: 600 }}>
-                      Tetkik Kataloğu
+                      {t("imagingCatalog")}
                     </span>
                   </div>
                   <div
@@ -443,7 +444,7 @@ export default function BusinessDashboard() {
                   >
                     <Flask size={18} />
                     <span style={{ fontSize: "13px", fontWeight: 600 }}>
-                      Tahlil Kataloğu
+                      {t("labCatalog")}
                     </span>
                   </div>
                   <div
@@ -482,7 +483,7 @@ export default function BusinessDashboard() {
                   fontWeight: 600,
                 }}
               >
-                <Gear size={20} /> Kurumu yönet
+                <Gear size={20} /> {t("manageOrg")}
               </Link>
               {org.status === "APPROVED" && org.isPublished && (
                 <Link
@@ -500,7 +501,7 @@ export default function BusinessDashboard() {
                     border: "1px solid #cbd5e1",
                   }}
                 >
-                  <ArrowSquareOut size={20} /> Yayınlanan profili gör
+                  <ArrowSquareOut size={20} /> {t("viewPublicProfile")}
                 </Link>
               )}
             </div>

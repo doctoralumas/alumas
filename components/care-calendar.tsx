@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Plus, CheckCircle, Circle, Ruler, Pill, User, TestTube, Heartbeat, CalendarCheck } from "@phosphor-icons/react";
+import { useTranslations, useLocale } from "next-intl";
 
 type CareItem = {
   id: string;
@@ -18,6 +19,10 @@ type CareItem = {
 };
 
 export default function CareCalendar({ doctorMode, patients = [], embedded = false }: { doctorMode?: boolean, patients?: any[], embedded?: boolean }) {
+  const t = useTranslations("professional.careCalendar");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
+
   const [rows, setRows] = useState<CareItem[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [msg, setMsg] = useState({ type: '', text: '' });
@@ -46,12 +51,12 @@ export default function CareCalendar({ doctorMode, patients = [], embedded = fal
     });
     
     if (r.ok) {
-      setMsg({ type: 'success', text: 'Görev takvime eklendi.' });
+      setMsg({ type: 'success', text: t("taskAdded") });
       form.reset();
       load();
     } else {
-      const j = await r.json();
-      setMsg({ type: 'error', text: j.error || 'Eklenemedi' });
+      const j = await r.json().catch(() => ({}));
+      setMsg({ type: 'error', text: j.error || t("taskAddFailed") });
     }
   }
 
@@ -76,15 +81,14 @@ export default function CareCalendar({ doctorMode, patients = [], embedded = fal
 
   const getLabel = (kind: string) => {
     switch(kind) {
-      case 'measurement': return 'Ölçüm';
-      case 'medication': return 'İlaç';
-      case 'visit': return 'Kontrol';
-      case 'test': return 'Tetkik';
-      default: return 'Diğer';
+      case 'measurement': return t("kinds.measurement");
+      case 'medication': return t("kinds.medication");
+      case 'visit': return t("kinds.visit");
+      case 'test': return t("kinds.test");
+      default: return t("kinds.care");
     }
   };
 
-  // Determine if we should wrap in the big panel or not
   const formContent = (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
@@ -92,8 +96,8 @@ export default function CareCalendar({ doctorMode, patients = [], embedded = fal
           <CalendarCheck size={24} weight="duotone" />
         </div>
         <div>
-          <h2 style={{ fontSize: "20px", color: "#0f172a", margin: 0 }}>Ortak Bakım Takvimi</h2>
-          <p style={{ margin: 0, fontSize: "14px", color: "#64748b", marginTop: "4px" }}>Doktor ve hastanın eş zamanlı görebildiği ortak takip planı.</p>
+          <h2 style={{ fontSize: "20px", color: "#0f172a", margin: 0 }}>{t("title")}</h2>
+          <p style={{ margin: 0, fontSize: "14px", color: "#64748b", marginTop: "4px" }}>{t("formDesc")}</p>
         </div>
       </div>
 
@@ -101,47 +105,47 @@ export default function CareCalendar({ doctorMode, patients = [], embedded = fal
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
           {doctorMode ? (
             <div>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Hasta Seçimi *</label>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("selectPatientLabel")}</label>
               <select name="patientId" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none", background: "#fff" }}>
-                <option value="">Hasta seçin</option>
+                <option value="">{t("selectPatientPlaceholder")}</option>
                 {patients.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
               </select>
             </div>
           ) : (
             <div>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>İlgili Bakım Planı *</label>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("selectPlanLabel")}</label>
               <select name="carePlanId" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none", background: "#fff" }}>
-                <option value="">Plan seçin</option>
+                <option value="">{t("selectPlanPlaceholder")}</option>
                 {plans.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                {!plans.length && <option value="">Aktif plan bulunamadı</option>}
+                {!plans.length && <option value="">{t("noActivePlan")}</option>}
               </select>
             </div>
           )}
           
           <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Tarih / Saat *</label>
+            <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("dateTimeLabel")}</label>
             <input name="startsAt" type="datetime-local" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none" }} />
           </div>
           
           <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Görev Türü</label>
+            <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("taskTypeLabel")}</label>
             <select name="kind" style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none", background: "#fff" }}>
-              <option value="measurement">Ölçüm</option>
-              <option value="medication">İlaç</option>
-              <option value="visit">Kontrol</option>
-              <option value="test">Tetkik</option>
-              <option value="care">Diğer</option>
+              <option value="measurement">{t("kinds.measurement")}</option>
+              <option value="medication">{t("kinds.medication")}</option>
+              <option value="visit">{t("kinds.visit")}</option>
+              <option value="test">{t("kinds.test")}</option>
+              <option value="care">{t("kinds.care")}</option>
             </select>
           </div>
         </div>
         
         <div style={{ display: "grid", gridTemplateColumns: embedded ? "1fr" : "2fr 1fr", gap: "16px", alignItems: "end" }}>
           <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Görev Başlığı *</label>
-            <input name="title" placeholder="Örn: Sabah tansiyon ölçümü" required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none" }} />
+            <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("taskTitleLabel")}</label>
+            <input name="title" placeholder={t("taskTitlePlaceholder")} required style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none" }} />
           </div>
           <button type="submit" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "12px", borderRadius: "10px", height: "43px", background: "#0284c7", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>
-            <Plus size={18} weight="bold" /> Ekle
+            <Plus size={18} weight="bold" /> {t("add")}
           </button>
         </div>
 
@@ -174,7 +178,6 @@ export default function CareCalendar({ doctorMode, patients = [], embedded = fal
               <button 
                 onClick={() => done(x.id, !x.completedAt)}
                 style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: x.completedAt ? "#16a34a" : "#cbd5e1" }}
-                title={x.completedAt ? "Tamamlandı" : "Tamamla"}
               >
                 {x.completedAt ? <CheckCircle size={32} weight="fill" /> : <Circle size={32} weight="bold" />}
               </button>
@@ -188,7 +191,7 @@ export default function CareCalendar({ doctorMode, patients = [], embedded = fal
                   {x.title}
                 </strong>
                 <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#64748b" }}>
-                  <span style={{ fontWeight: 600, color: "#475569" }}>{new Date(x.startsAt).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                  <span style={{ fontWeight: 600, color: "#475569" }}>{new Date(x.startsAt).toLocaleString(dateLocale, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                   <span>•</span>
                   <span>{getLabel(x.kind)}</span>
                   <span>•</span>
@@ -207,7 +210,7 @@ export default function CareCalendar({ doctorMode, patients = [], embedded = fal
         {!rows.length && (
           <div style={{ padding: "48px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #cbd5e1", color: "#64748b" }}>
             <CalendarCheck size={48} weight="duotone" color="#cbd5e1" style={{ margin: "0 auto 16px" }} />
-            <p style={{ margin: 0, fontSize: "15px" }}>Takvimde henüz planlanmış bir ortak bakım görevi yok.</p>
+            <p style={{ margin: 0, fontSize: "15px" }}>{t("empty")}</p>
           </div>
         )}
       </div>

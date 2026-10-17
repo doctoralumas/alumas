@@ -1,14 +1,15 @@
 "use client";
 import { useState } from "react";
 import { UserCircle, EnvelopeSimple, CheckCircle, FloppyDisk } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function PersonalInfoEditor({ initialName, initialEmail }: { initialName: string, initialEmail: string }) {
+  const t = useTranslations("profile.personalInfo");
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState({ type: "", text: "" });
 
-  // Do not show email as "phone-1234@alumas.local" in the UI
   const displayEmail = email.includes("@alumas.local") ? "" : email;
   const [editEmail, setEditEmail] = useState(displayEmail);
 
@@ -24,12 +25,12 @@ export default function PersonalInfoEditor({ initialName, initialEmail }: { init
     });
 
     if (res.ok) {
-      setMsg({ type: "success", text: "Bilgileriniz başarıyla güncellendi." });
+      setMsg({ type: "success", text: t("successMsg") });
       const data = await res.json();
       setEmail(data.user.email);
     } else {
-      const data = await res.json();
-      setMsg({ type: "error", text: data.error || "Bir hata oluştu." });
+      const data = await res.json().catch(() => ({}));
+      setMsg({ type: "error", text: data.error || t("errorMsg") });
     }
     setLoading(false);
   }
@@ -38,15 +39,15 @@ export default function PersonalInfoEditor({ initialName, initialEmail }: { init
     <section style={{ background: "#fff", padding: "32px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px", color: "#0f172a" }}>
         <UserCircle size={24} weight="duotone" color="#0ea5e9" />
-        <h2 style={{ margin: 0, fontSize: "20px" }}>Kişisel Bilgiler</h2>
+        <h2 style={{ margin: 0, fontSize: "20px" }}>{t("title")}</h2>
       </div>
       <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px", lineHeight: "1.5" }}>
-        Sistemde görünen adınızı ve iletişim e-posta adresinizi güncelleyebilirsiniz.
+        {t("desc")}
       </p>
 
       <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div>
-          <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Ad Soyad</label>
+          <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("nameLabel")}</label>
           <div style={{ position: "relative" }}>
             <UserCircle size={18} color="#94a3b8" style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)" }} />
             <input 
@@ -54,21 +55,21 @@ export default function PersonalInfoEditor({ initialName, initialEmail }: { init
               value={name} 
               onChange={e => setName(e.target.value)} 
               required 
-              placeholder="Adınız Soyadınız"
+              placeholder={t("namePlaceholder")}
               style={{ width: "100%", padding: "12px 14px 12px 42px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none", fontSize: "14px", fontFamily: "inherit" }} 
             />
           </div>
         </div>
 
         <div>
-          <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>E-posta Adresi</label>
+          <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("emailLabel")}</label>
           <div style={{ position: "relative" }}>
             <EnvelopeSimple size={18} color="#94a3b8" style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)" }} />
             <input 
               type="email" 
               value={editEmail} 
               onChange={e => setEditEmail(e.target.value)} 
-              placeholder="Geçerli bir e-posta ekleyin"
+              placeholder={t("emailPlaceholder")}
               style={{ width: "100%", padding: "12px 14px 12px 42px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none", fontSize: "14px", fontFamily: "inherit" }} 
             />
           </div>
@@ -80,7 +81,7 @@ export default function PersonalInfoEditor({ initialName, initialEmail }: { init
           style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "12px", borderRadius: "10px", background: "#0ea5e9", color: "#fff", border: "none", fontWeight: 600, fontSize: "15px", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, transition: "background 0.2s", marginTop: "8px" }}
         >
           {msg.type === "success" ? <CheckCircle size={20} weight="bold" /> : <FloppyDisk size={20} weight="bold" />}
-          {loading ? "Kaydediliyor..." : msg.type === "success" ? "Kaydedildi" : "Değişiklikleri Kaydet"}
+          {loading ? t("saving") : msg.type === "success" ? t("saved") : t("saveButton")}
         </button>
 
         {msg.text && (

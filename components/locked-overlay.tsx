@@ -1,7 +1,9 @@
-﻿import { Info, LockKey, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { Sparkle } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function LockedOverlay() {
+  const t = useTranslations("lockedOverlay");
   return (
     <div
       style={{
@@ -50,7 +52,7 @@ export default function LockedOverlay() {
               fontWeight: 700,
             }}
           >
-            Alumas'ı Keşfedin
+            {t("title")}
           </h3>
           <p
             style={{
@@ -60,9 +62,7 @@ export default function LockedOverlay() {
               lineHeight: 1.5,
             }}
           >
-            Şu anda ziyaretçi olarak önizleme yapıyorsunuz. Kendi verilerinizi
-            girmek, kaydetmek ve tüm bu özellikleri kullanabilmek için ücretsiz
-            hesap oluşturun.
+            {t("desc")}
           </p>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function LockedOverlay() {
             border: "1px solid #c7d2fe",
           }}
         >
-          Giriş Yap
+          {t("login")}
         </Link>
         <Link
           href="/register"
@@ -94,7 +94,7 @@ export default function LockedOverlay() {
             textDecoration: "none",
           }}
         >
-          Ücretsiz Üye Ol
+          {t("register")}
         </Link>
       </div>
     </div>

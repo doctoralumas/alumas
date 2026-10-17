@@ -1,1 +1,21 @@
-export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Yasal & Uyum</span><h1>Alumas AI Kullanım ve Güvenlik Politikası</h1><p>Son Güncelleme: 26 Eylül 2026. Alumas Sağlık Teknolojileri A.Ş. tarafından uluslararası güvenlik standartlarına ve KVKK/GDPR regülasyonlarına tam uyumlu olarak düzenlenmiştir.</p></div><section className="panel legal-copy" dangerouslySetInnerHTML={{__html:`<h2>AI’nın rolü</h2><p>Alumas AI bir sağlık navigasyon ve bilgilendirme aracıdır; sağlık profesyoneli değildir, tanı koymaz, reçete yazmaz ve acil sağlık hizmetinin yerine geçmez.</p><h2>Kaynak ve açıklanabilirlik</h2><p>Tıbbi bilgi yalnız onaylı kaynak katmanından sunulur. Doktor/kurum sonuçları doğrulanmış Alumas kayıtları ve açıkça etiketlenen harita/yer sağlayıcılarından gelebilir. Kullanıcıya mümkün olduğunda yönlendirme nedeni ve kaynak gösterilir.</p><h2>Acil durumlar</h2><p>Acil risk sinyallerinde normal sıralama geri plana alınır ve uygun acil yardım akışı öne çıkarılır. Otomatik sınıflandırmanın hata yapabileceği kabul edilir.</p><h2>Zorunlu uyarı</h2><p><strong>Ben sağlık profesyoneli değilim.</strong> Bu ifade sağlık yanıtlarında görünür tutulur.</p>`}} /></div>}
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const t = await getTranslations("legal");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("legalKicker")}</span>
+        <h1>{t("aiPolicyTitle")}</h1>
+        <p>{t("lastUpdatedNotice")}</p>
+      </div>
+      <section
+        className="panel legal-copy"
+        dangerouslySetInnerHTML={{
+          __html: t.raw("aiPolicyHtml"),
+        }}
+      />
+    </div>
+  );
+}

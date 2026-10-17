@@ -1,0 +1,42 @@
+{
+  "home": {
+    "heroAria": "For your health, the right place",
+    "heroTitleLine1": "For your health,",
+    "heroTitleLine2": "the right place.",
+    "heroSubtitle": "Discover physicians and healthcare institutions with ease.",
+    "sectionTitle": "What do you need?",
+    "categories": {
+      "experts": "Specialists",
+      "institutions": "Facilities",
+      "nearby": "Nearby",
+      "tourism": "Health Tourism",
+      "health": "My Health",
+      "insurance": "Insurance",
+      "home": "Home Care"
+    },
+    "promos": {
+      "doctor": {
+        "title": "Find your specialist",
+        "description": "Discover doctors by medical specialty."
+      },
+      "hospital": {
+        "title": "Nearby healthcare facilities",
+        "description": "Explore hospitals and medical clinics."
+      },
+      "insurance": {
+        "title": "Insurance-covered\noptions",
+        "description": "Discover affiliated network providers."
+      },
+      "family": {
+        "title": "Family Health Hub",
+        "description": "Manage health journeys for your whole family."
+      }
+    },
+    "footer": {
+      "privacy": "Data Protection",
+      "cookies": "Cookies",
+      "terms": "Terms of Use",
+      "legalNav": "Legal"
+    }
+  }
+}

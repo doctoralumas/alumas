@@ -3,10 +3,12 @@ import {useEffect,useState} from "react";
 import Link from "next/link";
 import SectionVisual from "@/components/section-visual";
 import { User, Baby, Heartbeat, CalendarPlus, ShieldCheck, Syringe, Plus, CaretRight } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 type P={id:string;name:string;type:"CHILD"|"PREGNANCY";relationLabel?:string;birthDate?:string;dueDate?:string};
 
 export default function Page(){
+  const t = useTranslations("familyHub");
   const [profiles,setProfiles]=useState<P[]>([]);
   const [counts,setCounts]=useState<Record<string,number>>({});
 
@@ -24,11 +26,11 @@ export default function Page(){
 
   return (
     <div className="page">
-      <SectionVisual slug="family" alt="Aile Sağlığı" />
+      <SectionVisual slug="family" alt={t("title")} />
       <div className="page-title">
-        <span className="kicker">Alumas Family</span>
-        <h1>Aile Sağlığı Paneli</h1>
-        <p>Kendi profiliniz ile çocuk ve gebelik profillerinizin sağlık süreçlerini tek merkezden yönetin.</p>
+        <span className="kicker">{t("kicker")}</span>
+        <h1>{t("title")}</h1>
+        <p>{t("subtitle")}</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px", marginBottom: "32px" }}>
@@ -39,10 +41,10 @@ export default function Page(){
             <div style={{ padding: "12px", background: "#e0f2fe", borderRadius: "14px", color: "#0284c7" }}>
               <User size={28} weight="duotone" />
             </div>
-            <span style={{ fontSize: "12px", fontWeight: 600, padding: "4px 10px", background: "#f1f5f9", color: "#64748b", borderRadius: "12px" }}>Ana Profil</span>
+            <span style={{ fontSize: "12px", fontWeight: 600, padding: "4px 10px", background: "#f1f5f9", color: "#64748b", borderRadius: "12px" }}>{t("mainProfileBadge")}</span>
           </div>
-          <h3 style={{ margin: "0 0 8px 0", color: "#0f172a", fontSize: "18px" }}>Benim Sağlığım</h3>
-          <p style={{ margin: 0, color: "#64748b", fontSize: "14px", lineHeight: "1.4" }}>Kişisel sağlık özetiniz, belgeleriniz ve paylaşımlarınız.</p>
+          <h3 style={{ margin: "0 0 8px 0", color: "#0f172a", fontSize: "18px" }}>{t("myHealthTitle")}</h3>
+          <p style={{ margin: 0, color: "#64748b", fontSize: "14px", lineHeight: "1.4" }}>{t("myHealthDesc")}</p>
         </Link>
 
         {/* Özel Profiller */}
@@ -53,15 +55,15 @@ export default function Page(){
                 {p.type === 'CHILD' ? <Baby size={28} weight="duotone" /> : <Heartbeat size={28} weight="duotone" />}
               </div>
               <span style={{ fontSize: "12px", fontWeight: 600, padding: "4px 10px", background: p.type === 'CHILD' ? "#f0fdf4" : "#fdf2f8", color: p.type === 'CHILD' ? "#15803d" : "#be185d", borderRadius: "12px" }}>
-                {p.type === 'CHILD' ? 'Çocuk' : 'Gebelik'}
+                {p.type === 'CHILD' ? t("typeChild") : t("typePregnancy")}
               </span>
             </div>
             <h3 style={{ margin: "0 0 8px 0", color: "#0f172a", fontSize: "18px" }}>{p.name}</h3>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
-              <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>{p.relationLabel || 'Aile üyesi'}</p>
+              <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>{p.relationLabel || t("defaultFamilyMember")}</p>
               {(counts[p.id] || 0) > 0 && (
                 <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 600, color: "#ea580c", background: "#ffedd5", padding: "4px 10px", borderRadius: "12px" }}>
-                  <CalendarPlus size={14} /> {counts[p.id]} planlı
+                  <CalendarPlus size={14} /> {counts[p.id]} {t("plannedTasks")}
                 </span>
               )}
             </div>
@@ -73,26 +75,26 @@ export default function Page(){
           <div style={{ padding: "12px", background: "#fff", borderRadius: "50%", color: "#64748b", marginBottom: "12px", border: "1px solid #e2e8f0" }}>
             <Plus size={24} />
           </div>
-          <strong style={{ color: "#475569", fontSize: "16px" }}>Yeni Profil Ekle</strong>
-          <small style={{ color: "#94a3b8", marginTop: "4px" }}>Çocuk veya gebelik</small>
+          <strong style={{ color: "#475569", fontSize: "16px" }}>{t("addNewProfile")}</strong>
+          <small style={{ color: "#94a3b8", marginTop: "4px" }}>{t("childOrPregnancy")}</small>
         </Link>
 
       </div>
 
       <section className="panel" style={{ padding: "32px", borderRadius: "24px" }}>
-        <h2 style={{ fontSize: "20px", color: "#0f172a", marginBottom: "24px" }}>Hızlı İşlemler</h2>
+        <h2 style={{ fontSize: "20px", color: "#0f172a", marginBottom: "24px" }}>{t("quickActions")}</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
           <Link href="/health/family" className="secondary compact" style={{ display: "flex", alignItems: "center", gap: "8px", borderRadius: "12px", padding: "12px 20px", fontSize: "15px", fontWeight: 600, border: "1px solid #e2e8f0" }}>
-            <Heartbeat size={20} weight="duotone" color="#0284c7" /> Büyüme & Gebelik Takibi
+            <Heartbeat size={20} weight="duotone" color="#0284c7" /> {t("growthAndPregnancy")}
           </Link>
           <Link href="/health/vaccinations" className="secondary compact" style={{ display: "flex", alignItems: "center", gap: "8px", borderRadius: "12px", padding: "12px 20px", fontSize: "15px", fontWeight: 600, border: "1px solid #e2e8f0" }}>
-            <Syringe size={20} weight="duotone" color="#16a34a" /> Aşı Kayıtları
+            <Syringe size={20} weight="duotone" color="#16a34a" /> {t("vaccineRecords")}
           </Link>
           <Link href="/calendar" className="secondary compact" style={{ display: "flex", alignItems: "center", gap: "8px", borderRadius: "12px", padding: "12px 20px", fontSize: "15px", fontWeight: 600, border: "1px solid #e2e8f0" }}>
-            <CalendarPlus size={20} weight="duotone" color="#8b5cf6" /> Sağlık Takvimi
+            <CalendarPlus size={20} weight="duotone" color="#8b5cf6" /> {t("healthCalendar")}
           </Link>
           <Link href="/health/family-access" className="secondary compact" style={{ display: "flex", alignItems: "center", gap: "8px", borderRadius: "12px", padding: "12px 20px", fontSize: "15px", fontWeight: 600, border: "1px solid #e2e8f0" }}>
-            <ShieldCheck size={20} weight="duotone" color="#ea580c" /> Aile Erişimini Yönet
+            <ShieldCheck size={20} weight="duotone" color="#ea580c" /> {t("manageFamilyAccess")}
           </Link>
         </div>
       </section>

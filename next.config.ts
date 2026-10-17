@@ -1,15 +1,64 @@
-import type {NextConfig} from "next";
-const csp=["default-src 'self'","base-uri 'self'","frame-ancestors 'none'","object-src 'none'","img-src 'self' data: blob: https:","font-src 'self' data: https://fonts.gstatic.com","style-src 'self' 'unsafe-inline' https://fonts.googleapis.com","script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://www.gstatic.com","connect-src 'self' https: wss:","media-src 'self' blob: https: data:","worker-src 'self' blob:","form-action 'self'"].join('; ');
-const nextConfig:NextConfig={
-  poweredByHeader:false,
+import type { NextConfig } from "next";
+
+const csp = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://www.gstatic.com",
+  "connect-src 'self' https: wss:",
+  "media-src 'self' blob: https: data:",
+  "worker-src 'self' blob:",
+  "form-action 'self'",
+].join("; ");
+
+const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  turbopack: {
+    resolveAlias: {
+      "next-intl/config": "./i18n/request.ts",
+    },
+  },
+  webpack: (config) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias["next-intl/config"] = `${process.cwd()}/i18n/request.ts`;
+    return config;
+  },
   outputFileTracingExcludes: {
-    '*': [
-      'node_modules/@swc/core-linux-x64-gnu',
-      'node_modules/@swc/core-linux-x64-musl',
-      'node_modules/@esbuild/linux-x64',
-      'node_modules/typescript/**',
-      'node_modules/eslint/**'
+    "*": [
+      "node_modules/@swc/core-linux-x64-gnu",
+      "node_modules/@swc/core-linux-x64-musl",
+      "node_modules/@esbuild/linux-x64",
+      "node_modules/typescript/**",
+      "node_modules/eslint/**",
     ],
   },
-  async headers(){
-    return [{source:"/:path*",headers:[{key:"X-Content-Type-Options",value:"nosniff"},{key:"Referrer-Policy",value:"strict-origin-when-cross-origin"},{key:"Permissions-Policy",value:"camera=(self), microphone=(self), geolocation=(self)"},{key:"X-Frame-Options",value:"DENY"},{key:"Content-Security-Policy",value:csp},{key:"Cross-Origin-Opener-Policy",value:"same-origin"},{key:"Strict-Transport-Security",value:"max-age=31536000; includeSubDomains"}]}]}};export default nextConfig;
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(self), microphone=(self), geolocation=(self)",
+          },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: csp },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+        ],
+      },
+    ];
+  },
+};
+
+export default nextConfig;

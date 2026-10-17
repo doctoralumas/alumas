@@ -1,0 +1,42 @@
+{
+  "cookieConsent": {
+    "title": "Your privacy preferences",
+    "desc": "Essential technologies are used for security and sessions. Optional analytics and marketing technologies will not be activated without your consent.",
+    "policyLink": "Review policy",
+    "onlyNecessary": "Essential only",
+    "acceptOptional": "Allow optional"
+  },
+  "legalFooter": {
+    "kvkk": "Privacy & Data Protection",
+    "healthData": "Health Data",
+    "aiPolicy": "AI Safety",
+    "cookies": "Cookies",
+    "terms": "Terms of Service",
+    "crossBorder": "Cross-Border Transfer",
+    "healthTourism": "Health Tourism"
+  },
+  "locationSelector": {
+    "ariaLabel": "Location: {address}",
+    "loading": "Loading...",
+    "title": "Select Location",
+    "useCurrent": "Use My Current Location",
+    "orSearch": "Or search:",
+    "placeholder": "City or district name...",
+    "findButton": "Find",
+    "notFound": "Location not found",
+    "searchError": "An error occurred during search."
+  },
+  "lockedOverlay": {
+    "title": "Discover Alumas",
+    "desc": "You are currently previewing as a guest. Create a free account to enter, save, and access all health features.",
+    "login": "Sign In",
+    "register": "Sign Up Free"
+  },
+  "aiLayout": {
+    "chatsTitle": "Conversations",
+    "newChat": "New Chat",
+    "historyTitle": "History",
+    "noHistory": "No conversations yet.",
+    "defaultConvTitle": "New Chat"
+  }
+}

@@ -1,1 +1,21 @@
-export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Yasal & Uyum</span><h1>Yurt Dışına Veri Aktarımı Bilgilendirmesi</h1><p>Son Güncelleme: 26 Eylül 2026. Alumas Sağlık Teknolojileri A.Ş. tarafından uluslararası güvenlik standartlarına ve KVKK/GDPR regülasyonlarına tam uyumlu olarak düzenlenmiştir.</p></div><section className="panel legal-copy" dangerouslySetInnerHTML={{__html:`<h2>Aktarım envanteri</h2><p>Vercel, Neon, Google veya başka bir yabancı hizmet sağlayıcısı kullanılmadan önce veri akışı, sağlayıcının rolü, ülke, veri kategorisi ve amaç dokümante edilir.</p><h2>Uygun güvence</h2><p>KVKK m.9 kapsamında yeterlilik kararı veya uygun güvence mekanizması değerlendirilir. Standart sözleşme kullanılacaksa Kurulun yayımladığı doğru sözleşme tipi değiştirilmeksizin uygulanır ve imzaların tamamlanmasından itibaren mevzuattaki bildirim süresi takip edilir.</p>`}} /></div>}
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const t = await getTranslations("legal");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("legalKicker")}</span>
+        <h1>{t("crossBorderTitle")}</h1>
+        <p>{t("lastUpdatedNotice")}</p>
+      </div>
+      <section
+        className="panel legal-copy"
+        dangerouslySetInnerHTML={{
+          __html: t.raw("crossBorderHtml"),
+        }}
+      />
+    </div>
+  );
+}

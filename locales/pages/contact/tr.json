@@ -1,0 +1,18 @@
+{
+  "contact": {
+    "kicker": "Destek",
+    "title": "İletişim",
+    "subtitle": "Alumas ile ilgili ürün, kurum hesabı veya destek taleplerini iletebilirsin.",
+    "namePlaceholder": "Ad soyad",
+    "emailPlaceholder": "E-posta",
+    "phonePlaceholder": "Telefon (opsiyonel)",
+    "subjectPlaceholder": "Konu",
+    "messagePlaceholder": "Mesajın",
+    "sendButton": "Gönder",
+    "success": "Mesajın alındı ✓",
+    "error": "Gönderilemedi",
+    "emergencyTitle": "Acil durumlar",
+    "emergencyDesc": "Bu iletişim formu acil yardım kanalı değildir. Türkiye’de acil yardım için 112’yi arayın.",
+    "emergencyCall": "112’yi ara"
+  }
+}

@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   IMAGING_MODALITIES,
   LAB_CATEGORIES,
@@ -40,18 +41,6 @@ const days = [
   "Cuma",
   "Cumartesi",
 ];
-const panelCopy: Record<string, string> = {
-  HOSPITAL:
-    "Departmanları, uzman kadroyu, acil birimleri ve klinik hizmetleri buradan yönetirsiniz. Yayınlanan profil bu kayıtları gösterir.",
-  CLINIC:
-    "Uzman kadroyu, muayene ve işlemleri buradan yönetirsiniz. Yayınlanan profil bu kayıtları gösterir.",
-  PHARMACY:
-    "Nöbet durumunu ve stok görünürlüğünü buradan yönetirsiniz. Hastalar adet yerine stok durumunu görür.",
-  IMAGING_CENTER:
-    "MR, BT, röntgen ve diğer tetkikleri buradan yönetirsiniz. Raporu, ilişkili hastanın görüntüleme geçmişine işlersiniz.",
-  LABORATORY:
-    "Kan, idrar ve diğer numune tahlillerini buradan yönetirsiniz. Sonucu, ilişkili hastanın tahlil geçmişine işlersiniz.",
-};
 
 const emptyExam = {
   modality: "MR",
@@ -74,6 +63,14 @@ const emptyTest = {
 };
 
 export default function OrganizationManager({ org, globalInsurances = [] }: Props) {
+  const t = useTranslations("professional.orgManager");
+  const panelCopy: Record<string, string> = {
+    HOSPITAL: t("panelCopy.HOSPITAL"),
+    CLINIC: t("panelCopy.CLINIC"),
+    PHARMACY: t("panelCopy.PHARMACY"),
+    IMAGING_CENTER: t("panelCopy.IMAGING_CENTER"),
+    LABORATORY: t("panelCopy.LABORATORY"),
+  };
   const clinical = org.type === "HOSPITAL" || org.type === "CLINIC";
   const hospital = org.type === "HOSPITAL";
   const pharmacy = org.type === "PHARMACY";
@@ -796,10 +793,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               <Info size={28} weight="duotone" />
             </div>
             <div>
-              <h3 className="premium-accordion-title">Genel Bilgiler</h3>
+              <h3 className="premium-accordion-title">{t("generalInfo")}</h3>
               <p className="premium-accordion-desc">
-                Kurum profilinizi, iletişim ve açıklama (Hakkında) bilgilerinizi
-                düzenleyin.
+                {t("generalInfoDesc")}
               </p>
             </div>
           </div>
@@ -861,19 +857,19 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Açık Adres</label>
+              <label>{t("addressLabel")}</label>
               <input name="address" defaultValue={org.address || ""} required />
             </div>
             <div
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Hakkında (Açıklama)</label>
+              <label>{t("aboutLabel")}</label>
               <textarea
                 name="description"
                 defaultValue={org.description || ""}
                 rows={4}
-                placeholder="Kurumunuzu tanıtın. Hizmetleriniz, vizyonunuz veya öne çıkan özelliklerinizden bahsedebilirsiniz..."
+                placeholder={t("aboutPlaceholder")}
               />
             </div>
             <div
@@ -1058,7 +1054,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               <div>
                 <h3 className="premium-accordion-title">
                   {org.type === "CLINIC"
-                    ? "Muayene ve İşlemler"
+                    ? t("consultationsAndProcedures")
                     : "Klinik Hizmetler"}
                 </h3>
                 <p className="premium-accordion-desc">
@@ -1097,7 +1093,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Kısa açıklama</label>
+                <label>{t("shortDesc")}</label>
                 <input
                   value={serviceForm.description}
                   onChange={(e) =>
@@ -1417,9 +1413,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               <Clock size={28} weight="duotone" />
             </div>
             <div>
-              <h3 className="premium-accordion-title">Çalışma Saatleri</h3>
+              <h3 className="premium-accordion-title">{t("workingHours")}</h3>
               <p className="premium-accordion-desc">
-                Haftalık açılış ve kapanış saatlerinizi düzenleyin.
+                {t("workingHoursDesc")}
               </p>
             </div>
           </div>
@@ -1646,7 +1642,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Açıklama</label>
+                <label>{t("descLabel")}</label>
                 <input
                   value={departmentForm.description}
                   onChange={(e) =>
@@ -1828,7 +1824,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
         <div className="premium-accordion-content">
           <form onSubmit={saveCampaign} className="responsive-form-grid">
             <div className="responsive-form-field">
-              <label>Kampanya başlığı</label>
+              <label>{t("campaignTitle")}</label>
               <input
                 value={campaignForm.title}
                 onChange={(e) =>
@@ -1838,7 +1834,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               />
             </div>
             <div className="responsive-form-field">
-              <label>Başlangıç</label>
+              <label>{t("startDate")}</label>
               <input
                 value={campaignForm.startsAt}
                 onChange={(e) =>
@@ -1861,7 +1857,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               className="responsive-form-field"
               style={{ gridColumn: "1 / -1" }}
             >
-              <label>Açıklama (Hastanın göreceği metin)</label>
+              <label>{t("campaignDescLabel")}</label>
               <textarea
                 value={campaignForm.description}
                 onChange={(e) =>
@@ -1919,7 +1915,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       marginTop: "4px",
                     }}
                   >
-                    {c.description || "Açıklama yok"}
+                    {c.description || t("noDescription")}
                   </span>
                   <div
                     style={{
@@ -1932,8 +1928,8 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   >
                     {c.startsAt && (
                       <span>
-                        Başlangıç:{" "}
-                        {new Date(c.startsAt).toLocaleDateString("tr-TR")}
+                        {t("startDatePrefix")}
+                        {new Date(c.startsAt).toLocaleDateString()}
                       </span>
                     )}
                     {c.endsAt && (
@@ -2005,7 +2001,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               <div>
                 <h3 className="premium-accordion-title">Acil Hizmetler</h3>
                 <p className="premium-accordion-desc">
-                  Acil servis, danışma hattı veya 7/24 hizmet birimleri.
+                  {t("emergencyUnitsDesc")}
                 </p>
               </div>
             </div>
@@ -2033,7 +2029,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   }
                 >
                   <option value="EMERGENCY_DEPARTMENT">Acil servis</option>
-                  <option value="EMERGENCY_CONSULT">Acil danışmanlık</option>
+                  <option value="EMERGENCY_CONSULT">{t("emergencyConsult")}</option>
                   <option value="AMBULANCE_COORDINATION">
                     Ambulans koordinasyonu
                   </option>
@@ -2062,7 +2058,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       description: e.target.value,
                     })
                   }
-                  placeholder="Açıklama"
+                  placeholder={t("descLabel")}
                 />
               </div>
               <label
@@ -2136,7 +2132,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                         item.kind === "EMERGENCY_DEPARTMENT"
                           ? "Acil servis"
                           : item.kind === "EMERGENCY_CONSULT"
-                          ? "Acil danışmanlık"
+                          ? t("emergencyConsult")
                           : "Ambulans koordinasyonu",
                         item.phone ? `Tel: ${item.phone}` : null,
                         item.is24Hours ? "7/24 Hizmet" : null,
@@ -2278,7 +2274,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <div>
                   <h3 className="premium-accordion-title">Stok Yönetimi</h3>
                   <p className="premium-accordion-desc">
-                    İlaç/ürün stok görünürlüğünü hastalara yansıtın.
+                    {t("stockDesc")}
                   </p>
                 </div>
               </div>
@@ -2302,7 +2298,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   </select>
                 </div>
                 <div className="responsive-form-field">
-                  <label>İç Miktar (Görünmez)</label>
+                  <label>{t("internalQuantity")}</label>
                   <input name="quantity" type="number" min="0" />
                 </div>
                 <button className="primary" style={{ height: "46px" }}>

@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { registerNativePush } from "@/lib/native-push";
 import { registerWebPush } from "@/lib/web-push";
 import { BellRinging, BellSlash, WarningCircle } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function PushSettings() {
+  const t = useTranslations("profile.pushSettings");
   const [enabled, setEnabled] = useState(false);
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,7 @@ export default function PushSettings() {
         const webToken = await registerWebPush();
         if (!webToken) {
           setLoading(false);
-          return setMsg("Bildirim izni verilmedi veya desteklenmiyor.");
+          return setMsg(t("deniedError"));
         }
         token = webToken;
       }
@@ -53,11 +55,11 @@ export default function PushSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ platform, token }),
       });
-      if (!r.ok) throw new Error("Cihaz kaydedilemedi.");
+      if (!r.ok) throw new Error(t("saveError"));
       setEnabled(true);
       localStorage.setItem("alumas_push_token", token);
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : "Push kaydı başarısız.");
+      setMsg(error instanceof Error ? error.message : t("pushError"));
     } finally {
       setLoading(false);
     }
@@ -87,9 +89,9 @@ export default function PushSettings() {
             {enabled ? <BellRinging size={24} weight="duotone" /> : <BellSlash size={24} weight="duotone" />}
           </div>
           <div>
-            <strong style={{ display: "block", fontSize: "16px", color: "#0f172a" }}>Anlık Bildirimler</strong>
+            <strong style={{ display: "block", fontSize: "16px", color: "#0f172a" }}>{t("title")}</strong>
             <span style={{ fontSize: "14px", color: enabled ? "#3b82f6" : "#64748b" }}>
-              {enabled ? "Açık (Bu cihazda)" : "Kapalı"}
+              {enabled ? t("enabledStatus") : t("disabledStatus")}
             </span>
           </div>
         </div>

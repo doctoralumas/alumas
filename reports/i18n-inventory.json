@@ -1,0 +1,4701 @@
+{
+  "timestamp": "2026-10-16T17:03:04.267Z",
+  "metrics": {
+    "uiRoutesTotal": 83,
+    "apiRoutesTotal": 153,
+    "reusableComponentsTotal": 92,
+    "totalRawExtractedOccurrences": 1547,
+    "uniqueUserFacingStrings": 1262,
+    "localizedRoutesCount": 23,
+    "unlocalizedRoutesCount": 60
+  },
+  "categories": {
+    "Static UI text": 1373,
+    "Structured business terminology": 114,
+    "Sensitive clinical/legal text": 60
+  },
+  "routeCoverage": {
+    "/about": {
+      "file": "app/about/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/admin/agencies": {
+      "file": "app/admin/agencies/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Doğrulama",
+        "Sağlık turizmi acenteleri"
+      ]
+    },
+    "/admin/content": {
+      "file": "app/admin/content/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "İçerik & Banner Yönetimi",
+        "Ana sayfa slider’ı, kategori şablonları ve iletişim talepleri."
+      ]
+    },
+    "/admin/doctors": {
+      "file": "app/admin/doctors/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Doğrulama",
+        "Uzman başvuruları"
+      ]
+    },
+    "/admin/organizations": {
+      "file": "app/admin/organizations/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 3,
+      "sampleStrings": [
+        "Yönetim",
+        "Kurum başvuruları",
+        "Başvuruları doğrula, onayla veya reddet."
+      ]
+    },
+    "/admin": {
+      "file": "app/admin/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/admin/release": {
+      "file": "app/admin/release/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 1,
+      "sampleStrings": [
+        "Çalışan build, veritabanı readiness, bakım modu ve feature flag görünümü."
+      ]
+    },
+    "/admin/reviews": {
+      "file": "app/admin/reviews/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 1,
+      "sampleStrings": [
+        "Kurum ve doktor değerlendirmelerini yayınlamadan önce incele."
+      ]
+    },
+    "/agencies/[id]": {
+      "file": "app/agencies/[id]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 9,
+      "sampleStrings": [
+        "Tercüman",
+        "Partner yönlendirme",
+        "Doğrulanmış sağlık turizmi acentesi"
+      ]
+    },
+    "/agency/apply": {
+      "file": "app/agency/apply/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Sağlık turizmi profili oluştur",
+        "Profil doğrulandıktan sonra paketlerin ve koordinasyon hizmetlerin halka açık görünür."
+      ]
+    },
+    "/agency": {
+      "file": "app/agency/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 9,
+      "sampleStrings": [
+        "Sağlık turizmi hesaplarım",
+        "Tedavi paketlerinizi ve destek hizmetlerinizi buradan yönetin.",
+        "Yeni Profil Oluştur"
+      ]
+    },
+    "/agency/[id]": {
+      "file": "app/agency/[id]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 3,
+      "sampleStrings": [
+        "Sağlık Turizmi paneli",
+        "Doğrulandı ve yayında",
+        "Doğrulama bekliyor"
+      ]
+    },
+    "/ai": {
+      "file": "app/ai/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/ai-policy": {
+      "file": "app/ai-policy/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/appointments": {
+      "file": "app/appointments/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 1,
+      "sampleStrings": [
+        "Çocuk"
+      ]
+    },
+    "/business/apply": {
+      "file": "app/business/apply/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Kurumsal hesap oluştur",
+        "Hastane, klinik, eczane, görüntüleme merkezi veya tıbbi laboratuvar başvurunuz doğrulamadan sonra yayınlanır."
+      ]
+    },
+    "/business": {
+      "file": "app/business/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 3,
+      "sampleStrings": [
+        "Kurum Paneli",
+        "Başvuru durumunu ve kurum verilerini yönet.",
+        "+ Yeni kurum"
+      ]
+    },
+    "/business/[id]": {
+      "file": "app/business/[id]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 3,
+      "sampleStrings": [
+        "Doğrulama bekliyor",
+        "Yayında",
+        "Yayın durduruldu"
+      ]
+    },
+    "/calendar": {
+      "file": "app/calendar/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 1,
+      "sampleStrings": [
+        "Sağlık takvimi"
+      ]
+    },
+    "/campaigns": {
+      "file": "app/campaigns/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 11,
+      "sampleStrings": [
+        "Fırsatları Keşfet",
+        "Doğrulanmış sağlık kurumlarının güncel duyuruları ve avantajlı sağlık paketleri.",
+        "Tıbbi deontoloji kuralları gereği sağlık hizmetlerinde doğrudan indirim veya promosyon yapılamaz. Listelenen içerikler, kurumların sunduğu"
+      ]
+    },
+    "/care-calendar": {
+      "file": "app/care-calendar/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 4,
+      "sampleStrings": [
+        "Tüm Hizmetlere Dön",
+        "Paylaşılan Plan",
+        "Ortak Bakım Takvimi"
+      ]
+    },
+    "/contact": {
+      "file": "app/contact/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/cookies": {
+      "file": "app/cookies/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/cross-border": {
+      "file": "app/cross-border/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/doctor": {
+      "file": "app/doctor/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/doctor/patients/[id]": {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 18,
+      "sampleStrings": [
+        "Hasta kaydı",
+        "Bu hasta sağlık verilerine veya rapor trendlerine henüz erişim izni vermedi.",
+        "Uzman paneline dön"
+      ]
+    },
+    "/doctors": {
+      "file": "app/doctors/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/doctors/[id]": {
+      "file": "app/doctors/[id]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 10,
+      "sampleStrings": [
+        "Müsait",
+        "Çevrimiçi",
+        "Meşgul"
+      ]
+    },
+    "/emergency": {
+      "file": "app/emergency/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 16,
+      "sampleStrings": [
+        "Konum alınıyor...",
+        "Yakından uzağa sıralandı",
+        "Acil Erişim"
+      ]
+    },
+    "/health/allergies": {
+      "file": "app/health/allergies/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 19,
+      "sampleStrings": [
+        "İlaç",
+        "Gıda",
+        "Çevresel"
+      ]
+    },
+    "/health/blood-pressure": {
+      "file": "app/health/blood-pressure/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/health/body": {
+      "file": "app/health/body/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 9,
+      "sampleStrings": [
+        "Fiziksel Ölçümler",
+        "Vücut Ölçüleri",
+        "Boy, kilo ve bel çevresi değişimlerinizi takip edin."
+      ]
+    },
+    "/health/cycle": {
+      "file": "app/health/cycle/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 23,
+      "sampleStrings": [
+        "Kayıt eklenemedi",
+        "Kayıt başarıyla eklendi.",
+        "Bu döngü kaydı silinsin mi?"
+      ]
+    },
+    "/health/family": {
+      "file": "app/health/family/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 37,
+      "sampleStrings": [
+        "Grafik için en az iki kayıt gerekir.",
+        "Yükleniyor...",
+        "Büyüme kaydı eklendi."
+      ]
+    },
+    "/health/family/[id]/calendar": {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 11,
+      "sampleStrings": [
+        "Profil Sağlık Takvimi",
+        "Yalnızca bu aile profiline bağlı randevu, aşı ve hatırlatıcıları görüntüle.",
+        "Tarih"
+      ]
+    },
+    "/health/family/[id]": {
+      "file": "app/health/family/[id]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 19,
+      "sampleStrings": [
+        "Hatırlatıcı eklendi.",
+        "Aile profili yükleniyor…",
+        "Çocuk profili"
+      ]
+    },
+    "/health/family-access": {
+      "file": "app/health/family-access/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 32,
+      "sampleStrings": [
+        "Görüntüleme",
+        "Temel sağlık özetine salt okunur erişim",
+        "Randevu ve etkinlikleri görebilme"
+      ]
+    },
+    "/health/family-hub": {
+      "file": "app/health/family-hub/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/health/family-profiles": {
+      "file": "app/health/family-profiles/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 20,
+      "sampleStrings": [
+        "Aile Paneline Dön",
+        "Profil Yönetimi",
+        "Gebelik & Çocuk Profilleri"
+      ]
+    },
+    "/health/glucose": {
+      "file": "app/health/glucose/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/health/goals": {
+      "file": "app/health/goals/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Sağlık hedeflerim",
+        "Kendi hedeflerini oluştur veya uzmanla birlikte takip et."
+      ]
+    },
+    "/health/imaging": {
+      "file": "app/health/imaging/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 4,
+      "sampleStrings": [
+        "Görüntüleme",
+        "Görüntüleme",
+        "Görüntüleme Sonuçlarım"
+      ]
+    },
+    "/health/labs": {
+      "file": "app/health/labs/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/health/medical-history": {
+      "file": "app/health/medical-history/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 25,
+      "sampleStrings": [
+        "Tıbbi Arşiv",
+        "Hastalık & İşlem Geçmişi",
+        "Kronik hastalıklarınızı, ameliyatlarınızı ve önemli tıbbi işlemlerinizi saklayın."
+      ]
+    },
+    "/health/medications": {
+      "file": "app/health/medications/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 1,
+      "sampleStrings": [
+        "İlaçlarım"
+      ]
+    },
+    "/health": {
+      "file": "app/health/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 2,
+      "sampleStrings": [
+        "şeker",
+        "nabız"
+      ]
+    },
+    "/health/reports": {
+      "file": "app/health/reports/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/health/sleep": {
+      "file": "app/health/sleep/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/health/summary": {
+      "file": "app/health/summary/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 26,
+      "sampleStrings": [
+        "Sağlık Özetiniz Yükleniyor...",
+        "Tek Bakışta",
+        "Sağlık Özeti"
+      ]
+    },
+    "/health/tasks": {
+      "file": "app/health/tasks/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Tetkik & Görevlerim",
+        "Doktorunun istediği tetkikleri planla ve tamamlanma durumlarını takip et."
+      ]
+    },
+    "/health/timeline": {
+      "file": "app/health/timeline/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/health/vaccinations": {
+      "file": "app/health/vaccinations/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 24,
+      "sampleStrings": [
+        "Yükleniyor...",
+        "Aşı kaydı ve cihaz hatırlatıcısı oluşturuldu.",
+        "Aşı kaydı ve Alumas hatırlatıcısı oluşturuldu."
+      ]
+    },
+    "/health/water": {
+      "file": "app/health/water/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 10,
+      "sampleStrings": [
+        "Günlük Takip",
+        "Su Tüketimi",
+        "Günlük su tüketiminizi takip edin ve hedefinize ulaşın."
+      ]
+    },
+    "/health-card": {
+      "file": "app/health-card/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 1,
+      "sampleStrings": [
+        "Sağlık kartı"
+      ]
+    },
+    "/health-card/[token]": {
+      "file": "app/health-card/[token]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 5,
+      "sampleStrings": [
+        "Alumas · Acil Sağlık Kartı",
+        "Bu kart kullanıcı tarafından acil durumda paylaşılmak üzere özellikle etkinleştirilmiştir.",
+        "Önemli ilaçlar"
+      ]
+    },
+    "/health-circle": {
+      "file": "app/health-circle/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 18,
+      "sampleStrings": [
+        "Sağlık Çevrem",
+        "Tüm Hizmetlere Dön",
+        "Kişisel Ağınız"
+      ]
+    },
+    "/health-data": {
+      "file": "app/health-data/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Özel Nitelikli Kişisel Veri ve Sağlık Verisi Politikası",
+        "Son Güncelleme: 26 Eylül 2026. Alumas Sağlık Teknolojileri A.Ş. tarafından uluslararası güvenlik standartlarına ve KVKK/GDPR regülasyonlarına tam uyumlu olarak düzenlenmiştir."
+      ]
+    },
+    "/health-tourism": {
+      "file": "app/health-tourism/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 18,
+      "sampleStrings": [
+        "Sağlık Turizmi",
+        "Sağlık Turizmi &",
+        "Türkiye'nin önde gelen sağlık kuruluşları, onaylı acenteler, VIP transfer ve konaklama seçenekleriyle tedavinizi birinci sınıf bir seyahat deneyimine dönüştürün."
+      ]
+    },
+    "/health-tourism-legal": {
+      "file": "app/health-tourism-legal/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/home-care": {
+      "file": "app/home-care/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/insurance": {
+      "file": "app/insurance/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/login": {
+      "file": "app/login/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/maintenance": {
+      "file": "app/maintenance/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/messages": {
+      "file": "app/messages/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 18,
+      "sampleStrings": [
+        "Yükleme adresi alınamadı",
+        "Dosya yüklenemedi",
+        "Yükleme hatası"
+      ]
+    },
+    "/nearby": {
+      "file": "app/nearby/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 7,
+      "sampleStrings": [
+        "Küresel Keşif Haritası",
+        "Küresel Keşif Haritası",
+        "Dünyanın neresinde olursanız olun; cihaz konumunuzu kullanarak size en yakın hastane, nöbetçi eczane veya acil servisleri Google Haritalar altyapısıyla anında bulun."
+      ]
+    },
+    "/notifications": {
+      "file": "app/notifications/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 5,
+      "sampleStrings": [
+        "Tüm Hizmetlere Dön",
+        "Güncellemeler",
+        "Randevularınız, mesajlarınız ve diğer önemli güncellemeler."
+      ]
+    },
+    "/onboarding/doctor": {
+      "file": "app/onboarding/doctor/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 2,
+      "sampleStrings": [
+        "Uzman profilini oluştur",
+        "Profilin doğrulama tamamlanana kadar sadece senin panelinde görünür."
+      ]
+    },
+    "/organizations": {
+      "file": "app/organizations/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/organizations/[slug]": {
+      "file": "app/organizations/[slug]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 26,
+      "sampleStrings": [
+        "Hastane",
+        "Klinik",
+        "Görüntüleme Merkezi"
+      ]
+    },
+    "/": {
+      "file": "app/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/partner/apply": {
+      "file": "app/partner/apply/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/phone-directory": {
+      "file": "app/phone-directory/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 3,
+      "sampleStrings": [
+        "Telefon Rehberi",
+        "Sağlık Rehberi",
+        "Sık görüştüğünüz doktorlar, kurumlar ve acil numaralar. Tek tıkla arayın, favorilerinize ekleyin."
+      ]
+    },
+    "/phone-login": {
+      "file": "app/phone-login/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/privacy": {
+      "file": "app/privacy/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/pro/login": {
+      "file": "app/pro/login/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 1,
+      "sampleStrings": [
+        "Hasta mısınız? Bireysel giriş yapın"
+      ]
+    },
+    "/pro/register": {
+      "file": "app/pro/register/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 1,
+      "sampleStrings": [
+        "Hasta mısınız? Bireysel kayıt olun"
+      ]
+    },
+    "/profile": {
+      "file": "app/profile/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/provider-terms": {
+      "file": "app/provider-terms/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/register": {
+      "file": "app/register/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/retention": {
+      "file": "app/retention/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/services": {
+      "file": "app/services/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 70,
+      "sampleStrings": [
+        "Sağlık hizmetleri",
+        "Doktor & Uzman Bul",
+        "Doktor, diyetisyen ve fizyoterapistleri incele."
+      ]
+    },
+    "/terms": {
+      "file": "app/terms/page.tsx",
+      "usesNextIntl": true,
+      "stringCount": 0,
+      "sampleStrings": []
+    },
+    "/video/[id]": {
+      "file": "app/video/[id]/page.tsx",
+      "usesNextIntl": false,
+      "stringCount": 8,
+      "sampleStrings": [
+        "Güvenli görüşme",
+        "Görüntülü Görüşme",
+        "Uzman görüşmesi"
+      ]
+    }
+  },
+  "inventory": [
+    {
+      "file": "app/admin/agencies/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Doğrulama",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/agencies/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Sağlık turizmi acenteleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/content/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "İçerik & Banner Yönetimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/content/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Ana sayfa slider’ı, kategori şablonları ve iletişim talepleri.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/doctors/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Doğrulama",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/doctors/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Uzman başvuruları",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/organizations/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Yönetim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/organizations/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Kurum başvuruları",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/organizations/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Başvuruları doğrula, onayla veya reddet.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/release/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Çalışan build, veritabanı readiness, bakım modu ve feature flag görünümü.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/admin/reviews/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Kurum ve doktor değerlendirmelerini yayınlamadan önce incele.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 17,
+      "type": "StringLiteral",
+      "text": "Tercüman",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 19,
+      "type": "StringLiteral",
+      "text": "Partner yönlendirme",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 25,
+      "type": "JsxText",
+      "text": "Doğrulanmış sağlık turizmi acentesi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 27,
+      "type": "StringLiteral",
+      "text": "Şehir belirtilmedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 32,
+      "type": "JsxText",
+      "text": "Hakkında",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 33,
+      "type": "StringLiteral",
+      "text": "Acente açıklaması henüz eklenmedi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 49,
+      "type": "JsxText",
+      "text": "Yayında hizmet yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 54,
+      "type": "JsxText",
+      "text": "Tedavi ve seyahat paketleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agencies/[id]/page.tsx",
+      "line": 66,
+      "type": "JsxText",
+      "text": "Yayında paket yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/apply/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Sağlık turizmi profili oluştur",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/apply/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Profil doğrulandıktan sonra paketlerin ve koordinasyon hizmetlerin halka açık görünür.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 45,
+      "type": "JsxText",
+      "text": "Sağlık turizmi hesaplarım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 48,
+      "type": "JsxText",
+      "text": "Tedavi paketlerinizi ve destek hizmetlerinizi buradan yönetin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 63,
+      "type": "JsxText",
+      "text": "Yeni Profil Oluştur",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 155,
+      "type": "StringLiteral",
+      "text": "Doğrulandı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 197,
+      "type": "JsxText",
+      "text": "Yayındaki paket",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 230,
+      "type": "JsxText",
+      "text": "Yayındaki hizmet",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 262,
+      "type": "JsxText",
+      "text": "Profili Yönet",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 283,
+      "type": "JsxText",
+      "text": "Yayınlanan Profili Gör",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/page.tsx",
+      "line": 301,
+      "type": "JsxText",
+      "text": "Henüz sağlık turizmi profiliniz yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/[id]/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Sağlık Turizmi paneli",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/[id]/page.tsx",
+      "line": 1,
+      "type": "StringLiteral",
+      "text": "Doğrulandı ve yayında",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/agency/[id]/page.tsx",
+      "line": 1,
+      "type": "StringLiteral",
+      "text": "Doğrulama bekliyor",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/appointments/page.tsx",
+      "line": 107,
+      "type": "StringLiteral",
+      "text": "Çocuk",
+      "category": "Static UI text",
+      "isLocalized": true
+    },
+    {
+      "file": "app/business/apply/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Kurumsal hesap oluştur",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/business/apply/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Hastane, klinik, eczane, görüntüleme merkezi veya tıbbi laboratuvar başvurunuz doğrulamadan sonra yayınlanır.",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/business/page.tsx",
+      "line": 11,
+      "type": "JsxText",
+      "text": "Kurum Paneli",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/business/page.tsx",
+      "line": 12,
+      "type": "JsxText",
+      "text": "Başvuru durumunu ve kurum verilerini yönet.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/business/page.tsx",
+      "line": 15,
+      "type": "JsxText",
+      "text": "+ Yeni kurum",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/business/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Doğrulama bekliyor",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/business/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Yayında",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/business/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Yayın durduruldu",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/calendar/page.tsx",
+      "line": 1,
+      "type": "JsxAttribute[alt]",
+      "text": "Sağlık takvimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 24,
+      "type": "JsxText",
+      "text": "Fırsatları Keşfet",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 27,
+      "type": "JsxText",
+      "text": "Doğrulanmış sağlık kurumlarının güncel duyuruları ve avantajlı sağlık paketleri.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 37,
+      "type": "JsxText",
+      "text": "Tıbbi deontoloji kuralları gereği sağlık hizmetlerinde doğrudan indirim veya promosyon yapılamaz. Listelenen içerikler, kurumların sunduğu",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 37,
+      "type": "JsxText",
+      "text": "Check-up, Beslenme Danışmanlığı, Güzellik ve Bakım Paketleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 37,
+      "type": "JsxText",
+      "text": "gibi farkındalık ve ek hizmet duyurularını kapsar.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 40,
+      "type": "JsxText",
+      "text": "Kampanyalar yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 62,
+      "type": "StringLiteral",
+      "text": "Detaylar ve randevu için doğrudan kurumla iletişime geçebilirsiniz.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 69,
+      "type": "StringLiteral",
+      "text": "Hemen Geçerli",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 70,
+      "type": "StringLiteral",
+      "text": "(Süresiz)",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 76,
+      "type": "JsxText",
+      "text": "Kurumu İncele",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/campaigns/page.tsx",
+      "line": 93,
+      "type": "JsxText",
+      "text": "Şu anda aktif bir kampanya bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/care-calendar/page.tsx",
+      "line": 18,
+      "type": "JsxText",
+      "text": "Tüm Hizmetlere Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/care-calendar/page.tsx",
+      "line": 22,
+      "type": "JsxText",
+      "text": "Paylaşılan Plan",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/care-calendar/page.tsx",
+      "line": 23,
+      "type": "JsxText",
+      "text": "Ortak Bakım Takvimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/care-calendar/page.tsx",
+      "line": 24,
+      "type": "JsxText",
+      "text": "Doktorunuzla birlikte oluşturulan tedavi ve takip görevlerini buradan yönetin.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 23,
+      "type": "JsxText",
+      "text": "Hasta kaydı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 23,
+      "type": "JsxText",
+      "text": "Bu hasta sağlık verilerine veya rapor trendlerine henüz erişim izni vermedi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 23,
+      "type": "JsxText",
+      "text": "Uzman paneline dön",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 40,
+      "type": "JsxText",
+      "text": "İzinli sağlık kaydı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 40,
+      "type": "StringLiteral",
+      "text": "Hasta belirli tarih aralığındaki sağlık raporunu seninle paylaştı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 40,
+      "type": "StringLiteral",
+      "text": "Hasta yalnızca seçilmiş Sağlık Özeti bölümlerini seninle paylaştı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Paylaşılan Sağlık Özeti",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Hasta yalnızca şu özet bölümlerini paylaştı:",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Son ölçümler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "StringLiteral",
+      "text": "Tansiyon kaydı yok",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "StringLiteral",
+      "text": "Şeker kaydı yok",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "İlaçlar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Aşılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "İşlemler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Paylaşılan aile profilleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "StringLiteral",
+      "text": "Çocuk",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Profil seçilmemiş.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctor/patients/[id]/page.tsx",
+      "line": 42,
+      "type": "JsxText",
+      "text": "Ölçümler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Müsait",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Çevrimiçi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Meşgul",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Çevrimdışı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "değerlendirme",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Uzmana mesaj gönder",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Uzman hakkında",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Alumas doğrulaması",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Uzman profili ve kurum bilgileri doğrulanmıştır.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/doctors/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Görüşme ücreti",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 30,
+      "type": "StringLiteral",
+      "text": "Konum alınıyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 36,
+      "type": "StringLiteral",
+      "text": "Yakından uzağa sıralandı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 46,
+      "type": "JsxText",
+      "text": "Acil Erişim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 47,
+      "type": "JsxText",
+      "text": "Acil Yardım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 49,
+      "type": "JsxText",
+      "text": "Hayati tehlike arz eden tüm acil durumlarda öncelikli olarak 112'yi arayın. Alumas bir acil çağrı merkezi değildir.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 58,
+      "type": "JsxText",
+      "text": "ACİL ARAMA",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 67,
+      "type": "JsxText",
+      "text": "Acil Sağlık Kartı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 69,
+      "type": "JsxText",
+      "text": "Kritik sağlık bilgilerinizi, alerjilerinizi ve kan grubunuzu acil durumlarda ilk yardım ekipleriyle anında paylaşın.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 72,
+      "type": "JsxText",
+      "text": "Kartı Aç",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 91,
+      "type": "JsxText",
+      "text": "Özel Ambulans & Transfer",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 93,
+      "type": "JsxText",
+      "text": "Doğrulanmış özel ambulans firmaları.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 96,
+      "type": "JsxText",
+      "text": "Yakınımdakiler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 123,
+      "type": "JsxText",
+      "text": "Yakınınızda ambulans hizmeti bulunamadı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 135,
+      "type": "JsxText",
+      "text": "Bölgenizdeki nöbetçi eczaneler ve hastane acil servisleri.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 149,
+      "type": "JsxText",
+      "text": "Ara",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/emergency/page.tsx",
+      "line": 155,
+      "type": "JsxText",
+      "text": "Yerel rehber kaydı bulunamadı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 33,
+      "type": "StringLiteral",
+      "text": "İlaç",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 34,
+      "type": "StringLiteral",
+      "text": "Gıda",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 35,
+      "type": "StringLiteral",
+      "text": "Çevresel",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 42,
+      "type": "StringLiteral",
+      "text": "Şiddetli",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 58,
+      "type": "JsxText",
+      "text": "Tıbbi Geçmiş",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 60,
+      "type": "JsxText",
+      "text": "İlaç, gıda ve çevresel alerjilerinizi kategorize ederek kaydedin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 64,
+      "type": "StringLiteral",
+      "text": "İptal",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 72,
+      "type": "JsxText",
+      "text": "Alerjen Adı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 73,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Penilisin, Fıstık",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 78,
+      "type": "JsxText",
+      "text": "İlaç",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 78,
+      "type": "JsxText",
+      "text": "Gıda",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 78,
+      "type": "JsxText",
+      "text": "Çevresel",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 78,
+      "type": "JsxText",
+      "text": "Diğer",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 82,
+      "type": "JsxText",
+      "text": "Şiddeti",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 84,
+      "type": "JsxText",
+      "text": "Şiddetli",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 90,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Ciltte kızarıklık, nefes darlığı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 96,
+      "type": "JsxText",
+      "text": "Yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 121,
+      "type": "StringLiteral",
+      "text": "Geçmişe Al",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/allergies/page.tsx",
+      "line": 132,
+      "type": "JsxText",
+      "text": "Kayıtlı alerjiniz bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 39,
+      "type": "JsxText",
+      "text": "Fiziksel Ölçümler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 40,
+      "type": "JsxText",
+      "text": "Vücut Ölçüleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Boy, kilo ve bel çevresi değişimlerinizi takip edin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 50,
+      "type": "JsxText",
+      "text": "Son Vücut Kitle İndeksi (BMI)",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 67,
+      "type": "JsxText",
+      "text": "Yeni Ölçüm Gir",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 80,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Bel Çevresi (cm)",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 92,
+      "type": "JsxText",
+      "text": "Ölçüm Geçmişi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 93,
+      "type": "JsxText",
+      "text": "Girdiğiniz tüm kayıtlar.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/body/page.tsx",
+      "line": 127,
+      "type": "JsxText",
+      "text": "Henüz ölçüm kaydınız bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 45,
+      "type": "StringLiteral",
+      "text": "Kayıt eklenemedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 50,
+      "type": "StringLiteral",
+      "text": "Kayıt başarıyla eklendi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 56,
+      "type": "StringLiteral",
+      "text": "Bu döngü kaydı silinsin mi?",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 71,
+      "type": "JsxText",
+      "text": "Kadın Sağlığı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 73,
+      "type": "JsxText",
+      "text": "Döngü tarihlerini, belirtileri ve kişisel notlarını kaydet, otomatik tahminleri gör.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 83,
+      "type": "JsxText",
+      "text": "Son Başlangıç",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 86,
+      "type": "JsxText",
+      "text": "kayıtlı son döngü",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 91,
+      "type": "JsxText",
+      "text": "Ortalama Döngü",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 93,
+      "type": "JsxText",
+      "text": "gün",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 94,
+      "type": "JsxText",
+      "text": "geçmiş verilere göre",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 110,
+      "type": "JsxText",
+      "text": "Tahmini sonraki başlangıç tarihi yalnızca geçmiş kayıtlarınızın ortalamasına dayalı kişisel planlama bilgisidir; doğum kontrolü, gebelik değerlendirmesi, tanı veya tedavi amacıyla kullanılmamalıdır.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 119,
+      "type": "JsxText",
+      "text": "Yeni Kayıt Ekle",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 125,
+      "type": "JsxText",
+      "text": "Başlangıç",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 129,
+      "type": "JsxText",
+      "text": "Bitiş",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 135,
+      "type": "JsxText",
+      "text": "Akış Yoğunluğu",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 137,
+      "type": "JsxText",
+      "text": "Seçiniz",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 140,
+      "type": "JsxText",
+      "text": "Yoğun",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 146,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Kramp, baş ağrısı, şişkinlik, yorgunluk...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 151,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Özel notunuz...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 167,
+      "type": "JsxText",
+      "text": "Geçmiş Döngüler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 179,
+      "type": "JsxText",
+      "text": "Akış:",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 196,
+      "type": "JsxText",
+      "text": "Henüz bir döngü kaydınız yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/cycle/page.tsx",
+      "line": 198,
+      "type": "JsxText",
+      "text": "Yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 11,
+      "type": "JsxText",
+      "text": "Grafik için en az iki kayıt gerekir.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 33,
+      "type": "JsxText",
+      "text": "Yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 69,
+      "type": "StringLiteral",
+      "text": "Büyüme kaydı eklendi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 89,
+      "type": "StringLiteral",
+      "text": "Takvim kaydı eklendi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 101,
+      "type": "JsxText",
+      "text": "Aile Paneline Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 105,
+      "type": "JsxText",
+      "text": "Büyüme & Gebelik",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 106,
+      "type": "JsxText",
+      "text": "Sağlık Takibi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 107,
+      "type": "JsxText",
+      "text": "Profiliniz ile özel çocuk ve gebelik profilleri arasında geçiş yapın.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 117,
+      "type": "JsxText",
+      "text": "Benim Sağlığım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 130,
+      "type": "JsxText",
+      "text": "Yeni Profil",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 145,
+      "type": "JsxText",
+      "text": "Kendi Sağlık Profiliniz",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 147,
+      "type": "JsxText",
+      "text": "Kişisel sağlık kayıtlarınız, laboratuvar sonuçlarınız ve diğer tüm sağlık verileriniz ana Sağlık Özeti alanında tutulur.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 149,
+      "type": "JsxText",
+      "text": "Sağlık Özetine Git",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 154,
+      "type": "JsxText",
+      "text": "Yeni Ölçüm Ekle",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 155,
+      "type": "JsxText",
+      "text": "için boy, kilo ve baş çevresi ölçümlerini kaydedin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 160,
+      "type": "JsxText",
+      "text": "Tarih *",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 165,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn: 75.5",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 169,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn: 9.2",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 172,
+      "type": "JsxText",
+      "text": "Baş Çevresi (cm)",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 173,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn: 44.0",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 178,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Ekstra belirtmek istediğiniz bir not...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 180,
+      "type": "JsxText",
+      "text": "Ölçümü Kaydet",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 196,
+      "type": "JsxText",
+      "text": "Geçmiş Ölçümler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 207,
+      "type": "JsxText",
+      "text": "Baş Çevresi:",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 212,
+      "type": "JsxText",
+      "text": "Henüz ölçüm kaydı bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 220,
+      "type": "JsxText",
+      "text": "Kontrol randevularını ve tetkik hatırlatmalarını",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 220,
+      "type": "JsxText",
+      "text": "için takvime ekleyin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 225,
+      "type": "JsxText",
+      "text": "Başlık *",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 226,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn: 12. Hafta Ultrason Kontrolü",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 229,
+      "type": "JsxText",
+      "text": "Tarih / Saat *",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 235,
+      "type": "JsxText",
+      "text": "Kayıt Türü",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 239,
+      "type": "JsxText",
+      "text": "Hatırlatma",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 240,
+      "type": "JsxText",
+      "text": "Diğer",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 261,
+      "type": "StringLiteral",
+      "text": "Tamamlandı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 267,
+      "type": "StringLiteral",
+      "text": "Hatırlatma",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 267,
+      "type": "StringLiteral",
+      "text": "Diğer",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/page.tsx",
+      "line": 272,
+      "type": "JsxText",
+      "text": "Planlanmış bir etkinlik bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Profil Sağlık Takvimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Yalnızca bu aile profiline bağlı randevu, aşı ve hatırlatıcıları görüntüle.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Tarih",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Profile dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Takvim yükleniyor…",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Randevu yok.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Hatırlatıcılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Hatırlatıcı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Aşı / gebelik",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Aşı kaydı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/calendar/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Kayıt yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Hatırlatıcı eklendi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Aile profili yükleniyor…",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "StringLiteral",
+      "text": "Çocuk profili",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Bu profile bağlı randevu, aşı ve sağlık görevlerini ayrı takip et.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Doktor bul",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Ölçüm / gebelik kaydı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Aşılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Profil takvimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Yeni sağlık görevi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. ölçüm, kontrol, aşı teyidi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Hatırlat",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Bu profilde hatırlatıcı oluşturma iznin yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Bu profile bağlı randevu yok.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Hatırlatıcılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Hatırlatıcı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Aşılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Bu profile bağlı aşı kaydı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Gebelik planı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family/[id]/page.tsx",
+      "line": 2,
+      "type": "JsxText",
+      "text": "Plan kaydı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 8,
+      "type": "StringLiteral",
+      "text": "Görüntüleme",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 8,
+      "type": "StringLiteral",
+      "text": "Temel sağlık özetine salt okunur erişim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 9,
+      "type": "StringLiteral",
+      "text": "Randevu ve etkinlikleri görebilme",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 10,
+      "type": "StringLiteral",
+      "text": "Hatırlatıcılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 10,
+      "type": "StringLiteral",
+      "text": "İlaç ve görev hatırlatıcılarına erişim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 11,
+      "type": "StringLiteral",
+      "text": "Aşılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 11,
+      "type": "StringLiteral",
+      "text": "Aşı takvimi ve kayıtlarına erişim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 12,
+      "type": "StringLiteral",
+      "text": "Büyüme",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 12,
+      "type": "StringLiteral",
+      "text": "Boy, kilo ve baş çevresi kayıtları",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 13,
+      "type": "StringLiteral",
+      "text": "Düzenleme",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 13,
+      "type": "StringLiteral",
+      "text": "Profil bilgilerini değiştirebilme yetkisi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 46,
+      "type": "StringLiteral",
+      "text": "Davet başarıyla gönderildi!",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 50,
+      "type": "StringLiteral",
+      "text": "Davet gönderilemedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 64,
+      "type": "JsxText",
+      "text": "Aile Paneline Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 68,
+      "type": "JsxText",
+      "text": "Güvenli Paylaşım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 69,
+      "type": "JsxText",
+      "text": "Aile Erişimleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 70,
+      "type": "JsxText",
+      "text": "Yakınlarınızı davet edin, her aile profilinin erişim yetkilerini detaylıca belirleyin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 84,
+      "type": "JsxText",
+      "text": "Yakın Davet Et",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 85,
+      "type": "JsxText",
+      "text": "Bir yakınınızı e-posta üzerinden ailenize dahil edin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 91,
+      "type": "JsxText",
+      "text": "Profil Seçimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 93,
+      "type": "StringLiteral",
+      "text": "Çocuk",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 94,
+      "type": "JsxText",
+      "text": "Profil bulunamadı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 98,
+      "type": "JsxText",
+      "text": "Davet Edilecek E-posta",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 125,
+      "type": "JsxText",
+      "text": "Daveti Gönder",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 147,
+      "type": "JsxText",
+      "text": "Gönderen:",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 147,
+      "type": "JsxText",
+      "text": "• İzinler:",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 165,
+      "type": "JsxText",
+      "text": "Paylaştığım Profiller",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 176,
+      "type": "StringLiteral",
+      "text": "Bakım Sağlayıcı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 180,
+      "type": "JsxText",
+      "text": "Paylaşım yapılmamış.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 182,
+      "type": "JsxText",
+      "text": "Oluşturduğunuz profil bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 192,
+      "type": "JsxText",
+      "text": "Bana Paylaşılan Profiller",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-access/page.tsx",
+      "line": 206,
+      "type": "JsxText",
+      "text": "Size paylaşılan profil bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 33,
+      "type": "JsxText",
+      "text": "Aile Paneline Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 37,
+      "type": "JsxText",
+      "text": "Profil Yönetimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 38,
+      "type": "JsxText",
+      "text": "Gebelik & Çocuk Profilleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 39,
+      "type": "JsxText",
+      "text": "Gebelik takibi veya çocuğunuz için özel sağlık profilleri oluşturun.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 56,
+      "type": "JsxText",
+      "text": "Çocuk Profili",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 64,
+      "type": "StringLiteral",
+      "text": "Profil Adı (Örn: İlk Gebeliğim) *",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 64,
+      "type": "StringLiteral",
+      "text": "Çocuğun Adı *",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 70,
+      "type": "JsxText",
+      "text": "Yakınlık Derecesi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 71,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn: Kızım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 81,
+      "type": "JsxText",
+      "text": "Tahmini Doğum Tarihi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 87,
+      "type": "JsxText",
+      "text": "Doğum Tarihi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 93,
+      "type": "JsxText",
+      "text": "Özel Notlar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 94,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Eklemek istediğiniz notlar...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 97,
+      "type": "JsxText",
+      "text": "Profili Oluştur",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 115,
+      "type": "StringLiteral",
+      "text": "Tahmini Doğum:",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 115,
+      "type": "StringLiteral",
+      "text": "Tarih belirtilmedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 116,
+      "type": "StringLiteral",
+      "text": "Doğum:",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 116,
+      "type": "StringLiteral",
+      "text": "Doğum tarihi belirtilmedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 122,
+      "type": "JsxText",
+      "text": "Yönet",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/family-profiles/page.tsx",
+      "line": 128,
+      "type": "JsxText",
+      "text": "Henüz oluşturulmuş bir özel profil bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/goals/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Sağlık hedeflerim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/goals/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Kendi hedeflerini oluştur veya uzmanla birlikte takip et.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/imaging/page.tsx",
+      "line": 1,
+      "type": "JsxAttribute[alt]",
+      "text": "Görüntüleme",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/imaging/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Görüntüleme",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/imaging/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Görüntüleme Sonuçlarım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/imaging/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Raporlarını ve görüntüleme geçmişini kişisel sağlık alanında sakla.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 37,
+      "type": "JsxText",
+      "text": "Tıbbi Arşiv",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 38,
+      "type": "JsxText",
+      "text": "Hastalık & İşlem Geçmişi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 39,
+      "type": "JsxText",
+      "text": "Kronik hastalıklarınızı, ameliyatlarınızı ve önemli tıbbi işlemlerinizi saklayın.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 43,
+      "type": "StringLiteral",
+      "text": "İptal",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 43,
+      "type": "StringLiteral",
+      "text": "Yeni Kayıt Ekle",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 52,
+      "type": "JsxText",
+      "text": "Hastalık / Durum",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 55,
+      "type": "JsxText",
+      "text": "Ameliyat / İşlem",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 64,
+      "type": "JsxText",
+      "text": "Hastalık / Durum Adı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 65,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Hipertansiyon, Astım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 70,
+      "type": "JsxText",
+      "text": "Geçmişte Kaldı / İyileşti",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 74,
+      "type": "JsxText",
+      "text": "Teşhis Tarihi",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 86,
+      "type": "JsxText",
+      "text": "İşlem / Ameliyat Adı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 87,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Apandisit, Anjiyo",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 90,
+      "type": "JsxText",
+      "text": "Tür",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 91,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Cerrahi, Tanısal",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 94,
+      "type": "JsxText",
+      "text": "Uygulanan Kurum",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 95,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Şişli Etfal",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 98,
+      "type": "JsxText",
+      "text": "İşlem Tarihi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 109,
+      "type": "JsxText",
+      "text": "Yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 117,
+      "type": "JsxText",
+      "text": "Hastalık / Durum Geçmişi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 129,
+      "type": "StringLiteral",
+      "text": "Geçmişte Kaldı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 140,
+      "type": "JsxText",
+      "text": "Kayıt yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 148,
+      "type": "JsxText",
+      "text": "Ameliyat / İşlemler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 162,
+      "type": "StringLiteral",
+      "text": "Kurum belirtilmedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medical-history/page.tsx",
+      "line": 167,
+      "type": "JsxText",
+      "text": "Kayıt yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/medications/page.tsx",
+      "line": 1,
+      "type": "JsxAttribute[alt]",
+      "text": "İlaçlarım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/page.tsx",
+      "line": 124,
+      "type": "StringLiteral",
+      "text": "şeker",
+      "category": "Static UI text",
+      "isLocalized": true
+    },
+    {
+      "file": "app/health/page.tsx",
+      "line": 125,
+      "type": "StringLiteral",
+      "text": "nabız",
+      "category": "Static UI text",
+      "isLocalized": true
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 17,
+      "type": "JsxText",
+      "text": "Sağlık Özetiniz Yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 30,
+      "type": "JsxText",
+      "text": "Tek Bakışta",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 31,
+      "type": "JsxText",
+      "text": "Sağlık Özeti",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 32,
+      "type": "JsxText",
+      "text": "Alerjiler, aktif durumlar, ilaçlar, aşılar ve son ölçümlerinizin kısa özeti.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 45,
+      "type": "StringLiteral",
+      "text": "Kayıt yok",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 50,
+      "type": "JsxText",
+      "text": "Son Şeker",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 53,
+      "type": "StringLiteral",
+      "text": "Kayıt yok",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 58,
+      "type": "JsxText",
+      "text": "Aktif İlaç",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 61,
+      "type": "JsxText",
+      "text": "kayıtlı tedavi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 66,
+      "type": "JsxText",
+      "text": "Bağlı Profiller",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 69,
+      "type": "JsxText",
+      "text": "aile / çocuk hesabı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 83,
+      "type": "JsxText",
+      "text": "Tümü",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 95,
+      "type": "JsxText",
+      "text": "Aktif alerji kaydı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 104,
+      "type": "JsxText",
+      "text": "Aktif Hastalıklar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 106,
+      "type": "JsxText",
+      "text": "Yönet",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 114,
+      "type": "StringLiteral",
+      "text": "Tarih yok",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 118,
+      "type": "JsxText",
+      "text": "Aktif durum kaydı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 127,
+      "type": "JsxText",
+      "text": "Son Aşılar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 129,
+      "type": "JsxText",
+      "text": "Tümü",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 141,
+      "type": "JsxText",
+      "text": "Aşı kaydı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 150,
+      "type": "JsxText",
+      "text": "Önemli İşlemler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 152,
+      "type": "JsxText",
+      "text": "Geçmiş",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 164,
+      "type": "JsxText",
+      "text": "İşlem kaydı yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 176,
+      "type": "JsxText",
+      "text": "Acil Durum & Sağlık Kartı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 177,
+      "type": "JsxText",
+      "text": "Sağlık Kartı paylaşımı ayrı kontrol edilir. Bu ekran sadece sizin kişisel özetinizdir ve kartı otomatik olarak herkese açmaz.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/summary/page.tsx",
+      "line": 179,
+      "type": "JsxText",
+      "text": "Sağlık Kartımı Yönet",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/tasks/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Tetkik & Görevlerim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/tasks/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Doktorunun istediği tetkikleri planla ve tamamlanma durumlarını takip et.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 13,
+      "type": "JsxText",
+      "text": "Yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 45,
+      "type": "StringLiteral",
+      "text": "Aşı kaydı ve cihaz hatırlatıcısı oluşturuldu.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 45,
+      "type": "StringLiteral",
+      "text": "Aşı kaydı ve Alumas hatırlatıcısı oluşturuldu.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 47,
+      "type": "StringLiteral",
+      "text": "Aşı kaydı başarıyla oluşturuldu.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 62,
+      "type": "JsxText",
+      "text": "Koruyucu Sağlık",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 63,
+      "type": "StringLiteral",
+      "text": "Aile Profili Aşı Takibi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 63,
+      "type": "StringLiteral",
+      "text": "Aşı Takvimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 64,
+      "type": "JsxText",
+      "text": "Uygulanan aşıları ve planlanan doz tarihlerini güvenle saklayın.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 68,
+      "type": "StringLiteral",
+      "text": "İptal",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 68,
+      "type": "StringLiteral",
+      "text": "Yeni Aşı Ekle",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 75,
+      "type": "JsxText",
+      "text": "Bu ekrandaki yeni aşı kayıtları seçili aile profiline kaydedilecektir.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 83,
+      "type": "JsxText",
+      "text": "Yeni Aşı Kaydı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 89,
+      "type": "JsxText",
+      "text": "Aşı Adı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 90,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Biontech, Tetanoz",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 94,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. 2. Doz, Hatırlatma",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 97,
+      "type": "JsxText",
+      "text": "Uygulanan Kurum",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 98,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Örn. Aile Hekimi, Hastane",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 112,
+      "type": "JsxText",
+      "text": "Girerseniz Alumas size hatırlatma gönderecektir.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 122,
+      "type": "JsxText",
+      "text": "Aşı kayıtları yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 150,
+      "type": "StringLiteral",
+      "text": "Planlanmadı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 161,
+      "type": "JsxText",
+      "text": "Kayıtlı aşınız bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 169,
+      "type": "JsxText",
+      "text": "Alumas kendi başına otomatik bir tıbbi aşı takvimi önermez; hatırlatmalar yalnızca sizin kaydettiğiniz manuel",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 169,
+      "type": "JsxText",
+      "text": "göre cihazınıza gönderilir.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/vaccinations/page.tsx",
+      "line": 174,
+      "type": "JsxText",
+      "text": "Sağlık Özetine Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 36,
+      "type": "JsxText",
+      "text": "Günlük Takip",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 37,
+      "type": "JsxText",
+      "text": "Su Tüketimi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 38,
+      "type": "JsxText",
+      "text": "Günlük su tüketiminizi takip edin ve hedefinize ulaşın.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 45,
+      "type": "JsxText",
+      "text": "Bugün",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 45,
+      "type": "JsxText",
+      "text": "kez su içtiniz",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 60,
+      "type": "JsxText",
+      "text": "Hızlı Ekle",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 66,
+      "type": "StringLiteral",
+      "text": "Küçük Şişe",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 67,
+      "type": "StringLiteral",
+      "text": "Büyük Şişe",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 88,
+      "type": "JsxText",
+      "text": "Geçmiş (Son 7 Gün)",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health/water/page.tsx",
+      "line": 104,
+      "type": "JsxText",
+      "text": "Henüz su tüketimi kaydedilmedi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-card/page.tsx",
+      "line": 1,
+      "type": "JsxAttribute[alt]",
+      "text": "Sağlık kartı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-card/[token]/page.tsx",
+      "line": 3,
+      "type": "JsxText",
+      "text": "Alumas · Acil Sağlık Kartı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-card/[token]/page.tsx",
+      "line": 3,
+      "type": "JsxText",
+      "text": "Bu kart kullanıcı tarafından acil durumda paylaşılmak üzere özellikle etkinleştirilmiştir.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-card/[token]/page.tsx",
+      "line": 3,
+      "type": "JsxText",
+      "text": "Önemli ilaçlar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-card/[token]/page.tsx",
+      "line": 3,
+      "type": "JsxText",
+      "text": "Acil iletişim",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-card/[token]/page.tsx",
+      "line": 3,
+      "type": "JsxText",
+      "text": "Bu kart acil sağlık hizmetinin, profesyonel tıbbi değerlendirmenin veya resmi sağlık kaydının yerine geçmez.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 21,
+      "type": "JsxAttribute[alt]",
+      "text": "Sağlık Çevrem",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 24,
+      "type": "JsxText",
+      "text": "Tüm Hizmetlere Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 28,
+      "type": "JsxText",
+      "text": "Kişisel Ağınız",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 29,
+      "type": "JsxText",
+      "text": "Sağlık Çevrem",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 30,
+      "type": "JsxText",
+      "text": "Güvendiğiniz doktorları, kurumları ve aktif bakım planlarınızı buradan takip edin.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Favori Doktor",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 50,
+      "type": "JsxText",
+      "text": "Favori Kurum",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 59,
+      "type": "JsxText",
+      "text": "Bekleyen Randevu",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 70,
+      "type": "JsxText",
+      "text": "Doktorlarım",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 82,
+      "type": "JsxText",
+      "text": "Favori doktor eklediğinizde burada görünür.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 89,
+      "type": "JsxText",
+      "text": "Kurumlarım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 101,
+      "type": "JsxText",
+      "text": "Favori kurum eklediğinizde burada görünür.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 111,
+      "type": "JsxText",
+      "text": "Yaklaşan Temaslar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 122,
+      "type": "StringLiteral",
+      "text": "Klinik",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 126,
+      "type": "JsxText",
+      "text": "Yaklaşan randevunuz bulunmuyor.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 133,
+      "type": "JsxText",
+      "text": "Aktif Bakım İlişkileri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 142,
+      "type": "JsxText",
+      "text": "Aktif İzlem",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-circle/page.tsx",
+      "line": 145,
+      "type": "JsxText",
+      "text": "Aktif bir bakım planı bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-data/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Özel Nitelikli Kişisel Veri ve Sağlık Verisi Politikası",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-data/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Son Güncelleme: 26 Eylül 2026. Alumas Sağlık Teknolojileri A.Ş. tarafından uluslararası güvenlik standartlarına ve KVKK/GDPR regülasyonlarına tam uyumlu olarak düzenlenmiştir.",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 28,
+      "type": "JsxAttribute[alt]",
+      "text": "Sağlık Turizmi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 38,
+      "type": "JsxText",
+      "text": "Sağlık Turizmi &",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 41,
+      "type": "JsxText",
+      "text": "Türkiye'nin önde gelen sağlık kuruluşları, onaylı acenteler, VIP transfer ve konaklama seçenekleriyle tedavinizi birinci sınıf bir seyahat deneyimine dönüştürün.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 52,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Tedavi, şehir, klinik veya kategori ara...",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 59,
+      "type": "JsxText",
+      "text": "Ara",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 66,
+      "type": "JsxText",
+      "text": "Yakındaki Oteller",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 69,
+      "type": "JsxText",
+      "text": "Sağlık Kurumları",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 78,
+      "type": "JsxText",
+      "text": "Doğrulanmış Acenteler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 79,
+      "type": "JsxText",
+      "text": "Koordinasyon ve seyahat hizmetleri sağlayan yetkili kurumlar.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 88,
+      "type": "JsxText",
+      "text": "Doğrulanmış",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 95,
+      "type": "StringLiteral",
+      "text": "Belirtilmemiş",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 115,
+      "type": "JsxText",
+      "text": "Ara",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 124,
+      "type": "JsxText",
+      "text": "İncele",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 138,
+      "type": "JsxText",
+      "text": "Her şey dahil organizasyonlar ve özel medikal paketler.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 142,
+      "type": "JsxText",
+      "text": "Yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 177,
+      "type": "StringLiteral",
+      "text": "Belirtilmemiş",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 182,
+      "type": "JsxText",
+      "text": "Başlangıç Fiyatı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/health-tourism/page.tsx",
+      "line": 190,
+      "type": "JsxText",
+      "text": "Arama kriterlerine uygun paket bulunamadı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 59,
+      "type": "StringLiteral",
+      "text": "Yükleme adresi alınamadı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 63,
+      "type": "StringLiteral",
+      "text": "Dosya yüklenemedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 71,
+      "type": "StringLiteral",
+      "text": "Yükleme hatası",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 83,
+      "type": "StringLiteral",
+      "text": "Mesaj gönderilemedi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 99,
+      "type": "JsxText",
+      "text": "Tüm Hizmetlere Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 103,
+      "type": "JsxText",
+      "text": "GÜVENLİ İLETİŞİM KANALI",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 107,
+      "type": "JsxText",
+      "text": "Sağlık profesyonelleri ve kurumlarla güvenli bir şekilde iletişim kurun.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 122,
+      "type": "JsxAttribute[placeholder]",
+      "text": "Kişi ara...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 152,
+      "type": "JsxText",
+      "text": "Görüşme bulunamadı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 169,
+      "type": "JsxText",
+      "text": "Güvenli İletişim Kanalı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 208,
+      "type": "JsxText",
+      "text": "Bu kişiyle henüz bir görüşmeniz yok.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 208,
+      "type": "JsxText",
+      "text": "Mesaj yazarak sohbeti başlatabilirsiniz.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 221,
+      "type": "JsxAttribute[title]",
+      "text": "Dosya veya Resim Yükle",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 229,
+      "type": "StringLiteral",
+      "text": "Dosya yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 229,
+      "type": "StringLiteral",
+      "text": "Mesajınızı yazın...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 247,
+      "type": "JsxText",
+      "text": "Mesajlaşma",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 248,
+      "type": "JsxText",
+      "text": "Soldaki listeden bir kişi seçerek sohbeti başlatın.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/messages/page.tsx",
+      "line": 270,
+      "type": "JsxText",
+      "text": "Mesajlar yükleniyor...",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/nearby/page.tsx",
+      "line": 13,
+      "type": "JsxAttribute[alt]",
+      "text": "Küresel Keşif Haritası",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/nearby/page.tsx",
+      "line": 18,
+      "type": "JsxText",
+      "text": "Küresel Keşif Haritası",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/nearby/page.tsx",
+      "line": 20,
+      "type": "JsxText",
+      "text": "Dünyanın neresinde olursanız olun; cihaz konumunuzu kullanarak size en yakın hastane, nöbetçi eczane veya acil servisleri Google Haritalar altyapısıyla anında bulun.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/nearby/page.tsx",
+      "line": 28,
+      "type": "JsxText",
+      "text": "Randevu mu almak istiyorsunuz?",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/nearby/page.tsx",
+      "line": 28,
+      "type": "JsxText",
+      "text": "Sadece Alumas üzerinden randevu alınabilen anlaşmalı kurumları görmek ve hasta yorumlarını okumak için",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/nearby/page.tsx",
+      "line": 28,
+      "type": "JsxText",
+      "text": "Alumas Sağlık Ağı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/nearby/page.tsx",
+      "line": 28,
+      "type": "JsxText",
+      "text": "sayfamıza göz atın.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/notifications/page.tsx",
+      "line": 62,
+      "type": "JsxText",
+      "text": "Tüm Hizmetlere Dön",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/notifications/page.tsx",
+      "line": 66,
+      "type": "JsxText",
+      "text": "Güncellemeler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/notifications/page.tsx",
+      "line": 68,
+      "type": "JsxText",
+      "text": "Randevularınız, mesajlarınız ve diğer önemli güncellemeler.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/notifications/page.tsx",
+      "line": 72,
+      "type": "JsxText",
+      "text": "Tümünü Okundu İşaretle",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/notifications/page.tsx",
+      "line": 122,
+      "type": "JsxText",
+      "text": "Şu an için okunmamış veya geçmiş bir bildiriminiz bulunmuyor.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/onboarding/doctor/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Uzman profilini oluştur",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/onboarding/doctor/page.tsx",
+      "line": 1,
+      "type": "JsxText",
+      "text": "Profilin doğrulama tamamlanana kadar sadece senin panelinde görünür.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 10,
+      "type": "StringLiteral",
+      "text": "Hastane",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 10,
+      "type": "StringLiteral",
+      "text": "Klinik",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 10,
+      "type": "StringLiteral",
+      "text": "Görüntüleme Merkezi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 10,
+      "type": "StringLiteral",
+      "text": "Tıbbi Laboratuvar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 11,
+      "type": "StringLiteral",
+      "text": "Salı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 11,
+      "type": "StringLiteral",
+      "text": "Çarşamba",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 11,
+      "type": "StringLiteral",
+      "text": "Perşembe",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 65,
+      "type": "JsxText",
+      "text": "Doğrulanmış",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 70,
+      "type": "JsxText",
+      "text": "Şu An Nöbetçi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 95,
+      "type": "JsxText",
+      "text": "değerlendirme)",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 117,
+      "type": "JsxText",
+      "text": "Hakkında",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 120,
+      "type": "StringLiteral",
+      "text": "Kurum açıklaması henüz eklenmedi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 127,
+      "type": "JsxText",
+      "text": "Çalışma Saatleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 144,
+      "type": "StringLiteral",
+      "text": "Kapalı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 160,
+      "type": "JsxText",
+      "text": "Şu an nöbetçi eczane!",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 162,
+      "type": "StringLiteral",
+      "text": "Bu eczane sistemde nöbetçi olarak kayıtlı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 182,
+      "type": "JsxText",
+      "text": "Anlaşmalı Kurumlar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 183,
+      "type": "JsxText",
+      "text": "Platformumuzdaki onaylı sigorta şirketleri.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 209,
+      "type": "JsxText",
+      "text": "Stok durumu eczane tarafından güncellenir; gitmeden önce teyit edin.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 222,
+      "type": "StringLiteral",
+      "text": "Sınırlı Stok",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 222,
+      "type": "StringLiteral",
+      "text": "Tükendi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 247,
+      "type": "JsxText",
+      "text": "Ara",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 267,
+      "type": "StringLiteral",
+      "text": "Kurum departmanı",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 284,
+      "type": "JsxText",
+      "text": "Güncel Kampanyalar",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 303,
+      "type": "JsxText",
+      "text": "Bu Kurumda Çalışan Uzmanlar",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/organizations/[slug]/page.tsx",
+      "line": 319,
+      "type": "StringLiteral",
+      "text": "Müsait",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/phone-directory/page.tsx",
+      "line": 9,
+      "type": "JsxAttribute[alt]",
+      "text": "Telefon Rehberi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/phone-directory/page.tsx",
+      "line": 12,
+      "type": "JsxText",
+      "text": "Sağlık Rehberi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/phone-directory/page.tsx",
+      "line": 14,
+      "type": "JsxText",
+      "text": "Sık görüştüğünüz doktorlar, kurumlar ve acil numaralar. Tek tıkla arayın, favorilerinize ekleyin.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/pro/login/page.tsx",
+      "line": 9,
+      "type": "JsxText",
+      "text": "Hasta mısınız? Bireysel giriş yapın",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/pro/register/page.tsx",
+      "line": 9,
+      "type": "JsxText",
+      "text": "Hasta mısınız? Bireysel kayıt olun",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 13,
+      "type": "StringLiteral",
+      "text": "Sağlık hizmetleri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 14,
+      "type": "StringLiteral",
+      "text": "Doktor & Uzman Bul",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 14,
+      "type": "StringLiteral",
+      "text": "Doktor, diyetisyen ve fizyoterapistleri incele.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 15,
+      "type": "StringLiteral",
+      "text": "Hastane & Klinik",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 15,
+      "type": "StringLiteral",
+      "text": "Doğrulanmış sağlık kurumlarını keşfet.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 16,
+      "type": "StringLiteral",
+      "text": "Yakınımdakiler",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 16,
+      "type": "StringLiteral",
+      "text": "Hastane, klinik, eczane, acil servis ve otel bul.",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 17,
+      "type": "StringLiteral",
+      "text": "Evde Sağlık",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 17,
+      "type": "StringLiteral",
+      "text": "Ev ziyaretini doktor, klinik veya laboratuvar üzerinden planla.",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 18,
+      "type": "StringLiteral",
+      "text": "112, ambulans, acil servis ve sağlık kartı.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 19,
+      "type": "StringLiteral",
+      "text": "Sağlık Turizmi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 19,
+      "type": "StringLiteral",
+      "text": "Klinik, paket, transfer, konaklama ve tercüman.",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 20,
+      "type": "StringLiteral",
+      "text": "Sigorta sağlayıcıları ve anlaşmalı kurumlar.",
+      "category": "Structured business terminology",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 21,
+      "type": "StringLiteral",
+      "text": "Sağlık kurumlarının kampanya ve duyuruları.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 22,
+      "type": "StringLiteral",
+      "text": "Telefon Rehberi",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 22,
+      "type": "StringLiteral",
+      "text": "112 ve favori sağlık numaraları.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 24,
+      "type": "StringLiteral",
+      "text": "Kişisel sağlık",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 25,
+      "type": "StringLiteral",
+      "text": "Sağlığım",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 25,
+      "type": "StringLiteral",
+      "text": "Kişisel sağlık merkezine git.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 26,
+      "type": "StringLiteral",
+      "text": "Sistolik, diyastolik ve nabız takibi.",
+      "category": "Sensitive clinical/legal text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 27,
+      "type": "StringLiteral",
+      "text": "Kan Şekeri",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 27,
+      "type": "StringLiteral",
+      "text": "Açlık/tokluk glukoz kayıtları.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 28,
+      "type": "StringLiteral",
+      "text": "Uyku süresi ve kalite takibi.",
+      "category": "Static UI text",
+      "isLocalized": false
+    },
+    {
+      "file": "app/services/page.tsx",
+      "line": 29,
+      "type": "StringLiteral",
+      "text": "Günlük su tüketimini kaydet.",
+      "category": "Static UI text",
+      "isLocalized": false
+    }
+  ]
+}

@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import { Buildings, MapPin } from "@phosphor-icons/react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function FavoriteOrganizations() {
+  const t = useTranslations("profile.favorites");
   const [rows, setRows] = useState<any[]>([]);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function FavoriteOrganizations() {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ fontSize: "10px", fontWeight: 800, color: "#10b981", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px", display: "block" }}>
-                  Favori Kurum
+                  {t("orgBadge")}
                 </span>
                 <strong style={{ display: "block", fontSize: "16px", color: "#0f172a", marginBottom: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {o.name}
@@ -43,7 +45,7 @@ export default function FavoriteOrganizations() {
 
       {!rows.length && (
         <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #cbd5e1", color: "#94a3b8", fontSize: "14px", gridColumn: "1 / -1" }}>
-          Henüz favori kurumun yok.
+          {t("emptyOrgs")}
         </div>
       )}
     </div>

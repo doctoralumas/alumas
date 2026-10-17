@@ -1,0 +1,98 @@
+{
+  "profile": {
+    "kicker": "Account",
+    "title": "Profile & Settings",
+    "subtitle": "Manage your personal information, security preferences, and account configuration.",
+    "noEmail": "No email address linked",
+    "roleAdmin": "System Administrator",
+    "roleDoctor": "Doctor / Specialist",
+    "roleOrg": "Organization Admin",
+    "roleAgency": "Health Tourism Admin",
+    "rolePatient": "Patient / Individual",
+    "proPanels": "Professional Portals",
+    "proPanelsDesc": "Manage your healthcare organization, medical tourism, or specialist accounts, or apply for new professional services.",
+    "orgPortal": "Organization Portal",
+    "orgApply": "Register Organization",
+    "agencyPortal": "Health Tourism Portal",
+    "agencyApply": "Register Agency",
+    "doctorPortal": "Specialist Portal",
+    "doctorApply": "Apply as Doctor",
+    "adminPortal": "Admin Dashboard",
+    "phoneVerification": "Phone Verification",
+    "phoneVerificationDesc": "Verify your mobile phone number for enhanced account security.",
+    "favoriteDoctors": "Favorite Doctors",
+    "favoriteOrgs": "Favorite Organizations",
+    "encryptionTitle": "End-to-End Encryption",
+    "encryptionDesc": "Your account and all associated medical records are encrypted according to international healthcare security standards.",
+    "logoutButton": "Log Out",
+    "personalInfo": {
+      "title": "Personal Information",
+      "desc": "Update your public display name and contact email address.",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Your Full Name",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter a valid email",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "saveButton": "Save Changes",
+      "successMsg": "Your information has been successfully updated.",
+      "errorMsg": "An error occurred."
+    },
+    "accountControls": {
+      "exportTitle": "Export Data",
+      "exportButton": "Download All Health and Account Data",
+      "dangerZone": "Danger Zone",
+      "deleteWarning": "All data associated with your account, including medical documents, will be permanently removed. Subject to statutory medical retention obligations, certain encrypted archives may be preserved.",
+      "confirmPlaceholder": "Type DELETE MY ACCOUNT",
+      "confirmPhrase": "DELETE MY ACCOUNT",
+      "passwordPlaceholder": "Password (if applicable)",
+      "deleteButton": "Permanently Delete My Account",
+      "deleting": "Deleting...",
+      "confirmPrompt": "This action cannot be undone. Are you sure you want to permanently delete your account?",
+      "deleteFailed": "Failed to delete"
+    },
+    "privacyCenter": {
+      "title": "Privacy Center",
+      "note": "Alumas protects your health data with robust encryption protocols and strict compliance standards. You can manage your privacy consent preferences below.",
+      "requiredBadge": "REQUIRED",
+      "acceptedBadge": "Read and Accepted",
+      "processing": "Processing...",
+      "approve": "Approve",
+      "on": "On",
+      "off": "Off",
+      "requiredWarning": "You must approve this consent to access platform services.",
+      "items": {
+        "privacy_notice": {
+          "title": "Privacy Notice",
+          "desc": "Explains how Alumas collects, processes, and protects your personal data and details your statutory privacy rights."
+        },
+        "health_processing": {
+          "title": "Health Data Processing",
+          "desc": "Authorizes processing of sensitive medical records for accurate diagnosis, treatment coordination, and clinical follow-up."
+        },
+        "health_integrations": {
+          "title": "Device Integrations",
+          "desc": "Allows importing biometric measurements from Apple Health and Google Health Connect directly into your health dashboard."
+        },
+        "marketing": {
+          "title": "Marketing & Communications",
+          "desc": "Receive personalized health advice, service announcements, seasonal checkup reminders, and healthcare newsletters."
+        }
+      }
+    },
+    "pushSettings": {
+      "title": "Push Notifications",
+      "enabledStatus": "Enabled (On this device)",
+      "disabledStatus": "Disabled",
+      "deniedError": "Notification permission was denied or is not supported by your browser.",
+      "saveError": "Could not register device token.",
+      "pushError": "Push registration failed."
+    },
+    "favorites": {
+      "doctorNew": "New",
+      "emptyDoctors": "You have not saved any favorite doctors yet.",
+      "orgBadge": "Favorite Clinic",
+      "emptyOrgs": "You have not saved any favorite organizations yet."
+    }
+  }
+}

@@ -1,58 +1,66 @@
-﻿"use client";
-import {useEffect,useMemo,useState} from "react";
+"use client";
+import { useEffect, useMemo, useState } from "react";
 import { Drop, CalendarBlank, Heart, Sparkle, Plus, Trash, Info, Heartbeat, ClockCounterClockwise, CaretRight, Textbox } from "@phosphor-icons/react";
+import { useTranslations, useLocale } from "next-intl";
 
-type R={id:string;startsAt:string;endsAt?:string|null;flow?:string|null;symptoms:string[];note?:string|null};
-const fmt=(d:string)=>new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
-const shortFmt=(d:string)=>new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+type R = { id: string; startsAt: string; endsAt?: string | null; flow?: string | null; symptoms: string[]; note?: string | null };
 
-export default function Page(){
-  const [rows,setRows]=useState<R[]>([]);
-  const [message,setMessage]=useState("");
-  const [loading,setLoading]=useState(true);
+export default function Page() {
+  const t = useTranslations("health.healthCycle");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
+
+  const [rows, setRows] = useState<R[]>([]);
+  const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
   
-  const load=()=>fetch('/api/health/cycle').then(r => r.ok ? r.json() : []).then(x=>setRows(Array.isArray(x)?x:[])).finally(()=>setLoading(false));
-  useEffect(()=>{load()},[]);
+  const shortFmt = (d: string) => new Date(d).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' });
 
-  const stats=useMemo(()=>{
-    const sorted=[...rows].sort((a,b)=>+new Date(a.startsAt)-+new Date(b.startsAt));
-    const diffs=sorted.slice(1).map((r,i)=>(+new Date(r.startsAt)-+new Date(sorted[i].startsAt))/86400000).filter(n=>n>=15&&n<=60);
-    const avg=diffs.length?Math.round(diffs.reduce((a,b)=>a+b,0)/diffs.length):null;
-    const last=sorted.at(-1);
-    const next=avg&&last?new Date(+new Date(last.startsAt)+avg*86400000):null;
-    return {avg,last,next}
-  },[rows]);
+  const load = () => fetch('/api/health/cycle').then(r => r.ok ? r.json() : []).then(x => setRows(Array.isArray(x) ? x : [])).finally(() => setLoading(false));
+  useEffect(() => { load(); }, []);
 
-  async function submit(e:React.FormEvent<HTMLFormElement>){
+  const stats = useMemo(() => {
+    const sorted = [...rows].sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
+    const diffs = sorted.slice(1).map((r, i) => (+new Date(r.startsAt) - +new Date(sorted[i].startsAt)) / 86400000).filter(n => n >= 15 && n <= 60);
+    const avg = diffs.length ? Math.round(diffs.reduce((a, b) => a + b, 0) / diffs.length) : null;
+    const last = sorted.at(-1);
+    const next = avg && last ? new Date(+new Date(last.startsAt) + avg * 86400000) : null;
+    return { avg, last, next };
+  }, [rows]);
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMessage("Kaydediliyor...");
-    const form=e.currentTarget,f=new FormData(form);
-    const res=await fetch('/api/health/cycle',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        startsAt:f.get('startsAt'),
-        endsAt:f.get('endsAt')||null,
-        flow:f.get('flow')||null,
-        symptoms:String(f.get('symptoms')||'').split(',').map(x=>x.trim()).filter(Boolean),
-        note:f.get('note')||null
+    setMessage(t("saving"));
+    const form = e.currentTarget, f = new FormData(form);
+    const res = await fetch('/api/health/cycle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startsAt: f.get('startsAt'),
+        endsAt: f.get('endsAt') || null,
+        flow: f.get('flow') || null,
+        symptoms: String(f.get('symptoms') || '').split(',').map(x => x.trim()).filter(Boolean),
+        note: f.get('note') || null
       })
     });
-    const x=await res.json();
-    if(!res.ok){
-      setMessage(x.error||'Kayıt eklenemedi');
+    const x = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setIsSuccess(false);
+      setMessage(x.error || t("failed"));
       return;
     }
+    setIsSuccess(true);
     form.reset();
-    setMessage('Kayıt başarıyla eklendi.');
+    setMessage(t("success"));
     setTimeout(() => setMessage(''), 3000);
     load();
   }
 
-  async function remove(id:string){
-    if(!confirm('Bu döngü kaydı silinsin mi?')) return;
-    const r=await fetch('/api/health/cycle?id='+encodeURIComponent(id),{method:'DELETE'});
-    if(r.ok) load();
+  async function remove(id: string) {
+    if (!confirm(t("confirmDelete"))) return;
+    const r = await fetch('/api/health/cycle?id=' + encodeURIComponent(id), { method: 'DELETE' });
+    if (r.ok) load();
   }
 
   return (
@@ -65,38 +73,38 @@ export default function Page(){
             <Drop size={32} weight="duotone" color="#db2777" />
           </div>
           <div>
-            <span className="kicker" style={{ color: "#db2777" }}>Kadın Sağlığı</span>
-            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>Regl Takibi</h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>Döngü tarihlerini, belirtileri ve kişisel notlarını kaydet, otomatik tahminleri gör.</p>
+            <span className="kicker" style={{ color: "#db2777" }}>{t("kicker")}</span>
+            <h1 style={{ fontSize: "32px", color: "#0f172a", margin: "4px 0" }}>{t("title")}</h1>
+            <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>{t("subtitle")}</p>
           </div>
         </div>
       </div>
 
-      {/* İstatistikler */}
+      {/* Stats Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "24px", marginBottom: "32px" }}>
         
         <div style={{ background: "#fff", padding: "24px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#db2777", marginBottom: "16px" }}>
-            <CalendarBlank size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>Son Başlangıç</span>
+            <CalendarBlank size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>{t("lastStart")}</span>
           </div>
-          <strong style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>{stats.last?shortFmt(stats.last.startsAt):'--'}</strong>
-          <span style={{ fontSize: "14px", color: "#64748b", marginTop: "8px", fontWeight: 500 }}>kayıtlı son döngü</span>
+          <strong style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>{stats.last ? shortFmt(stats.last.startsAt) : '--'}</strong>
+          <span style={{ fontSize: "14px", color: "#64748b", marginTop: "8px", fontWeight: 500 }}>{t("lastCycleNote")}</span>
         </div>
 
         <div style={{ background: "#fff", padding: "24px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#0ea5e9", marginBottom: "16px" }}>
-            <Heartbeat size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>Ortalama Döngü</span>
+            <Heartbeat size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>{t("avgCycle")}</span>
           </div>
-          <strong style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>{stats.avg?`${stats.avg} `:'--'} <small style={{ fontSize: "16px", color: "#64748b", fontWeight: 600 }}>gün</small></strong>
-          <span style={{ fontSize: "14px", color: "#64748b", marginTop: "8px", fontWeight: 500 }}>geçmiş verilere göre</span>
+          <strong style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>{stats.avg ? `${stats.avg} ` : '--'} <small style={{ fontSize: "16px", color: "#64748b", fontWeight: 600 }}>{t("daysUnit")}</small></strong>
+          <span style={{ fontSize: "14px", color: "#64748b", marginTop: "8px", fontWeight: 500 }}>{t("basedOnHistory")}</span>
         </div>
 
         <div style={{ background: "linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)", padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#db2777", marginBottom: "16px" }}>
-            <Sparkle size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>Tahmini Sonraki</span>
+            <Sparkle size={20} weight="fill" /> <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>{t("estimatedNext")}</span>
           </div>
-          <strong style={{ fontSize: "28px", fontWeight: 800, color: "#9d174d", lineHeight: 1 }}>{stats.next?shortFmt(stats.next.toISOString()):'--'}</strong>
-          <span style={{ fontSize: "14px", color: "#be185d", marginTop: "8px", fontWeight: 500 }}>beklenen regl tarihi</span>
+          <strong style={{ fontSize: "28px", fontWeight: 800, color: "#9d174d", lineHeight: 1 }}>{stats.next ? shortFmt(stats.next.toISOString()) : '--'}</strong>
+          <span style={{ fontSize: "14px", color: "#be185d", marginTop: "8px", fontWeight: 500 }}>{t("expectedDate")}</span>
         </div>
 
       </div>
@@ -104,64 +112,64 @@ export default function Page(){
       <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", background: "#f8fafc", padding: "16px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "40px" }}>
         <Info size={20} color="#64748b" style={{ flexShrink: 0, marginTop: "2px" }} />
         <p style={{ margin: 0, fontSize: "13px", color: "#475569", lineHeight: "1.5" }}>
-          Tahmini sonraki başlangıç tarihi yalnızca geçmiş kayıtlarınızın ortalamasına dayalı kişisel planlama bilgisidir; doğum kontrolü, gebelik değerlendirmesi, tanı veya tedavi amacıyla kullanılmamalıdır.
+          {t("disclaimer")}
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "32px", alignItems: "start" }}>
         
-        {/* Form Alanı */}
+        {/* Form Area */}
         <div style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
           <h2 style={{ margin: "0 0 24px", fontSize: "20px", color: "#0f172a", display: "flex", alignItems: "center", gap: "8px" }}>
-            <Plus size={24} weight="duotone" color="#db2777" /> Yeni Kayıt Ekle
+            <Plus size={24} weight="duotone" color="#db2777" /> {t("addRecord")}
           </h2>
           
           <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
               <div style={{ flex: 1, minWidth: "150px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Başlangıç <span style={{ color: "#ef4444" }}>*</span></label>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("startsAtLabel")} <span style={{ color: "#ef4444" }}>*</span></label>
                 <input name="startsAt" type="date" required style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
               </div>
               <div style={{ flex: 1, minWidth: "150px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Bitiş</label>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("endsAtLabel")}</label>
                 <input name="endsAt" type="date" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
               </div>
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Akış Yoğunluğu</label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("flowLabel")}</label>
               <select name="flow" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a", appearance: "none" }}>
-                <option value="">Seçiniz</option>
-                <option>Hafif</option>
-                <option>Orta</option>
-                <option>Yoğun</option>
+                <option value="">{t("selectFlow")}</option>
+                <option value="Hafif">{t("flowLight")}</option>
+                <option value="Orta">{t("flowMedium")}</option>
+                <option value="Yoğun">{t("flowHeavy")}</option>
               </select>
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Belirtiler</label>
-              <input name="symptoms" placeholder="Kramp, baş ağrısı, şişkinlik, yorgunluk..." style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("symptomsLabel")}</label>
+              <input name="symptoms" placeholder={t("symptomsPlaceholder")} style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a" }} />
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>Not</label>
-              <textarea name="note" placeholder="Özel notunuz..." rows={2} style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a", resize: "vertical" }} />
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("noteLabel")}</label>
+              <textarea name="note" placeholder={t("notePlaceholder")} rows={2} style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px", color: "#0f172a", resize: "vertical" }} />
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "8px" }}>
               <button type="submit" style={{ flex: 1, padding: "16px", background: "#0f172a", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 700, fontSize: "16px", cursor: "pointer", transition: "background 0.2s" }} className="hover-shadow">
-                Kaydet
+                {t("save")}
               </button>
             </div>
-            {message && <div style={{ background: message.includes('başarı') ? '#f0fdf4' : '#fef2f2', color: message.includes('başarı') ? '#16a34a' : '#ef4444', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center" }}>{message}</div>}
+            {message && <div style={{ background: isSuccess ? '#f0fdf4' : '#fef2f2', color: isSuccess ? '#16a34a' : '#ef4444', padding: "12px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, textAlign: "center" }}>{message}</div>}
           </form>
         </div>
 
-        {/* Geçmiş Kayıtlar */}
+        {/* History Records */}
         <section style={{ background: "#fff", borderRadius: "32px", padding: "32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
             <div style={{ background: "#f1f5f9", color: "#475569", padding: "8px", borderRadius: "12px" }}><ClockCounterClockwise size={20} weight="fill" /></div>
-            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>Geçmiş Döngüler</h2>
+            <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>{t("historyTitle")}</h2>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -173,7 +181,7 @@ export default function Page(){
                     {shortFmt(r.startsAt)} {r.endsAt ? <><CaretRight size={14} color="#94a3b8" /> {shortFmt(r.endsAt)}</> : ''}
                   </b>
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {r.flow && <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}><Drop size={14} /> Akış: {r.flow}</span>}
+                    {r.flow && <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}><Drop size={14} /> {t("flowPrefix")}: {r.flow === "Hafif" ? t("flowLight") : r.flow === "Orta" ? t("flowMedium") : r.flow === "Yoğun" ? t("flowHeavy") : r.flow}</span>}
                     {r.symptoms?.length > 0 && <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}><Heart size={14} /> {r.symptoms.join(', ')}</span>}
                     {r.note && <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}><Textbox size={14} /> {r.note}</span>}
                   </div>
@@ -182,7 +190,7 @@ export default function Page(){
                 <button 
                   onClick={() => remove(r.id)}
                   style={{ width: "36px", height: "36px", borderRadius: "12px", background: "#fee2e2", border: "none", color: "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-                  title="Sil"
+                  title={t("deleteTooltip")}
                 >
                   <Trash size={16} weight="bold" />
                 </button>
@@ -190,14 +198,13 @@ export default function Page(){
             ))}
             
             {!loading && rows.length === 0 && (
-              <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", background: "#f8fafc", borderRadius: "16px" }}>Henüz bir döngü kaydınız yok.</div>
+              <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", background: "#f8fafc", borderRadius: "16px" }}>{t("empty")}</div>
             )}
-            {loading && <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8" }}>Yükleniyor...</div>}
+            {loading && <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8" }}>{t("loading")}</div>}
           </div>
         </section>
 
       </div>
     </div>
-  )
+  );
 }
-

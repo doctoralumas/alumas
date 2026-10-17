@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import { Star, MapPin } from "@phosphor-icons/react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function FavoriteDoctors() {
+  const t = useTranslations("profile.favorites");
   const [rows, setRows] = useState<any[]>([]);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function FavoriteDoctors() {
                 {d.reviewCount > 0 ? (
                   <>{d.rating.toFixed(1)} <span style={{ color: "#94a3b8", fontWeight: 500 }}>({d.reviewCount})</span></>
                 ) : (
-                  <span style={{ color: "#64748b", fontWeight: 600 }}>Yeni</span>
+                  <span style={{ color: "#64748b", fontWeight: 600 }}>{t("doctorNew")}</span>
                 )}
               </div>
               {d.organization?.name && (
@@ -53,7 +55,7 @@ export default function FavoriteDoctors() {
 
       {!rows.length && (
         <div style={{ padding: "32px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #cbd5e1", color: "#94a3b8", fontSize: "14px", gridColumn: "1 / -1" }}>
-          Henüz favori doktorun yok.
+          {t("emptyDoctors")}
         </div>
       )}
     </div>

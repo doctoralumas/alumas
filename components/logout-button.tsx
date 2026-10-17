@@ -1,7 +1,9 @@
 "use client";
 import { SignOut } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function LogoutButton() {
+  const t = useTranslations("profile");
   return (
     <button 
       onClick={async()=>{
@@ -12,7 +14,7 @@ export default function LogoutButton() {
       onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
       onMouseOut={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
     >
-      <SignOut size={18} weight="bold" /> Çıkış Yap
+      <SignOut size={18} weight="bold" /> {t("logoutButton")}
     </button>
   );
 }

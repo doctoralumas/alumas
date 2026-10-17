@@ -3,13 +3,20 @@ import {useEffect,useState} from "react";
 import InteractiveOrganizationMap from '@/components/interactive-organization-map';
 import { MagnifyingGlass, NavigationArrow, MapTrifold, Buildings, Crosshair, Pill, Prescription, FirstAid, CaretRight, Star, ShieldCheck, Moon, TestTube } from "@phosphor-icons/react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 type Named={id:string;name:string};
 type Org={id:string;slug:string;type:"HOSPITAL"|"CLINIC"|"PHARMACY"|"IMAGING_CENTER"|"LABORATORY";name:string;city:string;district?:string|null;address:string;phone:string;description?:string|null;latitude?:number|null;longitude?:number|null;distanceKm?:number|null;rating?:number|null;isOnDuty?:boolean;onDutyUntil?:string|null;_count?:{doctors:number;reviews:number};services?:Named[];imagingExams?:Named[];laboratoryTests?:Named[]};
 
-const labels:any = { HOSPITAL:"Hastane", CLINIC:"Klinik", PHARMACY:"Eczane", IMAGING_CENTER:"Görüntüleme Merkezi", LABORATORY:"Tıbbi Laboratuvar" };
-
 export default function OrganizationDirectory({ isLoggedIn = false }: { isLoggedIn?: boolean }){
+  const t = useTranslations("discovery");
+  const labels: Record<string, string> = {
+    HOSPITAL: t("typeHospital"),
+    CLINIC: t("typeClinic"),
+    PHARMACY: t("typePharmacy"),
+    IMAGING_CENTER: t("typeImaging"),
+    LABORATORY: t("typeLab")
+  };
   const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
   const [rows,setRows] = useState<Org[]>([]);
   const [type,setType] = useState("");
@@ -46,16 +53,16 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
       return;
     }
     if(!navigator.geolocation){
-      setGeoMsg('Konum bu cihazda kullanılamıyor.');
+      setGeoMsg(t("geoNotSupported"));
       return;
     }
-    setGeoMsg('Konum alınıyor...');
+    setGeoMsg(t("geoLoading"));
     navigator.geolocation.getCurrentPosition(p=>{
       const n={lat:p.coords.latitude,lng:p.coords.longitude};
       setPos(n);
-      setGeoMsg('Yakınlığa göre sıralandı.');
+      setGeoMsg(t("geoSorted"));
       load(n);
-    },()=>setGeoMsg('Konum izni verilmedi.'))
+    },()=>setGeoMsg(t("geoDenied")))
   }
 
   const getOrgStyling = (orgType: string, isDuty: boolean) => {
@@ -80,14 +87,14 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
             value={q} 
             onChange={e=>setQ(e.target.value)} 
             onKeyDown={e=>{if(e.key==='Enter')load()}} 
-            placeholder="Kurum, tetkik, tahlil, il veya ilçe ara..."
+            placeholder={t("searchOrgInputPlaceholder")}
             style={{ width: "100%", padding: "14px 16px 14px 44px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }}
           />
         </div>
-        <button onClick={()=>load()} style={{ padding: "0 24px", background: "#0f172a", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center" }}>Ara</button>
-        <button onClick={nearby} style={{ padding: "0 20px", background: "#f8fafc", color: "#0f172a", borderRadius: "16px", border: "1px solid #cbd5e1", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}><Crosshair size={20} weight="bold" /> Yakınımdakiler</button>
+        <button onClick={()=>load()} style={{ padding: "0 24px", background: "#0f172a", color: "#fff", borderRadius: "16px", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center" }}>{t("searchButton")}</button>
+        <button onClick={nearby} style={{ padding: "0 20px", background: "#f8fafc", color: "#0f172a", borderRadius: "16px", border: "1px solid #cbd5e1", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}><Crosshair size={20} weight="bold" /> {t("nearbyButton")}</button>
         <button onClick={()=>setView(view==='list'?'map':'list')} style={{ padding: "0 20px", background: "#f8fafc", color: "#0f172a", borderRadius: "16px", border: "1px solid #cbd5e1", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
-          <MapTrifold size={20} weight="bold" /> {view==='list' ? 'Haritada Gör' : 'Listeye Dön'}
+          <MapTrifold size={20} weight="bold" /> {view==='list' ? t("viewOnMap") : t("backToList")}
         </button>
       </div>
       
@@ -96,12 +103,12 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
       {/* Filter Pills */}
       <div style={{ display: "flex", gap: "12px", marginBottom: "32px", overflowX: "auto", paddingBottom: "8px" }}>
         {[
-          { id: "", label: "Tümü" },
-          { id: "HOSPITAL", label: "Hastane" },
-          { id: "CLINIC", label: "Klinik" },
-          { id: "PHARMACY", label: "Eczane" },
-          { id: "IMAGING_CENTER", label: "Görüntüleme Merkezi" },
-          { id: "LABORATORY", label: "Tıbbi Laboratuvar" }
+          { id: "", label: t("typeAll") },
+          { id: "HOSPITAL", label: t("typeHospital") },
+          { id: "CLINIC", label: t("typeClinic") },
+          { id: "PHARMACY", label: t("typePharmacy") },
+          { id: "IMAGING_CENTER", label: t("typeImaging") },
+          { id: "LABORATORY", label: t("typeLab") }
         ].map(x => {
           const isSelected = type === x.id && !onDuty;
           return (
@@ -118,7 +125,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
           onClick={()=>{setType('PHARMACY');setOnDuty(true)}}
           style={{ padding: "10px 20px", borderRadius: "100px", border: onDuty ? "none" : "1px solid #fed7aa", background: onDuty ? "#ea580c" : "#fff7ed", color: onDuty ? "#fff" : "#ea580c", fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}
         >
-          <Moon size={18} weight="fill" /> Nöbetçi Eczane
+          <Moon size={18} weight="fill" /> {t("onDutyPharmacy")}
         </button>
       </div>
 
@@ -136,7 +143,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
                       <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", color: style.text }}>{labels[o.type]}</span>
-                      {o.type === "PHARMACY" && o.isOnDuty && <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 8px", background: "#ea580c", color: "#fff", borderRadius: "100px" }}>NÖBETÇİ</span>}
+                      {o.type === "PHARMACY" && o.isOnDuty && <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 8px", background: "#ea580c", color: "#fff", borderRadius: "100px" }}>{t("onDutyBadge")}</span>}
                     </div>
                     <h3 style={{ margin: 0, fontSize: "18px", color: "#0f172a", fontWeight: 700, lineHeight: "1.4" }}>
                       <Link href={`/organizations/${o.slug}`} style={{ color: "inherit", textDecoration: "none" }}>{o.name}</Link>
@@ -153,7 +160,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                   
                   <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "8px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", fontWeight: 600, color: "#16a34a" }}>
-                      <ShieldCheck size={18} weight="fill" /> Doğrulanmış
+                      <ShieldCheck size={18} weight="fill" /> {t("verified")}
                     </div>
                     {o.rating != null && (
                       <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", fontWeight: 700, color: "#f59e0b" }}>
@@ -166,11 +173,11 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                 <div style={{ padding: "16px 24px", background: "#fff", borderTop: "1px solid #f1f5f9", display: "flex", gap: "12px" }}>
                   {o.latitude != null && o.longitude != null && (
                     <a href={`https://www.google.com/maps/dir/?api=1&destination=${o.latitude},${o.longitude}`} target="_blank" rel="noreferrer" style={{ flex: 1, padding: "12px", borderRadius: "12px", border: "1px solid #cbd5e1", background: "#f8fafc", color: "#0f172a", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontWeight: 600, fontSize: "14px" }}>
-                      Yol Tarifi <NavigationArrow size={16} weight="bold" />
+                      {t("directions")} <NavigationArrow size={16} weight="bold" />
                     </a>
                   )}
                   <Link href={`/organizations/${o.slug}`} style={{ flex: 1, padding: "12px", borderRadius: "12px", background: "#0f172a", color: "#fff", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontWeight: 600, fontSize: "14px" }}>
-                    İncele <CaretRight size={16} weight="bold" />
+                    {t("inspect")} <CaretRight size={16} weight="bold" />
                   </Link>
                 </div>
               </div>
@@ -178,7 +185,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
           })}
           {!loading && rows.length === 0 && (
             <div style={{ gridColumn: "1 / -1", padding: "64px", textAlign: "center", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #cbd5e1", color: "#64748b" }}>
-              Bu kriterlere uygun sağlık kurumu bulunamadı.
+              {t("noOrgFound")}
             </div>
           )}
         </div>

@@ -2,6 +2,7 @@ import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { getTranslations, getLocale } from "next-intl/server";
 import DoctorAvailabilityManager from "@/components/doctor-availability-manager";
 import DoctorCompletionList from "@/components/doctor-completion-list";
 import CarePlanComposer from "@/components/care-plan-composer";
@@ -12,6 +13,9 @@ import { Users, ShieldCheck, MapPin, Notepad, CalendarCheck, ChatCircleText, Loc
 export default async function DoctorDashboard() {
   const u = await currentUser();
   if (!u || u.role !== "DOCTOR" || !u.doctorProfile) return redirect("/pro/login");
+
+  const t = await getTranslations("professional");
+  const locale = await getLocale();
 
   const now = new Date();
   
@@ -51,9 +55,9 @@ export default async function DoctorDashboard() {
     <div className="page" style={{ maxWidth: "1100px" }}>
       <DoctorInvites invites={invites} />
       <div className="page-title" style={{ marginBottom: "32px" }}>
-        <span className="kicker">Uzman Paneli</span>
-        <h1>Hoş Geldin, {u.name.split(" ")[0]}</h1>
-        <p>Randevularını, hasta takiplerini ve ortak bakım planlarını yönet.</p>
+        <span className="kicker">{t("kicker")}</span>
+        <h1>{t("welcomeDoctor", { name: u.name.split(" ")[0] })}</h1>
+        <p>{t("doctorSubtitle")}</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", alignItems: "start" }}>
@@ -64,8 +68,8 @@ export default async function DoctorDashboard() {
               <CalendarCheck size={28} weight="duotone" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>Müsaitlik takvimi</h2>
-              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>Hastaların seçebileceği zaman aralıklarını aç.</p>
+              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>{t("availabilityTitle")}</h2>
+              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>{t("availabilitySubtitle")}</p>
             </div>
           </div>
           <DoctorAvailabilityManager />
@@ -78,8 +82,8 @@ export default async function DoctorDashboard() {
                 <Notepad size={28} weight="duotone" />
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>Bakım planı oluştur</h2>
-                <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>Hastalarınıza takip talimatı ve görev gönderin.</p>
+                <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>{t("carePlanTitle")}</h2>
+                <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>{t("carePlanSubtitle")}</p>
               </div>
             </div>
           </div>
@@ -99,8 +103,8 @@ export default async function DoctorDashboard() {
               <Users size={28} weight="duotone" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>Yaklaşan hastalar</h2>
-              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>Onaylanmış yaklaşan randevularınız.</p>
+              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>{t("upcomingPatients")}</h2>
+              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>{t("upcomingPatientsSubtitle")}</p>
             </div>
           </div>
 
@@ -115,11 +119,11 @@ export default async function DoctorDashboard() {
                     <b style={{ display: "block", color: "#0f172a", fontSize: "15px", marginBottom: "4px" }}>{a.user.name}</b>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#64748b" }}>
                       <span style={{ fontWeight: 600, color: "#475569" }}>
-                        {new Date(a.startsAt).toLocaleString("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(a.startsAt).toLocaleString(locale === "en" ? "en-US" : "tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </span>
                       <span style={{ display: "flex", alignItems: "center", gap: "4px", padding: "2px 8px", background: a.type === "home" ? "#fef2f2" : a.type === "online" ? "#eff6ff" : "#f0fdf4", color: a.type === "home" ? "#ef4444" : a.type === "online" ? "#3b82f6" : "#16a34a", borderRadius: "6px", fontWeight: 500 }}>
                         {getTypeIcon(a.type)}
-                        {a.type === "home" ? "Evde" : a.type === "online" ? "Online" : "Klinik"}
+                        {a.type === "home" ? t("typeHome") : a.type === "online" ? t("typeOnline") : t("typeClinic")}
                       </span>
                       {a.type === "home" && a.visitAddress && (
                         <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
@@ -134,7 +138,7 @@ export default async function DoctorDashboard() {
             {appointments.length === 0 && (
               <div style={{ textAlign: "center", padding: "32px", color: "#94a3b8", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
                 <CalendarBlank size={32} weight="duotone" style={{ margin: "0 auto 12px" }} color="#cbd5e1" />
-                <p style={{ margin: 0, fontSize: "14px" }}>Yaklaşan randevu yok.</p>
+                <p style={{ margin: 0, fontSize: "14px" }}>{t("noUpcomingAppointments")}</p>
               </div>
             )}
           </div>
@@ -146,8 +150,8 @@ export default async function DoctorDashboard() {
               <ChatCircleText size={28} weight="duotone" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>Tamamlanan görüşmeler</h2>
-              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>Görüşme sonrası otomatik değerlendirme talepleri.</p>
+              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>{t("completedConsultations")}</h2>
+              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>{t("completedConsultationsSubtitle")}</p>
             </div>
           </div>
           <DoctorCompletionList
@@ -168,8 +172,8 @@ export default async function DoctorDashboard() {
               <LockKey size={28} weight="duotone" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>Paylaşılan sağlık kayıtları</h2>
-              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>Hasta izinli verilere güvenli erişim sağlayın.</p>
+              <h2 style={{ margin: 0, fontSize: "19px", fontWeight: 700, color: "#0f172a" }}>{t("sharedHealthRecords")}</h2>
+              <p style={{ color: "#64748b", fontSize: "14px", margin: "4px 0 0 0" }}>{t("sharedHealthRecordsSubtitle")}</p>
             </div>
           </div>
 
@@ -182,7 +186,7 @@ export default async function DoctorDashboard() {
                   </div>
                   <div>
                     <b style={{ display: "block", color: "#0f172a", fontSize: "15px", marginBottom: "4px" }}>{p.name}</b>
-                    <span style={{ fontSize: "13px", color: "#64748b" }}>İzinli kayıtları görüntüle</span>
+                    <span style={{ fontSize: "13px", color: "#64748b" }}>{t("viewConsentedRecords")}</span>
                   </div>
                 </div>
                 <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#eff6ff", color: "#3b82f6", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -193,7 +197,7 @@ export default async function DoctorDashboard() {
             {patients.length === 0 && (
               <div style={{ textAlign: "center", padding: "32px", color: "#94a3b8", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
                 <Users size={32} weight="duotone" style={{ margin: "0 auto 12px" }} color="#cbd5e1" />
-                <p style={{ margin: 0, fontSize: "14px" }}>Kayıtlı hasta yok.</p>
+                <p style={{ margin: 0, fontSize: "14px" }}>{t("noRegisteredPatients")}</p>
               </div>
             )}
           </div>

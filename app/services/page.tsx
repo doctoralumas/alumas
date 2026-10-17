@@ -2,85 +2,131 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { 
   Stethoscope, Hospital, MapPin, HouseLine, Ambulance, AirplaneTilt, ShieldCheck, Megaphone, AddressBook,
   Heart, Heartbeat, Drop, Moon, DropHalf, Scales, GenderFemale, Pill, Flask, Scan, Syringe, Bug, ClockCounterClockwise, FileText, IdentificationCard, Calendar,
-  Users, Key, Baby, CalendarCheck, ChatTeardropText, Bell, UsersThree, MagnifyingGlass, Target, ListChecks, Question, TrendUp, Clock, FileMagnifyingGlass
+  Users, Key, Baby, CalendarCheck, ChatTeardropText, Bell, UsersThree, MagnifyingGlass, Target, ListChecks, TrendUp, Clock, FileMagnifyingGlass
 } from "@phosphor-icons/react";
 
-type Item={href:string;title:string;desc:string;tone:string;icon:React.ElementType};
-const groups:{title:string;items:Item[]}[]=[
-  {title:"Sağlık hizmetleri",items:[
-    {href:"/doctors",title:"Doktor & Uzman Bul",desc:"Doktor, diyetisyen ve fizyoterapistleri incele.",tone:"blue",icon:Stethoscope},
-    {href:"/organizations",title:"Hastane & Klinik",desc:"Doğrulanmış sağlık kurumlarını keşfet.",tone:"blue2",icon:Hospital},
-    {href:"/nearby",title:"Yakınımdakiler",desc:"Hastane, klinik, eczane, acil servis ve otel bul.",tone:"mint",icon:MapPin},
-    {href:"/home-care",title:"Evde Sağlık",desc:"Ev ziyaretini doktor, klinik veya laboratuvar üzerinden planla.",tone:"teal",icon:HouseLine},
-    {href:"/emergency",title:"Acil / 112",desc:"112, ambulans, acil servis ve sağlık kartı.",tone:"emergency",icon:Ambulance},
-    {href:"/health-tourism",title:"Sağlık Turizmi",desc:"Klinik, paket, transfer, konaklama ve tercüman.",tone:"navy",icon:AirplaneTilt},
-    {href:"/insurance",title:"Sigortalar",desc:"Sigorta sağlayıcıları ve anlaşmalı kurumlar.",tone:"ice",icon:ShieldCheck},
-    {href:"/campaigns",title:"Kampanyalar",desc:"Sağlık kurumlarının kampanya ve duyuruları.",tone:"sand",icon:Megaphone},
-    {href:"/phone-directory",title:"Telefon Rehberi",desc:"112 ve favori sağlık numaraları.",tone:"lavender",icon:AddressBook},
-  ]},
-  {title:"Kişisel sağlık",items:[
-    {href:"/health",title:"Sağlığım",desc:"Kişisel sağlık merkezine git.",tone:"blue",icon:Heart},
-    {href:"/health/blood-pressure",title:"Tansiyon",desc:"Sistolik, diyastolik ve nabız takibi.",tone:"mint",icon:Heartbeat},
-    {href:"/health/glucose",title:"Kan Şekeri",desc:"Açlık/tokluk glukoz kayıtları.",tone:"sand",icon:Drop},
-    {href:"/health/sleep",title:"Uyku",desc:"Uyku süresi ve kalite takibi.",tone:"lavender",icon:Moon},
-    {href:"/health/water",title:"Su Takibi",desc:"Günlük su tüketimini kaydet.",tone:"blue2",icon:DropHalf},
-    {href:"/health/body",title:"Kilo & Boy",desc:"Vücut ölçümleri ve trendler.",tone:"teal",icon:Scales},
-    {href:"/health/cycle",title:"Regl Takibi",desc:"Döngü, akış, belirtiler ve geçmiş kayıtları.",tone:"pink",icon:GenderFemale},
-    {href:"/health/medications",title:"İlaçlarım",desc:"İlaç, doz ve kullanım hatırlatıcıları.",tone:"sand",icon:Pill},
-    {href:"/health/labs",title:"Laboratuvar",desc:"Tahlil sonuçları, referans ve trendler.",tone:"blue",icon:Flask},
-    {href:"/health/imaging",title:"Görüntüleme",desc:"MR, BT, röntgen, ultrason kayıtları.",tone:"blue2",icon:Scan},
-    {href:"/health/vaccinations",title:"Aşı Takvimi",desc:"Geçmiş aşılar ve sonraki dozlar.",tone:"mint",icon:Syringe},
-    {href:"/health/allergies",title:"Alerjiler",desc:"Alerji ve reaksiyon kayıtları.",tone:"sand",icon:Bug},
-    {href:"/health/medical-history",title:"Sağlık Geçmişi",desc:"Hastalık, ameliyat ve klinik geçmiş.",tone:"lavender",icon:ClockCounterClockwise},
-    {href:"/health/timeline",title:"Zaman Çizelgesi",desc:"Tüm klinik olaylar tek zaman çizelgesinde.",tone:"blue",icon:Clock},
-    {href:"/health/goals",title:"Sağlık Hedeflerim",desc:"Kişisel ve ortak hedefler.",tone:"mint",icon:Target},
-    {href:"/health/tasks",title:"Görev Listem",desc:"Doktor istekleri ve tetkikler.",tone:"teal",icon:ListChecks},
-    {href:"/health/reports",title:"Sağlık Raporları",desc:"Sağlık özetleri ve paylaşılabilir raporlar.",tone:"ice",icon:FileText},
-    {href:"/health/summary",title:"Sağlık Özeti",desc:"Alerji, aşı, geçmiş ve aktif ilaçlar.",tone:"blue2",icon:FileMagnifyingGlass},
-    {href:"/health-card",title:"Sağlık Kartım",desc:"Acil durumda paylaşılabilen kısa sağlık özeti.",tone:"blue",icon:IdentificationCard},
-    {href:"/calendar",title:"Takvim & Alarmlar",desc:"Randevu, ilaç ve sağlık hatırlatıcıları.",tone:"teal",icon:Calendar},
-  ]},
-  {title:"Aile ve iletişim",items:[
-    {href:"/health/family-hub",title:"Aile Sağlığı",desc:"Aile paneli, randevu ve görevler.",tone:"pink",icon:Users},
-    {href:"/health/family",title:"Büyüme & Gebelik",desc:"Boy-kilo trendi ve gebelik takvimi.",tone:"mint",icon:TrendUp},
-    {href:"/health/family-access",title:"Aile Erişimleri",desc:"Sağlık verisi paylaşım izinlerini yönet.",tone:"mint",icon:Key},
-    {href:"/health/family-profiles",title:"Çocuk & Gebelik",desc:"Özel sağlık profillerini yönet.",tone:"lavender",icon:Baby},
-    {href:"/appointments",title:"Randevularım",desc:"Yaklaşan ve geçmiş randevular.",tone:"blue2",icon:CalendarCheck},
-    {href:"/care-calendar",title:"Ortak Takvim",desc:"Doktorla paylaşılan görevler.",tone:"pink",icon:Calendar},
-    {href:"/messages",title:"Mesajlar",desc:"Sağlık profesyonelleriyle güvenli mesajlaşma.",tone:"ice",icon:ChatTeardropText},
-    {href:"/notifications",title:"Bildirimler",desc:"Randevu ve takip bildirimlerini yönet.",tone:"sand",icon:Bell},
-    {href:"/health-circle",title:"Sağlık Çevrem",desc:"Paylaşım, takip ve bakım işbirliği.",tone:"teal",icon:UsersThree},
-  ]}
+interface ServiceDefinition {
+  href: string;
+  key: string;
+  tone: string;
+  icon: React.ElementType;
+}
+
+interface ServiceGroupDefinition {
+  groupKey: "healthServices" | "personalHealth" | "familyAndCommunication";
+  items: ServiceDefinition[];
+}
+
+const SERVICE_GROUPS: ServiceGroupDefinition[] = [
+  {
+    groupKey: "healthServices",
+    items: [
+      { href: "/doctors", key: "doctors", tone: "blue", icon: Stethoscope },
+      { href: "/organizations", key: "organizations", tone: "blue2", icon: Hospital },
+      { href: "/nearby", key: "nearby", tone: "mint", icon: MapPin },
+      { href: "/home-care", key: "homeCare", tone: "teal", icon: HouseLine },
+      { href: "/emergency", key: "emergency", tone: "emergency", icon: Ambulance },
+      { href: "/health-tourism", key: "healthTourism", tone: "navy", icon: AirplaneTilt },
+      { href: "/insurance", key: "insurance", tone: "ice", icon: ShieldCheck },
+      { href: "/campaigns", key: "campaigns", tone: "sand", icon: Megaphone },
+      { href: "/phone-directory", key: "phoneDirectory", tone: "lavender", icon: AddressBook },
+    ],
+  },
+  {
+    groupKey: "personalHealth",
+    items: [
+      { href: "/health", key: "health", tone: "blue", icon: Heart },
+      { href: "/health/blood-pressure", key: "bloodPressure", tone: "mint", icon: Heartbeat },
+      { href: "/health/glucose", key: "glucose", tone: "sand", icon: Drop },
+      { href: "/health/sleep", key: "sleep", tone: "lavender", icon: Moon },
+      { href: "/health/water", key: "water", tone: "blue2", icon: DropHalf },
+      { href: "/health/body", key: "body", tone: "teal", icon: Scales },
+      { href: "/health/cycle", key: "cycle", tone: "pink", icon: GenderFemale },
+      { href: "/health/medications", key: "medications", tone: "sand", icon: Pill },
+      { href: "/health/labs", key: "labs", tone: "blue", icon: Flask },
+      { href: "/health/imaging", key: "imaging", tone: "blue2", icon: Scan },
+      { href: "/health/vaccinations", key: "vaccinations", tone: "mint", icon: Syringe },
+      { href: "/health/allergies", key: "allergies", tone: "sand", icon: Bug },
+      { href: "/health/medical-history", key: "medicalHistory", tone: "lavender", icon: ClockCounterClockwise },
+      { href: "/health/timeline", key: "timeline", tone: "blue", icon: Clock },
+      { href: "/health/goals", key: "goals", tone: "mint", icon: Target },
+      { href: "/health/tasks", key: "tasks", tone: "teal", icon: ListChecks },
+      { href: "/health/reports", key: "reports", tone: "ice", icon: FileText },
+      { href: "/health/summary", key: "summary", tone: "blue2", icon: FileMagnifyingGlass },
+      { href: "/health-card", key: "healthCard", tone: "blue", icon: IdentificationCard },
+      { href: "/calendar", key: "calendar", tone: "teal", icon: Calendar },
+    ],
+  },
+  {
+    groupKey: "familyAndCommunication",
+    items: [
+      { href: "/health/family-hub", key: "familyHub", tone: "pink", icon: Users },
+      { href: "/health/family", key: "growthPregnancy", tone: "mint", icon: TrendUp },
+      { href: "/health/family-access", key: "familyAccess", tone: "mint", icon: Key },
+      { href: "/health/family-profiles", key: "familyProfiles", tone: "lavender", icon: Baby },
+      { href: "/appointments", key: "appointments", tone: "blue2", icon: CalendarCheck },
+      { href: "/care-calendar", key: "careCalendar", tone: "pink", icon: Calendar },
+      { href: "/messages", key: "messages", tone: "ice", icon: ChatTeardropText },
+      { href: "/notifications", key: "notifications", tone: "sand", icon: Bell },
+      { href: "/health-circle", key: "healthCircle", tone: "teal", icon: UsersThree },
+    ],
+  },
 ];
 
-export default function Services(){
+export default function ServicesPage() {
+  const t = useTranslations("services");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredGroups = groups.map(group => {
+  const queryNormalized = searchQuery.trim().toLowerCase();
+
+  const renderedGroups = SERVICE_GROUPS.map((group) => {
+    const groupTitle = t(`groups.${group.groupKey}`);
+    const items = group.items
+      .map((item) => ({
+        ...item,
+        title: t(`items.${item.key}.title`),
+        desc: t(`items.${item.key}.desc`),
+      }))
+      .filter((item) => {
+        if (!queryNormalized) return true;
+        return (
+          item.title.toLowerCase().includes(queryNormalized) ||
+          item.desc.toLowerCase().includes(queryNormalized)
+        );
+      });
+
     return {
-      ...group,
-      items: group.items.filter(item => 
-        item.title.toLocaleLowerCase("tr-TR").includes(searchQuery.toLocaleLowerCase("tr-TR")) ||
-        item.desc.toLocaleLowerCase("tr-TR").includes(searchQuery.toLocaleLowerCase("tr-TR"))
-      )
+      title: groupTitle,
+      items,
     };
-  }).filter(group => group.items.length > 0);
+  }).filter((group) => group.items.length > 0);
 
   return (
     <div className="page services-page">
       <div className="page-title">
-        <span className="kicker">Alumas</span>
-        <h1>Tüm Hizmetler</h1>
-        <p>Uygulamadaki bütün ana modüllere tek ekrandan ulaş.</p>
-        
+        <span className="kicker">{t("kicker")}</span>
+        <h1>{t("title")}</h1>
+        <p>{t("subtitle")}</p>
+
         <div style={{ marginTop: "24px", position: "relative", maxWidth: "400px" }}>
-          <MagnifyingGlass size={20} color="var(--primary, #123f6b)" style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", opacity: 0.5 }} />
-          <input 
-            type="text" 
-            placeholder="Hizmetlerde ara... (Örn: Aşı, Tansiyon)"
+          <MagnifyingGlass
+            size={20}
+            color="var(--primary, #123f6b)"
+            style={{
+              position: "absolute",
+              left: "16px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              opacity: 0.5,
+            }}
+          />
+          <input
+            type="text"
+            placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -93,35 +139,35 @@ export default function Services(){
               color: "#123f6b",
               outline: "none",
               boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
-              transition: "border-color 0.2s"
+              transition: "border-color 0.2s",
             }}
           />
         </div>
       </div>
 
-      {filteredGroups.length === 0 ? (
+      {renderedGroups.length === 0 ? (
         <div style={{ padding: "40px", textAlign: "center", color: "rgba(11,37,69,0.5)" }}>
           <MagnifyingGlass size={48} opacity={0.3} style={{ marginBottom: "16px" }} />
-          <h3>Sonuç bulunamadı</h3>
-          <p>"{searchQuery}" ile eşleşen bir hizmet yok.</p>
+          <h3>{t("noResultsTitle")}</h3>
+          <p>{t("noResultsDesc", { query: searchQuery })}</p>
         </div>
       ) : (
-        filteredGroups.map(g=>
+        renderedGroups.map((g) => (
           <section key={g.title} className="services-section">
             <h2>{g.title}</h2>
             <div className="services-grid">
-              {g.items.map(i=>
+              {g.items.map((i) => (
                 <Link key={i.href} href={i.href} className={`service-link ${i.tone}`}>
                   <i.icon size={28} weight="duotone" style={{ marginBottom: "auto", opacity: 0.85 }} />
                   <b>{i.title}</b>
                   <span>{i.desc}</span>
                   <em>›</em>
                 </Link>
-              )}
+              ))}
             </div>
           </section>
-        )
+        ))
       )}
     </div>
-  )
+  );
 }

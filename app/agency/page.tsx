@@ -1,7 +1,8 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   Buildings,
   SuitcaseRolling,
@@ -15,6 +16,7 @@ import {
 export default async function Page() {
   const user = await currentUser();
   if (!user) redirect("/login");
+  const t = await getTranslations("professional.agencyDashboard");
   const rows = await prisma.healthTourismAgency.findMany({
     where: { ownerUserId: user.id },
     include: {
@@ -39,13 +41,13 @@ export default async function Page() {
             className="kicker"
             style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
           >
-            <SuitcaseRolling weight="fill" size={18} /> Alumas Turizm
+            <SuitcaseRolling weight="fill" size={18} /> {t("kicker")}
           </span>
           <h1 style={{ fontSize: "28px", margin: "8px 0" }}>
-            Sağlık turizmi hesaplarım
+            {t("title")}
           </h1>
           <p style={{ color: "#64748b", margin: 0 }}>
-            Tedavi paketlerinizi ve destek hizmetlerinizi buradan yönetin.
+            {t("subtitle")}
           </p>
         </div>
         <Link
@@ -60,7 +62,7 @@ export default async function Page() {
             fontWeight: 600,
           }}
         >
-          <Plus size={20} weight="bold" /> Yeni Profil Oluştur
+          <Plus size={20} weight="bold" /> {t("newProfile")}
         </Link>
       </div>
 
@@ -152,7 +154,7 @@ export default async function Page() {
                 ) : (
                   <Clock size={16} weight="fill" />
                 )}
-                {agency.isVerified ? "Doğrulandı" : "Bekliyor"}
+                {agency.isVerified ? t("badgeVerified") : t("badgePending")}
               </span>
             </div>
 
@@ -186,7 +188,7 @@ export default async function Page() {
                     gap: "6px",
                   }}
                 >
-                  <Stethoscope size={16} weight="duotone" /> Tedavi Paketleri
+                  <Stethoscope size={16} weight="duotone" /> {t("statPackages")}
                 </span>
                 <strong
                   style={{ fontSize: "28px", color: "#0f172a", lineHeight: 1 }}
@@ -194,7 +196,7 @@ export default async function Page() {
                   {agency._count.packages}
                 </strong>
                 <span style={{ color: "#94a3b8", fontSize: "12px" }}>
-                  Yayındaki paket
+                  {t("statPackagesActive")}
                 </span>
               </div>
               <div
@@ -218,8 +220,7 @@ export default async function Page() {
                     gap: "6px",
                   }}
                 >
-                  <SuitcaseRolling size={16} weight="duotone" /> Destek
-                  Hizmetleri
+                  <SuitcaseRolling size={16} weight="duotone" /> {t("statServices")}
                 </span>
                 <strong
                   style={{ fontSize: "28px", color: "#0f172a", lineHeight: 1 }}
@@ -227,7 +228,7 @@ export default async function Page() {
                   {agency._count.services}
                 </strong>
                 <span style={{ color: "#94a3b8", fontSize: "12px" }}>
-                  Yayındaki hizmet
+                  {t("statServicesActive")}
                 </span>
               </div>
             </div>
@@ -259,7 +260,7 @@ export default async function Page() {
                   transition: "0.2s",
                 }}
               >
-                Profili Yönet <CaretRight size={16} weight="bold" />
+                {t("manageProfile")} <CaretRight size={16} weight="bold" />
               </Link>
               {agency.isVerified && (
                 <Link
@@ -280,7 +281,7 @@ export default async function Page() {
                     border: "1px solid #cbd5e1",
                   }}
                 >
-                  Yayınlanan Profili Gör
+                  {t("viewPublicProfile")}
                 </Link>
               )}
             </div>
@@ -298,7 +299,7 @@ export default async function Page() {
             color: "#64748b",
           }}
         >
-          Henüz sağlık turizmi profiliniz yok.
+          {t("emptyTitle")}
         </div>
       )}
     </div>

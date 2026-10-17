@@ -1,0 +1,14 @@
+{
+  "about": {
+    "kicker": "Alumas",
+    "title": "About Us",
+    "intro": "Alumas is a digital health technology platform uniting personal health management, healthcare professionals, and verified institutions into a unified healthcare super-app.",
+    "whatWeDoTitle": "What We Do",
+    "whatWeDoDesc": "We create a seamless experience for appointment booking, health tracking, family care, institution discovery, home care, cross-border care, and secure health data sharing.",
+    "approachTitle": "Our Approach",
+    "approachDesc": "Alumas is not a medical diagnostic system. It provides tools for organizing health records, tracking vital metrics, and sharing clinical data with authorized healthcare providers.",
+    "trustTitle": "Trust & Confidentiality",
+    "trustDesc": "Health data is treated with strict confidentiality. Access permissions are strictly controlled by role and patient consent; users maintain full ownership over sharing preferences.",
+    "privacyCenter": "Privacy Center"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "header": {
+    "brandAria": "ALUMAS Home",
+    "backAria": "Back",
+    "lumaAssistant": "Luma Assistant",
+    "allServices": "All Services",
+    "notifications": "Notifications",
+    "login": "Sign In",
+    "profile": "My Profile"
+  },
+  "navigation": {
+    "home": "Home",
+    "health": "My Health",
+    "services": "Services",
+    "messages": "Messages",
+    "profile": "Profile",
+    "appointments": "Appointments",
+    "doctors": "Doctors",
+    "organizations": "Facilities",
+    "calendar": "Calendar",
+    "notifications": "Notifications",
+    "admin": "Admin",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out"
+  }
+}

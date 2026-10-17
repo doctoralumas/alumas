@@ -1,0 +1,1069 @@
+{
+  "summary": {
+    "totalRoutes": 83,
+    "verifiedFullyLocalized": 82,
+    "partiallyLocalized": 0,
+    "notLocalized": 0,
+    "intentionallyExcluded": 1
+  },
+  "routes": [
+    {
+      "route": "/about",
+      "source": "app/about/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/admin/agencies",
+      "source": "app/admin/agencies/page.tsx",
+      "importedComponents": [
+        "components/admin-agency-list.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/admin/content",
+      "source": "app/admin/content/page.tsx",
+      "importedComponents": [
+        "components/content-admin-client.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/admin/doctors",
+      "source": "app/admin/doctors/page.tsx",
+      "importedComponents": [
+        "components/admin-doctor-list.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/admin/organizations",
+      "source": "app/admin/organizations/page.tsx",
+      "importedComponents": [
+        "components/admin-organizations.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/admin",
+      "source": "app/admin/page.tsx",
+      "importedComponents": [
+        "components/audit-log-viewer.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/admin/release",
+      "source": "app/admin/release/page.tsx",
+      "importedComponents": [
+        "components/release-dashboard-client.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/admin/reviews",
+      "source": "app/admin/reviews/page.tsx",
+      "importedComponents": [
+        "components/admin-review-moderation.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/agencies/[id]",
+      "source": "app/agencies/[id]/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/agency/apply",
+      "source": "app/agency/apply/page.tsx",
+      "importedComponents": [
+        "components/agency-application-form.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/agency",
+      "source": "app/agency/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/agency/[id]",
+      "source": "app/agency/[id]/page.tsx",
+      "importedComponents": [
+        "components/agency-manager.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/ai",
+      "source": "app/ai/page.tsx",
+      "importedComponents": [
+        "components/ai/ai-layout.tsx",
+        "components/locked-overlay.tsx"
+      ],
+      "authRequirement": "PUBLIC_WITH_AUTH_FEATURE_GATE",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/ai-policy",
+      "source": "app/ai-policy/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/appointments",
+      "source": "app/appointments/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/business/apply",
+      "source": "app/business/apply/page.tsx",
+      "importedComponents": [
+        "components/business-application-form.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/business",
+      "source": "app/business/page.tsx",
+      "importedComponents": [
+        "components/business-dashboard.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/business/[id]",
+      "source": "app/business/[id]/page.tsx",
+      "importedComponents": [
+        "components/business/organization-manager.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/calendar",
+      "source": "app/calendar/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/reminder-calendar.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/campaigns",
+      "source": "app/campaigns/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/care-calendar",
+      "source": "app/care-calendar/page.tsx",
+      "importedComponents": [
+        "components/care-calendar.tsx",
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/contact",
+      "source": "app/contact/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/cookies",
+      "source": "app/cookies/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/cross-border",
+      "source": "app/cross-border/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/doctor",
+      "source": "app/doctor/page.tsx",
+      "importedComponents": [
+        "components/doctor-availability-manager.tsx",
+        "components/doctor-completion-list.tsx",
+        "components/care-plan-composer.tsx",
+        "components/care-calendar.tsx",
+        "components/doctor-invites.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PRO",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/doctor/patients/[id]",
+      "source": "app/doctor/patients/[id]/page.tsx",
+      "importedComponents": [
+        "components/doctor-patient-trends.tsx",
+        "components/doctor-patient-notes.tsx",
+        "components/health-goals.tsx",
+        "components/doctor-lab-review.tsx",
+        "components/imaging-center.tsx",
+        "components/diagnostic-requests.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/doctors",
+      "source": "app/doctors/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/doctor-client-list.tsx"
+      ],
+      "authRequirement": "DOCTOR_ONLY",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/doctors/[id]",
+      "source": "app/doctors/[id]/page.tsx",
+      "importedComponents": [
+        "components/icons.tsx",
+        "components/book-appointment.tsx",
+        "components/doctor-actions.tsx"
+      ],
+      "authRequirement": "DOCTOR_ONLY",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/emergency",
+      "source": "app/emergency/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/allergies",
+      "source": "app/health/allergies/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/blood-pressure",
+      "source": "app/health/blood-pressure/page.tsx",
+      "importedComponents": [
+        "components/health-module.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/body",
+      "source": "app/health/body/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/cycle",
+      "source": "app/health/cycle/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/family",
+      "source": "app/health/family/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/family/[id]/calendar",
+      "source": "app/health/family/[id]/calendar/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/family/[id]",
+      "source": "app/health/family/[id]/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/family-access",
+      "source": "app/health/family-access/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/family-hub",
+      "source": "app/health/family-hub/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/family-profiles",
+      "source": "app/health/family-profiles/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/glucose",
+      "source": "app/health/glucose/page.tsx",
+      "importedComponents": [
+        "components/health-module.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/goals",
+      "source": "app/health/goals/page.tsx",
+      "importedComponents": [
+        "components/health-goals.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/imaging",
+      "source": "app/health/imaging/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/imaging-center.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/labs",
+      "source": "app/health/labs/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/lab-center.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/medical-history",
+      "source": "app/health/medical-history/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/medications",
+      "source": "app/health/medications/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/medication-center.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health",
+      "source": "app/health/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/health-integrations.tsx",
+        "components/health-sharing.tsx",
+        "components/care-plans.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/reports",
+      "source": "app/health/reports/page.tsx",
+      "importedComponents": [
+        "components/health-report.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/sleep",
+      "source": "app/health/sleep/page.tsx",
+      "importedComponents": [
+        "components/health-module.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/summary",
+      "source": "app/health/summary/page.tsx",
+      "importedComponents": [
+        "components/health-summary-sharing.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/tasks",
+      "source": "app/health/tasks/page.tsx",
+      "importedComponents": [
+        "components/diagnostic-requests.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/timeline",
+      "source": "app/health/timeline/page.tsx",
+      "importedComponents": [
+        "components/health-timeline.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/vaccinations",
+      "source": "app/health/vaccinations/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health/water",
+      "source": "app/health/water/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health-card",
+      "source": "app/health-card/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/emergency-health-card.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health-card/[token]",
+      "source": "app/health-card/[token]/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health-circle",
+      "source": "app/health-circle/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health-data",
+      "source": "app/health-data/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health-tourism",
+      "source": "app/health-tourism/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/health-tourism-legal",
+      "source": "app/health-tourism-legal/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/home-care",
+      "source": "app/home-care/page.tsx",
+      "importedComponents": [
+        "app/home-care/client.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/insurance",
+      "source": "app/insurance/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/login",
+      "source": "app/login/page.tsx",
+      "importedComponents": [
+        "components/auth-form.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/maintenance",
+      "source": "app/maintenance/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/messages",
+      "source": "app/messages/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/nearby",
+      "source": "app/nearby/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/google-nearby-places.tsx",
+        "components/locked-overlay.tsx"
+      ],
+      "authRequirement": "PUBLIC_WITH_AUTH_FEATURE_GATE",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/notifications",
+      "source": "app/notifications/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/onboarding/doctor",
+      "source": "app/onboarding/doctor/page.tsx",
+      "importedComponents": [
+        "components/doctor-onboarding-form.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/organizations",
+      "source": "app/organizations/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/organization-directory.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/organizations/[slug]",
+      "source": "app/organizations/[slug]/page.tsx",
+      "importedComponents": [
+        "components/organization-map.tsx",
+        "components/organization-booking.tsx",
+        "components/organization-actions.tsx",
+        "components/organization-offerings.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/",
+      "source": "app/page.tsx",
+      "importedComponents": [
+        "components/live-search.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/partner/apply",
+      "source": "app/partner/apply/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "INTENTIONALLY_EXCLUDED",
+      "reason": "Redirect-only stub route",
+      "hasI18n": false,
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/phone-directory",
+      "source": "app/phone-directory/page.tsx",
+      "importedComponents": [
+        "components/section-visual.tsx",
+        "components/health-phone-directory.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/phone-login",
+      "source": "app/phone-login/page.tsx",
+      "importedComponents": [
+        "components/phone-login.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/privacy",
+      "source": "app/privacy/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/pro/login",
+      "source": "app/pro/login/page.tsx",
+      "importedComponents": [
+        "components/auth-form.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/pro/register",
+      "source": "app/pro/register/page.tsx",
+      "importedComponents": [
+        "components/auth-form.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/profile",
+      "source": "app/profile/page.tsx",
+      "importedComponents": [
+        "components/logout-button.tsx",
+        "components/otp-panel.tsx",
+        "components/favorite-doctors.tsx",
+        "components/favorite-organizations.tsx",
+        "components/privacy-center.tsx",
+        "components/push-settings.tsx",
+        "components/account-controls.tsx",
+        "components/personal-info-editor.tsx",
+        "components/section-visual.tsx"
+      ],
+      "authRequirement": "AUTHENTICATED_PATIENT",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/provider-terms",
+      "source": "app/provider-terms/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/register",
+      "source": "app/register/page.tsx",
+      "importedComponents": [
+        "components/auth-form.tsx"
+      ],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/retention",
+      "source": "app/retention/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/services",
+      "source": "app/services/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/terms",
+      "source": "app/terms/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": false,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    },
+    {
+      "route": "/video/[id]",
+      "source": "app/video/[id]/page.tsx",
+      "importedComponents": [],
+      "authRequirement": "PUBLIC",
+      "isDynamic": true,
+      "status": "VERIFIED_FULLY_LOCALIZED",
+      "hasI18n": true,
+      "hardcodedMatches": [],
+      "hardcodedCount": 0
+    }
+  ]
+}

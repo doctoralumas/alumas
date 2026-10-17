@@ -1,70 +1,64 @@
 "use client";
-import {useEffect,useState} from "react";
-import { FileText, ShieldCheck, Heartbeat, Megaphone, CheckCircle, WarningCircle, ShieldWarning, LockKey } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
+import { FileText, ShieldCheck, Heartbeat, Megaphone, CheckCircle, ShieldWarning, LockKey } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
-type C={kind:string;accepted:boolean;version:string};
+type C = { kind: string; accepted: boolean; version: string };
 
-const items=[
- {
-   kind: "privacy_notice",
-   title: "Aydınlatma Metni",
-   desc: "Alumas'ın hangi kişisel verileri hangi amaçlarla işlediğini ve yasal haklarınızı açıklar.",
-   required: true,
-   icon: FileText,
-   color: "#3b82f6"
- },
- {
-   kind: "health_processing",
-   title: "Sağlık Verisi İşleme",
-   desc: "Özel nitelikli sağlık verilerinizin klinik teşhis ve tedavi hizmetleri için işlenmesini sağlar.",
-   required: true,
-   icon: ShieldCheck,
-   color: "#8b5cf6"
- },
- {
-   kind: "health_integrations",
-   title: "Cihaz Entegrasyonları",
-   desc: "Telefonunuzdaki seçili sağlık verilerini (Apple Health / Health Connect) Alumas'a aktarın.",
-   required: false,
-   icon: Heartbeat,
-   color: "#f59e0b"
- },
- {
-   kind: "marketing",
-   title: "Kampanya ve İletişim",
-   desc: "Size özel pazarlama amaçlı elektronik ileti, teklif ve bülten gönderimine izin verin.",
-   required: false,
-   icon: Megaphone,
-   color: "#ec4899"
- }
-];
+const ITEMS_CONFIG = [
+  {
+    kind: "privacy_notice",
+    required: true,
+    icon: FileText,
+    color: "#3b82f6"
+  },
+  {
+    kind: "health_processing",
+    required: true,
+    icon: ShieldCheck,
+    color: "#8b5cf6"
+  },
+  {
+    kind: "health_integrations",
+    required: false,
+    icon: Heartbeat,
+    color: "#f59e0b"
+  },
+  {
+    kind: "marketing",
+    required: false,
+    icon: Megaphone,
+    color: "#ec4899"
+  }
+] as const;
 
-export default function PrivacyCenter(){
-  const [rows,setRows]=useState<C[]>([]);
-  const [busy,setBusy]=useState("");
-  const [isNative, setIsNative] = useState(true); // default true for SSR layout stability, then hide if web
+export default function PrivacyCenter() {
+  const t = useTranslations("profile.privacyCenter");
+  const [rows, setRows] = useState<C[]>([]);
+  const [busy, setBusy] = useState("");
+  const [isNative, setIsNative] = useState(true);
 
-  const load=()=>fetch('/api/privacy/consents').then(r=>r.json()).then(setRows);
-  useEffect(()=>{
+  const load = () => fetch('/api/privacy/consents').then(r => r.ok ? r.json() : []).then(setRows);
+  useEffect(() => {
     load();
     if (typeof window !== 'undefined') {
       import("@capacitor/core").then(({ Capacitor }) => {
         setIsNative(Capacitor.isNativePlatform());
       }).catch(() => {});
     }
-  },[]);
+  }, []);
 
-  const latest=(k:string)=>rows.find(x=>x.kind===k)?.accepted??false;
+  const latest = (k: string) => rows.find(x => x.kind === k)?.accepted ?? false;
 
-  async function save(kind:string,accepted:boolean){
-    const isRequired = items.find(x => x.kind === kind)?.required;
-    if(isRequired && !accepted) return;
+  async function save(kind: string, accepted: boolean) {
+    const isRequired = ITEMS_CONFIG.find(x => x.kind === kind)?.required;
+    if (isRequired && !accepted) return;
 
     setBusy(kind);
-    await fetch('/api/privacy/consents',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({kind,accepted,version:'2026-08-21'})
+    await fetch('/api/privacy/consents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind, accepted, version: '2026-08-21' })
     });
     await load();
     setBusy("");
@@ -73,17 +67,16 @@ export default function PrivacyCenter(){
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       
-      {/* Gizlilik Güvencesi Bilgi Notu */}
+      {/* Privacy Guarantee Note */}
       <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", background: "#f8fafc", padding: "16px", borderRadius: "16px", border: "1px solid #e2e8f0" }}>
         <LockKey size={24} weight="duotone" color="#64748b" style={{ flexShrink: 0 }} />
         <p style={{ margin: 0, fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>
-          Alumas, kişisel verilerinizi uçtan uca şifreleme ve en yüksek güvenlik standartlarıyla korur. Gizlilik ayarlarınızı dilediğiniz an buradan yönetebilirsiniz. 
+          {t("note")}
         </p>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        {items.map(i => {
-          // Hayalet Mod (Ghost Mode): Eğer native uygulamada değilsek Cihaz Entegrasyonlarını gizle
+        {ITEMS_CONFIG.map(i => {
           if (i.kind === 'health_integrations' && !isNative) return null;
 
           const isAccepted = latest(i.kind);
@@ -101,12 +94,12 @@ export default function PrivacyCenter(){
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <strong style={{ fontSize: "16px", color: "#0f172a" }}>{i.title}</strong>
+                      <strong style={{ fontSize: "16px", color: "#0f172a" }}>{t(`items.${i.kind}.title` as any)}</strong>
                       {i.required && (
-                        <span style={{ fontSize: "11px", fontWeight: 700, color: "#b91c1c", background: "#fef2f2", padding: "2px 8px", borderRadius: "100px", border: "1px solid #fecaca" }}>ZORUNLU</span>
+                        <span style={{ fontSize: "11px", fontWeight: 700, color: "#b91c1c", background: "#fef2f2", padding: "2px 8px", borderRadius: "100px", border: "1px solid #fecaca" }}>{t("requiredBadge")}</span>
                       )}
                     </div>
-                    <p style={{ margin: 0, fontSize: "14px", color: "#64748b", lineHeight: "1.5" }}>{i.desc}</p>
+                    <p style={{ margin: 0, fontSize: "14px", color: "#64748b", lineHeight: "1.5" }}>{t(`items.${i.kind}.desc` as any)}</p>
                   </div>
                 </div>
 
@@ -114,7 +107,7 @@ export default function PrivacyCenter(){
                   {i.required ? (
                     isAccepted ? (
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#059669", background: "#ecfdf5", padding: "8px 16px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, border: "1px solid #d1fae5" }}>
-                        <CheckCircle weight="fill" size={20} /> Okundu ve Onaylandı
+                        <CheckCircle weight="fill" size={20} /> {t("acceptedBadge")}
                       </div>
                     ) : (
                       <button 
@@ -122,13 +115,13 @@ export default function PrivacyCenter(){
                         disabled={isBusy}
                         style={{ padding: "10px 24px", background: "#0f172a", color: "#fff", borderRadius: "12px", border: "none", fontWeight: 600, fontSize: "14px", cursor: "pointer", transition: "all 0.2s", opacity: isBusy ? 0.7 : 1 }}
                       >
-                        {isBusy ? "İşleniyor..." : "Onayla"}
+                        {isBusy ? t("processing") : t("approve")}
                       </button>
                     )
                   ) : (
                     <>
                       <span style={{ fontSize: "14px", fontWeight: 600, color: isAccepted ? "#10b981" : "#94a3b8" }}>
-                        {isAccepted ? "Açık" : "Kapalı"}
+                        {isAccepted ? t("on") : t("off")}
                       </span>
                       <button 
                         onClick={() => save(i.kind, !isAccepted)}
@@ -145,7 +138,7 @@ export default function PrivacyCenter(){
               
               {!isAccepted && i.required && (
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#b91c1c", fontSize: "13px", paddingLeft: "64px" }}>
-                  <ShieldWarning size={16} weight="fill" /> Hizmetleri kullanabilmek için onaylamanız gerekmektedir.
+                  <ShieldWarning size={16} weight="fill" /> {t("requiredWarning")}
                 </div>
               )}
 

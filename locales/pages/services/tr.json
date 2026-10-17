@@ -1,0 +1,170 @@
+{
+  "services": {
+    "kicker": "Alumas",
+    "title": "Tüm Hizmetler",
+    "subtitle": "Uygulamadaki bütün ana modüllere tek ekrandan ulaş.",
+    "searchPlaceholder": "Hizmetlerde ara... (Örn: Aşı, Tansiyon)",
+    "noResults": "Aramanızla eşleşen hizmet bulunamadı.",
+    "noResultsTitle": "Sonuç bulunamadı",
+    "noResultsDesc": "\"{query}\" ile eşleşen bir hizmet yok.",
+    "groups": {
+      "healthServices": "Sağlık hizmetleri",
+      "personalHealth": "Kişisel sağlık",
+      "familyAndCommunication": "Aile ve iletişim"
+    },
+    "items": {
+      "doctors": {
+        "title": "Doktor & Uzman Bul",
+        "desc": "Doktor, diyetisyen ve fizyoterapistleri incele."
+      },
+      "organizations": {
+        "title": "Hastane & Klinik",
+        "desc": "Doğrulanmış sağlık kurumlarını keşfet."
+      },
+      "nearby": {
+        "title": "Yakınımdakiler",
+        "desc": "Hastane, klinik, eczane, acil servis ve otel bul."
+      },
+      "homeCare": {
+        "title": "Evde Sağlık",
+        "desc": "Ev ziyaretini doktor, klinik veya laboratuvar üzerinden planla."
+      },
+      "emergency": {
+        "title": "Acil / 112",
+        "desc": "112, ambulans, acil servis ve sağlık kartı."
+      },
+      "healthTourism": {
+        "title": "Sağlık Turizmi",
+        "desc": "Klinik, paket, transfer, konaklama ve tercüman."
+      },
+      "insurance": {
+        "title": "Sigortalar",
+        "desc": "Sigorta sağlayıcıları ve anlaşmalı kurumlar."
+      },
+      "campaigns": {
+        "title": "Kampanyalar",
+        "desc": "Sağlık kurumlarının kampanya ve duyuruları."
+      },
+      "phoneDirectory": {
+        "title": "Telefon Rehberi",
+        "desc": "112 ve favori sağlık numaraları."
+      },
+      "health": {
+        "title": "Sağlığım",
+        "desc": "Kişisel sağlık merkezine git."
+      },
+      "bloodPressure": {
+        "title": "Tansiyon",
+        "desc": "Sistolik, diyastolik ve nabız takibi."
+      },
+      "glucose": {
+        "title": "Kan Şekeri",
+        "desc": "Açlık/tokluk glukoz kayıtları."
+      },
+      "sleep": {
+        "title": "Uyku",
+        "desc": "Uyku süresi ve kalite takibi."
+      },
+      "water": {
+        "title": "Su Takibi",
+        "desc": "Günlük su tüketimini kaydet."
+      },
+      "body": {
+        "title": "Kilo & Boy",
+        "desc": "Vücut ölçümleri ve trendler."
+      },
+      "cycle": {
+        "title": "Regl Takibi",
+        "desc": "Döngü, akış, belirtiler ve geçmiş kayıtları."
+      },
+      "medications": {
+        "title": "İlaçlarım",
+        "desc": "İlaç, doz ve kullanım hatırlatıcıları."
+      },
+      "labs": {
+        "title": "Laboratuvar",
+        "desc": "Tahlil sonuçları, referans ve trendler."
+      },
+      "imaging": {
+        "title": "Görüntüleme",
+        "desc": "MR, BT, röntgen, ultrason kayıtları."
+      },
+      "vaccinations": {
+        "title": "Aşı Takvimi",
+        "desc": "Geçmiş aşılar ve sonraki dozlar."
+      },
+      "allergies": {
+        "title": "Alerjiler",
+        "desc": "Alerji ve reaksiyon kayıtları."
+      },
+      "medicalHistory": {
+        "title": "Sağlık Geçmişi",
+        "desc": "Hastalık, ameliyat ve klinik geçmiş."
+      },
+      "timeline": {
+        "title": "Zaman Çizelgesi",
+        "desc": "Tüm klinik olaylar tek zaman çizelgesinde."
+      },
+      "goals": {
+        "title": "Sağlık Hedeflerim",
+        "desc": "Kişisel ve ortak hedefler."
+      },
+      "tasks": {
+        "title": "Görev Listem",
+        "desc": "Doktor istekleri ve tetkikler."
+      },
+      "reports": {
+        "title": "Sağlık Raporları",
+        "desc": "Sağlık özetleri ve paylaşılabilir raporlar."
+      },
+      "summary": {
+        "title": "Sağlık Özeti",
+        "desc": "Alerji, aşı, geçmiş ve aktif ilaçlar."
+      },
+      "healthCard": {
+        "title": "Sağlık Kartım",
+        "desc": "Acil durumda paylaşılabilen kısa sağlık özeti."
+      },
+      "calendar": {
+        "title": "Takvim & Alarmlar",
+        "desc": "Randevu, ilaç ve sağlık hatırlatıcıları."
+      },
+      "familyHub": {
+        "title": "Aile Sağlığı",
+        "desc": "Aile paneli, randevu ve görevler."
+      },
+      "growthPregnancy": {
+        "title": "Büyüme & Gebelik",
+        "desc": "Boy-kilo trendi ve gebelik takvimi."
+      },
+      "familyAccess": {
+        "title": "Aile Erişimleri",
+        "desc": "Sağlık verisi paylaşım izinlerini yönet."
+      },
+      "familyProfiles": {
+        "title": "Çocuk & Gebelik",
+        "desc": "Özel sağlık profillerini yönet."
+      },
+      "appointments": {
+        "title": "Randevularım",
+        "desc": "Yaklaşan ve geçmiş randevular."
+      },
+      "careCalendar": {
+        "title": "Ortak Takvim",
+        "desc": "Doktorla paylaşılan görevler."
+      },
+      "messages": {
+        "title": "Mesajlar",
+        "desc": "Sağlık profesyonelleriyle güvenli mesajlaşma."
+      },
+      "notifications": {
+        "title": "Bildirimler",
+        "desc": "Randevu ve takip bildirimlerini yönet."
+      },
+      "healthCircle": {
+        "title": "Sağlık Çevrem",
+        "desc": "Paylaşım, takip ve bakım işbirliği."
+      }
+    }
+  }
+}

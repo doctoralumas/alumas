@@ -1,1 +1,16 @@
-import DiagnosticRequests from '@/components/diagnostic-requests';export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Takip</span><h1>Tetkik & Görevlerim</h1><p>Doktorunun istediği tetkikleri planla ve tamamlanma durumlarını takip et.</p></div><DiagnosticRequests/></div>}
+import DiagnosticRequests from '@/components/diagnostic-requests';
+import { getTranslations } from 'next-intl/server';
+
+export default async function Page() {
+  const t = await getTranslations('health.healthTasks');
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t('kicker')}</span>
+        <h1>{t('title')}</h1>
+        <p>{t('subtitlePatient')}</p>
+      </div>
+      <DiagnosticRequests />
+    </div>
+  );
+}

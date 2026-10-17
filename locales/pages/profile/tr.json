@@ -1,0 +1,98 @@
+{
+  "profile": {
+    "kicker": "Hesap",
+    "title": "Profil & Ayarlar",
+    "subtitle": "Kişisel bilgilerinizi, güvenlik ayarlarınızı ve tercihlerinizi yönetin.",
+    "noEmail": "E-posta adresi eklenmemiş",
+    "roleAdmin": "Sistem Yöneticisi",
+    "roleDoctor": "Uzman / Doktor",
+    "roleOrg": "Kurum Yöneticisi",
+    "roleAgency": "Sağlık Turizmi Yöneticisi",
+    "rolePatient": "Hasta / Son Kullanıcı",
+    "proPanels": "Profesyonel Paneller",
+    "proPanelsDesc": "Kurum, sağlık turizmi veya uzman hesaplarınızı buradan yönetebilir veya yeni başvuru yapabilirsiniz.",
+    "orgPortal": "Kurum Paneli",
+    "orgApply": "Kurum Başvurusu",
+    "agencyPortal": "Sağlık Turizmi Paneli",
+    "agencyApply": "Sağlık Turizmi Başvurusu",
+    "doctorPortal": "Uzman Paneli",
+    "doctorApply": "Uzman Başvurusu",
+    "adminPortal": "Admin Paneli",
+    "phoneVerification": "Telefon Doğrulama",
+    "phoneVerificationDesc": "Güvenliğiniz için telefon numaranızı doğrulayın.",
+    "favoriteDoctors": "Favori Doktorlarım",
+    "favoriteOrgs": "Favori Kurumlarım",
+    "encryptionTitle": "Uçtan Uca Şifreleme",
+    "encryptionDesc": "Hesabınız ve tüm sağlık verileriniz uluslararası standartlarda şifrelenir. Oturumunuz en üst düzey güvenlik protokolleriyle korunmaktadır.",
+    "logoutButton": "Çıkış Yap",
+    "personalInfo": {
+      "title": "Kişisel Bilgiler",
+      "desc": "Sistemde görünen adınızı ve iletişim e-posta adresinizi güncelleyebilirsiniz.",
+      "nameLabel": "Ad Soyad",
+      "namePlaceholder": "Adınız Soyadınız",
+      "emailLabel": "E-posta Adresi",
+      "emailPlaceholder": "Geçerli bir e-posta ekleyin",
+      "saving": "Kaydediliyor...",
+      "saved": "Kaydedildi",
+      "saveButton": "Değişiklikleri Kaydet",
+      "successMsg": "Bilgileriniz başarıyla güncellendi.",
+      "errorMsg": "Bir hata oluştu."
+    },
+    "accountControls": {
+      "exportTitle": "Verileri Dışa Aktar",
+      "exportButton": "Tüm Sağlık ve Hesap Verilerimi İndir",
+      "dangerZone": "Tehlikeli Bölge",
+      "deleteWarning": "Sağlık belgeleri dahil hesabınıza bağlı tüm veriler silinir. Yasal saklama yükümlülükleri bulunan üretim senaryoları için verileriniz yasal süre boyunca arşivde şifreli tutulabilir.",
+      "confirmPlaceholder": "HESABIMI SİL yazın",
+      "confirmPhrase": "HESABIMI SİL",
+      "passwordPlaceholder": "Parola (varsa)",
+      "deleteButton": "Hesabımı Kalıcı Olarak Sil",
+      "deleting": "Siliniyor...",
+      "confirmPrompt": "Bu işlem geri alınamaz. Hesabı silmek istiyor musunuz?",
+      "deleteFailed": "Silinemedi"
+    },
+    "privacyCenter": {
+      "title": "Gizlilik Merkezi",
+      "note": "Alumas, kişisel verilerinizi uçtan uca şifreleme ve en yüksek güvenlik standartlarıyla korur. Gizlilik ayarlarınızı dilediğiniz an buradan yönetebilirsiniz.",
+      "requiredBadge": "ZORUNLU",
+      "acceptedBadge": "Okundu ve Onaylandı",
+      "processing": "İşleniyor...",
+      "approve": "Onayla",
+      "on": "Açık",
+      "off": "Kapalı",
+      "requiredWarning": "Hizmetleri kullanabilmek için onaylamanız gerekmektedir.",
+      "items": {
+        "privacy_notice": {
+          "title": "Aydınlatma Metni",
+          "desc": "Alumas'ın hangi kişisel verileri hangi amaçlarla işlediğini ve yasal haklarınızı açıklar."
+        },
+        "health_processing": {
+          "title": "Sağlık Verisi İşleme",
+          "desc": "Özel nitelikli sağlık verilerinizin klinik teşhis ve tedavi hizmetleri için işlenmesini sağlar."
+        },
+        "health_integrations": {
+          "title": "Cihaz Entegrasyonları",
+          "desc": "Telefonunuzdaki seçili sağlık verilerini (Apple Health / Health Connect) Alumas'a aktarın."
+        },
+        "marketing": {
+          "title": "Kampanya ve İletişim",
+          "desc": "Size özel pazarlama amaçlı elektronik ileti, teklif ve bülten gönderimine izin verin."
+        }
+      }
+    },
+    "pushSettings": {
+      "title": "Anlık Bildirimler",
+      "enabledStatus": "Açık (Bu cihazda)",
+      "disabledStatus": "Kapalı",
+      "deniedError": "Bildirim izni verilmedi veya desteklenmiyor.",
+      "saveError": "Cihaz kaydedilemedi.",
+      "pushError": "Push kaydı başarısız."
+    },
+    "favorites": {
+      "doctorNew": "Yeni",
+      "emptyDoctors": "Henüz favori doktorun yok.",
+      "orgBadge": "Favori Kurum",
+      "emptyOrgs": "Henüz favori kurumun yok."
+    }
+  }
+}

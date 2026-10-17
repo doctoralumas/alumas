@@ -1,0 +1,42 @@
+{
+  "home": {
+    "heroAria": "Sağlığın için doğru yere",
+    "heroTitleLine1": "Sağlığın için",
+    "heroTitleLine2": "doğru yere.",
+    "heroSubtitle": "Doktorları ve sağlık kurumlarını kolayca keşfet.",
+    "sectionTitle": "Neye ihtiyacın var?",
+    "categories": {
+      "experts": "Uzmanlar",
+      "institutions": "Kurumlar",
+      "nearby": "Yakınımdakiler",
+      "tourism": "Sağlık Turizmi",
+      "health": "Sağlığım",
+      "insurance": "Sigorta",
+      "home": "Evde Sağlık"
+    },
+    "promos": {
+      "doctor": {
+        "title": "Uzmanını bul",
+        "description": "Branşına göre doktorları keşfet."
+      },
+      "hospital": {
+        "title": "Yakınındaki kurumlar",
+        "description": "Hastane ve klinikleri incele."
+      },
+      "insurance": {
+        "title": "Sigortana uygun\nseçenekler",
+        "description": "Anlaşmalı kurumları keşfet."
+      },
+      "family": {
+        "title": "Aile Sağlığı Paneli",
+        "description": "Ailenizin sağlık sürecini yönetin."
+      }
+    },
+    "footer": {
+      "privacy": "KVKK",
+      "cookies": "Çerezler",
+      "terms": "Kullanım Koşulları",
+      "legalNav": "Yasal"
+    }
+  }
+}

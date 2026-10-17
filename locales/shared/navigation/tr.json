@@ -1,0 +1,27 @@
+{
+  "header": {
+    "brandAria": "ALUMAS Ana Sayfa",
+    "backAria": "Geri",
+    "lumaAssistant": "Luma Asistan",
+    "allServices": "Tüm Hizmetler",
+    "notifications": "Bildirimler",
+    "login": "Giriş Yap",
+    "profile": "Profilim"
+  },
+  "navigation": {
+    "home": "Ana Sayfa",
+    "health": "Sağlığım",
+    "services": "Hizmetler",
+    "messages": "Mesajlar",
+    "profile": "Profil",
+    "appointments": "Randevular",
+    "doctors": "Doktorlar",
+    "organizations": "Kurumlar",
+    "calendar": "Takvim",
+    "notifications": "Bildirimler",
+    "admin": "Yönetim",
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol",
+    "logout": "Çıkış Yap"
+  }
+}

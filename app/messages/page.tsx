@@ -3,12 +3,15 @@ import {useEffect,useState,useRef,useMemo,Suspense} from "react";
 import {useSearchParams} from "next/navigation";
 import {Paperclip, FileText, Check, Checks, PaperPlaneRight, Image as ImageIcon, ChatsCircle, MagnifyingGlass, CaretLeft} from "@phosphor-icons/react";
 import Link from "next/link";
-import SectionVisual from "@/components/section-visual";
+import { useTranslations, useLocale } from "next-intl";
 
 type Message={id:string;senderId:string;recipientId:string;body:string;senderName:string;createdAt:string;readAt:string|null;mine:boolean;attachmentPath?:string;fileName?:string;mimeType?:string};
 type Contact={id:string;name:string;subtitle:string};
 
 function MessagesContent(){
+  const t = useTranslations('messages');
+  const locale = useLocale();
+  const dateLocale = locale === 'en' ? 'en-US' : 'tr-TR';
   const sp=useSearchParams(), initialUserId=sp.get('userId');
   const [messages,setMessages]=useState<Message[]>([]);
   const [contacts,setContacts]=useState<Contact[]>([]);
@@ -47,7 +50,7 @@ function MessagesContent(){
   async function handleFileUpload(e:React.ChangeEvent<HTMLInputElement>){
     const file = e.target.files?.[0];
     if(!file||!active)return;
-    if(file.size > 5 * 1024 * 1024){ alert('Dosya boyutu en fazla 5MB olabilir.'); return; }
+    if(file.size > 5 * 1024 * 1024){ alert(t('fileSizeError')); return; }
     
     setUploading(true);
     try {
@@ -56,11 +59,11 @@ function MessagesContent(){
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fileName: file.name, fileType: file.type || 'application/octet-stream', fileSize: file.size })
       });
-      if(!presignRes.ok) throw new Error("Yükleme adresi alınamadı");
+      if(!presignRes.ok) throw new Error(t('uploadUrlError'));
       const { presignedUrl, storagePath } = await presignRes.json();
       
       const uploadRes = await fetch(presignedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } });
-      if(!uploadRes.ok) throw new Error("Dosya yüklenemedi");
+      if(!uploadRes.ok) throw new Error(t('uploadFailed'));
       
       await fetch('/api/messages', {
         method: 'POST',
@@ -68,7 +71,7 @@ function MessagesContent(){
         body: JSON.stringify({ recipientId: active, body: '', attachmentPath: storagePath, fileName: file.name, mimeType: file.type || 'application/octet-stream' })
       });
       load(initialUserId||undefined);
-    } catch (err: any) { alert(err.message || 'Yükleme hatası'); } 
+    } catch (err: any) { alert(err.message || t('uploadErrorGeneric')); } 
     finally { setUploading(false); if(fileInputRef.current) fileInputRef.current.value = ''; }
   }
 
@@ -80,7 +83,7 @@ function MessagesContent(){
     const r=await fetch('/api/messages',{
       method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({recipientId:active,body:currentBody})
     });
-    if(!r.ok){ setBody(currentBody); alert("Mesaj gönderilemedi"); } 
+    if(!r.ok){ setBody(currentBody); alert(t('sendFailed')); } 
     else { load(initialUserId||undefined); }
   }
 
@@ -96,22 +99,22 @@ function MessagesContent(){
     <div className="page" style={{ maxWidth: "1200px" }}>
       <div style={{ marginBottom: "24px", padding: "32px", background: "linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)", borderRadius: "24px", border: "1px solid #e2e8f0" }}>
         <Link href="/services" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", textDecoration: "none", fontSize: "14px", fontWeight: 600, marginBottom: "20px", transition: "color 0.2s" }} onMouseOver={e=>e.currentTarget.style.color="#3b82f6"} onMouseOut={e=>e.currentTarget.style.color="#64748b"}>
-          <CaretLeft size={16} weight="bold" /> Tüm Hizmetlere Dön
+          <CaretLeft size={16} weight="bold" /> {t('backToServices')}
         </Link>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <span className="kicker" style={{ background: "#dbeafe", color: "#1d4ed8", padding: "6px 12px", borderRadius: "100px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>GÜVENLİ İLETİŞİM KANALI</span>
+            <span className="kicker" style={{ background: "#dbeafe", color: "#1d4ed8", padding: "6px 12px", borderRadius: "100px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>{t('kicker')}</span>
             <h1 style={{ fontSize: "32px", fontWeight: 800, color: "#0f172a", margin: "16px 0 8px 0", letterSpacing: "-0.5px", display: "flex", alignItems: "center", gap: "12px" }}>
-              Mesajlar
+              {t('title')}
             </h1>
-            <p style={{ color: "#475569", margin: 0, fontSize: "15px" }}>Sağlık profesyonelleri ve kurumlarla güvenli bir şekilde iletişim kurun.</p>
+            <p style={{ color: "#475569", margin: 0, fontSize: "15px" }}>{t('subtitle')}</p>
           </div>
         </div>
       </div>
       
       <div className="messages-layout">
         
-        {/* Sol Panel: Kişiler */}
+        {/* Left Panel: Contacts */}
         <aside className={`contact-list ${active ? 'mobile-hidden' : ''}`} style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
           <div style={{ padding: "20px", borderBottom: "1px solid #e2e8f0" }}>
             <div style={{ position: "relative" }}>
@@ -119,7 +122,7 @@ function MessagesContent(){
               <input 
                 value={searchQuery}
                 onChange={e=>setSearchQuery(e.target.value)}
-                placeholder="Kişi ara..." 
+                placeholder={t('searchPlaceholder')} 
                 style={{ width: "100%", padding: "10px 12px 10px 38px", borderRadius: "12px", border: "1px solid #cbd5e1", fontSize: "14px", background: "#f8fafc", color: "#0f172a" }} 
               />
             </div>
@@ -149,13 +152,13 @@ function MessagesContent(){
             {!filteredContacts.length && (
               <div style={{ padding: "32px 16px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
                 <ChatsCircle size={32} weight="duotone" style={{ margin: "0 auto 8px", opacity: 0.5 }} />
-                Görüşme bulunamadı.
+                {t('noConversations')}
               </div>
             )}
           </div>
         </aside>
         
-        {/* Sağ Panel: Sohbet Alanı */}
+        {/* Right Panel: Chat Area */}
         <section className={`chat-area ${!active ? 'mobile-hidden' : ''}`} style={{ background: "#fff", borderRadius: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.03)" }}>
           {active ? (
             <>
@@ -165,8 +168,8 @@ function MessagesContent(){
                   {contacts.find(c=>c.id===active)?.name?.substring(0,2).toUpperCase() || "AL"}
                 </div>
                 <div>
-                  <strong style={{ display: "block", fontSize: "18px", color: "#0f172a" }}>{contacts.find(c=>c.id===active)?.name || "Sohbet"}</strong>
-                  <span style={{ fontSize: "13px", color: "#64748b" }}>Güvenli İletişim Kanalı</span>
+                  <strong style={{ display: "block", fontSize: "18px", color: "#0f172a" }}>{contacts.find(c=>c.id===active)?.name || t('chatDefaultTitle')}</strong>
+                  <span style={{ fontSize: "13px", color: "#64748b" }}>{t('secureChannel')}</span>
                 </div>
               </div>
               
@@ -180,7 +183,7 @@ function MessagesContent(){
                         <div style={{ marginTop: m.body ? "12px" : "0" }}>
                           {m.mimeType?.startsWith('image/') ? (
                             <a href={`/api/messages/${m.id}/file`} target="_blank" rel="noopener noreferrer" style={{ display: "block", borderRadius: "12px", overflow: "hidden" }}>
-                              <img src={`/api/messages/${m.id}/file`} alt={m.fileName||'Ek'} style={{ maxWidth: '100%', maxHeight: "250px", display: "block", objectFit: "cover" }} />
+                              <img src={`/api/messages/${m.id}/file`} alt={m.fileName||t('attachmentAlt')} style={{ maxWidth: '100%', maxHeight: "250px", display: "block", objectFit: "cover" }} />
                             </a>
                           ) : (
                             <a href={`/api/messages/${m.id}/file`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: m.mine ? 'rgba(255,255,255,0.2)' : '#f1f5f9', padding: '12px', borderRadius: '12px', textDecoration: 'none', color: 'inherit' }}>
@@ -193,7 +196,7 @@ function MessagesContent(){
                     </div>
                     
                     <div style={{ display: "flex", alignItems: "center", justifyContent: m.mine ? "flex-end" : "flex-start", gap: "6px", marginTop: "6px", padding: "0 4px" }}>
-                      <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>{new Date(m.createdAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+                      <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>{new Date(m.createdAt).toLocaleString(dateLocale,{hour:'2-digit',minute:'2-digit'})}</span>
                       {m.mine && (
                         <span style={{ color: m.readAt ? "#3b82f6" : "#cbd5e1" }}>
                           {m.readAt ? <Checks size={14} weight="bold" /> : <Check size={14} weight="bold" />}
@@ -204,8 +207,8 @@ function MessagesContent(){
                 ))}
                 <div ref={messagesEndRef} />
                 {!thread.length && (
-                  <div style={{ margin: "auto", textAlign: "center", padding: "24px", background: "rgba(255,255,255,0.6)", borderRadius: "16px", color: "#64748b" }}>
-                    Bu kişiyle henüz bir görüşmeniz yok.<br/>Mesaj yazarak sohbeti başlatabilirsiniz.
+                  <div style={{ margin: "auto", textAlign: "center", padding: "24px", background: "rgba(255,255,255,0.6)", borderRadius: "16px", color: "#64748b", whiteSpace: "pre-line" }}>
+                    {t('emptyThread')}
                   </div>
                 )}
               </div>
@@ -218,7 +221,7 @@ function MessagesContent(){
                     onClick={()=>fileInputRef.current?.click()} 
                     disabled={uploading}
                     style={{ flexShrink: 0, background: '#f1f5f9', border: 'none', cursor: 'pointer', padding: '12px', borderRadius: '50%', color: '#64748b', display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-                    title="Dosya veya Resim Yükle"
+                    title={t('uploadTitle')}
                   >
                     <Paperclip size={24} weight="bold" />
                   </button>
@@ -226,7 +229,7 @@ function MessagesContent(){
                   <input 
                     value={body} 
                     onChange={e=>setBody(e.target.value)} 
-                    placeholder={uploading ? "Dosya yükleniyor..." : "Mesajınızı yazın..."} 
+                    placeholder={uploading ? t('uploadingPlaceholder') : t('typeMessagePlaceholder')} 
                     disabled={uploading} 
                     style={{ flex: 1, minWidth: 0, padding: '14px 16px', borderRadius: '100px', border: '1px solid #cbd5e1', fontSize: "15px", background: "#f8fafc", outline: "none" }}
                   />
@@ -244,8 +247,8 @@ function MessagesContent(){
           ) : (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", background: "#f8fafc", color: "#94a3b8" }}>
               <ChatsCircle size={64} weight="duotone" style={{ marginBottom: "16px", opacity: 0.5 }} />
-              <h3 style={{ margin: "0 0 8px 0", color: "#64748b" }}>Mesajlaşma</h3>
-              <p style={{ margin: 0, fontSize: "14px" }}>Soldaki listeden bir kişi seçerek sohbeti başlatın.</p>
+              <h3 style={{ margin: "0 0 8px 0", color: "#64748b" }}>{t('messagingTitle')}</h3>
+              <p style={{ margin: 0, fontSize: "14px" }}>{t('selectContactPrompt')}</p>
             </div>
           )}
         </section>
@@ -266,8 +269,9 @@ function MessagesContent(){
 }
 
 export default function Messages(){
+  const t = useTranslations('messages');
   return (
-    <Suspense fallback={<div style={{padding: "40px", textAlign: "center", color: "#64748b"}}>Mesajlar yükleniyor...</div>}>
+    <Suspense fallback={<div style={{padding: "40px", textAlign: "center", color: "#64748b"}}>{t('loading')}</div>}>
       <MessagesContent />
     </Suspense>
   );

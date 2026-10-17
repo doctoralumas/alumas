@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   connectNativeHealth,
   HEALTH_SCOPES,
@@ -12,11 +13,12 @@ import {
 type Row = { provider: string; scopes: string[]; lastSyncAt?: string };
 
 export default function HealthIntegrations() {
+  const t = useTranslations("healthIntegrations");
   const [rows, setRows] = useState<Row[]>([]);
   const [scopes, setScopes] = useState<HealthScope[]>(["steps", "heart_rate", "weight"]);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
-  const [isNative, setIsNative] = useState(true); // default true for SSR, hide on web client
+  const [isNative, setIsNative] = useState(true);
 
   const load = () => fetch("/api/health/integrations").then((r) => (r.ok ? r.json() : [])).then(setRows);
   
@@ -29,7 +31,7 @@ export default function HealthIntegrations() {
     }
   }, []);
 
-  if (!isNative) return null; // Hayalet Mod: Sadece native mobilde görünür
+  if (!isNative) return null;
 
   function toggle(scope: HealthScope) {
     setScopes((current) => current.includes(scope) ? current.filter((x) => x !== scope) : [...current, scope]);
@@ -41,9 +43,9 @@ export default function HealthIntegrations() {
     try {
       const native = await connectNativeHealth(provider, scopes);
       if (!native.ok && "demo" in native) {
-        setMsg("Web önizlemesinde native sağlık deposu açılamaz. Mobil cihazda gerçek izin ekranı açılır.");
+        setMsg(t("previewNotice"));
       } else if (!native.ok) {
-        setMsg(native.reason || "Sağlık erişimi verilemedi.");
+        setMsg(native.reason || t("accessDenied"));
         return;
       }
 
@@ -52,11 +54,11 @@ export default function HealthIntegrations() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider, scopes }),
       });
-      if (!r.ok) throw new Error("Bağlantı kaydedilemedi.");
+      if (!r.ok) throw new Error(t("saveFailed"));
       await load();
-      if (native.ok) setMsg("Sağlık izinleri kaydedildi. Şimdi verileri senkronize edebilirsin.");
+      if (native.ok) setMsg(t("saveSuccess"));
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : "Bağlantı kurulamadı.");
+      setMsg(error instanceof Error ? error.message : t("connectionFailed"));
     } finally {
       setBusy(false);
     }
@@ -68,7 +70,7 @@ export default function HealthIntegrations() {
     try {
       const result = await syncNativeHealth(providerScopes as HealthScope[]);
       if ("demo" in result) {
-        setMsg("Sağlık senkronizasyonu yalnızca iOS/Android uygulamasında çalışır.");
+        setMsg(t("syncMobileOnly"));
         return;
       }
       const r = await fetch("/api/health/sync", {
@@ -77,11 +79,11 @@ export default function HealthIntegrations() {
         body: JSON.stringify({ provider, samples: result.samples }),
       });
       const body = await r.json();
-      if (!r.ok) throw new Error(body.error || "Senkronizasyon kaydedilemedi.");
-      setMsg(`${body.imported} sağlık kaydı Alumas'a aktarıldı.`);
+      if (!r.ok) throw new Error(body.error || t("syncFailed"));
+      setMsg(t("syncSuccess", { count: body.imported }));
       await load();
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : "Senkronizasyon başarısız.");
+      setMsg(error instanceof Error ? error.message : t("syncError"));
     } finally {
       setBusy(false);
     }
@@ -89,29 +91,29 @@ export default function HealthIntegrations() {
 
   return (
     <section className="panel health-section">
-      <h2>Cihaz sağlık verileri</h2>
-      <p>Yalnızca seçtiğin veri türlerine erişim istenir. İzinleri cihaz ayarlarından istediğin zaman kapatabilirsin.</p>
+      <h2>{t("title")}</h2>
+      <p>{t("description")}</p>
       <div className="scope-grid">
         {HEALTH_SCOPES.map((scope) => (
           <label key={scope} className="scope-chip">
             <input type="checkbox" checked={scopes.includes(scope)} onChange={() => toggle(scope)} />
-            {scope === "steps" ? "Adım" : scope === "heart_rate" ? "Nabız" : scope === "weight" ? "Kilo" : "Uyku"}
+            {t(`scopes.${scope}` as any)}
           </label>
         ))}
       </div>
       <div className="integration-actions">
-        <button disabled={busy} className="secondary" onClick={() => connect("apple_health")}>Apple Health bağla</button>
-        <button disabled={busy} className="secondary" onClick={() => connect("health_connect")}>Health Connect bağla</button>
+        <button disabled={busy} className="secondary" onClick={() => connect("apple_health")}>{t("connectApple")}</button>
+        <button disabled={busy} className="secondary" onClick={() => connect("health_connect")}>{t("connectGoogle")}</button>
       </div>
       {msg && <div className="inline-message">{msg}</div>}
       <div className="integration-list">
         {rows.map((row) => (
           <div key={row.provider} className="integration-row">
             <span className="status">
-              {row.provider === "apple_health" ? "Apple Health" : "Health Connect"} · {row.scopes.length} izin
+              {row.provider === "apple_health" ? "Apple Health" : "Health Connect"} · {row.scopes.length} {t("permissionsSuffix")}
             </span>
             <button disabled={busy} className="text-button" onClick={() => sync(row.provider as HealthProvider, row.scopes)}>
-              Senkronize et
+              {t("syncAction")}
             </button>
           </div>
         ))}

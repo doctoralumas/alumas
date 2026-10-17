@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChatText, List, X } from "@phosphor-icons/react";
 import HealthNavigator from "@/components/ai/health-navigator";
+import { useTranslations } from "next-intl";
 
 export default function AiLayout({ history, currentConversationId, initialMessages }: any) {
+  const t = useTranslations("aiLayout");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -62,7 +64,7 @@ export default function AiLayout({ history, currentConversationId, initialMessag
       }}>
         {isMobile && (
           <div style={{ padding: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #e2e8f0" }}>
-            <span style={{ fontWeight: "bold", color: "#1e293b" }}>Sohbetler</span>
+            <span style={{ fontWeight: "bold", color: "#1e293b" }}>{t('chatsTitle')}</span>
             <button onClick={() => setSidebarOpen(false)} style={{ padding: "8px", color: "#64748b", background: "transparent", border: "none", cursor: "pointer", borderRadius: "8px" }} onMouseOver={e => e.currentTarget.style.backgroundColor = "#e2e8f0"} onMouseOut={e => e.currentTarget.style.backgroundColor = "transparent"}>
               <X size={20} weight="bold" />
             </button>
@@ -71,14 +73,14 @@ export default function AiLayout({ history, currentConversationId, initialMessag
 
         <div style={{ padding: "16px", paddingTop: isMobile ? "16px" : "24px" }}>
           <Link href="/ai" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "12px", backgroundColor: "#0f172a", color: "#fff", borderRadius: "12px", fontWeight: 600, textDecoration: "none", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", transition: "background-color 0.2s" }} onMouseOver={e => e.currentTarget.style.backgroundColor = "#1e293b"} onMouseOut={e => e.currentTarget.style.backgroundColor = "#0f172a"}>
-            <span>+</span> Yeni Sohbet
+            <span>+</span> {t('newChat')}
           </Link>
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 16px 16px", display: "flex", flexDirection: "column", gap: "4px" }} className="hide-scrollbar">
-          <div style={{ fontSize: "12px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", padding: "8px", marginTop: "8px" }}>Geçmiş</div>
+          <div style={{ fontSize: "12px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", padding: "8px", marginTop: "8px" }}>{t('historyTitle')}</div>
           {history.length === 0 ? (
-            <div style={{ padding: "12px 8px", color: "#94a3b8", fontSize: "14px" }}>Henüz sohbet yok.</div>
+            <div style={{ padding: "12px 8px", color: "#94a3b8", fontSize: "14px" }}>{t('noHistory')}</div>
           ) : (
             history.map((h: any) => (
               <Link 
@@ -95,7 +97,7 @@ export default function AiLayout({ history, currentConversationId, initialMessag
                 onMouseOut={e => { if(currentConversationId !== h.id) e.currentTarget.style.backgroundColor = "transparent" }}
               >
                 <ChatText size={18} weight={currentConversationId === h.id ? "fill" : "regular"} />
-                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1 }}>{h.title || "Yeni Sohbet"}</span>
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1 }}>{h.title || t('defaultConvTitle')}</span>
               </Link>
             ))
           )}
@@ -143,4 +145,3 @@ export default function AiLayout({ history, currentConversationId, initialMessag
     </div>
   );
 }
-

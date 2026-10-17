@@ -1,0 +1,42 @@
+{
+  "cookieConsent": {
+    "title": "Gizlilik tercihleriniz",
+    "desc": "Zorunlu teknolojiler oturum ve güvenlik için kullanılır. İsteğe bağlı analitik/pazarlama teknolojileri siz izin vermeden etkinleştirilmez.",
+    "policyLink": "Politikayı incele",
+    "onlyNecessary": "Yalnız zorunlu",
+    "acceptOptional": "İsteğe bağlılara izin ver"
+  },
+  "legalFooter": {
+    "kvkk": "KVKK",
+    "healthData": "Sağlık Verileri",
+    "aiPolicy": "AI Güvenliği",
+    "cookies": "Çerezler",
+    "terms": "Kullanım Koşulları",
+    "crossBorder": "Yurt Dışı Aktarım",
+    "healthTourism": "Sağlık Turizmi"
+  },
+  "locationSelector": {
+    "ariaLabel": "Konum: {address}",
+    "loading": "Yükleniyor...",
+    "title": "Konum Seçin",
+    "useCurrent": "Mevcut Konumumu Kullan",
+    "orSearch": "Veya arayın:",
+    "placeholder": "İlçe veya şehir adı...",
+    "findButton": "Bul",
+    "notFound": "Konum bulunamadı",
+    "searchError": "Arama sırasında hata oluştu."
+  },
+  "lockedOverlay": {
+    "title": "Alumas'ı Keşfedin",
+    "desc": "Şu anda ziyaretçi olarak önizleme yapıyorsunuz. Kendi verilerinizi girmek, kaydetmek ve tüm bu özellikleri kullanabilmek için ücretsiz hesap oluşturun.",
+    "login": "Giriş Yap",
+    "register": "Ücretsiz Üye Ol"
+  },
+  "aiLayout": {
+    "chatsTitle": "Sohbetler",
+    "newChat": "Yeni Sohbet",
+    "historyTitle": "Geçmiş",
+    "noHistory": "Henüz sohbet yok.",
+    "defaultConvTitle": "Yeni Sohbet"
+  }
+}

@@ -1,1 +1,19 @@
-export default function Page(){return <div className="page"><div className="page-title"><span className="kicker">Yasal & Uyum</span><h1>Özel Nitelikli Kişisel Veri ve Sağlık Verisi Politikası</h1><p>Son Güncelleme: 26 Eylül 2026. Alumas Sağlık Teknolojileri A.Ş. tarafından uluslararası güvenlik standartlarına ve KVKK/GDPR regülasyonlarına tam uyumlu olarak düzenlenmiştir.</p></div><section className="panel legal-copy" dangerouslySetInnerHTML={{__html:`<h2>Sağlık verisinin kapsamı</h2><p>Sağlık geçmişi, tanılar, ilaçlar, alerjiler, laboratuvar/görüntüleme kayıtları, gebelik ve menstrual döngü verileri gibi bilgiler özel nitelikli kişisel veridir.</p><h2>Ürün ilkeleri</h2><p>Veri minimizasyonu, rol bazlı erişim, erişim kayıtları, aktarım sınırlaması ve amaçla sınırlılık uygulanır. Sağlık verileri pazarlama profillemesi için kullanılmaz. AI kişiselleştirmesi ayrı kullanıcı tercihiyle açılır ve gerekli olmayan ham sağlık verileri üçüncü taraf modele gönderilmez.</p><h2>Ek tedbirler</h2><p>Üretimde şifreleme, anahtar yönetimi, erişim yetkisi gözden geçirmesi, loglama, olay müdahalesi, yedekleme ve veri ihlali prosedürleri teknik/idari kontrol listesiyle işletilir.</p>`}} /></div>}
+import { getTranslations } from "next-intl/server";
+
+export default async function Page() {
+  const t = await getTranslations("legal");
+
+  return (
+    <div className="page">
+      <div className="page-title">
+        <span className="kicker">{t("legalKicker")}</span>
+        <h1>{t("healthDataPolicyTitle")}</h1>
+        <p>{t("lastUpdatedNotice")}</p>
+      </div>
+      <section
+        className="panel legal-copy"
+        dangerouslySetInnerHTML={{ __html: t.raw("healthDataPolicyHtml") }}
+      />
+    </div>
+  );
+}
