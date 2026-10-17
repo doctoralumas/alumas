@@ -134,3 +134,35 @@ test("tr.json and en.json dictionaries have 100% exact key parity", () => {
   assert.equal(missingInEn.length, 0, `Keys missing in en.json: ${missingInEn.join(", ")}`);
   assert.equal(missingInTr.length, 0, `Keys missing in tr.json: ${missingInTr.join(", ")}`);
 });
+
+test("components/business/organization-manager.tsx has zero unresolved t() translation keys", () => {
+  const tr = JSON.parse(fs.readFileSync("messages/tr.json", "utf8"));
+  const en = JSON.parse(fs.readFileSync("messages/en.json", "utf8"));
+  const orgTr = tr.professional?.orgManager || {};
+  const orgEn = en.professional?.orgManager || {};
+
+  const code = fs.readFileSync("components/business/organization-manager.tsx", "utf8");
+  const regex = /(?:^|[^\w$.])t\(\s*["']([^"']+)["']/g;
+  let match;
+  const missingTr = [];
+  const missingEn = [];
+  while ((match = regex.exec(code)) !== null) {
+    const k = match[1];
+    let valTr = orgTr;
+    let valEn = orgEn;
+    if (k.includes(".")) {
+      for (const p of k.split(".")) {
+        valTr = valTr?.[p];
+        valEn = valEn?.[p];
+      }
+    } else {
+      valTr = valTr[k];
+      valEn = valEn[k];
+    }
+    if (valTr === undefined) missingTr.push(k);
+    if (valEn === undefined) missingEn.push(k);
+  }
+  assert.equal(missingTr.length, 0, `Unresolved keys in organization-manager (TR): ${missingTr.join(", ")}`);
+  assert.equal(missingEn.length, 0, `Unresolved keys in organization-manager (EN): ${missingEn.join(", ")}`);
+});
+
