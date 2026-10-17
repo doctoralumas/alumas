@@ -38,5 +38,59 @@
     "historyTitle": "History",
     "noHistory": "No conversations yet.",
     "defaultConvTitle": "New Chat"
+  },
+  "luma": {
+    "greetingTitle": "I'm Luma. How can I help you?",
+    "greetingDesc": "Describe your concern, and I will guide you to the most suitable specialist or healthcare facility.",
+    "searching": "Luma is searching...",
+    "recommendedSpecialists": "Recommended Specialists",
+    "suitableOrganizations": "Available Facilities",
+    "onDuty": "• On Duty",
+    "errorResponse": "Could not receive response.",
+    "inputPlaceholder": "Send your message to Luma...",
+    "useHealthProfile": "Use my health profile",
+    "encryptedConnection": "Encrypted Connection",
+    "openAssistant": "Open Luma Assistant",
+    "copilotTitle": "Luma Copilot",
+    "copilotSubtitle": "Your Health Assistant",
+    "disclaimer": "I am not a healthcare professional. Open pharmacy information does not necessarily mean on-duty pharmacy.",
+    "liveHealthTitle": "Healthcare services near you",
+    "liveHealthDesc": "Live and verified options based on your location.",
+    "searchLocation": "Search near me",
+    "searchingAction": "Searching…",
+    "verifiedBadge": "✓ Alumas verified",
+    "onDutyBadge": "On Duty",
+    "openBadge": "Open",
+    "noAddress": "Address not available",
+    "openMap": "Open in Maps",
+    "categories": {
+      "hospital": "Hospitals",
+      "clinic": "Clinics",
+      "pharmacy": "Open pharmacies"
+    },
+    "insuranceMatch": "Insurance matched",
+    "geoUnsupported": "This device does not support location services.",
+    "permissionDenied": "Location permission is required to show nearby results.",
+    "fetchError": "Could not retrieve results."
+  },
+  "organizationMap": {
+    "mapPlaceholder": "Map location not verified yet.",
+    "directions": "Get directions ↗"
+  },
+  "videoConsultation": {
+    "preparing": "Preparing…",
+    "startCall": "Video consultation",
+    "error": "Could not start consultation"
+  },
+  "liveHealthPreview": {
+    "bloodPressure": "Blood pressure",
+    "lastRecord": "Latest record",
+    "trackWithLogin": "Sign in to track",
+    "bloodGlucose": "Blood glucose",
+    "fasting": "Fasting",
+    "sleep": "Sleep",
+    "hours": "hours",
+    "quality": "Quality {score}/5",
+    "noRecordYet": "No records yet"
   }
 }

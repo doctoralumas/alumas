@@ -37,6 +37,39 @@
       "cookies": "Çerezler",
       "terms": "Kullanım Koşulları",
       "legalNav": "Yasal"
+    },
+    "carousel": {
+      "ariaLabel": "Öne Çıkan Kampanyalar ve Hizmetler",
+      "prevSlide": "Önceki Slayt",
+      "nextSlide": "Sonraki Slayt",
+      "slideNum": "Slayt {num}",
+      "slides": {
+        "1": {
+          "title": "Sağlığın için doğru adres.",
+          "subtitle": "Doktor, kurum ve sağlık hizmetlerini tek yerde keşfet.",
+          "alt": "Sağlık Hizmetleri"
+        },
+        "2": {
+          "title": "Uzmanını kolayca bul.",
+          "subtitle": "İhtiyacına uygun doktor ve klinikleri keşfet.",
+          "alt": "Uzman Doktor Keşfi"
+        },
+        "3": {
+          "title": "Sigortana uygun seçenekleri keşfet.",
+          "subtitle": "Sana uygun sağlık kurumlarına daha kolay ulaş.",
+          "alt": "Sağlık Sigortası"
+        },
+        "4": {
+          "title": "Sağlık yolculuğunu kolaylaştır.",
+          "subtitle": "Sağlık turizmi seçeneklerini tek yerde keşfet.",
+          "alt": "Sağlık Turizmi"
+        },
+        "5": {
+          "title": "Luma’ya anlat, doğru hizmeti bul.",
+          "subtitle": "İhtiyacını doğal şekilde anlat, uygun hizmetlere yönel.",
+          "alt": "Yapay Zeka Sağlık Asistanı"
+        }
+      }
     }
   }
 }

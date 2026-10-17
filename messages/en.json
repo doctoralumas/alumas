@@ -159,6 +159,60 @@
     "noHistory": "No conversations yet.",
     "defaultConvTitle": "New Chat"
   },
+  "luma": {
+    "greetingTitle": "I'm Luma. How can I help you?",
+    "greetingDesc": "Describe your concern, and I will guide you to the most suitable specialist or healthcare facility.",
+    "searching": "Luma is searching...",
+    "recommendedSpecialists": "Recommended Specialists",
+    "suitableOrganizations": "Available Facilities",
+    "onDuty": "• On Duty",
+    "errorResponse": "Could not receive response.",
+    "inputPlaceholder": "Send your message to Luma...",
+    "useHealthProfile": "Use my health profile",
+    "encryptedConnection": "Encrypted Connection",
+    "openAssistant": "Open Luma Assistant",
+    "copilotTitle": "Luma Copilot",
+    "copilotSubtitle": "Your Health Assistant",
+    "disclaimer": "I am not a healthcare professional. Open pharmacy information does not necessarily mean on-duty pharmacy.",
+    "liveHealthTitle": "Healthcare services near you",
+    "liveHealthDesc": "Live and verified options based on your location.",
+    "searchLocation": "Search near me",
+    "searchingAction": "Searching…",
+    "verifiedBadge": "✓ Alumas verified",
+    "onDutyBadge": "On Duty",
+    "openBadge": "Open",
+    "noAddress": "Address not available",
+    "openMap": "Open in Maps",
+    "categories": {
+      "hospital": "Hospitals",
+      "clinic": "Clinics",
+      "pharmacy": "Open pharmacies"
+    },
+    "insuranceMatch": "Insurance matched",
+    "geoUnsupported": "This device does not support location services.",
+    "permissionDenied": "Location permission is required to show nearby results.",
+    "fetchError": "Could not retrieve results."
+  },
+  "organizationMap": {
+    "mapPlaceholder": "Map location not verified yet.",
+    "directions": "Get directions ↗"
+  },
+  "videoConsultation": {
+    "preparing": "Preparing…",
+    "startCall": "Video consultation",
+    "error": "Could not start consultation"
+  },
+  "liveHealthPreview": {
+    "bloodPressure": "Blood pressure",
+    "lastRecord": "Latest record",
+    "trackWithLogin": "Sign in to track",
+    "bloodGlucose": "Blood glucose",
+    "fasting": "Fasting",
+    "sleep": "Sleep",
+    "hours": "hours",
+    "quality": "Quality {score}/5",
+    "noRecordYet": "No records yet"
+  },
   "appointments": {
     "bookingTitle": "Book Appointment",
     "familyContext": "This appointment will be linked to the selected family profile.",
@@ -3372,6 +3426,39 @@
       "cookies": "Cookies",
       "terms": "Terms of Use",
       "legalNav": "Legal"
+    },
+    "carousel": {
+      "ariaLabel": "Featured Campaigns and Services",
+      "prevSlide": "Previous Slide",
+      "nextSlide": "Next Slide",
+      "slideNum": "Slide {num}",
+      "slides": {
+        "1": {
+          "title": "The right address for your health.",
+          "subtitle": "Discover doctors, institutions, and healthcare services in one place.",
+          "alt": "Healthcare Services"
+        },
+        "2": {
+          "title": "Find your specialist easily.",
+          "subtitle": "Discover doctors and clinics suited to your needs.",
+          "alt": "Specialist Doctor Discovery"
+        },
+        "3": {
+          "title": "Explore options suited to your insurance.",
+          "subtitle": "Reach matching healthcare providers more easily.",
+          "alt": "Health Insurance"
+        },
+        "4": {
+          "title": "Simplify your health journey.",
+          "subtitle": "Discover health tourism options in one place.",
+          "alt": "Health Tourism"
+        },
+        "5": {
+          "title": "Tell Luma, find the right care.",
+          "subtitle": "Describe your needs naturally and get guided to the right care.",
+          "alt": "AI Health Assistant"
+        }
+      }
     }
   },
   "about": {
@@ -4139,6 +4226,60 @@
         "historyTitle": "History",
         "noHistory": "No conversations yet.",
         "defaultConvTitle": "New Chat"
+      },
+      "luma": {
+        "greetingTitle": "I'm Luma. How can I help you?",
+        "greetingDesc": "Describe your concern, and I will guide you to the most suitable specialist or healthcare facility.",
+        "searching": "Luma is searching...",
+        "recommendedSpecialists": "Recommended Specialists",
+        "suitableOrganizations": "Available Facilities",
+        "onDuty": "• On Duty",
+        "errorResponse": "Could not receive response.",
+        "inputPlaceholder": "Send your message to Luma...",
+        "useHealthProfile": "Use my health profile",
+        "encryptedConnection": "Encrypted Connection",
+        "openAssistant": "Open Luma Assistant",
+        "copilotTitle": "Luma Copilot",
+        "copilotSubtitle": "Your Health Assistant",
+        "disclaimer": "I am not a healthcare professional. Open pharmacy information does not necessarily mean on-duty pharmacy.",
+        "liveHealthTitle": "Healthcare services near you",
+        "liveHealthDesc": "Live and verified options based on your location.",
+        "searchLocation": "Search near me",
+        "searchingAction": "Searching…",
+        "verifiedBadge": "✓ Alumas verified",
+        "onDutyBadge": "On Duty",
+        "openBadge": "Open",
+        "noAddress": "Address not available",
+        "openMap": "Open in Maps",
+        "categories": {
+          "hospital": "Hospitals",
+          "clinic": "Clinics",
+          "pharmacy": "Open pharmacies"
+        },
+        "insuranceMatch": "Insurance matched",
+        "geoUnsupported": "This device does not support location services.",
+        "permissionDenied": "Location permission is required to show nearby results.",
+        "fetchError": "Could not retrieve results."
+      },
+      "organizationMap": {
+        "mapPlaceholder": "Map location not verified yet.",
+        "directions": "Get directions ↗"
+      },
+      "videoConsultation": {
+        "preparing": "Preparing…",
+        "startCall": "Video consultation",
+        "error": "Could not start consultation"
+      },
+      "liveHealthPreview": {
+        "bloodPressure": "Blood pressure",
+        "lastRecord": "Latest record",
+        "trackWithLogin": "Sign in to track",
+        "bloodGlucose": "Blood glucose",
+        "fasting": "Fasting",
+        "sleep": "Sleep",
+        "hours": "hours",
+        "quality": "Quality {score}/5",
+        "noRecordYet": "No records yet"
       }
     }
   },
@@ -6174,6 +6315,39 @@
         "cookies": "Cookies",
         "terms": "Terms of Use",
         "legalNav": "Legal"
+      },
+      "carousel": {
+        "ariaLabel": "Featured Campaigns and Services",
+        "prevSlide": "Previous Slide",
+        "nextSlide": "Next Slide",
+        "slideNum": "Slide {num}",
+        "slides": {
+          "1": {
+            "title": "The right address for your health.",
+            "subtitle": "Discover doctors, institutions, and healthcare services in one place.",
+            "alt": "Healthcare Services"
+          },
+          "2": {
+            "title": "Find your specialist easily.",
+            "subtitle": "Discover doctors and clinics suited to your needs.",
+            "alt": "Specialist Doctor Discovery"
+          },
+          "3": {
+            "title": "Explore options suited to your insurance.",
+            "subtitle": "Reach matching healthcare providers more easily.",
+            "alt": "Health Insurance"
+          },
+          "4": {
+            "title": "Simplify your health journey.",
+            "subtitle": "Discover health tourism options in one place.",
+            "alt": "Health Tourism"
+          },
+          "5": {
+            "title": "Tell Luma, find the right care.",
+            "subtitle": "Describe your needs naturally and get guided to the right care.",
+            "alt": "AI Health Assistant"
+          }
+        }
       }
     },
     "about": {

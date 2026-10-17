@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Sparkle, X } from "@phosphor-icons/react";
 import HealthNavigator from "./health-navigator";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function LumaCopilot() {
+  const t = useTranslations("luma");
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -38,7 +40,7 @@ export default function LumaCopilot() {
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           transform: isOpen ? "scale(0.9)" : "scale(1)",
         }}
-        aria-label="Luma Asistanı Aç"
+        aria-label={t("openAssistant")}
         className="luma-floating-btn"
       >
         {isOpen ? <X size={20} weight="bold" /> : pathname === "/" ? (
@@ -80,8 +82,8 @@ export default function LumaCopilot() {
               <Sparkle size={24} weight="fill" />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700 }}>Luma Copilot</h3>
-              <span style={{ fontSize: "12px", opacity: 0.9 }}>Sağlık Asistanınız</span>
+              <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700 }}>{t("copilotTitle")}</h3>
+              <span style={{ fontSize: "12px", opacity: 0.9 }}>{t("copilotSubtitle")}</span>
             </div>
             <button onClick={() => setIsOpen(false)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#fff", cursor: "pointer", padding: "4px" }}>
               <X size={20} weight="bold" />

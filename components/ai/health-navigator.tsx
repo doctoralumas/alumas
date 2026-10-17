@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+// @ts-nocheck
 "use client";
 import ReactMarkdown from "react-markdown";
 import { useState, useRef, useEffect, useMemo } from "react";
@@ -6,6 +6,7 @@ import { Sparkle, Stethoscope, MapPin, WarningCircle, ShieldCheck, PaperPlaneRig
 import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import { useTranslations, useLocale } from "next-intl";
 
 function toUIMessages(raw: any[]) {
   return (raw || []).map((message, index) => {
@@ -73,6 +74,8 @@ export default function HealthNavigator({
   initialConversationId?: string | null;
   initialMessages?: any[];
 }) {
+  const t = useTranslations("luma");
+  const locale = useLocale();
   const [personalize, setPersonalize] = useState(true);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
@@ -83,9 +86,9 @@ export default function HealthNavigator({
     () =>
       new DefaultChatTransport({
         api: "/api/ai/chat",
-        body: () => ({ personalize: personalizeRef.current }),
+        body: () => ({ personalize: personalizeRef.current, locale }),
       }),
-    []
+    [locale]
   );
 
   const { messages, sendMessage, status, error } = useChat({
@@ -120,9 +123,9 @@ export default function HealthNavigator({
              <div style={{ width: "64px", height: "64px", borderRadius: "20px", background: "linear-gradient(135deg, #0bbec5 0%, #0a9aa3 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", marginBottom: "20px", boxShadow: "0 10px 25px -5px rgba(11, 190, 197, 0.4)" }}>
               <Sparkle size={32} weight="fill" />
             </div>
-            <h1 style={{ fontSize: "24px", color: "#0f172a", margin: "0 0 12px 0", fontWeight: 800 }}>Ben Luma. Nasıl yardımcı olabilirim?</h1>
+            <h1 style={{ fontSize: "24px", color: "#0f172a", margin: "0 0 12px 0", fontWeight: 800 }}>{t("greetingTitle")}</h1>
             <p style={{ margin: 0, fontSize: "15px", color: "#64748b", maxWidth: "400px" }}>
-              Şikayetinizi yazın, sizi en doğru uzman veya kuruma yönlendireyim.
+              {t("greetingDesc")}
             </p>
           </div>
         )}
@@ -166,15 +169,15 @@ export default function HealthNavigator({
                  </div>
                )}
 
-               {tools.map((ti: any) => {
-                  if (ti.pending) return <div key={ti.toolCallId} style={{ marginTop: text ? "12px" : "0", color: "#64748b", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}><Sparkle className="spinner" size={14} color="#0bbec5" /> Luma araştırıyor...</div>;
+                {tools.map((ti: any) => {
+                  if (ti.pending) return <div key={ti.toolCallId} style={{ marginTop: text ? "12px" : "0", color: "#64748b", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}><Sparkle className="spinner" size={14} color="#0bbec5" /> {t("searching")}</div>;
                   
                   if (ti.toolName === 'find_doctors') {
                      const docs = ti.result;
                      if (!Array.isArray(docs)) return null;
                      return (
                         <div key={ti.toolCallId} style={{ marginTop: text ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
-                          <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#0bbec5" }}><Stethoscope size={16} /> Önerilen Uzmanlar</strong>
+                          <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#0bbec5" }}><Stethoscope size={16} /> {t("recommendedSpecialists")}</strong>
                           <div style={{ display: "flex", flexDirection: compact ? "column" : "row", gap: "8px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "none" }}>
                             {docs.map((d: any) => (
                               <Link key={d.id} href={`/doctors/${d.slug}`} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "12px", borderRadius: "12px", minWidth: compact ? "100%" : "240px", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.2s" }} onMouseOver={e => e.currentTarget.style.borderColor = "#0bbec5"} onMouseOut={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
@@ -195,12 +198,12 @@ export default function HealthNavigator({
                      if (!Array.isArray(orgs)) return null;
                      return (
                         <div key={ti.toolCallId} style={{ marginTop: text ? "16px" : "0", display: "flex", flexDirection: "column", gap: "8px" }}>
-                          <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#10b981" }}><MapPin size={16} /> Uygun Kurumlar</strong>
+                          <strong style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", color: "#10b981" }}><MapPin size={16} /> {t("suitableOrganizations")}</strong>
                           <div style={{ display: "flex", flexDirection: compact ? "column" : "row", gap: "8px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "none" }}>
                             {orgs.map((o: any) => (
                               <Link key={o.id} href={`/organizations/${o.slug}`} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "12px", borderRadius: "12px", minWidth: compact ? "100%" : "220px", textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column", transition: "all 0.2s" }} onMouseOver={e => e.currentTarget.style.borderColor = "#10b981"} onMouseOut={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
                                  <div style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{o.name}</div>
-                                 <div style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{o.city} {o.isOnDuty ? "• Nöbetçi" : ""}</div>
+                                 <div style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{o.city} {o.isOnDuty ? t("onDuty") : ""}</div>
                               </Link>
                             ))}
                           </div>
@@ -216,7 +219,7 @@ export default function HealthNavigator({
 
         {error && (
            <div style={{ alignSelf: "center", background: "#fef2f2", color: "#ef4444", padding: "12px 20px", borderRadius: "12px", fontSize: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
-             <WarningCircle size={18} weight="bold" /> Yanıt alınamadı.
+             <WarningCircle size={18} weight="bold" /> {t("errorResponse")}
            </div>
         )}
       </div>
@@ -227,7 +230,7 @@ export default function HealthNavigator({
            <input 
              value={input}
              onChange={e => setInput(e.target.value)}
-             placeholder="Mesajınızı Luma'ya iletin..."
+             placeholder={t("inputPlaceholder")}
              disabled={isLoading}
              style={{ width: "100%", background: "#f1f5f9", border: "1px solid transparent", borderRadius: "100px", padding: "16px 60px 16px 24px", fontSize: "15px", outline: "none", color: "#0f172a", transition: "all 0.2s" }}
              onFocus={e => { e.target.style.background = "#fff"; e.target.style.borderColor = "#cbd5e1"; e.target.style.boxShadow = "0 0 0 4px #f1f5f9"; }}
@@ -245,9 +248,9 @@ export default function HealthNavigator({
          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "0 8px" }}>
            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: 600, color: personalize ? "#0a9aa3" : "#64748b", cursor: "pointer" }}>
               <input type="checkbox" checked={personalize} onChange={e => setPersonalize(e.target.checked)} style={{ accentColor: "#0a9aa3", cursor: "pointer", width: "14px", height: "14px" }} />
-              Sağlık profilimi kullan
+              {t("useHealthProfile")}
            </label>
-           <span style={{ fontSize: "11px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}><ShieldCheck size={14} /> Şifreli Bağlantı</span>
+           <span style={{ fontSize: "11px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}><ShieldCheck size={14} /> {t("encryptedConnection")}</span>
          </div>
       </div>
 

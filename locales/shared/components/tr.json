@@ -38,5 +38,59 @@
     "historyTitle": "Geçmiş",
     "noHistory": "Henüz sohbet yok.",
     "defaultConvTitle": "Yeni Sohbet"
+  },
+  "luma": {
+    "greetingTitle": "Ben Luma. Nasıl yardımcı olabilirim?",
+    "greetingDesc": "Şikayetinizi yazın, sizi en doğru uzman veya kuruma yönlendireyim.",
+    "searching": "Luma araştırıyor...",
+    "recommendedSpecialists": "Önerilen Uzmanlar",
+    "suitableOrganizations": "Uygun Kurumlar",
+    "onDuty": "• Nöbetçi",
+    "errorResponse": "Yanıt alınamadı.",
+    "inputPlaceholder": "Mesajınızı Luma'ya iletin...",
+    "useHealthProfile": "Sağlık profilimi kullan",
+    "encryptedConnection": "Şifreli Bağlantı",
+    "openAssistant": "Luma Asistanı Aç",
+    "copilotTitle": "Luma Copilot",
+    "copilotSubtitle": "Sağlık Asistanınız",
+    "disclaimer": "Ben sağlık profesyoneli değilim. Açık eczane bilgisi nöbetçi eczane anlamına gelmez.",
+    "liveHealthTitle": "Yakınınızdaki sağlık hizmetleri",
+    "liveHealthDesc": "Konumunuza göre canlı ve doğrulanmış seçenekler.",
+    "searchLocation": "Konumumda ara",
+    "searchingAction": "Aranıyor…",
+    "verifiedBadge": "✓ Alumas doğrulandı",
+    "onDutyBadge": "Nöbetçi",
+    "openBadge": "Açık",
+    "noAddress": "Adres bilgisi mevcut değil",
+    "openMap": "Haritada aç",
+    "categories": {
+      "hospital": "Hastaneler",
+      "clinic": "Klinikler",
+      "pharmacy": "Açık eczaneler"
+    },
+    "insuranceMatch": "Sigorta uyumlu",
+    "geoUnsupported": "Bu cihaz konum hizmetini desteklemiyor.",
+    "permissionDenied": "Yakındaki sonuçları göstermek için konum izni gerekli.",
+    "fetchError": "Sonuçlar alınamadı."
+  },
+  "organizationMap": {
+    "mapPlaceholder": "Harita konumu henüz doğrulanmadı.",
+    "directions": "Yol tarifi al ↗"
+  },
+  "videoConsultation": {
+    "preparing": "Hazırlanıyor…",
+    "startCall": "Görüntülü görüşme",
+    "error": "Görüşme başlatılamadı"
+  },
+  "liveHealthPreview": {
+    "bloodPressure": "Tansiyon",
+    "lastRecord": "Son kayıt",
+    "trackWithLogin": "Giriş yaparak takip et",
+    "bloodGlucose": "Kan şekeri",
+    "fasting": "Açlık",
+    "sleep": "Uyku",
+    "hours": "saat",
+    "quality": "Kalite {score}/5",
+    "noRecordYet": "Henüz kayıt yok"
   }
 }

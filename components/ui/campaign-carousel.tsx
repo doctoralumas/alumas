@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const SCRIM_GRADIENTS = {
   normal: "linear-gradient(90deg, rgba(11,37,69,0.96) 0%, rgba(11,37,69,0.82) 45%, rgba(11,37,69,0.25) 75%, transparent 100%)",
@@ -91,6 +92,7 @@ const AUTOPLAY_INTERVAL = 4000;
 const TRANSITION_DURATION = 600;
 
 export default function CampaignCarousel() {
+  const t = useTranslations("home.carousel");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -186,7 +188,7 @@ export default function CampaignCarousel() {
       onBlur={() => setIsPaused(false)}
       onKeyDown={handleKeyDown}
       tabIndex={0}
-      aria-label="Öne Çıkan Kampanyalar ve Hizmetler"
+      aria-label={t("ariaLabel")}
       aria-roledescription="carousel"
     >
       <div 
@@ -245,7 +247,7 @@ export default function CampaignCarousel() {
         <button 
           className="carousel-control prev-control" 
           onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-          aria-label="Önceki Slayt"
+          aria-label={t("prevSlide")}
           tabIndex={-1}
         >
           <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -255,7 +257,7 @@ export default function CampaignCarousel() {
         <button 
           className="carousel-control next-control" 
           onClick={(e) => { e.stopPropagation(); goToNext(); }}
-          aria-label="Sonraki Slayt"
+          aria-label={t("nextSlide")}
           tabIndex={-1}
         >
           <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -269,7 +271,7 @@ export default function CampaignCarousel() {
               key={index}
               role="tab"
               aria-selected={currentIndex === index}
-              aria-label={`Slayt ${index + 1}`}
+              aria-label={t("slideNum", { num: index + 1 })}
               className={`dot ${currentIndex === index ? "active" : ""}`}
               onClick={(e) => { e.stopPropagation(); goToSlide(index); }}
               tabIndex={-1}
@@ -497,6 +499,11 @@ export default function CampaignCarousel() {
 }
 
 function SlideContent({ slide, isNear }: { slide: typeof carouselSlides[0], isNear: boolean }) {
+  const t = useTranslations("home.carousel");
+  const title = t(`slides.${slide.id}.title` as any);
+  const subtitle = t(`slides.${slide.id}.subtitle` as any);
+  const alt = t(`slides.${slide.id}.alt` as any);
+
   return (
     <>
       <div className="campaign-visual">
@@ -505,14 +512,14 @@ function SlideContent({ slide, isNear }: { slide: typeof carouselSlides[0], isNe
           <source media="(min-width: 769px)" srcSet={slide.desktopImage} />
           <img 
             src={slide.desktopImage} 
-            alt={slide.alt} 
+            alt={alt} 
             loading={isNear ? "eager" : "lazy"}
           />
         </picture>
       </div>
       <div className="campaign-content">
-        <h1>{slide.title}</h1>
-        <p>{slide.subtitle}</p>
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
       </div>
     </>
   );

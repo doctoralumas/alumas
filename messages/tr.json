@@ -159,6 +159,60 @@
     "noHistory": "Henüz sohbet yok.",
     "defaultConvTitle": "Yeni Sohbet"
   },
+  "luma": {
+    "greetingTitle": "Ben Luma. Nasıl yardımcı olabilirim?",
+    "greetingDesc": "Şikayetinizi yazın, sizi en doğru uzman veya kuruma yönlendireyim.",
+    "searching": "Luma araştırıyor...",
+    "recommendedSpecialists": "Önerilen Uzmanlar",
+    "suitableOrganizations": "Uygun Kurumlar",
+    "onDuty": "• Nöbetçi",
+    "errorResponse": "Yanıt alınamadı.",
+    "inputPlaceholder": "Mesajınızı Luma'ya iletin...",
+    "useHealthProfile": "Sağlık profilimi kullan",
+    "encryptedConnection": "Şifreli Bağlantı",
+    "openAssistant": "Luma Asistanı Aç",
+    "copilotTitle": "Luma Copilot",
+    "copilotSubtitle": "Sağlık Asistanınız",
+    "disclaimer": "Ben sağlık profesyoneli değilim. Açık eczane bilgisi nöbetçi eczane anlamına gelmez.",
+    "liveHealthTitle": "Yakınınızdaki sağlık hizmetleri",
+    "liveHealthDesc": "Konumunuza göre canlı ve doğrulanmış seçenekler.",
+    "searchLocation": "Konumumda ara",
+    "searchingAction": "Aranıyor…",
+    "verifiedBadge": "✓ Alumas doğrulandı",
+    "onDutyBadge": "Nöbetçi",
+    "openBadge": "Açık",
+    "noAddress": "Adres bilgisi mevcut değil",
+    "openMap": "Haritada aç",
+    "categories": {
+      "hospital": "Hastaneler",
+      "clinic": "Klinikler",
+      "pharmacy": "Açık eczaneler"
+    },
+    "insuranceMatch": "Sigorta uyumlu",
+    "geoUnsupported": "Bu cihaz konum hizmetini desteklemiyor.",
+    "permissionDenied": "Yakındaki sonuçları göstermek için konum izni gerekli.",
+    "fetchError": "Sonuçlar alınamadı."
+  },
+  "organizationMap": {
+    "mapPlaceholder": "Harita konumu henüz doğrulanmadı.",
+    "directions": "Yol tarifi al ↗"
+  },
+  "videoConsultation": {
+    "preparing": "Hazırlanıyor…",
+    "startCall": "Görüntülü görüşme",
+    "error": "Görüşme başlatılamadı"
+  },
+  "liveHealthPreview": {
+    "bloodPressure": "Tansiyon",
+    "lastRecord": "Son kayıt",
+    "trackWithLogin": "Giriş yaparak takip et",
+    "bloodGlucose": "Kan şekeri",
+    "fasting": "Açlık",
+    "sleep": "Uyku",
+    "hours": "saat",
+    "quality": "Kalite {score}/5",
+    "noRecordYet": "Henüz kayıt yok"
+  },
   "appointments": {
     "bookingTitle": "Randevu oluştur",
     "familyContext": "Bu randevu seçili aile profiline bağlanacak.",
@@ -3372,6 +3426,39 @@
       "cookies": "Çerezler",
       "terms": "Kullanım Koşulları",
       "legalNav": "Yasal"
+    },
+    "carousel": {
+      "ariaLabel": "Öne Çıkan Kampanyalar ve Hizmetler",
+      "prevSlide": "Önceki Slayt",
+      "nextSlide": "Sonraki Slayt",
+      "slideNum": "Slayt {num}",
+      "slides": {
+        "1": {
+          "title": "Sağlığın için doğru adres.",
+          "subtitle": "Doktor, kurum ve sağlık hizmetlerini tek yerde keşfet.",
+          "alt": "Sağlık Hizmetleri"
+        },
+        "2": {
+          "title": "Uzmanını kolayca bul.",
+          "subtitle": "İhtiyacına uygun doktor ve klinikleri keşfet.",
+          "alt": "Uzman Doktor Keşfi"
+        },
+        "3": {
+          "title": "Sigortana uygun seçenekleri keşfet.",
+          "subtitle": "Sana uygun sağlık kurumlarına daha kolay ulaş.",
+          "alt": "Sağlık Sigortası"
+        },
+        "4": {
+          "title": "Sağlık yolculuğunu kolaylaştır.",
+          "subtitle": "Sağlık turizmi seçeneklerini tek yerde keşfet.",
+          "alt": "Sağlık Turizmi"
+        },
+        "5": {
+          "title": "Luma’ya anlat, doğru hizmeti bul.",
+          "subtitle": "İhtiyacını doğal şekilde anlat, uygun hizmetlere yönel.",
+          "alt": "Yapay Zeka Sağlık Asistanı"
+        }
+      }
     }
   },
   "about": {
@@ -4139,6 +4226,60 @@
         "historyTitle": "Geçmiş",
         "noHistory": "Henüz sohbet yok.",
         "defaultConvTitle": "Yeni Sohbet"
+      },
+      "luma": {
+        "greetingTitle": "Ben Luma. Nasıl yardımcı olabilirim?",
+        "greetingDesc": "Şikayetinizi yazın, sizi en doğru uzman veya kuruma yönlendireyim.",
+        "searching": "Luma araştırıyor...",
+        "recommendedSpecialists": "Önerilen Uzmanlar",
+        "suitableOrganizations": "Uygun Kurumlar",
+        "onDuty": "• Nöbetçi",
+        "errorResponse": "Yanıt alınamadı.",
+        "inputPlaceholder": "Mesajınızı Luma'ya iletin...",
+        "useHealthProfile": "Sağlık profilimi kullan",
+        "encryptedConnection": "Şifreli Bağlantı",
+        "openAssistant": "Luma Asistanı Aç",
+        "copilotTitle": "Luma Copilot",
+        "copilotSubtitle": "Sağlık Asistanınız",
+        "disclaimer": "Ben sağlık profesyoneli değilim. Açık eczane bilgisi nöbetçi eczane anlamına gelmez.",
+        "liveHealthTitle": "Yakınınızdaki sağlık hizmetleri",
+        "liveHealthDesc": "Konumunuza göre canlı ve doğrulanmış seçenekler.",
+        "searchLocation": "Konumumda ara",
+        "searchingAction": "Aranıyor…",
+        "verifiedBadge": "✓ Alumas doğrulandı",
+        "onDutyBadge": "Nöbetçi",
+        "openBadge": "Açık",
+        "noAddress": "Adres bilgisi mevcut değil",
+        "openMap": "Haritada aç",
+        "categories": {
+          "hospital": "Hastaneler",
+          "clinic": "Klinikler",
+          "pharmacy": "Açık eczaneler"
+        },
+        "insuranceMatch": "Sigorta uyumlu",
+        "geoUnsupported": "Bu cihaz konum hizmetini desteklemiyor.",
+        "permissionDenied": "Yakındaki sonuçları göstermek için konum izni gerekli.",
+        "fetchError": "Sonuçlar alınamadı."
+      },
+      "organizationMap": {
+        "mapPlaceholder": "Harita konumu henüz doğrulanmadı.",
+        "directions": "Yol tarifi al ↗"
+      },
+      "videoConsultation": {
+        "preparing": "Hazırlanıyor…",
+        "startCall": "Görüntülü görüşme",
+        "error": "Görüşme başlatılamadı"
+      },
+      "liveHealthPreview": {
+        "bloodPressure": "Tansiyon",
+        "lastRecord": "Son kayıt",
+        "trackWithLogin": "Giriş yaparak takip et",
+        "bloodGlucose": "Kan şekeri",
+        "fasting": "Açlık",
+        "sleep": "Uyku",
+        "hours": "saat",
+        "quality": "Kalite {score}/5",
+        "noRecordYet": "Henüz kayıt yok"
       }
     }
   },
@@ -6174,6 +6315,39 @@
         "cookies": "Çerezler",
         "terms": "Kullanım Koşulları",
         "legalNav": "Yasal"
+      },
+      "carousel": {
+        "ariaLabel": "Öne Çıkan Kampanyalar ve Hizmetler",
+        "prevSlide": "Önceki Slayt",
+        "nextSlide": "Sonraki Slayt",
+        "slideNum": "Slayt {num}",
+        "slides": {
+          "1": {
+            "title": "Sağlığın için doğru adres.",
+            "subtitle": "Doktor, kurum ve sağlık hizmetlerini tek yerde keşfet.",
+            "alt": "Sağlık Hizmetleri"
+          },
+          "2": {
+            "title": "Uzmanını kolayca bul.",
+            "subtitle": "İhtiyacına uygun doktor ve klinikleri keşfet.",
+            "alt": "Uzman Doktor Keşfi"
+          },
+          "3": {
+            "title": "Sigortana uygun seçenekleri keşfet.",
+            "subtitle": "Sana uygun sağlık kurumlarına daha kolay ulaş.",
+            "alt": "Sağlık Sigortası"
+          },
+          "4": {
+            "title": "Sağlık yolculuğunu kolaylaştır.",
+            "subtitle": "Sağlık turizmi seçeneklerini tek yerde keşfet.",
+            "alt": "Sağlık Turizmi"
+          },
+          "5": {
+            "title": "Luma’ya anlat, doğru hizmeti bul.",
+            "subtitle": "İhtiyacını doğal şekilde anlat, uygun hizmetlere yönel.",
+            "alt": "Yapay Zeka Sağlık Asistanı"
+          }
+        }
       }
     },
     "about": {

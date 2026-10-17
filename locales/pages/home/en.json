@@ -37,6 +37,39 @@
       "cookies": "Cookies",
       "terms": "Terms of Use",
       "legalNav": "Legal"
+    },
+    "carousel": {
+      "ariaLabel": "Featured Campaigns and Services",
+      "prevSlide": "Previous Slide",
+      "nextSlide": "Next Slide",
+      "slideNum": "Slide {num}",
+      "slides": {
+        "1": {
+          "title": "The right address for your health.",
+          "subtitle": "Discover doctors, institutions, and healthcare services in one place.",
+          "alt": "Healthcare Services"
+        },
+        "2": {
+          "title": "Find your specialist easily.",
+          "subtitle": "Discover doctors and clinics suited to your needs.",
+          "alt": "Specialist Doctor Discovery"
+        },
+        "3": {
+          "title": "Explore options suited to your insurance.",
+          "subtitle": "Reach matching healthcare providers more easily.",
+          "alt": "Health Insurance"
+        },
+        "4": {
+          "title": "Simplify your health journey.",
+          "subtitle": "Discover health tourism options in one place.",
+          "alt": "Health Tourism"
+        },
+        "5": {
+          "title": "Tell Luma, find the right care.",
+          "subtitle": "Describe your needs naturally and get guided to the right care.",
+          "alt": "AI Health Assistant"
+        }
+      }
     }
   }
 }
