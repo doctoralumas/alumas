@@ -109,9 +109,9 @@ export default async function Home() {
           />
           <div className="home-hero-copy">
             <h1>
-              {t("heroTitleLine1")}
+              <span className="home-hero-line">{t("heroTitleLine1")}</span>
               <br />
-              {t("heroTitleLine2")}
+              <span className="home-hero-line">{t("heroTitleLine2")}</span>
             </h1>
             <p className="home-hero-sub">{t("heroSubtitle")}</p>
             <div className="home-hero-accent" />

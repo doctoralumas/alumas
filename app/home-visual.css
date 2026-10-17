@@ -451,6 +451,10 @@ body:has(.home-page) {
   text-shadow: none;
 }
 
+.home-hero-line {
+  display: inline-block;
+}
+
 .home-hero-sub {
   margin: 16px 0 0;
   color: rgba(255, 255, 255, 1);
@@ -809,23 +813,28 @@ body:has(.home-page) {
   }
 
   .home-hero {
-    height: 230px;
+    min-height: 230px;
+    height: auto;
+    padding-bottom: 20px;
   }
 
   .home-hero-copy {
-      padding: 24px 0 0 20px;
-      width: 68%;
-      max-width: none;
-    }
+    padding: 24px 0 0 20px;
+    width: 68%;
+    max-width: none;
+  }
 
-    .home-hero-kit {
-      display: none;
-    }
-    .home-hero-doctor {
-      right: -5%;
-      height: 95%;
-    }
+  .home-hero-kit {
+    display: none;
+  }
 
+  .home-hero-doctor {
+    right: -5%;
+    height: 95%;
+    max-height: 235px;
+    top: auto;
+    bottom: 0;
+  }
 
   .home-hero h1 {
     font-size: 34px;
@@ -833,6 +842,10 @@ body:has(.home-page) {
 
   .home-hero-sub {
     font-size: 15px;
+  }
+
+  .home-hero-accent {
+    margin-top: 18px;
   }
 
   .home-hero-art {
@@ -926,6 +939,43 @@ body:has(.home-page) {
 
   .home-search-go {
     padding: 0 12px;
+  }
+
+  .home-hero {
+    min-height: 220px;
+    padding-bottom: 18px;
+  }
+
+  .home-hero-copy {
+    padding: 20px 0 0 18px;
+    width: 66%;
+  }
+
+  .home-hero-doctor {
+    right: -4%;
+    height: 98%;
+    max-height: 225px;
+    top: auto;
+    bottom: 0;
+  }
+
+  .home-hero h1 {
+    font-size: clamp(23px, 5.8vw, 28px);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .home-hero-sub {
+    font-size: 13.5px;
+    line-height: 1.32;
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .home-hero-accent {
+    margin-top: 14px;
+    width: 36px;
+    height: 3.5px;
   }
 
   .home-cats {
@@ -1053,5 +1103,40 @@ body:has(.home-page) {
     padding: 3px 5px;
     font-size: 10px;
     min-width: 22px;
+  }
+
+  .home-hero {
+    min-height: 215px;
+    padding-bottom: 16px;
+  }
+
+  .home-hero-copy {
+    padding: 16px 0 0 14px;
+    width: 66%;
+  }
+
+  .home-hero-doctor {
+    right: -6%;
+    height: 96%;
+    max-height: 215px;
+    top: auto;
+    bottom: 0;
+  }
+
+  .home-hero h1 {
+    font-size: 22px;
+    line-height: 1.12;
+  }
+
+  .home-hero-sub {
+    font-size: 12.5px;
+    line-height: 1.3;
+    margin: 7px 0 0;
+  }
+
+  .home-hero-accent {
+    margin-top: 10px;
+    width: 32px;
+    height: 3px;
   }
 }
