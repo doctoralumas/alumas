@@ -104,7 +104,7 @@ export default function Appointments(){
                     <p style={{ margin: "0 0 16px 0", color: "#475569", fontSize: "15px" }}>
                       {a.specialty}
                       {a.patientName ? ` • ${a.patientName}` : ''}
-                      {a.specialProfile ? ` • ${a.specialProfile.type==='CHILD'?'Çocuk':'Gebelik'}: ${a.specialProfile.name}` : ''}
+                      {a.specialProfile ? ` • ${a.specialProfile.type === 'CHILD' ? t('profileChildLabel') : t('profilePregnancyLabel')}: ${a.specialProfile.name}` : ''}
                     </p>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
                       <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "14px", color: "#64748b", background: "#f8fafc", padding: "6px 12px", borderRadius: "10px" }}>

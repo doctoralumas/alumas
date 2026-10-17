@@ -24,7 +24,9 @@
     "placeholder": "City or district name...",
     "findButton": "Find",
     "notFound": "Location not found",
-    "searchError": "An error occurred during search."
+    "searchError": "An error occurred during search.",
+    "geoUnsupported": "Your browser does not support location services.",
+    "permissionDenied": "Location permission was denied or could not be obtained."
   },
   "lockedOverlay": {
     "title": "Discover Alumas",
@@ -75,7 +77,12 @@
   },
   "organizationMap": {
     "mapPlaceholder": "Map location not verified yet.",
-    "directions": "Get directions ↗"
+    "directions": "Get directions ↗",
+    "ariaLabel": "Alumas healthcare organizations map",
+    "openProfile": "View profile",
+    "goToWebsite": "Visit website ↗",
+    "onDutyPrefix": "On duty · ",
+    "getDirections": "Get directions ↗"
   },
   "videoConsultation": {
     "preparing": "Preparing…",

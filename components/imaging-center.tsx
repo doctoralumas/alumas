@@ -1,12 +1,14 @@
 'use client';
 import {useEffect,useState} from 'react';
 import { Trash, FilePdf, FileImage, FileZip, Images, DownloadSimple, Plus, X, UploadSimple, ShieldCheck, Heartbeat } from "@phosphor-icons/react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 type Row={id:string;title:string;modality:string;bodyPart?:string;provider?:string;reportText?:string;impression?:string;performedAt:string;fileName?:string;mimeType?:string};
 
 export default function ImagingCenter({patientId,doctorMode=false}:{patientId?:string;doctorMode?:boolean}){
   const t = useTranslations("health.healthImaging");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
   const [rows,setRows]=useState<Row[]>([]);
   const [open,setOpen]=useState(false);
   const [msg,setMsg]=useState('');
@@ -140,7 +142,13 @@ export default function ImagingCenter({patientId,doctorMode=false}:{patientId?:s
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#475569", marginBottom: "8px" }}>{t("modalityLabel")} <span style={{ color: "#ef4444" }}>*</span></label>
                 <select name="modality" style={{ width: "100%", padding: "14px 16px", borderRadius: "16px", border: "1px solid #cbd5e1", background: "#f8fafc", outline: "none", fontSize: "15px" }}>
-                  <option>MR</option><option>BT</option><option>Röntgen</option><option>Ultrason</option><option>Mamografi</option><option>PET</option><option>Diğer</option>
+                  <option value="MR">{t("modalities.MR")}</option>
+                  <option value="BT">{t("modalities.BT")}</option>
+                  <option value="Röntgen">{t("modalities.XRAY")}</option>
+                  <option value="Ultrason">{t("modalities.ULTRASOUND")}</option>
+                  <option value="Mamografi">{t("modalities.MAMMOGRAPHY")}</option>
+                  <option value="PET">{t("modalities.PET")}</option>
+                  <option value="Diğer">{t("modalities.OTHER")}</option>
                 </select>
               </div>
               <div>
@@ -192,7 +200,7 @@ export default function ImagingCenter({patientId,doctorMode=false}:{patientId?:s
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px" }}>
               <div>
                 <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "#8b5cf6", background: "#f5f3ff", padding: "4px 8px", borderRadius: "100px", display: "inline-block", marginBottom: "8px" }}>
-                  {x.modality}
+                  {x.modality === "Röntgen" ? t("modalities.XRAY") : x.modality === "Ultrason" ? t("modalities.ULTRASOUND") : x.modality === "Mamografi" ? t("modalities.MAMMOGRAPHY") : x.modality === "Diğer" ? t("modalities.OTHER") : x.modality}
                 </span>
                 <h3 style={{ margin: 0, fontSize: "22px", color: "#0f172a" }}>{x.title}</h3>
                 <p style={{ margin: "4px 0 0", fontSize: "15px", color: "#64748b", display: "flex", alignItems: "center", gap: "8px" }}>
@@ -200,7 +208,7 @@ export default function ImagingCenter({patientId,doctorMode=false}:{patientId?:s
                 </p>
               </div>
               <span style={{ fontSize: "14px", fontWeight: 600, color: "#64748b", background: "#f8fafc", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                {new Date(x.performedAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {new Date(x.performedAt).toLocaleDateString(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
 

@@ -2,12 +2,14 @@
 import {useEffect,useState} from "react";
 import SectionVisual from "@/components/section-visual";
 import { FolderUser, Heartbeat, Scissors, Plus, X, CalendarBlank, Buildings, FirstAid } from "@phosphor-icons/react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 type H={conditions:any[];procedures:any[]};
 
 export default function Page(){
   const t = useTranslations("health.healthMedicalHistory");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
   const [d,setD]=useState<H>({conditions:[],procedures:[]});
   const [kind,setKind]=useState<'condition'|'procedure'>('condition');
   const [open, setOpen]=useState(false);
@@ -133,7 +135,7 @@ export default function Page(){
                     {x.diagnosedAt && (
                       <>
                         <span style={{ color: "#cbd5e1" }}>•</span>
-                        <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}><CalendarBlank size={14}/> {new Date(x.diagnosedAt).toLocaleDateString('tr-TR')}</span>
+                        <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}><CalendarBlank size={14}/> {new Date(x.diagnosedAt).toLocaleDateString(dateLocale)}</span>
                       </>
                     )}
                   </div>
@@ -160,7 +162,7 @@ export default function Page(){
                 <div>
                   <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>{x.procedureName}</h3>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
-                    <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}><CalendarBlank size={14}/> {new Date(x.performedAt).toLocaleDateString('tr-TR')}</span>
+                    <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}><CalendarBlank size={14}/> {new Date(x.performedAt).toLocaleDateString(dateLocale)}</span>
                     <span style={{ color: "#cbd5e1" }}>•</span>
                     <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}><Buildings size={14}/> {x.provider || t("noProvider")}</span>
                   </div>

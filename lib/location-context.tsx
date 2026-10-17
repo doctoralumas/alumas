@@ -1,11 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export type LocationState = {
   lat: number | null;
   lng: number | null;
-  addressName: string; // e.g. "İstanbul, Kadıköy" or "Konum Seçin"
+  addressName: string;
 };
 
 type LocationContextType = {
@@ -18,10 +19,11 @@ type LocationContextType = {
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("locationSelector");
   const [location, setLoc] = useState<LocationState>({
     lat: null,
     lng: null,
-    addressName: "Konum Seçin",
+    addressName: "",
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,7 +39,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
           setLoc({ lat, lng, addressName: storedName });
         } else {
           // We have coords but no name, let's reverse geocode it silently
-          setLoc(prev => ({ ...prev, lat, lng, addressName: "Konum bulunuyor..." }));
+          setLoc(prev => ({ ...prev, lat, lng, addressName: t("loading") }));
           fetch("/api/maps/reverse", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -49,15 +51,15 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
                 setLoc({ lat, lng, addressName: data.address });
                 sessionStorage.setItem("alumas_location_name", data.address);
               } else {
-                setLoc({ lat, lng, addressName: "Konum Bulunamadı" });
+                setLoc({ lat, lng, addressName: t("notFound") });
               }
             })
-            .catch(() => setLoc({ lat, lng, addressName: "Konum Seçin" }));
+            .catch(() => setLoc({ lat, lng, addressName: "" }));
         }
       }
     } catch (e) {}
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
   const setLocation = (loc: Partial<LocationState>) => {
     setLoc(prev => {
@@ -76,7 +78,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
   const refreshLocation = async () => {
     setIsLoading(true);
     if (!navigator.geolocation) {
-      alert("Tarayıcınız konum servisini desteklemiyor.");
+      alert(t("geoUnsupported"));
       setIsLoading(false);
       return;
     }
@@ -85,7 +87,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-        setLocation({ lat, lng, addressName: "Konum bulunuyor..." });
+        setLocation({ lat, lng, addressName: t("loading") });
         
         try {
           const res = await fetch("/api/maps/reverse", {
@@ -97,15 +99,15 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
           if (data.address) {
             setLocation({ addressName: data.address });
           } else {
-            setLocation({ addressName: "Konum Bulunamadı" });
+            setLocation({ addressName: t("notFound") });
           }
         } catch (e) {
-          setLocation({ addressName: "Hata oluştu" });
+          setLocation({ addressName: t("searchError") });
         }
         setIsLoading(false);
       },
       (err) => {
-        alert("Konum izni reddedildi veya alınamadı.");
+        alert(t("permissionDenied"));
         setIsLoading(false);
       }
     );

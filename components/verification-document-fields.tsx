@@ -1,13 +1,14 @@
 "use client";
 
 import { requiredDocuments, type DocumentOwnerKind, type RequiredDocument } from "@/lib/verification-requirements";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 const fieldStyle = { padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px", width: "100%" };
 
 export function DocumentUploadFields({ kind, entityType }: { kind: DocumentOwnerKind; entityType?: string | null }) {
   const t = useTranslations("professional.verificationFields");
-  const documents = requiredDocuments(kind, entityType);
+  const locale = useLocale();
+  const documents = requiredDocuments(kind, entityType, locale);
   if (!documents.length) return null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>

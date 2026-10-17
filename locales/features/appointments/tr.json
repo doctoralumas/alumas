@@ -60,6 +60,8 @@
       "devRoomDesc": "Gerçek görüşme için VIDEO_PROVIDER ve sağlayıcı API anahtarı yapılandırılmalı. Burada cihaz kamera/mikrofon testi yapabilirsin.",
       "testCamera": "Kamera & mikrofonu test et",
       "cameraError": "Kamera/mikrofon izni verilemedi."
-    }
+    },
+    "profileChildLabel": "Çocuk",
+    "profilePregnancyLabel": "Gebelik"
   }
 }

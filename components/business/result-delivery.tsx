@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Patient = { id: string; name: string; email: string };
 type CatalogItem = { id: string; name: string };
@@ -14,6 +15,7 @@ export default function ResultDelivery({
   kind: "imaging" | "laboratory";
   catalog: CatalogItem[];
 }) {
+  const t = useTranslations("professional.resultDelivery");
   const imaging = kind === "imaging";
   const [patients, setPatients] = useState<Patient[]>([]);
   const [patientId, setPatientId] = useState("");
@@ -36,7 +38,7 @@ export default function ResultDelivery({
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    setMsg("Kaydediliyor...");
+    setMsg(t("saving"));
     const response = await fetch(`/api/organizations/${organizationId}/results`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -55,7 +57,7 @@ export default function ResultDelivery({
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setMsg(data.error || "Sonuç işlenemedi");
+      setMsg(data.error || t("saveFailed"));
       return;
     }
     setReportText("");
@@ -65,73 +67,71 @@ export default function ResultDelivery({
     setReferenceLow("");
     setReferenceHigh("");
     setWhen("");
-    setMsg(imaging ? "Rapor hastanın görüntüleme geçmişine işlendi." : "Sonuç hastanın tahlil geçmişine işlendi.");
+    setMsg(imaging ? t("imagingSaved") : t("labSaved"));
   }
 
   return (
     <section className="panel form-span" style={{ marginBottom: 24 }}>
-      <h2>{imaging ? "Raporu hastanın kaydına işle" : "Sonucu hastanın tahlil geçmişine işle"}</h2>
+      <h2>{imaging ? t("imagingTitle") : t("labTitle")}</h2>
       <p>
-        {imaging
-          ? "Seçilen tetkik raporu, mesajı veya randevusu olan hastanın görüntüleme geçmişine yazılır."
-          : "Seçilen tahlil sonucu, mesajı veya randevusu olan hastanın tahlil geçmişine yazılır."}
+        {imaging ? t("imagingDesc") : t("labDesc")}
         {" "}
-        <a href="/messages">Mesajlara git</a>
+        <a href="/messages">{t("goToMessages")}</a>
       </p>
-      {!catalog.length && <div className="empty">Önce kataloğa kayıt ekleyin. Sonuç, yayınlanan katalogdan seçilir.</div>}
-      {!!catalog.length && !patients.length && <div className="empty">Henüz bu kurumla mesajlaşan veya randevusu olan hasta yok.</div>}
+      {!catalog.length && <div className="empty">{t("emptyCatalog")}</div>}
+      {!!catalog.length && !patients.length && <div className="empty">{t("emptyPatients")}</div>}
       {!!catalog.length && !!patients.length && (
         <form className="panel-fields" onSubmit={submit}>
           <label className="field">
-            <span>Hasta</span>
+            <span>{t("patientLabel")}</span>
             <select value={patientId} onChange={(event) => setPatientId(event.target.value)} required>
-              <option value="">Hasta seç</option>
+              <option value="">{t("selectPatient")}</option>
               {patients.map((patient) => <option key={patient.id} value={patient.id}>{patient.name} · {patient.email}</option>)}
             </select>
           </label>
           <label className="field">
-            <span>{imaging ? "Tetkik" : "Tahlil"}</span>
+            <span>{imaging ? t("examLabel") : t("testLabel")}</span>
             <select value={catalogId} onChange={(event) => setCatalogId(event.target.value)} required>
-              <option value="">{imaging ? "Tetkik seç" : "Tahlil seç"}</option>
+              <option value="">{imaging ? t("selectExam") : t("selectTest")}</option>
               {catalog.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <label className="field">
-            <span>{imaging ? "Çekim tarihi" : "Numune tarihi"}</span>
+            <span>{imaging ? t("scanDateLabel") : t("sampleDateLabel")}</span>
             <input type="date" value={when} onChange={(event) => setWhen(event.target.value)} required />
           </label>
           {imaging ? (
             <>
               <label className="field">
-                <span>Rapor metni</span>
-                <textarea value={reportText} onChange={(event) => setReportText(event.target.value)} placeholder="Bulgular" required />
+                <span>{t("reportTextLabel")}</span>
+                <textarea value={reportText} onChange={(event) => setReportText(event.target.value)} placeholder={t("findingsPlaceholder")} required />
               </label>
               <label className="field">
-                <span>Kısa sonuç notu</span>
-                <input value={impression} onChange={(event) => setImpression(event.target.value)} placeholder="İsteğe bağlı" />
+                <span>{t("shortImpressionLabel")}</span>
+                <input value={impression} onChange={(event) => setImpression(event.target.value)} placeholder={t("optionalPlaceholder")} />
               </label>
             </>
           ) : (
             <>
               <label className="field">
-                <span>Sonuç değeri</span>
+                <span>{t("resultValueLabel")}</span>
                 <input value={value} onChange={(event) => setValue(event.target.value)} required />
               </label>
               <label className="field">
-                <span>Birim</span>
+                <span>{t("unitLabel")}</span>
                 <input value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="mg/dL" />
               </label>
               <label className="field">
-                <span>Referans alt</span>
+                <span>{t("referenceLowLabel")}</span>
                 <input value={referenceLow} onChange={(event) => setReferenceLow(event.target.value)} />
               </label>
               <label className="field">
-                <span>Referans üst</span>
+                <span>{t("referenceHighLabel")}</span>
                 <input value={referenceHigh} onChange={(event) => setReferenceHigh(event.target.value)} />
               </label>
             </>
           )}
-          <button className="primary">Hastanın kaydına işle</button>
+          <button className="primary">{t("submitButton")}</button>
         </form>
       )}
       {msg && <div className="inline-message">{msg}</div>}

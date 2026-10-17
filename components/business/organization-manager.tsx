@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   IMAGING_MODALITIES,
   LAB_CATEGORIES,
@@ -32,15 +32,6 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 
 type Props = { org: any, globalInsurances?: any[] };
-const days = [
-  "Pazar",
-  "Pazartesi",
-  "Salı",
-  "Çarşamba",
-  "Perşembe",
-  "Cuma",
-  "Cumartesi",
-];
 
 const emptyExam = {
   modality: "MR",
@@ -64,6 +55,17 @@ const emptyTest = {
 
 export default function OrganizationManager({ org, globalInsurances = [] }: Props) {
   const t = useTranslations("professional.orgManager");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
+  const days = [
+    t("days.0"),
+    t("days.1"),
+    t("days.2"),
+    t("days.3"),
+    t("days.4"),
+    t("days.5"),
+    t("days.6"),
+  ];
   const panelCopy: Record<string, string> = {
     HOSPITAL: t("panelCopy.HOSPITAL"),
     CLINIC: t("panelCopy.CLINIC"),
@@ -167,19 +169,19 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       body: JSON.stringify({ insuranceProviderId: insuranceForm.providerId, note: insuranceForm.note }),
     });
     const j = await r.json();
-    if (!r.ok) return setMsg(j.error || "Sigorta eklenemedi");
+    if (!r.ok) return setMsg(j.error || t("insuranceAddFailed"));
     setInsuranceContracts(x => {
       const filtered = x.filter(c => c.insuranceProviderId !== j.insuranceProviderId);
       return [j, ...filtered];
     });
     setInsuranceForm({ providerId: "", note: "" });
-    setMsg("Sigorta kuruma eklendi");
+    setMsg(t("insuranceAdded"));
   }
   async function removeInsurance(providerId: string) {
     const r = await fetch("/api/organizations/" + org.id + "/insurance?providerId=" + providerId, { method: "DELETE" });
     if (r.ok) {
       setInsuranceContracts(x => x.filter(i => i.insuranceProviderId !== providerId));
-      setMsg("Sigorta anlaşması kaldırıldı");
+      setMsg(t("insuranceRemoved"));
     }
   }
 
@@ -193,7 +195,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       body: JSON.stringify(payload),
     });
     const j = await r.json();
-    if (!r.ok) return setMsg(j.error || "Departman kaydedilemedi");
+    if (!r.ok) return setMsg(j.error || t("departmentSaveFailed"));
     setDepartments((x) =>
       editingDepartmentId
         ? x.map((item) => (item.id === j.id ? j : item))
@@ -201,7 +203,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     setDepartmentForm({ name: "", floor: "", phone: "", description: "" });
     setEditingDepartmentId(null);
-    setMsg(editingDepartmentId ? "Departman güncellendi" : "Departman eklendi");
+    setMsg(editingDepartmentId ? t("departmentUpdated") : t("departmentAdded"));
   }
   function editDepartment(item: any) {
     setEditingDepartmentId(item.id);
@@ -227,7 +229,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
             : doctor
         )
       );
-      setMsg("Departman kaldırıldı");
+      setMsg(t("departmentRemoved"));
       if (editingDepartmentId === id) {
         setEditingDepartmentId(null);
         setDepartmentForm({ name: "", floor: "", phone: "", description: "" });
@@ -244,7 +246,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       body: JSON.stringify(payload),
     });
     const j = await r.json();
-    if (!r.ok) return setMsg(j.error || "Kampanya kaydedilemedi");
+    if (!r.ok) return setMsg(j.error || t("campaignSaveFailed"));
     setCampaigns((x) =>
       editingCampaignId
         ? x.map((item) => (item.id === j.id ? j : item))
@@ -258,7 +260,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       isActive: true,
     });
     setEditingCampaignId(null);
-    setMsg(editingCampaignId ? "Kampanya güncellendi" : "Kampanya eklendi");
+    setMsg(editingCampaignId ? t("campaignUpdated") : t("campaignAdded"));
   }
   function editCampaign(item: any) {
     setEditingCampaignId(item.id);
@@ -292,7 +294,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     if (r.ok) {
       setCampaigns((x) => x.filter((i) => i.id !== id));
-      setMsg("Kampanya silindi");
+      setMsg(t("campaignRemoved"));
       if (editingCampaignId === id) {
         setEditingCampaignId(null);
         setCampaignForm({
@@ -315,7 +317,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       body: JSON.stringify(payload),
     });
     const j = await r.json();
-    if (!r.ok) return setMsg(j.error || "Hizmet kaydedilemedi");
+    if (!r.ok) return setMsg(j.error || t("serviceSaveFailed"));
     setServices((x) =>
       editingServiceId
         ? x.map((item) => (item.id === j.id ? { ...item, ...j } : item))
@@ -323,7 +325,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     setServiceForm({ name: "", description: "", price: "", homeCareKind: "" });
     setEditingServiceId(null);
-    setMsg(editingServiceId ? "Hizmet güncellendi" : "Hizmet eklendi");
+    setMsg(editingServiceId ? t("serviceUpdated") : t("serviceAdded"));
   }
   function editService(item: any) {
     setEditingServiceId(item.id);
@@ -342,7 +344,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     });
     if (r.ok) {
       setServices((x) => x.filter((i) => i.id !== id));
-      setMsg("Hizmet kaldırıldı");
+      setMsg(t("serviceRemoved"));
       if (editingServiceId === id) {
         setEditingServiceId(null);
         setServiceForm({
@@ -367,7 +369,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       }
     );
     const j = await r.json();
-    if (!r.ok) return setMsg(j.error || "Acil hizmet kaydedilemedi");
+    if (!r.ok) return setMsg(j.error || t("emergencySaveFailed"));
     setEmergencyServices((x) =>
       editingEmergencyId
         ? x.map((item) => (item.id === j.id ? j : item))
@@ -382,7 +384,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     });
     setEditingEmergencyId(null);
     setMsg(
-      editingEmergencyId ? "Acil hizmet güncellendi" : "Acil hizmet eklendi"
+      editingEmergencyId ? t("emergencyUpdated") : t("emergencyAdded")
     );
   }
   function editEmergency(item: any) {
@@ -406,7 +408,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     if (r.ok) {
       setEmergencyServices((x) => x.filter((i) => i.id !== id));
-      setMsg("Acil hizmet kaldırıldı");
+      setMsg(t("emergencyRemoved"));
       if (editingEmergencyId === id) {
         setEditingEmergencyId(null);
         setEmergencyForm({
@@ -446,7 +448,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
         priceDelta: "",
         durationMinutes: "",
       });
-      setMsg("Varyant eklendi");
+      setMsg(t("variantAdded"));
     } else setMsg(j.error);
   }
   async function removeVariant(serviceId: string, variantId: string) {
@@ -471,7 +473,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
             : item
         )
       );
-      setMsg("Varyant kaldırıldı");
+      setMsg(t("variantRemoved"));
     }
   }
 
@@ -491,7 +493,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     if (r.ok) {
       setInvites((x) => [j, ...x]);
       form.reset();
-      setMsg("Doktor daveti gönderildi");
+      setMsg(t("inviteSent"));
     } else setMsg(j.error);
   }
 
@@ -514,7 +516,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       setHoursSaved(true);
       setTimeout(() => setHoursSaved(false), 2000);
     } else {
-      setMsg("Saatler kaydedilemedi");
+      setMsg(t("hoursSaveFailed"));
     }
   }
   function updateHour(day: number, key: string, value: any) {
@@ -530,7 +532,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     });
   }
   async function locate() {
-    setMsg("Konum aranıyor...");
+    setMsg(t("locatingMessage"));
     const r = await fetch("/api/maps/geocode", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -546,7 +548,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     });
     const j = await r.json();
     if (!r.ok) {
-      setMsg(j.error || "Konum bulunamadı");
+      setMsg(j.error || t("locationNotFound"));
       return;
     }
     const u = await fetch(`/api/organizations/` + org.id, {
@@ -554,7 +556,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       headers: { "content-type": "application/json" },
       body: JSON.stringify(j),
     });
-    setMsg(u.ok ? "Harita konumu kaydedildi" : "Konum kaydedilemedi");
+    setMsg(u.ok ? t("locationSaved") : t("locationSaveFailed"));
   }
   async function saveDuty() {
     const r = await fetch(`/api/organizations/` + org.id, {
@@ -567,7 +569,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       }),
     });
     setMsg(
-      r.ok ? "Nöbetçi durumu güncellendi" : "Nöbetçi durumu kaydedilemedi"
+      r.ok ? t("dutyStatusUpdated") : t("dutyStatusSaveFailed")
     );
   }
 
@@ -586,8 +588,8 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           d.id === doctorId ? { ...d, departmentId: departmentId || null } : d
         )
       );
-      setMsg("Doktor departmanı güncellendi");
-    } else setMsg("Departman atanamadı");
+      setMsg(t("doctorDepartmentUpdated"));
+    } else setMsg(t("doctorDepartmentAssignFailed"));
   }
 
   async function addStock(e: any) {
@@ -607,7 +609,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     if (r.ok) {
       setStock((x) => [...x.filter((s) => s.itemName !== j.itemName), j]);
       form.reset();
-      setMsg("Stok güncellendi");
+      setMsg(t("stockUpdated"));
     } else setMsg(j.error);
   }
   async function updateStock(stockId: string, stockStatus: string) {
@@ -618,13 +620,13 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     });
     const data = await response.json();
     if (!response.ok) {
-      setMsg(data.error || "Stok güncellenemedi");
+      setMsg(data.error || t("stockUpdateFailed"));
       return;
     }
     setStock((current) =>
       current.map((item) => (item.id === data.id ? data : item))
     );
-    setMsg("Stok durumu güncellendi");
+    setMsg(t("stockStatusUpdated"));
   }
   async function removeStock(stockId: string) {
     const response = await fetch(
@@ -632,11 +634,11 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       { method: "DELETE" }
     );
     if (!response.ok) {
-      setMsg("Stok kaydı kaldırılamadı");
+      setMsg(t("stockRemoveFailed"));
       return;
     }
     setStock((current) => current.filter((item) => item.id !== stockId));
-    setMsg("Stok kaydı kaldırıldı");
+    setMsg(t("stockRemoved"));
   }
 
   function editExam(exam: any) {
@@ -661,7 +663,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     });
     const j = await r.json();
     if (!r.ok) {
-      setMsg(j.error || "Tetkik kaydedilemedi");
+      setMsg(j.error || t("examSaveFailed"));
       return;
     }
     setExams((current) =>
@@ -671,7 +673,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     setExamForm(emptyExam);
     setEditingExamId(null);
-    setMsg(editingExamId ? "Tetkik güncellendi" : "Tetkik kataloğa eklendi");
+    setMsg(editingExamId ? t("examUpdated") : t("examAdded"));
   }
   async function removeExam(id: string) {
     const r = await fetch(
@@ -680,7 +682,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     const j = await r.json().catch(() => ({}));
     if (!r.ok) {
-      setMsg(j.error || "Tetkik kaldırılamadı");
+      setMsg(j.error || t("examRemoveFailed"));
       return;
     }
     setExams((current) => current.filter((item) => item.id !== id));
@@ -688,7 +690,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       setEditingExamId(null);
       setExamForm(emptyExam);
     }
-    setMsg("Tetkik yayından kaldırıldı");
+    setMsg(t("examRemoved"));
   }
   function editTest(test: any) {
     setEditingTestId(test.id);
@@ -716,7 +718,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     const j = await r.json();
     if (!r.ok) {
-      setMsg(j.error || "Tahlil kaydedilemedi");
+      setMsg(j.error || t("testSaveFailed"));
       return;
     }
     setTests((current) =>
@@ -726,7 +728,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     setTestForm(emptyTest);
     setEditingTestId(null);
-    setMsg(editingTestId ? "Tahlil güncellendi" : "Tahlil kataloğa eklendi");
+    setMsg(editingTestId ? t("testUpdated") : t("testAdded"));
   }
   async function removeTest(id: string) {
     const r = await fetch(
@@ -735,7 +737,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     );
     const j = await r.json().catch(() => ({}));
     if (!r.ok) {
-      setMsg(j.error || "Tahlil kaldırılamadı");
+      setMsg(j.error || t("testRemoveFailed"));
       return;
     }
     setTests((current) => current.filter((item) => item.id !== id));
@@ -743,7 +745,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       setEditingTestId(null);
       setTestForm(emptyTest);
     }
-    setMsg("Tahlil yayından kaldırıldı");
+    setMsg(t("testRemoved"));
   }
 
   return (
@@ -762,7 +764,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       >
         <Info size={24} weight="duotone" color="#3b82f6" />
         <p className="muted" style={{ margin: 0, fontSize: "15px" }}>
-          {panelCopy[org.type] || "Kurum bilgilerini buradan yönetirsiniz."}
+          {panelCopy[org.type] || t("defaultPanelCopy")}
         </p>
       </div>
 
@@ -822,23 +824,23 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 body: JSON.stringify(payload),
               });
               if (r.ok) {
-                setMsg("Genel bilgiler güncellendi");
+                setMsg(t("msgGeneralInfoUpdated"));
                 setTimeout(() => window.location.reload(), 1000);
               } else {
-                setMsg("Bilgiler güncellenemedi");
+                setMsg(t("msgGeneralInfoUpdateFailed"));
               }
             }}
           >
             <div className="responsive-form-field">
-              <label>Kurum Adı</label>
+              <label>{t("orgNameLabel")}</label>
               <input name="name" defaultValue={org.name} required />
             </div>
             <div className="responsive-form-field">
-              <label>Telefon</label>
+              <label>{t("phoneLabel")}</label>
               <input name="phone" defaultValue={org.phone || ""} type="tel" />
             </div>
             <div className="responsive-form-field">
-              <label>Web Sitesi</label>
+              <label>{t("websiteLabel")}</label>
               <input
                 name="website"
                 defaultValue={org.website || ""}
@@ -846,11 +848,11 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               />
             </div>
             <div className="responsive-form-field">
-              <label>İl</label>
+              <label>{t("cityLabel")}</label>
               <input name="city" defaultValue={org.city || ""} required />
             </div>
             <div className="responsive-form-field">
-              <label>İlçe</label>
+              <label>{t("districtLabel")}</label>
               <input name="district" defaultValue={org.district || ""} />
             </div>
             <div
@@ -881,7 +883,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               }}
             >
               <button className="primary" type="submit">
-                Genel Bilgileri Güncelle
+                {t("updateGeneralInfoBtn")}
               </button>
             </div>
           </form>
@@ -890,68 +892,67 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
 
       {/* Anlaşmalı Sigortalar */}
       <details className="premium-accordion">
-        <summary className="premium-accordion-summary">
-          <div className="premium-accordion-header">
-            <div className="premium-accordion-icon" style={{ background: "#e0f2fe", color: "#0ea5e9" }}>
-              <Heartbeat size={28} weight="duotone" />
+          <summary className="premium-accordion-summary">
+            <div className="premium-accordion-header">
+              <div className="premium-accordion-icon" style={{ background: "#e0f2fe", color: "#0ea5e9" }}>
+                <Heartbeat size={28} weight="duotone" />
+              </div>
+              <div>
+                <h3 className="premium-accordion-title">{t("insuranceTitle")}</h3>
+                <p className="premium-accordion-desc">
+                  {t("insuranceDesc")}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="premium-accordion-title">Anlaşmalı Sigortalar</h3>
-              <p className="premium-accordion-desc">
-                Kurumunuzda geçerli olan tamamlayıcı veya özel sağlık sigortalarını buradan yönetin.
-              </p>
-            </div>
-          </div>
-          <CaretDown size={20} className="premium-chevron" />
-        </summary>
-        <div className="premium-accordion-content">
-          <form className="responsive-form-grid" onSubmit={addInsurance}>
-            <div className="responsive-form-field">
-              <label>Sigorta Firması Seçin</label>
-              <select 
-                value={insuranceForm.providerId} 
-                onChange={(e) => setInsuranceForm({ ...insuranceForm, providerId: e.target.value })}
-                required
-              >
-                <option value="">-- Listeden Seçin --</option>
-                {globalInsurances.map((ins: any) => (
-                  <option key={ins.id} value={ins.id}>{ins.name}</option>
+            <CaretDown size={20} className="premium-chevron" />
+          </summary>
+          <div className="premium-accordion-content">
+            <form className="responsive-form-grid" onSubmit={addInsurance}>
+              <div className="responsive-form-field">
+                <label>{t("selectInsuranceLabel")}</label>
+                <select 
+                  value={insuranceForm.providerId} 
+                  onChange={(e) => setInsuranceForm({ ...insuranceForm, providerId: e.target.value })}
+                  required
+                >
+                  <option value="">{t("selectInsurancePlaceholder")}</option>
+                  {globalInsurances.map((ins: any) => (
+                    <option key={ins.id} value={ins.id}>{ins.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="responsive-form-field">
+                <label>{t("insuranceNoteLabel")}</label>
+                <input 
+                  placeholder={t("insuranceNotePlaceholder")}
+                  value={insuranceForm.note}
+                  onChange={(e) => setInsuranceForm({ ...insuranceForm, note: e.target.value })}
+                />
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <button className="primary" style={{ height: "46px", width: "100%" }}>{t("addInsuranceBtn")}</button>
+              </div>
+            </form>
+
+            {insuranceContracts.length > 0 && (
+              <div className="premium-card-list" style={{ marginTop: "20px" }}>
+                {insuranceContracts.map((contract: any) => (
+                  <div key={contract.insuranceProviderId} className="premium-card-item">
+                    <div>
+                      <b style={{ fontSize: "16px", color: "#0f172a" }}>{contract.insuranceProvider?.name}</b>
+                      {contract.note && <div style={{ color: "#64748b", fontSize: "14px", marginTop: "4px" }}>{contract.note}</div>}
+                    </div>
+                    <div className="premium-card-item-actions">
+                      <button type="button" className="secondary danger" onClick={() => removeInsurance(contract.insuranceProviderId)}>
+                        <Trash size={16} /> {t("cancelContractBtn")}
+                      </button>
+                    </div>
+                  </div>
                 ))}
-              </select>
-            </div>
-            <div className="responsive-form-field">
-              <label>Kuruma Özel Not (Opsiyonel)</label>
-              <input 
-                placeholder="Örn: Sadece Dahiliye bölümünde geçerlidir."
-                value={insuranceForm.note}
-                onChange={(e) => setInsuranceForm({ ...insuranceForm, note: e.target.value })}
-              />
-            </div>
-            <div style={{ gridColumn: "1 / -1" }}>
-              <button className="primary" style={{ height: "46px", width: "100%" }}>Anlaşmalara Ekle</button>
-            </div>
-          </form>
-
-          {insuranceContracts.length > 0 && (
-            <div className="premium-card-list" style={{ marginTop: "20px" }}>
-              {insuranceContracts.map((contract: any) => (
-                <div key={contract.insuranceProviderId} className="premium-card-item">
-                  <div>
-                    <b style={{ fontSize: "16px", color: "#0f172a" }}>{contract.insuranceProvider?.name}</b>
-                    {contract.note && <div style={{ color: "#64748b", fontSize: "14px", marginTop: "4px" }}>{contract.note}</div>}
-                  </div>
-                  <div className="premium-card-item-actions">
-                    <button type="button" className="secondary danger" onClick={() => removeInsurance(contract.insuranceProviderId)}>
-                      <Trash size={16} /> Anlaşmayı İptal Et
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </details>
-
+              </div>
+            )}
+          </div>
+        </details>
 
       <VerificationDocumentManager
         owner={{
@@ -968,7 +969,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           kind="imaging"
           catalog={exams.map((exam) => ({
             id: exam.id,
-            name: imagingModalityLabel(exam.modality) + " - " + exam.name,
+            name: imagingModalityLabel(exam.modality, locale) + " - " + exam.name,
           }))}
         />
       )}
@@ -978,7 +979,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           kind="laboratory"
           catalog={tests.map((test) => ({
             id: test.id,
-            name: labCategoryLabel(test.category) + " - " + test.name,
+            name: labCategoryLabel(test.category, locale) + " - " + test.name,
           }))}
         />
       )}
@@ -993,10 +994,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               <MapPin size={28} weight="duotone" />
             </div>
             <div>
-              <h3 className="premium-accordion-title">Konum ve Harita</h3>
+              <h3 className="premium-accordion-title">{t("locationTitle")}</h3>
               <p className="premium-accordion-desc">
-                Hastalarınızın kurumunuzu bulabilmesi için konumunuzu
-                doğrulayın.
+                {t("locationDesc")}
               </p>
             </div>
           </div>
@@ -1025,7 +1025,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   color: "#0f172a",
                 }}
               >
-                Kayıtlı Adres
+                {t("registeredAddress")}
               </h2>
               <p
                 className="muted"
@@ -1035,7 +1035,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               </p>
             </div>
             <button className="primary" onClick={locate}>
-              Adresten harita konumu bul
+              {t("locateFromAddressBtn")}
             </button>
           </div>
         </div>
@@ -1055,11 +1055,10 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <h3 className="premium-accordion-title">
                   {org.type === "CLINIC"
                     ? t("consultationsAndProcedures")
-                    : "Klinik Hizmetler"}
+                    : t("clinicalServicesTitle")}
                 </h3>
                 <p className="premium-accordion-desc">
-                  Sunulan sağlık hizmetlerini, fiyat ve evde bakım opsiyonlarını
-                  yönetin.
+                  {t("clinicalServicesDesc")}
                 </p>
               </div>
             </div>
@@ -1070,8 +1069,8 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               <div className="responsive-form-field">
                 <label>
                   {org.type === "CLINIC"
-                    ? "Muayene veya işlem adı"
-                    : "Hizmet adı"}
+                    ? t("procedureNameLabel")
+                    : t("serviceNameLabel")}
                 </label>
                 <input
                   value={serviceForm.name}
@@ -1082,7 +1081,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Fiyat (₺)</label>
+                <label>{t("priceLabel")}</label>
                 <input
                   value={serviceForm.price}
                   onChange={(e) =>
@@ -1105,7 +1104,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Konum</label>
+                <label>{t("servicePlaceLabel")}</label>
                 <select
                   value={serviceForm.homeCareKind}
                   onChange={(e) =>
@@ -1115,17 +1114,17 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                     })
                   }
                 >
-                  <option value="">Yalnızca kurumda</option>
-                  <option value="nurse">Evde hemşirelik</option>
-                  <option value="dressing">Evde pansuman</option>
-                  <option value="physio">Evde fizyoterapi</option>
+                  <option value="">{t("placeClinicOnly")}</option>
+                  <option value="nurse">{t("placeHomeNurse")}</option>
+                  <option value="dressing">{t("placeHomeDressing")}</option>
+                  <option value="physio">{t("placeHomePhysio")}</option>
                 </select>
               </div>
               <div
                 style={{ display: "flex", gap: "12px", gridColumn: "1 / -1" }}
               >
                 <button className="primary" style={{ height: "46px", flex: 1 }}>
-                  {editingServiceId ? "Güncelle" : "Hizmet Ekle"}
+                  {editingServiceId ? t("updateBtn") : t("addServiceBtn")}
                 </button>
                 {editingServiceId && (
                   <button
@@ -1141,7 +1140,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       });
                     }}
                   >
-                    Vazgeç
+                    {t("cancelBtn")}
                   </button>
                 )}
               </div>
@@ -1164,12 +1163,12 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       {[
                         s.price ? `${s.price} ₺` : null,
                         s.homeCareKind === "nurse"
-                          ? "Evde hemşirelik"
+                          ? t("placeHomeNurse")
                           : s.homeCareKind === "dressing"
-                          ? "Evde pansuman"
+                          ? t("placeHomeDressing")
                           : s.homeCareKind === "physio"
-                          ? "Evde fizyoterapi"
-                          : "Kurumda",
+                          ? t("placeHomePhysio")
+                          : t("placeClinicShort"),
                         s.description,
                       ]
                         .filter(Boolean)
@@ -1185,14 +1184,14 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       type="button"
                       onClick={() => editService(s)}
                     >
-                      <PencilSimple size={16} /> Düzenle
+                      <PencilSimple size={16} /> {t("editBtn")}
                     </button>
                     <button
                       className="secondary danger"
                       type="button"
                       onClick={() => removeService(s.id)}
                     >
-                      <Trash size={16} /> Kaldır
+                      <Trash size={16} /> {t("removeBtn")}
                     </button>
                   </div>
                 </div>
@@ -1213,9 +1212,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <ListDashes size={28} weight="duotone" />
               </div>
               <div>
-                <h3 className="premium-accordion-title">Hizmet Varyantları</h3>
+                <h3 className="premium-accordion-title">{t("variantsTitle")}</h3>
                 <p className="premium-accordion-desc">
-                  Hizmetlere süre bazlı veya premium alt seçenekler ekleyin.
+                  {t("variantsDesc")}
                 </p>
               </div>
             </div>
@@ -1224,7 +1223,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           <div className="premium-accordion-content">
             <form onSubmit={addVariant} className="responsive-form-grid">
               <div className="responsive-form-field">
-                <label>Hizmet</label>
+                <label>{t("serviceLabel")}</label>
                 <select
                   value={variantForm.serviceId}
                   onChange={(e) =>
@@ -1235,7 +1234,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   }
                   required
                 >
-                  <option value="">Seçiniz...</option>
+                  <option value="">{t("selectPlaceholder")}</option>
                   {services.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
@@ -1244,7 +1243,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 </select>
               </div>
               <div className="responsive-form-field">
-                <label>Varyant Etiketi (Örn: Premium)</label>
+                <label>{t("variantLabelInput")}</label>
                 <input
                   value={variantForm.label}
                   onChange={(e) =>
@@ -1254,7 +1253,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Ek fiyat (₺)</label>
+                <label>{t("priceDeltaLabel")}</label>
                 <input
                   value={variantForm.priceDelta}
                   onChange={(e) =>
@@ -1267,7 +1266,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Süre (dk)</label>
+                <label>{t("durationMinutesLabel")}</label>
                 <input
                   value={variantForm.durationMinutes}
                   onChange={(e) =>
@@ -1280,7 +1279,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <button className="primary" style={{ height: "46px" }}>
-                Varyant Ekle
+                {t("addVariantBtn")}
               </button>
             </form>
             <div className="premium-card-list">
@@ -1301,7 +1300,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                             marginTop: "4px",
                           }}
                         >
-                          {v.durationMinutes ? `${v.durationMinutes} dk ` : ""}
+                          {v.durationMinutes ? `${v.durationMinutes} ${t("minutesUnit")} ` : ""}
                           {v.priceDelta ? `· +${v.priceDelta} ₺` : ""}
                         </div>
                       </div>
@@ -1311,7 +1310,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                           className="secondary danger"
                           onClick={() => removeVariant(s.id, v.id)}
                         >
-                          <Trash size={16} /> Kaldır
+                          <Trash size={16} /> {t("removeBtn")}
                         </button>
                       </div>
                     </div>
@@ -1333,9 +1332,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <EnvelopeSimpleOpen size={28} weight="duotone" />
               </div>
               <div>
-                <h3 className="premium-accordion-title">Doktor Davetleri</h3>
+                <h3 className="premium-accordion-title">{t("doctorInvitesTitle")}</h3>
                 <p className="premium-accordion-desc">
-                  Kurumunuza uzman doktorları davet edin ve durumlarını izleyin.
+                  {t("doctorInvitesDesc")}
                 </p>
               </div>
             </div>
@@ -1347,20 +1346,20 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 className="responsive-form-field"
                 style={{ gridColumn: "span 2" }}
               >
-                <label>E-posta Adresi</label>
+                <label>{t("emailLabel")}</label>
                 <input
                   name="email"
                   type="email"
-                  placeholder="doktor@ornek.com"
+                  placeholder={t("doctorEmailPlaceholder")}
                   required
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Branş (Opsiyonel)</label>
-                <input name="specialty" placeholder="Örn: Kardiyoloji" />
+                <label>{t("specialtyOptionalLabel")}</label>
+                <input name="specialty" placeholder={t("specialtyPlaceholder")} />
               </div>
               <button className="primary" style={{ height: "46px" }}>
-                Davet Gönder
+                {t("sendInviteBtn")}
               </button>
             </form>
             <div className="premium-card-list">
@@ -1377,7 +1376,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       {i.email}
                     </b>
                     <span style={{ color: "#64748b", fontSize: "14px" }}>
-                      {i.specialty || "Doktor"}
+                      {i.specialty || t("defaultDoctorRole")}
                     </span>
                   </div>
                   <span
@@ -1434,7 +1433,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               onClick={saveHours}
               style={{ backgroundColor: hoursSaved ? "#16a34a" : undefined }}
             >
-              {hoursSaved ? "✅ Kaydedildi" : "Tüm Saatleri Kaydet"}
+              {hoursSaved ? t("hoursSavedBtn") : t("saveAllHoursBtn")}
             </button>
           </div>
           <div
@@ -1521,7 +1520,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                         fontWeight: 600,
                       }}
                     >
-                      Kapalı
+                      {t("closedLabel")}
                     </span>
                   </label>
                   <div
@@ -1590,10 +1589,10 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               </div>
               <div>
                 <h3 className="premium-accordion-title">
-                  Branşlar ve Departmanlar
+                  {t("departmentsTitle")}
                 </h3>
                 <p className="premium-accordion-desc">
-                  Hastane departmanlarını ve uzman doktor atamalarını yönetin.
+                  {t("departmentsDesc")}
                 </p>
               </div>
             </div>
@@ -1602,7 +1601,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           <div className="premium-accordion-content">
             <form onSubmit={saveDepartment} className="responsive-form-grid">
               <div className="responsive-form-field">
-                <label>Departman Adı</label>
+                <label>{t("departmentNameLabel")}</label>
                 <input
                   value={departmentForm.name}
                   onChange={(e) =>
@@ -1611,12 +1610,12 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       name: e.target.value,
                     })
                   }
-                  placeholder="Örn: Kardiyoloji"
+                  placeholder={t("specialtyPlaceholder")}
                   required
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Kat / Bölüm</label>
+                <label>{t("floorLabel")}</label>
                 <input
                   value={departmentForm.floor}
                   onChange={(e) =>
@@ -1625,11 +1624,11 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       floor: e.target.value,
                     })
                   }
-                  placeholder="1. Kat"
+                  placeholder={t("floorPlaceholder")}
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Dahili Telefon</label>
+                <label>{t("extensionPhoneLabel")}</label>
                 <input
                   value={departmentForm.phone}
                   onChange={(e) =>
@@ -1657,7 +1656,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 style={{ display: "flex", gap: "12px", gridColumn: "1 / -1" }}
               >
                 <button className="primary" style={{ height: "46px", flex: 1 }}>
-                  {editingDepartmentId ? "Güncelle" : "Departman Ekle"}
+                  {editingDepartmentId ? t("updateBtn") : t("addDepartmentBtn")}
                 </button>
                 {editingDepartmentId && (
                   <button
@@ -1673,7 +1672,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       });
                     }}
                   >
-                    Vazgeç
+                    {t("cancelBtn")}
                   </button>
                 )}
               </div>
@@ -1694,8 +1693,8 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                     </b>
                     <span style={{ color: "#64748b", fontSize: "14px" }}>
                       {[
-                        d.floor ? `Kat: ${d.floor}` : null,
-                        d.phone ? `Tel: ${d.phone}` : null,
+                        d.floor ? `${t("floorPrefix")} ${d.floor}` : null,
+                        d.phone ? `${t("phonePrefix")} ${d.phone}` : null,
                         d.description,
                       ]
                         .filter(Boolean)
@@ -1711,14 +1710,14 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       type="button"
                       onClick={() => editDepartment(d)}
                     >
-                      <PencilSimple size={16} /> Düzenle
+                      <PencilSimple size={16} /> {t("editBtn")}
                     </button>
                     <button
                       className="secondary danger"
                       type="button"
                       onClick={() => removeDepartment(d.id)}
                     >
-                      <Trash size={16} /> Kaldır
+                      <Trash size={16} /> {t("removeBtn")}
                     </button>
                   </div>
                 </div>
@@ -1740,7 +1739,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                     color: "#0f172a",
                   }}
                 >
-                  Doktor Atamaları
+                  {t("doctorAssignmentsTitle")}
                 </h4>
                 <div
                   style={{
@@ -1787,7 +1786,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                           fontWeight: 500,
                         }}
                       >
-                        <option value="">Departmansız</option>
+                        <option value="">{t("unassignedDepartment")}</option>
                         {departments.map((dep) => (
                           <option value={dep.id} key={dep.id}>
                             {dep.name}
@@ -1813,9 +1812,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               <Megaphone size={28} weight="duotone" />
             </div>
             <div>
-              <h3 className="premium-accordion-title">Kampanyalar</h3>
+              <h3 className="premium-accordion-title">{t("campaignsTitle")}</h3>
               <p className="premium-accordion-desc">
-                Özel fırsatları profilinizde ve genel listede yayınlayın.
+                {t("campaignsDesc")}
               </p>
             </div>
           </div>
@@ -1844,7 +1843,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
               />
             </div>
             <div className="responsive-form-field">
-              <label>Bitiş</label>
+              <label>{t("endDateLabel")}</label>
               <input
                 value={campaignForm.endsAt}
                 onChange={(e) =>
@@ -1871,7 +1870,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
             </div>
             <div style={{ display: "flex", gap: "12px", gridColumn: "1 / -1" }}>
               <button className="primary" style={{ height: "46px", flex: 1 }}>
-                {editingCampaignId ? "Güncelle" : "Kampanyayı Yayınla"}
+                {editingCampaignId ? t("updateBtn") : t("publishCampaignBtn")}
               </button>
               {editingCampaignId && (
                 <button
@@ -1888,7 +1887,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                     });
                   }}
                 >
-                  Vazgeç
+                  {t("cancelBtn")}
                 </button>
               )}
             </div>
@@ -1929,12 +1928,12 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                     {c.startsAt && (
                       <span>
                         {t("startDatePrefix")}
-                        {new Date(c.startsAt).toLocaleDateString()}
+                        {new Date(c.startsAt).toLocaleDateString(dateLocale)}
                       </span>
                     )}
                     {c.endsAt && (
                       <span>
-                        Bitiş: {new Date(c.endsAt).toLocaleDateString("tr-TR")}
+                        {t("endDatePrefix")} {new Date(c.endsAt).toLocaleDateString(dateLocale)}
                       </span>
                     )}
                   </div>
@@ -1965,21 +1964,21 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                         accentColor: "#16a34a",
                       }}
                     />
-                    {c.isActive ? "Aktif" : "Pasif"}
+                    {c.isActive ? t("activeLabel") : t("inactiveLabel")}
                   </label>
                   <button
                     className="secondary"
                     type="button"
                     onClick={() => editCampaign(c)}
                   >
-                    <PencilSimple size={16} /> Düzenle
+                    <PencilSimple size={16} /> {t("editBtn")}
                   </button>
                   <button
                     className="secondary danger"
                     type="button"
                     onClick={() => removeCampaign(c.id)}
                   >
-                    <Trash size={16} /> Kaldır
+                    <Trash size={16} /> {t("removeBtn")}
                   </button>
                 </div>
               </div>
@@ -1999,7 +1998,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <Ambulance size={28} weight="duotone" />
               </div>
               <div>
-                <h3 className="premium-accordion-title">Acil Hizmetler</h3>
+                <h3 className="premium-accordion-title">{t("emergencyServicesTitle")}</h3>
                 <p className="premium-accordion-desc">
                   {t("emergencyUnitsDesc")}
                 </p>
@@ -2010,33 +2009,33 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           <div className="premium-accordion-content">
             <form onSubmit={saveEmergency} className="responsive-form-grid">
               <div className="responsive-form-field">
-                <label>Birim Adı</label>
+                <label>{t("unitNameLabel")}</label>
                 <input
                   value={emergencyForm.name}
                   onChange={(e) =>
                     setEmergencyForm({ ...emergencyForm, name: e.target.value })
                   }
-                  placeholder="Örn: Acil Servis"
+                  placeholder={t("unitNamePlaceholder")}
                   required
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Hizmet Tipi</label>
+                <label>{t("serviceTypeLabel")}</label>
                 <select
                   value={emergencyForm.kind}
                   onChange={(e) =>
                     setEmergencyForm({ ...emergencyForm, kind: e.target.value })
                   }
                 >
-                  <option value="EMERGENCY_DEPARTMENT">Acil servis</option>
+                  <option value="EMERGENCY_DEPARTMENT">{t("emergencyDeptOption")}</option>
                   <option value="EMERGENCY_CONSULT">{t("emergencyConsult")}</option>
                   <option value="AMBULANCE_COORDINATION">
-                    Ambulans koordinasyonu
+                    {t("ambulanceCoordinationOption")}
                   </option>
                 </select>
               </div>
               <div className="responsive-form-field">
-                <label>İletişim</label>
+                <label>{t("contactLabel")}</label>
                 <input
                   value={emergencyForm.phone}
                   onChange={(e) =>
@@ -2045,11 +2044,11 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       phone: e.target.value,
                     })
                   }
-                  placeholder="Telefon"
+                  placeholder={t("phoneLabel")}
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Ek Bilgi</label>
+                <label>{t("additionalInfoLabel")}</label>
                 <input
                   value={emergencyForm.description}
                   onChange={(e) =>
@@ -2085,13 +2084,13 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                     accentColor: "#dc2626",
                   }}
                 />{" "}
-                7/24 Hizmet
+                {t("open24HoursLabel")}
               </label>
               <div
                 style={{ display: "flex", gap: "12px", gridColumn: "1 / -1" }}
               >
                 <button className="primary" style={{ height: "46px", flex: 1 }}>
-                  {editingEmergencyId ? "Güncelle" : "Ekle"}
+                  {editingEmergencyId ? t("updateBtn") : t("addBtn")}
                 </button>
                 {editingEmergencyId && (
                   <button
@@ -2108,7 +2107,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       });
                     }}
                   >
-                    Vazgeç
+                    {t("cancelBtn")}
                   </button>
                 )}
               </div>
@@ -2130,12 +2129,12 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                     <span style={{ color: "#64748b", fontSize: "14px" }}>
                       {[
                         item.kind === "EMERGENCY_DEPARTMENT"
-                          ? "Acil servis"
+                          ? t("emergencyDeptOption")
                           : item.kind === "EMERGENCY_CONSULT"
                           ? t("emergencyConsult")
-                          : "Ambulans koordinasyonu",
-                        item.phone ? `Tel: ${item.phone}` : null,
-                        item.is24Hours ? "7/24 Hizmet" : null,
+                          : t("ambulanceCoordinationOption"),
+                        item.phone ? `${t("phonePrefix")} ${item.phone}` : null,
+                        item.is24Hours ? t("open24HoursLabel") : null,
                       ]
                         .filter(Boolean)
                         .join(" • ")}
@@ -2150,14 +2149,14 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       type="button"
                       onClick={() => editEmergency(item)}
                     >
-                      <PencilSimple size={16} /> Düzenle
+                      <PencilSimple size={16} /> {t("editBtn")}
                     </button>
                     <button
                       className="secondary danger"
                       type="button"
                       onClick={() => removeEmergency(item.id)}
                     >
-                      <Trash size={16} /> Kaldır
+                      <Trash size={16} /> {t("removeBtn")}
                     </button>
                   </div>
                 </div>
@@ -2179,9 +2178,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   <FirstAid size={28} weight="duotone" />
                 </div>
                 <div>
-                  <h3 className="premium-accordion-title">Nöbetçi Durumu</h3>
+                  <h3 className="premium-accordion-title">{t("onDutyTitle")}</h3>
                   <p className="premium-accordion-desc">
-                    Nöbetçi eczane listelerinde yer almak için güncelleyin.
+                    {t("onDutyDesc")}
                   </p>
                 </div>
               </div>
@@ -2220,7 +2219,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       accentColor: "#ef4444",
                     }}
                   />{" "}
-                  Nöbetçi
+                  {t("onDutyCheckbox")}
                 </label>
                 <div
                   style={{
@@ -2234,7 +2233,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   }}
                 >
                   <span style={{ fontWeight: 600, color: "#64748b" }}>
-                    Bitiş zamanı:
+                    {t("onDutyUntilLabel")}
                   </span>
                   <input
                     type="datetime-local"
@@ -2256,7 +2255,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   onClick={saveDuty}
                   style={{ height: "46px" }}
                 >
-                  Durumu Kaydet
+                  {t("saveStatusBtn")}
                 </button>
               </div>
             </div>
@@ -2272,7 +2271,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   <Pill size={28} weight="duotone" />
                 </div>
                 <div>
-                  <h3 className="premium-accordion-title">Stok Yönetimi</h3>
+                  <h3 className="premium-accordion-title">{t("stockManagementTitle")}</h3>
                   <p className="premium-accordion-desc">
                     {t("stockDesc")}
                   </p>
@@ -2286,15 +2285,15 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   className="responsive-form-field"
                   style={{ gridColumn: "span 2" }}
                 >
-                  <label>Ürün / İlaç Adı</label>
+                  <label>{t("itemNameLabel")}</label>
                   <input name="itemName" required />
                 </div>
                 <div className="responsive-form-field">
-                  <label>Stok Durumu</label>
+                  <label>{t("stockStatusLabel")}</label>
                   <select name="stockStatus">
-                    <option value="in_stock">Stokta var</option>
-                    <option value="limited">Sınırlı</option>
-                    <option value="out_of_stock">Yok</option>
+                    <option value="in_stock">{t("stockInStock")}</option>
+                    <option value="limited">{t("stockLimited")}</option>
+                    <option value="out_of_stock">{t("stockOutOfStock")}</option>
                   </select>
                 </div>
                 <div className="responsive-form-field">
@@ -2302,7 +2301,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   <input name="quantity" type="number" min="0" />
                 </div>
                 <button className="primary" style={{ height: "46px" }}>
-                  Ekle
+                  {t("addBtn")}
                 </button>
               </form>
 
@@ -2343,16 +2342,16 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                               : "#fff7ed",
                         }}
                       >
-                        <option value="in_stock">Stokta var</option>
-                        <option value="limited">Sınırlı</option>
-                        <option value="out_of_stock">Yok</option>
+                        <option value="in_stock">{t("stockInStock")}</option>
+                        <option value="limited">{t("stockLimited")}</option>
+                        <option value="out_of_stock">{t("stockOutOfStock")}</option>
                       </select>
                       <button
                         type="button"
                         className="secondary danger"
                         onClick={() => removeStock(s.id)}
                       >
-                        <Trash size={16} /> Kaldır
+                        <Trash size={16} /> {t("removeBtn")}
                       </button>
                     </div>
                   </div>
@@ -2374,9 +2373,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <Heartbeat size={28} weight="duotone" />
               </div>
               <div>
-                <h3 className="premium-accordion-title">Tetkik Kataloğu</h3>
+                <h3 className="premium-accordion-title">{t("imagingCatalogTitle")}</h3>
                 <p className="premium-accordion-desc">
-                  Görüntüleme hizmetleri, hazırlık şartları ve ücretleri.
+                  {t("imagingCatalogDesc")}
                 </p>
               </div>
             </div>
@@ -2385,7 +2384,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           <div className="premium-accordion-content">
             <form onSubmit={saveExam} className="responsive-form-grid">
               <div className="responsive-form-field">
-                <label>Kategori</label>
+                <label>{t("categoryLabel")}</label>
                 <select
                   value={examForm.modality}
                   onChange={(e) =>
@@ -2394,44 +2393,44 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 >
                   {IMAGING_MODALITIES.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.label}
+                      {imagingModalityLabel(item.id, locale)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="responsive-form-field">
-                <label>Tetkik Adı</label>
+                <label>{t("examNameLabel")}</label>
                 <input
                   value={examForm.name}
                   onChange={(e) =>
                     setExamForm({ ...examForm, name: e.target.value })
                   }
-                  placeholder="Örn: Beyin MR"
+                  placeholder={t("examNamePlaceholder")}
                   required
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Bölge</label>
+                <label>{t("bodyRegionLabel")}</label>
                 <input
                   value={examForm.bodyRegion}
                   onChange={(e) =>
                     setExamForm({ ...examForm, bodyRegion: e.target.value })
                   }
-                  placeholder="Örn: Baş"
+                  placeholder={t("bodyRegionPlaceholder")}
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Hazırlık</label>
+                <label>{t("preparationLabel")}</label>
                 <input
                   value={examForm.preparation}
                   onChange={(e) =>
                     setExamForm({ ...examForm, preparation: e.target.value })
                   }
-                  placeholder="4 saat açlık"
+                  placeholder={t("preparationPlaceholder")}
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Süre (dk)</label>
+                <label>{t("durationMinutesLabel")}</label>
                 <input
                   value={examForm.durationMinutes}
                   onChange={(e) =>
@@ -2444,7 +2443,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Rapor (Saat)</label>
+                <label>{t("reportHoursLabel")}</label>
                 <input
                   value={examForm.reportHours}
                   onChange={(e) =>
@@ -2454,7 +2453,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Fiyat (₺)</label>
+                <label>{t("priceLabel")}</label>
                 <input
                   value={examForm.price}
                   onChange={(e) =>
@@ -2467,7 +2466,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 style={{ display: "flex", gap: "12px", gridColumn: "1 / -1" }}
               >
                 <button className="primary" style={{ height: "46px", flex: 1 }}>
-                  {editingExamId ? "Güncelle" : "Kataloğa Ekle"}
+                  {editingExamId ? t("updateBtn") : t("addToCatalogBtn")}
                 </button>
                 {editingExamId && (
                   <button
@@ -2478,7 +2477,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       setExamForm(emptyExam);
                     }}
                   >
-                    Vazgeç
+                    {t("cancelBtn")}
                   </button>
                 )}
               </div>
@@ -2489,7 +2488,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <div key={exam.id} className="premium-card-item">
                   <div>
                     <b style={{ fontSize: "16px", color: "#0f172a" }}>
-                      {imagingModalityLabel(exam.modality)} · {exam.name}
+                      {imagingModalityLabel(exam.modality, locale)} · {exam.name}
                     </b>
                     <div
                       style={{
@@ -2502,12 +2501,12 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                         exam.bodyRegion,
                         exam.preparation,
                         exam.durationMinutes
-                          ? `${exam.durationMinutes} dk`
+                          ? `${exam.durationMinutes} ${t("minutesUnit")}`
                           : "",
-                        exam.reportHours ? `rapor ${exam.reportHours} sa` : "",
+                        exam.reportHours ? `${t("reportHoursPrefix")} ${exam.reportHours} ${t("hoursUnit")}` : "",
                       ]
                         .filter(Boolean)
-                        .join(" · ") || "Ayrıntı yok"}
+                        .join(" · ") || t("noDetails")}
                     </div>
                   </div>
                   <div
@@ -2520,22 +2519,22 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   >
                     <strong style={{ fontSize: "18px", color: "#16a34a" }}>
                       {exam.price
-                        ? `${exam.price.toLocaleString("tr-TR")} ₺`
-                        : "Fiyat sorunuz"}
+                        ? `${exam.price.toLocaleString(dateLocale)} ₺`
+                        : t("askForPrice")}
                     </strong>
                     <button
                       type="button"
                       className="secondary"
                       onClick={() => editExam(exam)}
                     >
-                      <PencilSimple size={16} /> Düzenle
+                      <PencilSimple size={16} /> {t("editBtn")}
                     </button>
                     <button
                       type="button"
                       className="secondary danger"
                       onClick={() => removeExam(exam.id)}
                     >
-                      <Trash size={16} /> Kaldır
+                      <Trash size={16} /> {t("removeBtn")}
                     </button>
                   </div>
                 </div>
@@ -2556,9 +2555,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <Flask size={28} weight="duotone" />
               </div>
               <div>
-                <h3 className="premium-accordion-title">Tahlil Kataloğu</h3>
+                <h3 className="premium-accordion-title">{t("labCatalogTitle")}</h3>
                 <p className="premium-accordion-desc">
-                  Grup, numune tipi, evde numune alma opsiyonları.
+                  {t("labCatalogDesc")}
                 </p>
               </div>
             </div>
@@ -2567,7 +2566,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           <div className="premium-accordion-content">
             <form onSubmit={saveTest} className="responsive-form-grid">
               <div className="responsive-form-field">
-                <label>Grup</label>
+                <label>{t("groupLabel")}</label>
                 <select
                   value={testForm.category}
                   onChange={(e) =>
@@ -2576,13 +2575,13 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 >
                   {LAB_CATEGORIES.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.label}
+                      {labCategoryLabel(item.id, locale)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="responsive-form-field">
-                <label>Numune Tipi</label>
+                <label>{t("sampleTypeLabel")}</label>
                 <select
                   value={testForm.sampleType}
                   onChange={(e) =>
@@ -2591,13 +2590,13 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 >
                   {LAB_SAMPLE_TYPES.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.label}
+                      {labSampleLabel(item.id, locale)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="responsive-form-field">
-                <label>Tahlil Adı</label>
+                <label>{t("testNameLabel")}</label>
                 <input
                   value={testForm.name}
                   onChange={(e) =>
@@ -2607,7 +2606,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Açlık (Saat)</label>
+                <label>{t("fastingHoursLabel")}</label>
                 <input
                   value={testForm.fastingHours}
                   onChange={(e) =>
@@ -2617,7 +2616,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Sonuç (Saat)</label>
+                <label>{t("turnaroundHoursLabel")}</label>
                 <input
                   value={testForm.turnaroundHours}
                   onChange={(e) =>
@@ -2630,7 +2629,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Hazırlık</label>
+                <label>{t("preparationLabel")}</label>
                 <input
                   value={testForm.preparation}
                   onChange={(e) =>
@@ -2639,7 +2638,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 />
               </div>
               <div className="responsive-form-field">
-                <label>Fiyat (₺)</label>
+                <label>{t("priceLabel")}</label>
                 <input
                   value={testForm.price}
                   onChange={(e) =>
@@ -2669,13 +2668,13 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   }
                   style={{ width: "22px", height: "22px" }}
                 />{" "}
-                Evde numune alınır
+                {t("homeCollectionCheckbox")}
               </label>
               <div
                 style={{ gridColumn: "1 / -1", display: "flex", gap: "12px" }}
               >
                 <button className="primary" style={{ height: "46px", flex: 1 }}>
-                  {editingTestId ? "Güncelle" : "Kataloğa Ekle"}
+                  {editingTestId ? t("updateBtn") : t("addToCatalogBtn")}
                 </button>
                 {editingTestId && (
                   <button
@@ -2686,7 +2685,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       setTestForm(emptyTest);
                     }}
                   >
-                    Vazgeç
+                    {t("cancelBtn")}
                   </button>
                 )}
               </div>
@@ -2697,7 +2696,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                 <div key={test.id} className="premium-card-item">
                   <div>
                     <b style={{ fontSize: "16px", color: "#0f172a" }}>
-                      {labCategoryLabel(test.category)} · {test.name}
+                      {labCategoryLabel(test.category, locale)} · {test.name}
                     </b>
                     <div
                       style={{
@@ -2707,15 +2706,15 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                       }}
                     >
                       {[
-                        labSampleLabel(test.sampleType),
+                        labSampleLabel(test.sampleType, locale),
                         test.fastingHours
-                          ? `${test.fastingHours} saat açlık`
-                          : "Açlık gerekmez",
+                          ? `${test.fastingHours} ${t("fastingHoursSuffix")}`
+                          : t("noFastingRequired"),
                         test.turnaroundHours
-                          ? `sonuç ${test.turnaroundHours} sa`
+                          ? `${t("turnaroundPrefix")} ${test.turnaroundHours} ${t("hoursUnit")}`
                           : "",
                         test.preparation,
-                        test.homeCollection ? "Evde numune" : "",
+                        test.homeCollection ? t("homeCollectionBadge") : "",
                       ]
                         .filter(Boolean)
                         .join(" · ")}
@@ -2731,22 +2730,22 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
                   >
                     <strong style={{ fontSize: "18px", color: "#16a34a" }}>
                       {test.price
-                        ? `${test.price.toLocaleString("tr-TR")} ₺`
-                        : "Fiyat sorunuz"}
+                        ? `${test.price.toLocaleString(dateLocale)} ₺`
+                        : t("askForPrice")}
                     </strong>
                     <button
                       type="button"
                       className="secondary"
                       onClick={() => editTest(test)}
                     >
-                      <PencilSimple size={16} /> Düzenle
+                      <PencilSimple size={16} /> {t("editBtn")}
                     </button>
                     <button
                       type="button"
                       className="secondary danger"
                       onClick={() => removeTest(test.id)}
                     >
-                      <Trash size={16} /> Kaldır
+                      <Trash size={16} /> {t("removeBtn")}
                     </button>
                   </div>
                 </div>

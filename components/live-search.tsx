@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { MagnifyingGlass, Sparkle, Stethoscope, Hospital, CaretRight, SpinnerGap } from "@phosphor-icons/react";
+import { MagnifyingGlass, Sparkle, Stethoscope, Hospital, CaretRight, SpinnerGap, ShieldCheck, ArrowSquareOut } from "@phosphor-icons/react";
 import { performLiveSearch } from "@/lib/search-actions";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -109,15 +109,54 @@ export default function LiveSearch() {
           {results.organizations.length > 0 && (
             <div className="home-search-group">
               <span className="home-sg-title">{t("groupOrganizations")}</span>
-              {results.organizations.map(o => (
-                <Link href={`/organizations/${o.slug}`} key={o.id} className="home-sg-result">
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Hospital size={20} color="#94a3b8" />
-                    <span style={{ fontWeight: 600 }}>{o.name}</span>
-                  </div>
-                  <em style={{ fontSize: "12px", color: "#64748b", fontStyle: "normal" }}>{o.type}</em>
-                </Link>
-              ))}
+              {results.organizations.map(o => {
+                const isExternal = o.navigationMode === "EXTERNAL" && o.primaryHref;
+                const href = o.primaryHref || `/organizations`;
+                const typeLabel =
+                  o.type === "HOSPITAL"
+                    ? t("typeHospital")
+                    : o.type === "CLINIC"
+                    ? t("typeClinic")
+                    : o.type === "PHARMACY"
+                    ? t("typePharmacy")
+                    : o.type === "IMAGING_CENTER"
+                    ? t("typeImaging")
+                    : o.type === "LABORATORY"
+                    ? t("typeLab")
+                    : o.type;
+                const inner = (
+                  <>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <Hospital size={20} color="#94a3b8" />
+                      <span style={{ fontWeight: 600 }}>{o.name}</span>
+                      {o.isVerified && (
+                        <span style={{ display: "inline-flex" }} title="ALUMAS Verified">
+                          <ShieldCheck size={16} weight="fill" color="#2563eb" />
+                        </span>
+                      )}
+                    </div>
+                    <em style={{ fontSize: "12px", color: "#64748b", fontStyle: "normal", display: "flex", alignItems: "center", gap: "4px" }}>
+                      {typeLabel}
+                      {isExternal && <ArrowSquareOut size={14} color="#64748b" />}
+                    </em>
+                  </>
+                );
+                return isExternal ? (
+                  <a
+                    href={href}
+                    key={o.id}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="home-sg-result"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <Link href={href} key={o.id} className="home-sg-result">
+                    {inner}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>

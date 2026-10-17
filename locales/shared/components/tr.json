@@ -24,7 +24,9 @@
     "placeholder": "İlçe veya şehir adı...",
     "findButton": "Bul",
     "notFound": "Konum bulunamadı",
-    "searchError": "Arama sırasında hata oluştu."
+    "searchError": "Arama sırasında hata oluştu.",
+    "geoUnsupported": "Tarayıcınız konum servisini desteklemiyor.",
+    "permissionDenied": "Konum izni reddedildi veya alınamadı."
   },
   "lockedOverlay": {
     "title": "Alumas'ı Keşfedin",
@@ -75,7 +77,12 @@
   },
   "organizationMap": {
     "mapPlaceholder": "Harita konumu henüz doğrulanmadı.",
-    "directions": "Yol tarifi al ↗"
+    "directions": "Yol tarifi al ↗",
+    "ariaLabel": "Alumas sağlık kurumları haritası",
+    "openProfile": "Profili aç",
+    "goToWebsite": "Web sitesine git ↗",
+    "onDutyPrefix": "Nöbetçi · ",
+    "getDirections": "Yol tarifi ↗"
   },
   "videoConsultation": {
     "preparing": "Hazırlanıyor…",

@@ -62,6 +62,11 @@
     "termsSuffix": "kabul ediyorum.",
     "marketingConsent": "Kampanya ve duyurular için elektronik ileti izni veriyorum.",
     "patientRegisterLink": "Hasta mısınız? Bireysel kayıt olun",
-    "patientLoginLink": "Hasta mısınız? Bireysel giriş yapın"
+    "patientLoginLink": "Hasta mısınız? Bireysel giriş yapın",
+    "claimContextKicker": "Kurum Sahiplenme Başvurusu",
+    "claimContextTitle": "{name} için kurum yetkilisi başvurusu yapıyorsunuz.",
+    "claimContextGenericTitle": "Sağlık kurumu yetkilisi başvurusu yapıyorsunuz.",
+    "claimContextSubtitle": "Devam ettiğinizde doğrulama belgelerini yükleyeceğiniz başvuru ekranına otomatik olarak yönlendirileceksiniz.",
+    "claimExistingAccountHint": "Mevcut bir ALUMAS hesabınız (bireysel/hasta veya kurumsal) varsa ikinci bir hesap açmadan giriş yaparak devam edebilirsiniz."
   }
 }

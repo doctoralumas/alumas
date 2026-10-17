@@ -13,10 +13,19 @@ import { NextIntlClientProvider } from "next-intl";
 import { getUserLocale } from "@/lib/locale";
 import { getMessagesForLocale } from "@/locales";
 
-export const metadata: Metadata = {
-  title: "Alumas | Sağlığın tek yerde",
-  description: "Alumas sağlık platformu MVP",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getUserLocale();
+  if (locale === "en") {
+    return {
+      title: "Alumas | Your Health in One Place",
+      description: "Alumas unified healthcare platform",
+    };
+  }
+  return {
+    title: "Alumas | Sağlığın tek yerde",
+    description: "Alumas sağlık platformu",
+  };
+}
 
 export default async function RootLayout({
   children,

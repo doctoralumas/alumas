@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { Info, CaretDown } from "@phosphor-icons/react/dist/ssr";
+import { useTranslations } from "next-intl";
 
 export default function DoctorProfileManager({ profile }: { profile: any }) {
+  const t = useTranslations("professional.doctorProfileManager");
   const [msg, setMsg] = useState("");
 
   async function handleSubmit(e: any) {
@@ -24,10 +26,10 @@ export default function DoctorProfileManager({ profile }: { profile: any }) {
       body: JSON.stringify(payload)
     });
     if (r.ok) {
-       setMsg("Profil bilgileri güncellendi");
+       setMsg(t("success"));
        setTimeout(() => window.location.reload(), 1000);
     } else {
-       setMsg("Bilgiler güncellenemedi");
+       setMsg(t("failed"));
     }
   }
 
@@ -45,8 +47,8 @@ export default function DoctorProfileManager({ profile }: { profile: any }) {
               <Info size={28} weight="duotone" />
             </div>
             <div>
-              <h3 className="premium-accordion-title">Profil Bilgileri</h3>
-              <p className="premium-accordion-desc">Uzman profilinizi, ünvanınızı ve hakkında bilginizi düzenleyin.</p>
+              <h3 className="premium-accordion-title">{t("title")}</h3>
+              <p className="premium-accordion-desc">{t("desc")}</p>
             </div>
           </div>
           <CaretDown size={20} className="premium-chevron" />
@@ -54,35 +56,35 @@ export default function DoctorProfileManager({ profile }: { profile: any }) {
         <div className="premium-accordion-content">
           <form className="responsive-form-grid" onSubmit={handleSubmit}>
             <div className="responsive-form-field">
-              <label>Ad Soyad</label>
+              <label>{t("fullName")}</label>
               <input name="name" defaultValue={profile.name} required />
             </div>
             <div className="responsive-form-field">
-              <label>Ünvan (Örn: Prof. Dr.)</label>
+              <label>{t("titleLabel")}</label>
               <input name="title" defaultValue={profile.title} required />
             </div>
             <div className="responsive-form-field">
-              <label>Uzmanlık Alanı</label>
+              <label>{t("specialty")}</label>
               <input name="specialty" defaultValue={profile.specialty} required />
             </div>
             <div className="responsive-form-field">
-              <label>Çalıştığı Kurum / Hastane</label>
+              <label>{t("hospital")}</label>
               <input name="hospital" defaultValue={profile.hospital} required />
             </div>
             <div className="responsive-form-field">
-              <label>Şehir</label>
+              <label>{t("city")}</label>
               <input name="city" defaultValue={profile.city} required />
             </div>
             <div className="responsive-form-field">
-              <label>Muayene Ücreti (TL)</label>
+              <label>{t("price")}</label>
               <input name="price" defaultValue={profile.price} type="number" required />
             </div>
             <div className="responsive-form-field" style={{ gridColumn: '1 / -1' }}>
-              <label>Hakkında (Bio)</label>
-              <textarea name="description" defaultValue={profile.bio || ''} rows={4} placeholder="Eğitim geçmişiniz, ilgi alanlarınız..." />
+              <label>{t("bio")}</label>
+              <textarea name="bio" defaultValue={profile.bio || ''} rows={4} placeholder={t("bioPlaceholder")} />
             </div>
             <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-              <button className="primary" type="submit">Bilgileri Güncelle</button>
+              <button className="primary" type="submit">{t("updateBtn")}</button>
             </div>
           </form>
         </div>

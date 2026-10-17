@@ -60,6 +60,8 @@
       "devRoomDesc": "For production consultations, VIDEO_PROVIDER and provider API key must be configured. You can test your camera and microphone here.",
       "testCamera": "Test Camera & Microphone",
       "cameraError": "Failed to obtain camera/microphone permissions."
-    }
+    },
+    "profileChildLabel": "Child",
+    "profilePregnancyLabel": "Pregnancy"
   }
 }

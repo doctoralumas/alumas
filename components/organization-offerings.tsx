@@ -104,7 +104,7 @@ function ImagingCatalog({ exams, t, locale }: { exams: Exam[]; t: any; locale: s
       {!exams.length && <div className="empty">{t("emptyExams")}</div>}
       {Object.entries(groups).map(([modality, rows]) => (
         <div key={modality} style={{ marginTop: 16 }}>
-          <h3 style={{ margin: "0 0 8px", fontSize: 16 }}>{imagingModalityLabel(modality)}</h3>
+          <h3 style={{ margin: "0 0 8px", fontSize: 16 }}>{imagingModalityLabel(modality, locale)}</h3>
           <div className="slot-list">
             {rows.map((exam) => (
               <div className="slot-row" key={exam.id}>
@@ -150,14 +150,14 @@ function LaboratoryCatalog({ tests, t, locale }: { tests: LabTest[]; t: any; loc
       {!tests.length && <div className="empty">{t("emptyTests")}</div>}
       {Object.entries(groups).map(([category, rows]) => (
         <div key={category} style={{ marginTop: 16 }}>
-          <h3 style={{ margin: "0 0 8px", fontSize: 16 }}>{labCategoryLabel(category)}</h3>
+          <h3 style={{ margin: "0 0 8px", fontSize: 16 }}>{labCategoryLabel(category, locale)}</h3>
           <div className="slot-list">
             {rows.map((test) => (
               <div className="slot-row" key={test.id}>
                 <div>
                   <b>{test.name}</b>
                   <span>
-                    {[labSampleLabel(test.sampleType), test.preparation]
+                    {[labSampleLabel(test.sampleType, locale), test.preparation]
                       .filter(Boolean)
                       .join(" · ")}
                   </span>

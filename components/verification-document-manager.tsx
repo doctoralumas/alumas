@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
-  DOCUMENT_STATUS_LABELS,
+  getDocumentStatusLabel,
   requiredDocuments,
   type DocumentOwnerKind,
 } from "@/lib/verification-requirements";
@@ -33,9 +33,11 @@ export default function VerificationDocumentManager({
   documents: any[];
 }) {
   const t = useTranslations("professional.verificationManager");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
   const [rows, setRows] = useState(documents || []);
   const [msg, setMsg] = useState("");
-  const requirements = requiredDocuments(owner.kind, owner.entityType);
+  const requirements = requiredDocuments(owner.kind, owner.entityType, locale);
 
   const statusLabels: Record<string, string> = {
     PENDING: t("statusPending"),
@@ -262,7 +264,7 @@ export default function VerificationDocumentManager({
                         {current?.expiresAt && (
                           <span>
                             • {t("expiresAt", {
-                              date: new Date(current.expiresAt).toLocaleDateString(),
+                              date: new Date(current.expiresAt).toLocaleDateString(dateLocale),
                             })}
                           </span>
                         )}
@@ -298,7 +300,7 @@ export default function VerificationDocumentManager({
                     {statusStyle.icon}
                     {current
                       ? statusLabels[current.status] ||
-                        DOCUMENT_STATUS_LABELS[current.status] ||
+                        getDocumentStatusLabel(current.status, locale) ||
                         current.status
                       : t("missing")}
                   </span>

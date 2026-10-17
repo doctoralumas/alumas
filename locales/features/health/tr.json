@@ -522,7 +522,16 @@
     "delete": "Sil",
     "empty": "Görüntüleme sonucunuz bulunmuyor.",
     "visualAlt": "Görüntüleme",
-    "genericError": "Bir hata oluştu."
+    "genericError": "Bir hata oluştu.",
+    "modalities": {
+      "MR": "MR",
+      "BT": "BT",
+      "XRAY": "Röntgen",
+      "ULTRASOUND": "Ultrason",
+      "MAMMOGRAPHY": "Mamografi",
+      "PET": "PET",
+      "OTHER": "Diğer"
+    }
   },
   "healthMedicalHistory": {
     "kicker": "Tıbbi Arşiv",
@@ -1052,5 +1061,29 @@
     "diagnosticPrefix": "Tetkik: {title}",
     "vaccinationPrefix": "Aşı: {name}",
     "pregnancyEventPrefix": "Gebelik • {name}"
+  },
+  "healthTrendChart": {
+    "empty": "Henüz grafik oluşturacak veri yok.",
+    "ariaLabel": "Sağlık trend grafiği"
+  },
+  "medicationAdherence": {
+    "title": "Doz takibi",
+    "subtitle": "İlacını aldığında veya atladığında kaydet.",
+    "taken": "Alındı",
+    "skipped": "Atlandı",
+    "noDoses": "Bu tarih için planlı doz yok."
+  },
+  "medicationHistoryCalendar": {
+    "title": "İlaç geçmişi takvimi",
+    "subtitle": "Yalnızca işaretlediğin dozlar gösterilir; boş günler otomatik “atlandı” sayılmaz.",
+    "days": {
+      "mon": "Pzt",
+      "tue": "Sal",
+      "wed": "Çar",
+      "thu": "Per",
+      "fri": "Cum",
+      "sat": "Cmt",
+      "sun": "Paz"
+    }
   }
 }

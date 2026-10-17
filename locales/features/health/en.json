@@ -522,7 +522,16 @@
     "delete": "Delete",
     "empty": "No imaging results found.",
     "visualAlt": "Imaging",
-    "genericError": "An error occurred."
+    "genericError": "An error occurred.",
+    "modalities": {
+      "MR": "MRI",
+      "BT": "CT",
+      "XRAY": "X-Ray",
+      "ULTRASOUND": "Ultrasound",
+      "MAMMOGRAPHY": "Mammography",
+      "PET": "PET",
+      "OTHER": "Other"
+    }
   },
   "healthMedicalHistory": {
     "kicker": "Medical Archive",
@@ -1052,5 +1061,29 @@
     "diagnosticPrefix": "Diagnostic: {title}",
     "vaccinationPrefix": "Vaccine: {name}",
     "pregnancyEventPrefix": "Pregnancy • {name}"
+  },
+  "healthTrendChart": {
+    "empty": "No data available to display chart yet.",
+    "ariaLabel": "Health trend chart"
+  },
+  "medicationAdherence": {
+    "title": "Dose tracking",
+    "subtitle": "Log when you take or skip your medication.",
+    "taken": "Taken",
+    "skipped": "Skipped",
+    "noDoses": "No scheduled doses for this date."
+  },
+  "medicationHistoryCalendar": {
+    "title": "Medication history calendar",
+    "subtitle": "Only logged doses are displayed; empty days are not automatically marked as skipped.",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
   }
 }

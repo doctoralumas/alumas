@@ -3,7 +3,7 @@ import SectionVisual from "@/components/section-visual";
 export default function Loading() {
   return (
     <div className="page" style={{ opacity: 0.7, pointerEvents: 'none', animation: 'pulse 1.5s infinite ease-in-out' }}>
-      <SectionVisual slug="doctors" alt="Yükleniyor" />
+      <SectionVisual slug="doctors" alt="" />
       <div className="page-title">
         <span className="kicker" style={{ width: 80, height: 14, backgroundColor: '#e2e8f0', display: 'inline-block', borderRadius: 4 }}></span>
         <h1 style={{ width: 250, height: 32, backgroundColor: '#cbd5e1', marginTop: 8, borderRadius: 6 }}></h1>

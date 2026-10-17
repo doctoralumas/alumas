@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { homeVisitStatusLabel } from "@/lib/home-care";
 
 type Visit = {
   id: string;
@@ -17,6 +19,9 @@ type Visit = {
 };
 
 export default function HomeVisitQueue({ organizationId }: { organizationId: string }) {
+  const t = useTranslations("professional.homeVisitQueue");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
   const [rows, setRows] = useState<Visit[]>([]);
   const [msg, setMsg] = useState("");
 
@@ -34,36 +39,36 @@ export default function HomeVisitQueue({ organizationId }: { organizationId: str
       body: JSON.stringify({ requestId, status }),
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) { setMsg(data.error || "Talep güncellenemedi"); return; }
-    setMsg(data.statusLabel || "Talep güncellendi");
+    if (!response.ok) { setMsg(data.error || t("updateFailed")); return; }
+    setMsg(homeVisitStatusLabel(status, false, locale) || t("updated"));
     load();
   }
 
   return (
     <section className="panel form-span">
-      <h2>Evde hizmet talepleri</h2>
-      <p>Hasta, yayındaki evde hizmetinizi seçerek talep bırakır. Kabul edene kadar randevu kesinleşmez.</p>
+      <h2>{t("title")}</h2>
+      <p>{t("subtitle")}</p>
       {msg && <div className="inline-message">{msg}</div>}
       <div className="slot-list">
         {rows.map((row) => (
           <div className="slot-row" key={row.id}>
             <div>
               <b>{row.patientName} · {row.title}</b>
-              <span>{[row.detail, row.district, row.addressNote, row.preferredAt ? new Date(row.preferredAt).toLocaleString("tr-TR") : "", row.note].filter(Boolean).join(" · ")}</span>
+              <span>{[row.detail, row.district, row.addressNote, row.preferredAt ? new Date(row.preferredAt).toLocaleString(dateLocale) : "", row.note].filter(Boolean).join(" · ")}</span>
             </div>
             <div className="row">
-              <span className="status">{row.statusLabel}</span>
+              <span className="status">{homeVisitStatusLabel(row.status, false, locale) || row.statusLabel}</span>
               {row.status === "REQUESTED" && (
                 <>
-                  <button type="button" className="primary" onClick={() => update(row.id, "ACCEPTED")}>Kabul et</button>
-                  <button type="button" className="secondary" onClick={() => update(row.id, "DECLINED")}>Reddet</button>
+                  <button type="button" className="primary" onClick={() => update(row.id, "ACCEPTED")}>{t("acceptButton")}</button>
+                  <button type="button" className="secondary" onClick={() => update(row.id, "DECLINED")}>{t("declineButton")}</button>
                 </>
               )}
-              {row.status === "ACCEPTED" && <button type="button" className="secondary" onClick={() => update(row.id, "COMPLETED")}>Tamamlandı</button>}
+              {row.status === "ACCEPTED" && <button type="button" className="secondary" onClick={() => update(row.id, "COMPLETED")}>{t("completedButton")}</button>}
             </div>
           </div>
         ))}
-        {!rows.length && <div className="empty">Bekleyen evde hizmet talebi yok.</div>}
+        {!rows.length && <div className="empty">{t("empty")}</div>}
       </div>
     </section>
   );

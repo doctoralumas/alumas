@@ -52,7 +52,7 @@ function qualityScore(rating?:number|null, reviewCount?:number|null){
   return clamp01(ratingNorm*.72 + confidence*.28);
 }
 
-export function scoreContextualDoctorMatch(input: ContextualMatchInput): ContextualMatchBreakdown {
+export function scoreContextualDoctorMatch(input: ContextualMatchInput, locale: string = "tr"): ContextualMatchBreakdown {
   const specialty = clamp01(input.specialtyMatch);
   const proximity = proximityScore(input.distanceKm);
   const availability = availabilityScore(input.hasAvailabilityToday,input.nextAvailableHours);
@@ -79,18 +79,19 @@ export function scoreContextualDoctorMatch(input: ContextualMatchInput): Context
   const denom=factors.reduce((s,[,w])=>s+w,0);
   const total=Math.round(100*factors.reduce((s,[v,w])=>s+v*w,0)/denom);
 
+  const isEn = locale === "en";
   const reasons:string[]=[];
-  if(specialty>=.9) reasons.push("Branş eşleşmesi çok güçlü");
-  else if(specialty>=.7) reasons.push("Branş eşleşmesi güçlü");
-  if(proximity>=.9) reasons.push("Konumu çok yakın");
-  else if(proximity>=.7) reasons.push("Konumu yakın");
-  if(input.hasAvailabilityToday) reasons.push("Bugün müsait randevu var");
-  else if(input.nextAvailableHours!=null && input.nextAvailableHours<=72) reasons.push("Yakın tarihte müsaitlik var");
-  if(input.organizationOnDuty) reasons.push("Kurum/eczane nöbetçi");
-  else if(input.organizationOpenNow===true) reasons.push("Kurum şu anda açık");
-  if(input.insuranceMatch===true) reasons.push("Sigorta uyumu var");
-  if((input.verificationScore??1)>=.9) reasons.push("Doğrulanmış hekim profili");
-  if(quality>=.75) reasons.push("Güçlü kullanıcı değerlendirmesi");
+  if(specialty>=.9) reasons.push(isEn ? "Strong specialty match" : "Branş eşleşmesi çok güçlü");
+  else if(specialty>=.7) reasons.push(isEn ? "Good specialty match" : "Branş eşleşmesi güçlü");
+  if(proximity>=.9) reasons.push(isEn ? "Very close location" : "Konumu çok yakın");
+  else if(proximity>=.7) reasons.push(isEn ? "Nearby location" : "Konumu yakın");
+  if(input.hasAvailabilityToday) reasons.push(isEn ? "Appointments available today" : "Bugün müsait randevu var");
+  else if(input.nextAvailableHours!=null && input.nextAvailableHours<=72) reasons.push(isEn ? "Availability in the coming days" : "Yakın tarihte müsaitlik var");
+  if(input.organizationOnDuty) reasons.push(isEn ? "Facility/pharmacy on duty" : "Kurum/eczane nöbetçi");
+  else if(input.organizationOpenNow===true) reasons.push(isEn ? "Facility currently open" : "Kurum şu anda açık");
+  if(input.insuranceMatch===true) reasons.push(isEn ? "Compatible with your insurance" : "Sigorta uyumu var");
+  if((input.verificationScore??1)>=.9) reasons.push(isEn ? "Verified physician profile" : "Doğrulanmış hekim profili");
+  if(quality>=.75) reasons.push(isEn ? "High patient rating" : "Güçlü kullanıcı değerlendirmesi");
 
   return {total,specialty,proximity,availability,verification,organization,insurance,quality,reasons};
 }

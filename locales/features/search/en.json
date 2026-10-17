@@ -44,7 +44,7 @@
     "noResultsFoundDesc": "No specialists found matching your criteria. Please try different keywords or filters.",
     "networkKicker": "ALUMAS NETWORK",
     "networkTitle": "Alumas Health Network",
-    "networkSubtitle": "Explore verified hospitals and clinics registered on Alumas, book instant appointments with specialists, and read verified reviews.",
+    "networkSubtitle": "Book appointments with ALUMAS-verified healthcare institutions or access official websites and directions for facilities across our healthcare directory.",
     "globalDiscoveryNoticeStrong": "Couldn't find results in your area?",
     "globalDiscoveryNoticeText": "To see all health facilities worldwide (via Google Maps), use the",
     "globalDiscoveryLink": "Global Discovery Map",
@@ -67,6 +67,16 @@
     "onDutyBadge": "ON-DUTY",
     "directions": "Directions",
     "inspect": "Inspect",
+    "visitOfficialWebsite": "Visit Website",
+    "externalSiteNotice": "Opens the official external website in a new tab.",
+    "websiteUnavailable": "Official website unavailable",
+    "alumasVerified": "ALUMAS Verified",
+    "alumasVerifiedTooltip": "Official healthcare institution with credentials and operating license verified by ALUMAS.",
+    "claimPendingBadge": "Verification Pending",
+    "claimPendingTooltip": "An ownership claim has been submitted for this institution; it remains an external directory listing until admin review is completed.",
+    "externalDirectoryListing": "Directory Listing",
+    "externalDirectoryTooltip": "Healthcare institution listed in the public directory and not yet verified on ALUMAS.",
+    "claimInstitution": "Claim Institution",
     "noOrgFound": "No health facility found matching these criteria.",
     "insuranceNetworksKicker": "Contracted Facilities",
     "insuranceNetworksTitle": "Insurance Networks",
@@ -109,7 +119,12 @@
     "emptyMessage": "No results found for \"{query}\". You can ask Luma.",
     "groupServices": "Services",
     "groupDoctors": "Doctors",
-    "groupOrganizations": "Facilities"
+    "groupOrganizations": "Facilities",
+    "typeHospital": "Hospital",
+    "typeClinic": "Clinic",
+    "typePharmacy": "Pharmacy",
+    "typeImaging": "Imaging Center",
+    "typeLab": "Laboratory"
   },
   "nearby": {
     "page": {
@@ -242,7 +257,9 @@
     "noResults": "No contacts found."
   },
   "organizationProfile": {
-    "verifiedOrg": "Verified {type}",
+    "verifiedOrg": "ALUMAS Verified {type}",
+    "verifiedOrgTooltip": "Healthcare institution with operating license and credentials verified by ALUMAS.",
+    "manageFacility": "Facility Dashboard",
     "onDutyNow": "Currently On-Duty",
     "website": "Website",
     "message": "Message",

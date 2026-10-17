@@ -44,7 +44,7 @@
     "noResultsFoundDesc": "Aradığınız kriterlere uygun uzman bulunmuyor. Farklı kelimelerle veya filtrelerle tekrar deneyin.",
     "networkKicker": "ALUMAS NETWORK",
     "networkTitle": "Alumas Sağlık Ağı",
-    "networkSubtitle": "Alumas'a kayıtlı onaylı hastane ve klinikleri inceleyin, uzman doktorlarımızdan anında randevu alın ve kullanıcı değerlendirmelerini okuyun.",
+    "networkSubtitle": "ALUMAS onaylı sağlık kurumlarından anında randevu alın veya sağlık dizinimizdeki diğer kurumların resmi web sitelerine ve yol tariflerine ulaşın.",
     "globalDiscoveryNoticeStrong": "Bulunduğunuz bölgede sonuç bulamadınız mı?",
     "globalDiscoveryNoticeText": "Dünyadaki tüm sağlık kurumlarını (Google Haritalar üzerinden) görmek için",
     "globalDiscoveryLink": "Küresel Keşif Haritası'nı",
@@ -67,6 +67,16 @@
     "onDutyBadge": "NÖBETÇİ",
     "directions": "Yol Tarifi",
     "inspect": "İncele",
+    "visitOfficialWebsite": "Web sitesine git",
+    "externalSiteNotice": "Harici resmi web sitesine yeni sekmede yönlendirilirsiniz.",
+    "websiteUnavailable": "Resmi web sitesi doğrulanmadı",
+    "alumasVerified": "ALUMAS Doğrulanmış",
+    "alumasVerifiedTooltip": "ALUMAS tarafından kurumsal belgeleri ve ruhsatı doğrulanmış resmi sağlık kurumu.",
+    "claimPendingBadge": "Doğrulama İncelemede",
+    "claimPendingTooltip": "Bu kurum için sahiplenme başvurusu alınmıştır; admin incelemesi tamamlanana kadar harici dizin kaydı olarak görüntülenir.",
+    "externalDirectoryListing": "Dizin Kaydı",
+    "externalDirectoryTooltip": "Genel sağlık dizininde yer alan, henüz ALUMAS üzerinde doğrulanmamış kurum kaydı.",
+    "claimInstitution": "Kurumu Sahiplen",
     "noOrgFound": "Bu kriterlere uygun sağlık kurumu bulunamadı.",
     "insuranceNetworksKicker": "Anlaşmalı Kurumlar",
     "insuranceNetworksTitle": "Sigorta Ağları",
@@ -109,7 +119,12 @@
     "emptyMessage": "\"{query}\" için sonuç bulunamadı. Luma'ya sorabilirsiniz.",
     "groupServices": "Hizmetler",
     "groupDoctors": "Doktorlar",
-    "groupOrganizations": "Kurumlar"
+    "groupOrganizations": "Kurumlar",
+    "typeHospital": "Hastane",
+    "typeClinic": "Klinik",
+    "typePharmacy": "Eczane",
+    "typeImaging": "Görüntüleme",
+    "typeLab": "Laboratuvar"
   },
   "nearby": {
     "page": {
@@ -242,7 +257,9 @@
     "noResults": "Sonuç bulunamadı."
   },
   "organizationProfile": {
-    "verifiedOrg": "Doğrulanmış {type}",
+    "verifiedOrg": "ALUMAS Doğrulanmış {type}",
+    "verifiedOrgTooltip": "ALUMAS tarafından kurumsal ruhsatı ve yetki belgeleri doğrulanmış sağlık kurumu.",
+    "manageFacility": "Kurum Paneli",
     "onDutyNow": "Şu An Nöbetçi",
     "website": "Web sitesi",
     "message": "Mesaj",

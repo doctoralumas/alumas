@@ -1,10 +1,12 @@
 "use client";
 import {useEffect,useState} from "react";
 import { Target, Trophy, Clock, CheckCircle, PauseCircle, Plus, X, TrendUp } from "@phosphor-icons/react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function HealthGoals({patientId}:{patientId?:string}){
   const t = useTranslations("health.healthGoals");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
   const [rows,setRows]=useState<any[]>([]);
   const [msg,setMsg]=useState('');
   const [isSuccess,setIsSuccess]=useState(false);
@@ -109,7 +111,7 @@ export default function HealthGoals({patientId}:{patientId?:string}){
                   <h3 style={{ margin: 0, fontSize: "20px", color: "#0f172a", fontWeight: 700 }}>{g.title}</h3>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
                     {g.doctor?.name && <span style={{ fontSize: "13px", fontWeight: 600, color: "#d97706", background: "#fef3c7", padding: "4px 10px", borderRadius: "100px" }}>{t("sharedWith", { doctor: g.doctor.name })}</span>}
-                    {g.targetDate && <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}><Clock size={14} /> {t("deadline", { date: new Date(g.targetDate).toLocaleDateString('tr-TR') })}</span>}
+                    {g.targetDate && <span style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}><Clock size={14} /> {t("deadline", { date: new Date(g.targetDate).toLocaleDateString(dateLocale) })}</span>}
                   </div>
                 </div>
                 {g.targetValue != null && (

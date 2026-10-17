@@ -1,17 +1,19 @@
 export const HOME_CARE_KINDS = [
-  { id: "doctor", title: "Evde Doktor Ziyareti" },
-  { id: "nurse", title: "Evde Hemşirelik" },
-  { id: "blood", title: "Kan / Numune Alma" },
-  { id: "dressing", title: "Pansuman" },
-  { id: "physio", title: "Fizyoterapi Desteği" },
+  { id: "doctor", title: "Evde Doktor Ziyareti", titleEn: "Home Doctor Visit" },
+  { id: "nurse", title: "Evde Hemşirelik", titleEn: "Home Nursing Care" },
+  { id: "blood", title: "Kan / Numune Alma", titleEn: "Blood / Sample Collection" },
+  { id: "dressing", title: "Pansuman", titleEn: "Wound Dressing" },
+  { id: "physio", title: "Fizyoterapi Desteği", titleEn: "Home Physiotherapy" },
 ] as const;
 
 export type HomeCareKind = (typeof HOME_CARE_KINDS)[number]["id"];
 export const CLINIC_HOME_KINDS = ["nurse", "dressing", "physio"] as const;
 export type ClinicHomeKind = (typeof CLINIC_HOME_KINDS)[number];
 
-export function homeCareTitle(kind: string) {
-  return HOME_CARE_KINDS.find((item) => item.id === kind)?.title || kind;
+export function homeCareTitle(kind: string, locale: string = "tr") {
+  const found = HOME_CARE_KINDS.find((item) => item.id === kind);
+  if (!found) return kind;
+  return locale === "en" ? found.titleEn : found.title;
 }
 
 export function isClinicHomeKind(kind: string): kind is ClinicHomeKind {
@@ -22,7 +24,16 @@ export function isLegacyHomeRequest(row: { organizationId?: string | null; servi
   return !row.organizationId && !row.serviceId && !row.laboratoryTestId;
 }
 
-export function homeVisitStatusLabel(status: string, legacy: boolean) {
+export function homeVisitStatusLabel(status: string, legacy: boolean, locale: string = "tr") {
+  if (locale === "en") {
+    if (legacy) return "Unfulfilled legacy request";
+    if (status === "REQUESTED") return "Pending request";
+    if (status === "ACCEPTED") return "Accepted";
+    if (status === "DECLINED") return "Declined";
+    if (status === "COMPLETED") return "Completed";
+    if (status === "CANCELLED") return "Cancelled";
+    return "Unfulfilled legacy request";
+  }
   if (legacy) return "Karşılanmamış eski talep";
   if (status === "REQUESTED") return "Talep bekliyor";
   if (status === "ACCEPTED") return "Kabul edildi";
@@ -32,10 +43,10 @@ export function homeVisitStatusLabel(status: string, legacy: boolean) {
   return "Karşılanmamış eski talep";
 }
 
-export function appointmentPlaceLabel(type: string) {
+export function appointmentPlaceLabel(type: string, locale: string = "tr") {
   if (type === "online") return "Online";
-  if (type === "home") return "Evde";
-  return "Klinik";
+  if (type === "home") return locale === "en" ? "Home" : "Evde";
+  return locale === "en" ? "Clinic" : "Klinik";
 }
 
 export function foldCity(value: string) {

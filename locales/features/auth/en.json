@@ -62,6 +62,11 @@
     "termsSuffix": "I accept.",
     "marketingConsent": "I consent to receive electronic messages for announcements and campaigns.",
     "patientRegisterLink": "Are you a patient? Register as an individual",
-    "patientLoginLink": "Are you a patient? Sign in as an individual"
+    "patientLoginLink": "Are you a patient? Sign in as an individual",
+    "claimContextKicker": "Institution Ownership Claim",
+    "claimContextTitle": "You are applying as an authorized representative for {name}.",
+    "claimContextGenericTitle": "You are applying as an authorized healthcare institution representative.",
+    "claimContextSubtitle": "After signing in or creating an account, you will automatically return to this institution's verification application.",
+    "claimExistingAccountHint": "If you already have an ALUMAS account (patient/individual or professional), you can sign in directly without creating a second account."
   }
 }

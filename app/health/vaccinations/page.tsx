@@ -5,7 +5,7 @@ import Link from "next/link";
 import { scheduleLocalReminder } from "@/lib/local-reminders";
 import { useSearchParams } from "next/navigation";
 import { Syringe, Plus, X, CalendarBlank, Buildings, ShieldCheck, ShieldPlus, CaretRight, Info } from "@phosphor-icons/react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 type V={id:string;vaccineName:string;doseLabel?:string;administeredAt:string;provider?:string;nextDoseAt?:string};
 
@@ -19,6 +19,8 @@ export default function Page(){
 
 function VaccinationsContent(){
   const t = useTranslations("health.healthVaccinations");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "tr-TR";
   const sp=useSearchParams();
   const profileId=sp.get("profileId")||"";
   
@@ -141,7 +143,7 @@ function VaccinationsContent(){
             <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
               <div>
                 <span style={{ display: "block", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", color: "#94a3b8", fontWeight: 600, marginBottom: "4px" }}>{t("administrationLabel")}</span>
-                <span style={{ fontSize: "15px", color: "#0f172a", fontWeight: 600 }}>{new Date(v.administeredAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                <span style={{ fontSize: "15px", color: "#0f172a", fontWeight: 600 }}>{new Date(v.administeredAt).toLocaleDateString(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                 <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", color: "#64748b", marginTop: "4px" }}>
                   <Buildings size={14} /> {v.provider || t("notSpecified")}
                 </div>
@@ -150,7 +152,7 @@ function VaccinationsContent(){
               <div style={{ background: v.nextDoseAt ? "#f0fdf4" : "#f8fafc", border: `1px solid ${v.nextDoseAt ? '#bbf7d0' : '#e2e8f0'}`, padding: "12px 16px", borderRadius: "16px" }}>
                 <span style={{ display: "block", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", color: v.nextDoseAt ? "#059669" : "#94a3b8", fontWeight: 600, marginBottom: "4px" }}>{t("nextDoseLabel")}</span>
                 <span style={{ fontSize: "14px", color: v.nextDoseAt ? "#065f46" : "#64748b", fontWeight: v.nextDoseAt ? 700 : 500 }}>
-                  {v.nextDoseAt ? new Date(v.nextDoseAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : t("notPlanned")}
+                  {v.nextDoseAt ? new Date(v.nextDoseAt).toLocaleDateString(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' }) : t("notPlanned")}
                 </span>
               </div>
             </div>
