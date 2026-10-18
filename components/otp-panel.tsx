@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { DeviceMobile, CheckCircle, WarningCircle, ArrowRight } from "@phosphor-icons/react";
+import { DeviceMobile, CheckCircle, WarningCircle, ArrowRight, ArrowLeft } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 
 function formatDisplayPhone(raw: string): string {
@@ -51,7 +51,6 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
         setMsg(j.error || t("errorSend"));
       } else {
         if (j.devCode) setDevCode(j.devCode);
-        setMsg(t("codeSent"));
         setStep(2);
       }
     } catch {
@@ -94,6 +93,7 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
     }
   }
 
+  // STEP 3: Phone is Verified
   if (step === 3 && verifiedPhone) {
     return (
       <div
@@ -107,10 +107,12 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
           borderRadius: "16px",
           border: "1px solid #d1fae5",
           flexWrap: "wrap",
+          boxSizing: "border-box",
+          width: "100%",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <CheckCircle size={24} weight="fill" color="#10b981" />
+          <CheckCircle size={26} weight="fill" color="#10b981" style={{ flexShrink: 0 }} />
           <div>
             <strong style={{ display: "block", color: "#065f46", fontSize: "15px" }}>
               {t("phoneVerified")}
@@ -139,6 +141,7 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
             fontWeight: 600,
             cursor: "pointer",
             transition: "all 0.2s",
+            whiteSpace: "nowrap",
           }}
         >
           {t("changePhone")}
@@ -148,11 +151,18 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", boxSizing: "border-box" }}>
+      {/* STEP 1: Phone Number Input */}
       {step === 1 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            request();
+          }}
+          style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", boxSizing: "border-box" }}
+        >
           {verifiedPhone && (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
               <span style={{ fontSize: "13px", color: "#64748b" }}>
                 {t("phoneVerified")}: <strong>{formatDisplayPhone(verifiedPhone)}</strong>
               </span>
@@ -179,14 +189,14 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
             </div>
           )}
 
-          <div style={{ display: "flex", gap: "12px" }}>
-            <div style={{ position: "relative", flex: 1 }}>
+          <div style={{ display: "flex", gap: "10px", width: "100%", boxSizing: "border-box", flexWrap: "wrap" }}>
+            <div style={{ position: "relative", flex: "1 1 200px", minWidth: "180px", boxSizing: "border-box" }}>
               <DeviceMobile
                 size={20}
                 color="#94a3b8"
                 style={{
                   position: "absolute",
-                  left: "16px",
+                  left: "14px",
                   top: "50%",
                   transform: "translateY(-50%)",
                 }}
@@ -194,30 +204,34 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
               <input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="555 123 45 67"
+                placeholder="05XX XXX XX XX"
                 type="tel"
                 disabled={loading}
                 style={{
                   width: "100%",
-                  padding: "14px 16px 14px 48px",
-                  borderRadius: "16px",
+                  boxSizing: "border-box",
+                  padding: "13px 14px 13px 44px",
+                  borderRadius: "14px",
                   border: "1px solid #cbd5e1",
                   background: "#f8fafc",
                   outline: "none",
                   fontSize: "15px",
                   color: "#0f172a",
+                  fontFamily: "inherit",
                 }}
               />
             </div>
             <button
               onClick={request}
               disabled={!phone || loading}
-              type="button"
+              type="submit"
               style={{
-                padding: "0 24px",
+                flex: "0 0 auto",
+                padding: "0 22px",
+                minHeight: "46px",
                 background: phone && !loading ? "#0f172a" : "#cbd5e1",
                 color: "#fff",
-                borderRadius: "16px",
+                borderRadius: "14px",
                 border: "none",
                 fontWeight: 600,
                 fontSize: "14px",
@@ -225,8 +239,10 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
                 transition: "all 0.2s",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: "6px",
                 whiteSpace: "nowrap",
+                boxSizing: "border-box",
               }}
             >
               {loading ? t("loading") : (
@@ -237,67 +253,36 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
               )}
             </button>
           </div>
-        </div>
+        </form>
       )}
 
+      {/* STEP 2: Verification Code Input (Clean stacked layout, no horizontal overflow) */}
       {step === 2 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <div style={{ display: "flex", gap: "12px" }}>
-            <input
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder={t("codeDigitsPlaceholder")}
-              inputMode="numeric"
-              maxLength={6}
-              disabled={loading}
-              autoFocus
-              style={{
-                flex: 1,
-                padding: "14px 16px",
-                borderRadius: "16px",
-                border: "1px solid #cbd5e1",
-                background: "#f8fafc",
-                outline: "none",
-                fontSize: "15px",
-                color: "#0f172a",
-                letterSpacing: "4px",
-                textAlign: "center",
-                fontWeight: 600,
-              }}
-            />
-            <button
-              onClick={verify}
-              disabled={code.length < 6 || loading}
-              type="button"
-              style={{
-                padding: "0 24px",
-                background: code.length >= 6 && !loading ? "#0f172a" : "#cbd5e1",
-                color: "#fff",
-                borderRadius: "16px",
-                border: "none",
-                fontWeight: 600,
-                fontSize: "14px",
-                cursor: code.length >= 6 && !loading ? "pointer" : "not-allowed",
-                transition: "all 0.2s",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {loading ? t("loading") : t("verifyOtp")}
-            </button>
-          </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            verify();
+          }}
+          style={{ display: "flex", flexDirection: "column", gap: "14px", width: "100%", boxSizing: "border-box" }}
+        >
+          {/* Helper info */}
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              gap: "8px",
+              flexWrap: "wrap",
+              fontSize: "13px",
             }}
           >
-            <span style={{ fontSize: "13px", color: "#64748b" }}>
+            <span style={{ color: "#475569" }}>
               {t("codeSentTo", { phone: formatDisplayPhone(phone) })}
             </span>
             <button
               onClick={() => {
                 setStep(1);
+                setCode("");
                 setMsg("");
                 setIsError(false);
               }}
@@ -309,14 +294,79 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
                 fontSize: "13px",
                 fontWeight: 600,
                 cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                padding: 0,
               }}
             >
+              <ArrowLeft size={14} weight="bold" />
               {t("goBack")}
             </button>
           </div>
-        </div>
+
+          {/* 6-digit input */}
+          <div style={{ width: "100%", boxSizing: "border-box" }}>
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              placeholder="------"
+              inputMode="numeric"
+              maxLength={6}
+              disabled={loading}
+              autoFocus
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "14px 16px",
+                borderRadius: "14px",
+                border: "1.5px solid #cbd5e1",
+                background: "#f8fafc",
+                outline: "none",
+                fontSize: "20px",
+                color: "#0f172a",
+                letterSpacing: "8px",
+                textAlign: "center",
+                fontWeight: 700,
+                fontFamily: "inherit",
+              }}
+            />
+          </div>
+
+          {/* Full-width action button */}
+          <button
+            onClick={verify}
+            disabled={code.length < 6 || loading}
+            type="submit"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "13px",
+              background: code.length >= 6 && !loading ? "#0f172a" : "#cbd5e1",
+              color: "#fff",
+              borderRadius: "14px",
+              border: "none",
+              fontWeight: 600,
+              fontSize: "14px",
+              cursor: code.length >= 6 && !loading ? "pointer" : "not-allowed",
+              transition: "all 0.2s",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}
+          >
+            {loading ? t("loading") : (
+              <>
+                <CheckCircle size={18} weight="bold" />
+                {t("verifyOtp")}
+              </>
+            )}
+          </button>
+        </form>
       )}
 
+      {/* Dev code helper (only in non-prod when sms provider is console/dev) */}
       {devCode && (
         <div
           style={{
@@ -325,24 +375,35 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
             gap: "8px",
             background: "#fef3c7",
             color: "#d97706",
-            padding: "12px 16px",
+            padding: "10px 14px",
             borderRadius: "12px",
-            fontSize: "14px",
+            fontSize: "13px",
+            boxSizing: "border-box",
           }}
         >
-          <WarningCircle size={20} weight="fill" /> Dev Code: <strong>{devCode}</strong>
+          <WarningCircle size={18} weight="fill" /> Dev Code: <strong>{devCode}</strong>
         </div>
       )}
 
-      {msg && (
+      {/* Error notification banner */}
+      {isError && msg && (
         <div
           style={{
+            padding: "10px 14px",
+            borderRadius: "12px",
+            background: "#fef2f2",
+            border: "1px solid #fee2e2",
+            color: "#b91c1c",
             fontSize: "13px",
-            color: isError ? "#ef4444" : "#10b981",
             fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            boxSizing: "border-box",
           }}
         >
-          {msg}
+          <WarningCircle size={18} weight="fill" style={{ flexShrink: 0 }} />
+          <span>{msg}</span>
         </div>
       )}
     </div>
