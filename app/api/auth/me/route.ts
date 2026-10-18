@@ -5,7 +5,7 @@ import { normalizeEmail } from "@/lib/security";
 
 export async function GET() {
   const u = await currentUser();
-  return NextResponse.json(u ? { id: u.id, name: u.name, email: u.email, role: u.role, doctorSlug: u.doctorProfile?.slug ?? null } : null);
+  return NextResponse.json(u ? { id: u.id, name: u.name, email: u.email, phone: u.phone ?? null, role: u.role, doctorSlug: u.doctorProfile?.slug ?? null } : null);
 }
 
 export async function PATCH(req: Request) {
@@ -31,7 +31,7 @@ export async function PATCH(req: Request) {
         ...(name ? { name } : {}),
         ...(email ? { email } : {})
       },
-      select: { id: true, name: true, email: true, role: true }
+      select: { id: true, name: true, email: true, phone: true, role: true }
     });
     return NextResponse.json({ ok: true, user: updated });
   } catch (e) {

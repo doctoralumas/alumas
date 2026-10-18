@@ -10,7 +10,17 @@ export function securityHash(value: string | null | undefined) {
   return createHash("sha256").update(`${salt}:${value}`).digest("hex");
 }
 export function normalizeEmail(v: unknown) { return String(v || "").trim().toLowerCase(); }
-export function normalizePhone(v: unknown) { return String(v || "").replace(/[^+\d]/g, "").slice(0, 20); }
+export function normalizePhone(v: unknown) {
+  let digits = String(v || "").replace(/\D/g, "");
+  if (digits.startsWith("0090") && digits.length === 14) {
+    digits = digits.slice(4);
+  } else if (digits.startsWith("90") && digits.length === 12) {
+    digits = digits.slice(2);
+  } else if (digits.startsWith("0") && digits.length === 11) {
+    digits = digits.slice(1);
+  }
+  return digits.slice(0, 15);
+}
 export function passwordPolicy(password: unknown) {
   const p = String(password || "");
   if (p.length < 10) return "Parola en az 10 karakter olmalı.";

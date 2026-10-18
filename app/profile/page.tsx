@@ -105,7 +105,7 @@ export default async function ProfilePage() {
             <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px", lineHeight: "1.5" }}>
               {t("phoneVerificationDesc")}
             </p>
-            <OtpPanel />
+            <OtpPanel initialPhone={user.phone} />
           </section>
 
           <section>

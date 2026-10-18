@@ -40,6 +40,8 @@
     "codeLabel": "6-digit code",
     "sendCode": "Send code",
     "changePhone": "Change phone number",
+    "cancel": "Cancel",
+    "phoneInUse": "This phone number is already registered to another account.",
     "codeSent": "Verification code sent.",
     "devCode": "Development code: {code}",
     "errorSend": "Could not send code",

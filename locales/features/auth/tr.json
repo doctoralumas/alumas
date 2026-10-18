@@ -40,6 +40,8 @@
     "codeLabel": "6 haneli kod",
     "sendCode": "Kod gönder",
     "changePhone": "Telefonu değiştir",
+    "cancel": "Vazgeç",
+    "phoneInUse": "Bu telefon numarası başka bir hesaba kayıtlı.",
     "codeSent": "Doğrulama kodu gönderildi.",
     "devCode": "Geliştirme kodu: {code}",
     "errorSend": "Kod gönderilemedi",
