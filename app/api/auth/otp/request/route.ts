@@ -48,12 +48,12 @@ export async function POST(req: Request) {
       userId: authUser?.id ?? null,
       phone,
       codeHash: createHash("sha256").update(code).digest("hex"),
-      expiresAt: new Date(Date.now() + 5 * 60000)
+      expiresAt: new Date(Date.now() + 3 * 60000)
     }
   });
 
   try {
-    await sendSms(phone, `Alumas doğrulama kodunuz: ${code}. 5 dakika geçerlidir.`);
+    await sendSms(phone, `Almasdent bünyesindeki Alumas için doğrulama kodunuz: ${code}. Kodunuz 3 dakika geçerlidir.`);
     await audit({
       actorUserId: authUser?.id ?? null,
       action: "otp.request",
