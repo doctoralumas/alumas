@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import OrganizationMap from "@/components/organization-map";
 import OrganizationBooking from "@/components/organization-booking";
 import { FavoriteOrganization, OrganizationReviews } from "@/components/organization-actions";
 import OrganizationOfferings from "@/components/organization-offerings";
 import { currentUser } from "@/lib/auth";
+import { isOrganizationVerifiedByAlumas } from "@/lib/institution-directory";
+import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
 import {
   MapPin,
   Phone,
@@ -19,6 +22,8 @@ import {
   CheckCircle,
   Warning,
   ChatCircle,
+  ShieldCheck,
+  GearSix,
 } from "@phosphor-icons/react/dist/ssr";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -42,6 +47,9 @@ export default async function OrganizationProfile({
       verificationDocuments: { none: { status: "APPROVED", expiresAt: { lt: new Date() } } },
     },
     include: {
+      verificationDocuments: {
+        select: { status: true, expiresAt: true },
+      },
       services: {
         where: { isActive: true },
         include: { variants: { where: { isActive: true }, orderBy: { createdAt: "asc" } } },
@@ -61,7 +69,10 @@ export default async function OrganizationProfile({
   });
 
   if (!o) notFound();
+  const isVerified = isOrganizationVerifiedByAlumas(o);
+  const safeWebsite = normalizeOfficialWebsiteUrl(o.website);
   const u = await currentUser();
+  const canManageFacility = Boolean(u && (u.id === o.ownerUserId || u.role === "ADMIN"));
   const avg = o.reviews.length
     ? (o.reviews.reduce((a, b) => a + b.rating, 0) / o.reviews.length).toFixed(1)
     : null;
@@ -137,22 +148,26 @@ export default async function OrganizationProfile({
                   flexWrap: "wrap",
                 }}
               >
-                <span
-                  style={{
-                    background: "#eff6ff",
-                    color: "#2563eb",
-                    padding: "6px 12px",
-                    borderRadius: "100px",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}
-                >
-                  <CheckCircle size={16} weight="fill" />
-                  {t("verifiedOrg", { type: typeLabel })}
-                </span>
+                {isVerified && (
+                  <span
+                    title={t("verifiedOrgTooltip")}
+                    style={{
+                      background: "#eff6ff",
+                      color: "#2563eb",
+                      border: "1px solid #bfdbfe",
+                      padding: "6px 12px",
+                      borderRadius: "100px",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                    }}
+                  >
+                    <ShieldCheck size={16} weight="fill" />
+                    {t("verifiedOrg", { type: typeLabel })}
+                  </span>
+                )}
                 {o.isOnDuty && (
                   <span
                     style={{
@@ -210,11 +225,11 @@ export default async function OrganizationProfile({
                     <Phone size={18} /> {o.phone}
                   </a>
                 )}
-                {o.website && (
+                {safeWebsite && (
                   <a
-                    href={o.website}
+                    href={safeWebsite}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -239,8 +254,26 @@ export default async function OrganizationProfile({
               minWidth: "200px",
             }}
           >
-            <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "flex-end" }}>
               <FavoriteOrganization id={o.id} />
+              {canManageFacility && (
+                <Link
+                  href={`/business/${o.id}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "10px 16px",
+                    borderRadius: "12px",
+                    background: "#0f172a",
+                    color: "#ffffff",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  <GearSix size={18} weight="bold" /> {t("manageFacility")}
+                </Link>
+              )}
               {u && u.id !== o.ownerUserId && (
                 <a
                   href={`/messages?userId=${o.ownerUserId}`}

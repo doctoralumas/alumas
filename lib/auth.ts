@@ -38,3 +38,17 @@ export async function currentUser() {
   if(!session || session.expiresAt < new Date()) { if(session) await prisma.session.delete({where:{id:session.id}}).catch(()=>{}); return null; }
   return session.user;
 }
+
+export async function findUserByPhone(phone: string) {
+  const { getPhoneLookupVariants, normalizePhone } = await import("./security");
+  const canonical = normalizePhone(phone);
+  if (!canonical) return null;
+  const variants = getPhoneLookupVariants(canonical);
+  if (variants.length === 0) return null;
+
+  return prisma.user.findFirst({
+    where: { phone: { in: variants } },
+    include: { doctorProfile: true },
+  });
+}
+

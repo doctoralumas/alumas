@@ -1,0 +1,32 @@
+{
+  "dataset_name": "Istanbul Health Institutions and Organizations Data",
+  "dataset_title_tr": "İstanbul Sağlık Kurum ve Kuruluşları Verisi",
+  "package_id": "bd3b9489-c7d5-4ff3-897c-8667f57c70bb",
+  "resource_id": "f2154883-68e3-41dc-b2be-a6c2eb721c9e",
+  "portal_url": "https://data.ibb.gov.tr/dataset/istanbul-saglik-kurum-ve-kuruluslari-verisi",
+  "download_url": "https://data.ibb.gov.tr/dataset/bd3b9489-c7d5-4ff3-897c-8667f57c70bb/resource/f2154883-68e3-41dc-b2be-a6c2eb721c9e/download/saglik-tesisleri.xlsx",
+  "publisher": "İstanbul Büyükşehir Belediyesi - Bilgi İşlem Dairesi Başkanlığı",
+  "license_id": "ibb-license",
+  "license_title": "Istanbul Metropolitan Municipality Open Data License (CC BY 4.0 uyumlu)",
+  "license_url": "https://data.ibb.gov.tr/license",
+  "file_format": "XLSX",
+  "file_size_bytes": 1517774,
+  "sha256": "f30b449594bcbdaa0aec92cbf283cea4d68ff3fe39331dbdc1c4f18e22dbdfef",
+  "last_modified_date": "2024-03-18",
+  "total_source_records": 20469,
+  "fields_present_in_source": [
+    "Sağlık Tesisi Adı",
+    "Ana Kategori",
+    "Alt Kategori",
+    "İlçe Adı",
+    "Mahalle Adı",
+    "ADRES",
+    "Latitude",
+    "Longitude"
+  ],
+  "fields_missing_in_source": [
+    "Telefon",
+    "Resmî Web Sitesi"
+  ],
+  "downloaded_at": "2026-10-18T18:18:53+03:00"
+}

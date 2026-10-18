@@ -10,6 +10,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const { id } = await params;
     const org = await prisma.organization.findFirst({ where: { id, ownerUserId: user.role === 'ADMIN' ? undefined : user.id } });
     if (!org) return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+    if (org.status !== 'APPROVED' || !org.isPublished) {
+      return NextResponse.json({ error: 'Sigorta anlaşması yönetimi yalnızca yönetici onaylı kurumlar için aktiftir.' }, { status: 403 });
+    }
 
     const body = await req.json();
     const { insuranceProviderId, note } = body;
@@ -50,6 +53,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const { id } = await params;
     const org = await prisma.organization.findFirst({ where: { id, ownerUserId: user.role === 'ADMIN' ? undefined : user.id } });
     if (!org) return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+    if (org.status !== 'APPROVED' || !org.isPublished) {
+      return NextResponse.json({ error: 'Sigorta anlaşması yönetimi yalnızca yönetici onaylı kurumlar için aktiftir.' }, { status: 403 });
+    }
 
     const url = new URL(req.url);
     const insuranceProviderId = url.searchParams.get('providerId');

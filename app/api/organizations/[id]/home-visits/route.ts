@@ -7,7 +7,7 @@ import { homeCareTitle, homeVisitStatusLabel, isLegacyHomeRequest } from "@/lib/
 async function managedOrganization(id: string, user: { id: string; role: string }) {
   return prisma.organization.findFirst({
     where: user.role === "ADMIN" ? { id } : { id, ownerUserId: user.id },
-    select: { id: true, type: true },
+    select: { id: true, type: true, status: true, isPublished: true },
   });
 }
 
@@ -17,6 +17,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json([]);
+  }
   if (org.type !== "HOSPITAL" && org.type !== "CLINIC" && org.type !== "LABORATORY") {
     return NextResponse.json([]);
   }
@@ -51,6 +54,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json(
+      { error: "Evde sağlık talepleri yalnızca yönetici onaylı kurumlar tarafından yönetilebilir." },
+      { status: 403 }
+    );
+  }
   const body = await req.json().catch(() => null);
   const next = String(body?.status || "");
   if (!["ACCEPTED", "DECLINED", "COMPLETED"].includes(next)) {

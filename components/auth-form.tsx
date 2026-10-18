@@ -1,21 +1,33 @@
 "use client";
 
 import React, { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import {
+  buildAuthHref,
+  resolvePostAuthDestination,
+  sanitizeClaimDirectoryId,
+  sanitizeInternalReturnUrl,
+} from "@/lib/claim-onboarding";
 
 export default function AuthForm({
   mode,
   isProfessional = false,
+  claimInstitutionName = null,
 }: {
   mode: "login" | "register";
   isProfessional?: boolean;
+  claimInstitutionName?: string | null;
 }) {
   const tCommon = useTranslations("common");
   return (
     <Suspense fallback={<div className="auth-card">{tCommon("loading")}</div>}>
-      <AuthFormContent mode={mode} isProfessional={isProfessional} />
+      <AuthFormContent
+        mode={mode}
+        isProfessional={isProfessional}
+        claimInstitutionName={claimInstitutionName}
+      />
     </Suspense>
   );
 }
@@ -23,19 +35,31 @@ export default function AuthForm({
 function AuthFormContent({
   mode,
   isProfessional,
+  claimInstitutionName,
 }: {
   mode: "login" | "register";
   isProfessional: boolean;
+  claimInstitutionName?: string | null;
 }) {
   const t = useTranslations("auth");
-  const router = useRouter();
   const params = useSearchParams();
-  const requested = String(params.get("type") || "patient").toLowerCase();
+  const claimDirectoryId = sanitizeClaimDirectoryId(params.get("claimDirectoryId"));
+  const nextUrl = sanitizeInternalReturnUrl(params.get("next"));
+  const requested = String(
+    params.get("type") || (claimDirectoryId ? "organization" : "patient")
+  ).toLowerCase();
+
   const initialType = isProfessional
     ? requested === "organization"
       ? "ORGANIZATION"
       : requested === "agency"
       ? "AGENCY"
+      : requested === "imaging_center"
+      ? "IMAGING_CENTER"
+      : requested === "laboratory"
+      ? "LABORATORY"
+      : claimDirectoryId
+      ? "ORGANIZATION"
       : "DOCTOR"
     : "PATIENT";
   const [error, setError] = useState("");
@@ -79,18 +103,27 @@ function AuthFormContent({
       return;
     }
 
-    if (mode === "register") {
-      const kind = String((data as any).accountType || "PATIENT");
-      if (kind === "DOCTOR") window.location.href = "/onboarding/doctor";
-      else if (kind === "ORGANIZATION" || kind === "IMAGING_CENTER" || kind === "LABORATORY")
-        window.location.href =
-          kind === "ORGANIZATION" ? "/business/apply" : `/business/apply?type=${kind}`;
-      else if (kind === "AGENCY") window.location.href = "/agency/apply";
-      else window.location.href = "/profile";
-    } else {
-      window.location.href = "/profile";
-    }
+    const destination = resolvePostAuthDestination({
+      mode,
+      accountType: String((data as any).accountType || "PATIENT"),
+      claimDirectoryId,
+      next: nextUrl,
+    });
+    window.location.href = destination;
   }
+
+  const switchAuthHref =
+    mode === "login"
+      ? buildAuthHref(isProfessional ? "/pro/register" : "/register", {
+          claimDirectoryId,
+          next: nextUrl,
+          type: claimDirectoryId ? "organization" : params.get("type"),
+        })
+      : buildAuthHref(isProfessional ? "/pro/login" : "/login", {
+          claimDirectoryId,
+          next: nextUrl,
+          type: params.get("type"),
+        });
 
   return (
     <form
@@ -103,9 +136,50 @@ function AuthFormContent({
         boxShadow: "0 20px 40px -10px rgba(0,0,0,0.08), 0 0 20px rgba(0,0,0,0.02)",
         background: "#fff",
         width: "100%",
-        maxWidth: isProfessional && mode === "register" ? "540px" : "400px",
+        maxWidth: isProfessional && mode === "register" ? "540px" : "440px",
       }}
     >
+      {claimDirectoryId && (
+        <div
+          data-testid="auth-claim-context-banner"
+          style={{
+            marginBottom: "20px",
+            padding: "14px 16px",
+            borderRadius: "16px",
+            background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            color: "#1e3a8a",
+            fontSize: "13px",
+            lineHeight: 1.5,
+          }}
+        >
+          <span
+            style={{
+              display: "inline-block",
+              fontSize: "11px",
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
+              color: "#1d4ed8",
+              marginBottom: "4px",
+            }}
+          >
+            {t("claimContextKicker")}
+          </span>
+          <div style={{ fontWeight: 700, fontSize: "14px", color: "#0f172a", marginBottom: "4px" }}>
+            {claimInstitutionName
+              ? t("claimContextTitle", { name: claimInstitutionName })
+              : t("claimContextGenericTitle")}
+          </div>
+          <div>{t("claimContextSubtitle")}</div>
+          {mode === "register" && (
+            <div style={{ marginTop: "6px", fontSize: "12px", color: "#1e40af" }}>
+              {t("claimExistingAccountHint")}
+            </div>
+          )}
+        </div>
+      )}
+
       <div style={{ textAlign: "center", marginBottom: "24px" }}>
         <span
           style={{
@@ -403,7 +477,8 @@ function AuthFormContent({
           <>
             {t("dontHaveAccount")}{" "}
             <Link
-              href={isProfessional ? "/pro/register" : "/register"}
+              href={switchAuthHref}
+              data-testid="auth-switch-mode-link"
               style={{ color: "#0f172a", fontWeight: 700, textDecoration: "none" }}
             >
               {t("registerLink")}
@@ -413,7 +488,8 @@ function AuthFormContent({
           <>
             {t("alreadyHaveAccount")}{" "}
             <Link
-              href={isProfessional ? "/pro/login" : "/login"}
+              href={switchAuthHref}
+              data-testid="auth-switch-mode-link"
               style={{ color: "#0f172a", fontWeight: 700, textDecoration: "none" }}
             >
               {t("loginLink")}

@@ -23,6 +23,8 @@ function serviceFields(body: any, existing?: { atHome: boolean; homeCareKind: st
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const org = await prisma.organization.findUnique({ where: { id }, select: { status: true, isPublished: true } });
+  if (!org || org.status !== "APPROVED" || !org.isPublished) return NextResponse.json([]);
   return NextResponse.json(await prisma.organizationService.findMany({ where: { organizationId: id, isActive: true }, orderBy: { name: "asc" } }));
 }
 
@@ -32,6 +34,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const org = await prisma.organization.findFirst({ where: user.role === "ADMIN" ? { id } : { id, ownerUserId: user.id } });
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Klinik hizmet yönetimi yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "services")) return NextResponse.json({ error: CAPABILITY_DENIED.services }, { status: 400 });
   const body = await req.json();
   if (!body.name) return NextResponse.json({ error: "Hizmet adı gerekli" }, { status: 400 });
@@ -55,6 +60,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const org = await prisma.organization.findFirst({ where: user.role === "ADMIN" ? { id } : { id, ownerUserId: user.id } });
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Klinik hizmet yönetimi yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "services")) return NextResponse.json({ error: CAPABILITY_DENIED.services }, { status: 400 });
   const body = await req.json();
   if (!body.serviceId) return NextResponse.json({ error: "serviceId gerekli" }, { status: 400 });

@@ -55,6 +55,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Tetkik kataloğu yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "imaging")) {
     return NextResponse.json({ error: CAPABILITY_DENIED.imaging }, { status: 400 });
   }
@@ -70,6 +73,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Tetkik kataloğu yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "imaging")) {
     return NextResponse.json({ error: CAPABILITY_DENIED.imaging }, { status: 400 });
   }
@@ -89,6 +95,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Tetkik kataloğu yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "imaging")) {
     return NextResponse.json({ error: CAPABILITY_DENIED.imaging }, { status: 400 });
   }
@@ -111,6 +120,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Tetkik kataloğu yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "imaging")) {
     return NextResponse.json({ error: CAPABILITY_DENIED.imaging }, { status: 400 });
   }

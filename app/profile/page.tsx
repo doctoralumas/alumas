@@ -62,7 +62,7 @@ export default async function ProfilePage() {
         {/* Left Column */}
         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
           
-          <PersonalInfoEditor initialName={user.name} initialEmail={user.email} />
+          <PersonalInfoEditor initialName={user.name} initialEmail={user.email} initialHasPassword={Boolean(user.passwordHash)} />
 
           <section style={{ background: "#fff", padding: "32px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px", color: "#0f172a" }}>

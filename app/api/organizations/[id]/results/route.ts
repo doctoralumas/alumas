@@ -52,6 +52,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ patients: [], error: "Hasta sonuç iletimi yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "imaging") && !organizationAllows(org.type, "laboratory")) {
     return NextResponse.json({ error: "Sonuç iletimi bu kurum tipinde kullanılmıyor." }, { status: 400 });
   }
@@ -64,6 +67,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const org = await managedOrganization(id, user);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json(
+      { error: "Hasta sonuç iletimi yalnızca yönetici onaylı (doğrulanmış) kurumlar için aktiftir." },
+      { status: 403 }
+    );
+  }
   const body = await req.json().catch(() => ({}));
   const patientId = String(body.patientId || "");
   const patients = await linkedPatients(org.id, org.ownerUserId);

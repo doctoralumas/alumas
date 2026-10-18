@@ -1,29 +1,35 @@
 import { NextResponse } from "next/server";
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { createSession, currentUser } from "@/lib/auth";
+import { createSession, currentUser, findUserByPhone } from "@/lib/auth";
 import { audit } from "@/lib/audit";
-import { normalizePhone } from "@/lib/security";
+import { getPhoneLookupVariants, isValidPhone, normalizePhone } from "@/lib/security";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { code, login } = body;
-  const phone = normalizePhone(body.phone);
+  const { code, login, mode: rawMode } = body;
+  const mode = rawMode || (login ? "login" : undefined);
+  const canonicalPhone = normalizePhone(body.phone);
 
-  if (!phone || !code) {
-    return NextResponse.json({ error: "Telefon ve kod gerekli" }, { status: 400 });
+  if (!canonicalPhone || !isValidPhone(canonicalPhone) || !code) {
+    return NextResponse.json({ error: "Geçerli bir telefon numarası ve kod giriniz." }, { status: 400 });
   }
 
+  const variants = getPhoneLookupVariants(canonicalPhone);
   const row = await prisma.otpCode.findFirst({
-    where: { phone, usedAt: null, expiresAt: { gt: new Date() } },
-    orderBy: { createdAt: "desc" }
+    where: {
+      phone: { in: variants },
+      usedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: "desc" },
   });
 
   if (!row || row.attempts >= 5) {
     return NextResponse.json({ error: "Kod geçersiz veya süresi dolmuş" }, { status: 400 });
   }
 
-  const got = Buffer.from(createHash("sha256").update(String(code)).digest("hex"));
+  const got = Buffer.from(createHash("sha256").update(String(code).trim()).digest("hex"));
   const expected = Buffer.from(row.codeHash);
   const valid = got.length === expected.length && timingSafeEqual(got, expected);
 
@@ -32,53 +38,139 @@ export async function POST(req: Request) {
       where: { id: row.id },
       data: {
         attempts: { increment: 1 },
-        ...(row.attempts >= 4 ? { usedAt: new Date() } : {})
-      }
+        ...(row.attempts >= 4 ? { usedAt: new Date() } : {}),
+      },
     });
     return NextResponse.json({ error: "Kod geçersiz veya süresi dolmuş" }, { status: 400 });
   }
 
   const authUser = await currentUser();
 
-  // Mark OTP code as used
-  await prisma.otpCode.update({
-    where: { id: row.id },
+  // If the OTP was requested by a specific authenticated user, ensure the verifying session matches
+  if (row.userId && authUser && row.userId !== authUser.id) {
+    return NextResponse.json({ error: "Doğrulama yetkisi uyuşmuyor." }, { status: 403 });
+  }
+
+  // ATOMIC CONSUMPTION: Prevent concurrent replay attacks
+  const consumed = await prisma.otpCode.updateMany({
+    where: { id: row.id, usedAt: null },
     data: {
       usedAt: new Date(),
-      userId: authUser?.id ?? row.userId ?? null
-    }
+      userId: authUser?.id ?? row.userId ?? null,
+    },
   });
 
-  // Flow 1: Phone Login
-  if (login) {
-    let user = await prisma.user.findUnique({ where: { phone } });
+  if (consumed.count === 0) {
+    return NextResponse.json({ error: "Kod zaten kullanılmış veya geçersiz." }, { status: 400 });
+  }
+
+  // FLOW 1: Explicit LOGIN
+  if (mode === "login") {
+    const user = await findUserByPhone(canonicalPhone);
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          name: `Alumas Kullanıcısı ${phone.slice(-4)}`,
-          email: `phone-${Date.now()}@alumas.local`,
-          phone,
-          role: "PATIENT"
-        }
-      });
+      // Invariant: Login NEVER silently provisions a new application account!
+      return NextResponse.json(
+        {
+          error: "Bu telefon numarasıyla kayıtlı bir hesap bulunamadı. Lütfen kayıt olun veya hesabınıza giriş yaparak profilinizden telefon numaranızı doğrulayın.",
+          code: "ACCOUNT_NOT_FOUND",
+        },
+        { status: 404 }
+      );
     }
+
+    // Ensure user's phone is healed to canonical E.164 if stored in legacy format
+    if (user.phone !== canonicalPhone) {
+      const collision = await prisma.user.findUnique({ where: { phone: canonicalPhone } });
+      if (!collision) {
+        await prisma.user
+          .update({
+            where: { id: user.id },
+            data: { phone: canonicalPhone },
+          })
+          .catch(() => {});
+        user.phone = canonicalPhone;
+      }
+    }
+
     await createSession(user.id);
     await audit({
       actorUserId: user.id,
       action: "auth.otp_login",
       entityType: "User",
       entityId: user.id,
-      req
+      req,
     });
+
     return NextResponse.json({
       ok: true,
-      user: { id: user.id, name: user.name, role: user.role }
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        phone: user.phone,
+        doctorSlug: user.doctorProfile?.slug ?? null,
+      },
     });
   }
 
-  // Flow 2: Authenticated user verifying / updating phone on profile
+  // FLOW 2: Explicit REGISTER with Phone
+  if (mode === "register") {
+    const existing = await findUserByPhone(canonicalPhone);
+    if (existing) {
+      return NextResponse.json(
+        {
+          error: "Bu telefon numarası zaten başka bir hesaba kayıtlı. Lütfen giriş yapın.",
+          code: "PHONE_ALREADY_REGISTERED",
+        },
+        { status: 409 }
+      );
+    }
+
+    const name = String(body.name || "").trim() || `Alumas Kullanıcısı ${canonicalPhone.slice(-4)}`;
+    const role = ["PATIENT", "DOCTOR", "ORGANIZATION", "AGENCY"].includes(
+      String(body.role || "").toUpperCase()
+    )
+      ? String(body.role).toUpperCase()
+      : "PATIENT";
+    const dummyEmail = `phone-${Date.now()}-${randomBytes(4).toString("hex")}@alumas.local`;
+
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email: dummyEmail,
+        phone: canonicalPhone,
+        role: role as any,
+      },
+    });
+
+    await createSession(newUser.id);
+    await audit({
+      actorUserId: newUser.id,
+      action: "account.register_phone",
+      entityType: "User",
+      entityId: newUser.id,
+      req,
+    });
+
+    return NextResponse.json(
+      {
+        ok: true,
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          role: newUser.role,
+          email: newUser.email,
+          phone: newUser.phone,
+        },
+      },
+      { status: 201 }
+    );
+  }
+
+  // FLOW 3: Authenticated user verifying / linking phone to their canonical account
   if (authUser) {
-    const existingWithPhone = await prisma.user.findUnique({ where: { phone } });
+    const existingWithPhone = await findUserByPhone(canonicalPhone);
     if (existingWithPhone && existingWithPhone.id !== authUser.id) {
       return NextResponse.json(
         { error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor." },
@@ -88,8 +180,8 @@ export async function POST(req: Request) {
 
     const updated = await prisma.user.update({
       where: { id: authUser.id },
-      data: { phone },
-      select: { id: true, name: true, email: true, phone: true, role: true }
+      data: { phone: canonicalPhone },
+      select: { id: true, name: true, email: true, phone: true, role: true },
     });
 
     await audit({
@@ -97,19 +189,18 @@ export async function POST(req: Request) {
       action: "auth.phone_verify",
       entityType: "User",
       entityId: authUser.id,
-      metadata: { phoneTail: phone.slice(-4) },
-      req
+      metadata: { phoneTail: canonicalPhone.slice(-4) },
+      req,
     });
 
     return NextResponse.json({
       ok: true,
       verified: true,
-      phone,
-      user: updated
+      phone: canonicalPhone,
+      user: updated,
     });
   }
 
-  // Flow 3: Standalone OTP verification
-  return NextResponse.json({ ok: true, verified: true, phone });
+  // FLOW 4: Standalone OTP verification (guest proving phone control without immediate session creation)
+  return NextResponse.json({ ok: true, verified: true, phone: canonicalPhone });
 }
-

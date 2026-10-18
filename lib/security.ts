@@ -10,16 +10,99 @@ export function securityHash(value: string | null | undefined) {
   return createHash("sha256").update(`${salt}:${value}`).digest("hex");
 }
 export function normalizeEmail(v: unknown) { return String(v || "").trim().toLowerCase(); }
-export function normalizePhone(v: unknown) {
-  let digits = String(v || "").replace(/\D/g, "");
-  if (digits.startsWith("0090") && digits.length === 14) {
-    digits = digits.slice(4);
-  } else if (digits.startsWith("90") && digits.length === 12) {
-    digits = digits.slice(2);
-  } else if (digits.startsWith("0") && digits.length === 11) {
-    digits = digits.slice(1);
+export function normalizePhone(v: unknown): string {
+  if (!v || (typeof v !== "string" && typeof v !== "number")) return "";
+  const str = String(v).trim();
+  if (!str) return "";
+
+  const startsWithPlus = str.startsWith("+");
+  const startsWithZeroZero = str.startsWith("00");
+
+  // Strip all non-digit characters
+  const digits = str.replace(/\D/g, "");
+  if (!digits) return "";
+
+  // Case 1: Turkish numbers with explicit 0090 or +90 or 90
+  if (startsWithZeroZero && digits.startsWith("0090")) {
+    const after90 = digits.slice(4);
+    const sub = after90.startsWith("0") ? after90.slice(1) : after90;
+    if (sub.length === 10) return `+90${sub}`;
   }
-  return digits.slice(0, 15);
+  if ((startsWithPlus || digits.startsWith("90")) && digits.startsWith("90")) {
+    const after90 = digits.slice(2);
+    const sub = after90.startsWith("0") ? after90.slice(1) : after90;
+    if (sub.length === 10) return `+90${sub}`;
+  }
+
+  // Case 2: Turkish national numbers (11 digits starting with 0, or 10 digits starting with 5)
+  if (digits.length === 11 && digits.startsWith("0")) {
+    return `+90${digits.slice(1)}`;
+  }
+  if (digits.length === 10 && digits.startsWith("5")) {
+    return `+90${digits}`;
+  }
+
+  // Case 3: International numbers starting with + or 00
+  if (startsWithPlus) {
+    if (digits.length >= 8 && digits.length <= 15) {
+      return `+${digits}`;
+    }
+  }
+  if (startsWithZeroZero && digits.length >= 10 && digits.length <= 17) {
+    const without00 = digits.slice(2);
+    if (without00.length >= 8 && without00.length <= 15) {
+      return `+${without00}`;
+    }
+  }
+
+  // Default fallback for valid digit sequences (E.164 format)
+  if (digits.length === 10) {
+    return `+90${digits}`;
+  }
+  return `+${digits.slice(0, 15)}`;
+}
+
+export function isValidPhone(v: unknown): boolean {
+  const norm = normalizePhone(v);
+  if (!norm || !norm.startsWith("+")) return false;
+  const digits = norm.slice(1);
+  if (digits.length < 8 || digits.length > 15) return false;
+  if (norm.startsWith("+90")) {
+    return norm.length === 13;
+  }
+  return true;
+}
+
+export function getPhoneLookupVariants(v: unknown): string[] {
+  const canonical = normalizePhone(v);
+  if (!canonical) return [];
+  const variants = new Set<string>();
+  variants.add(canonical);
+
+  if (canonical.startsWith("+90") && canonical.length === 13) {
+    const subscriber = canonical.slice(3);
+    variants.add(subscriber);
+    variants.add(`0${subscriber}`);
+    variants.add(`90${subscriber}`);
+  } else if (canonical.startsWith("+")) {
+    variants.add(canonical.slice(1));
+  }
+  return Array.from(variants);
+}
+
+export function formatDisplayPhone(raw: unknown): string {
+  const norm = normalizePhone(raw);
+  if (!norm) return String(raw || "");
+  if (norm.startsWith("+90") && norm.length === 13) {
+    const s = norm.slice(3);
+    return `0${s.slice(0, 3)} ${s.slice(3, 6)} ${s.slice(6, 8)} ${s.slice(8, 10)}`;
+  }
+  if (norm.startsWith("+")) {
+    const cc = norm.slice(1, 3);
+    const rest = norm.slice(3);
+    return `+${cc} ${rest}`;
+  }
+  return norm;
 }
 export function passwordPolicy(password: unknown) {
   const p = String(password || "");

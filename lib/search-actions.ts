@@ -2,6 +2,7 @@
 
 import { prisma } from "./prisma";
 import { resolveSearchSpecialties } from "./search-aliases";
+import { queryNormalizedDirectory } from "./institution-directory";
 
 export async function performLiveSearch(query: string) {
   if (!query || query.trim().length < 2) return { doctors: [], organizations: [], services: [] };
@@ -29,17 +30,18 @@ export async function performLiveSearch(query: string) {
       take: 3,
     });
 
-    // 2. Search Organizations (Hospitals/Clinics)
-    const organizations = await prisma.organization.findMany({
-      where: {
-        OR: [
-          { name: { contains: trimmed, mode: "insensitive" } },
-          { city: { contains: trimmed, mode: "insensitive" } },
-        ],
-      },
-      select: { id: true, name: true, slug: true, type: true },
-      take: 3,
-    });
+    // 2. Search Normalized Institution Directory (Verified ALUMAS + External Directory)
+    const matchedDirectory = await queryNormalizedDirectory({ q: trimmed });
+    const organizations = matchedDirectory.slice(0, 4).map((o) => ({
+      id: o.id,
+      name: o.name,
+      slug: o.slug,
+      type: o.type,
+      isVerified: o.isVerified,
+      navigationMode: o.navigationMode,
+      primaryHref: o.primaryHref,
+      isExternalDestination: o.isExternalDestination,
+    }));
 
     // 3. Static Services Search (Bilingual dictionary for instant routing)
     const staticServices = [

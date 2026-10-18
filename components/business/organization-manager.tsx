@@ -78,6 +78,9 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
   const pharmacy = org.type === "PHARMACY";
   const imaging = org.type === "IMAGING_CENTER";
   const laboratory = org.type === "LABORATORY";
+  const [currentStatus, setCurrentStatus] = useState<string>(org.status || "PENDING");
+  const [resubmitting, setResubmitting] = useState(false);
+  const isApproved = currentStatus === "APPROVED" && !!org.isPublished;
 
   const [msg, setMsg] = useState("");
 
@@ -748,6 +751,29 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
     setMsg(t("testRemoved"));
   }
 
+  async function resubmitApplication() {
+    setResubmitting(true);
+    setMsg(t("resubmitting"));
+    try {
+      const r = await fetch(`/api/organizations/${org.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ resubmit: true }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setMsg(j.error || t("resubmitError"));
+        return;
+      }
+      setCurrentStatus("PENDING");
+      setMsg(t("resubmitSuccess"));
+    } catch {
+      setMsg(t("resubmitError"));
+    } finally {
+      setResubmitting(false);
+    }
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <div
@@ -767,6 +793,104 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           {panelCopy[org.type] || t("defaultPanelCopy")}
         </p>
       </div>
+
+      {currentStatus === "PENDING" && (
+        <div
+          data-testid="org-status-banner-pending"
+          style={{
+            background: "#fffbeb",
+            padding: "16px 20px",
+            borderRadius: "16px",
+            border: "1px solid #fde68a",
+            color: "#92400e",
+            marginBottom: "24px",
+            fontSize: "14px",
+            lineHeight: 1.5,
+          }}
+        >
+          <strong>{t("pendingReviewTitle")}:</strong> {t("pendingReviewDesc")}
+        </div>
+      )}
+
+      {currentStatus === "REJECTED" && (
+        <div
+          data-testid="org-status-banner-rejected"
+          style={{
+            background: "#fef2f2",
+            padding: "18px 20px",
+            borderRadius: "16px",
+            border: "1px solid #fecaca",
+            color: "#991b1b",
+            marginBottom: "24px",
+            fontSize: "14px",
+            lineHeight: 1.55,
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          <div>
+            <strong style={{ display: "block", fontSize: "15px", marginBottom: "4px" }}>
+              {t("rejectedReviewTitle")}
+            </strong>
+            <span>{t("rejectedReviewDesc")}</span>
+          </div>
+          {org.rejectionReason && (
+            <div
+              style={{
+                padding: "10px 12px",
+                borderRadius: "10px",
+                background: "#ffffff",
+                border: "1px solid #fecaca",
+                color: "#7f1d1d",
+                fontWeight: 600,
+              }}
+            >
+              {t("rejectionReasonPrefix")}
+              {org.rejectionReason}
+            </div>
+          )}
+          <div>
+            <button
+              type="button"
+              data-testid="org-resubmit-btn"
+              disabled={resubmitting}
+              onClick={resubmitApplication}
+              style={{
+                padding: "10px 18px",
+                borderRadius: "10px",
+                border: "none",
+                background: "#dc2626",
+                color: "#ffffff",
+                fontWeight: 700,
+                fontSize: "13.5px",
+                cursor: resubmitting ? "not-allowed" : "pointer",
+                opacity: resubmitting ? 0.7 : 1,
+              }}
+            >
+              {resubmitting ? t("resubmitting") : t("resubmitButton")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {currentStatus === "SUSPENDED" && (
+        <div
+          data-testid="org-status-banner-suspended"
+          style={{
+            background: "#fff7ed",
+            padding: "16px 20px",
+            borderRadius: "16px",
+            border: "1px solid #fed7aa",
+            color: "#9a3412",
+            marginBottom: "24px",
+            fontSize: "14px",
+            lineHeight: 1.5,
+          }}
+        >
+          <strong>{t("suspendedReviewTitle")}:</strong> {t("suspendedReviewDesc")}
+        </div>
+      )}
 
       {msg && (
         <div
@@ -891,7 +1015,8 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
       </details>
 
       {/* Anlaşmalı Sigortalar */}
-      <details className="premium-accordion">
+      {isApproved && (
+        <details className="premium-accordion">
           <summary className="premium-accordion-summary">
             <div className="premium-accordion-header">
               <div className="premium-accordion-icon" style={{ background: "#e0f2fe", color: "#0ea5e9" }}>
@@ -953,6 +1078,8 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
             )}
           </div>
         </details>
+      )}
+
 
       <VerificationDocumentManager
         owner={{
@@ -963,7 +1090,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
         documents={org.verificationDocuments || []}
       />
 
-      {imaging && (
+      {isApproved && imaging && (
         <ResultDelivery
           organizationId={org.id}
           kind="imaging"
@@ -973,7 +1100,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
           }))}
         />
       )}
-      {laboratory && (
+      {isApproved && laboratory && (
         <ResultDelivery
           organizationId={org.id}
           kind="laboratory"
@@ -1041,7 +1168,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
         </div>
       </details>
 
-      {clinical && (
+      {isApproved && clinical && (
         <details className="premium-accordion" open>
           <summary className="premium-accordion-summary">
             <div className="premium-accordion-header">
@@ -1201,7 +1328,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
         </details>
       )}
 
-      {clinical && (
+      {isApproved && clinical && (
         <details className="premium-accordion">
           <summary className="premium-accordion-summary">
             <div className="premium-accordion-header">
@@ -1321,7 +1448,7 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
         </details>
       )}
 
-      {clinical && (
+      {isApproved && clinical && (
         <details className="premium-accordion">
           <summary className="premium-accordion-summary">
             <div className="premium-accordion-header">
@@ -1396,9 +1523,11 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
         </details>
       )}
 
-      {clinical && <HomeVisitQueue organizationId={org.id} />}
+      {isApproved && clinical && <HomeVisitQueue organizationId={org.id} />}
 
-      <details className="premium-accordion" open>
+      {isApproved && (
+        <>
+          <details className="premium-accordion" open>
         <summary className="premium-accordion-summary">
           <div className="premium-accordion-header">
             <div
@@ -2753,6 +2882,8 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
             </div>
           </div>
         </details>
+      )}
+        </>
       )}
     </div>
   );

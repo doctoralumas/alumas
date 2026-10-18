@@ -67,7 +67,7 @@ export async function oneDocumentFromForm(form: FormData, kind: DocumentOwnerKin
 }
 
 export function approvalBlockReason(kind: DocumentOwnerKind, entityType: string | null | undefined, documents: { documentType: string; status: string; expiresAt?: Date | string | null }[]) {
-  if (!documents.length) return null;
+  if (!documents.length && kind !== "organization") return null;
   const missing = missingRequiredDocuments(kind, entityType, documents);
   if (!missing.length) return null;
   return `Onay için şu belgeler onaylı ve süresi geçerli olmalı: ${missing.map((item) => item.label).join(", ")}.`;

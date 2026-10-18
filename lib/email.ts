@@ -1,7 +1,11 @@
 export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
   const provider = (process.env.EMAIL_PROVIDER || "console").toLowerCase();
+  const isProduction = process.env.NODE_ENV === "production" || process.env.APP_ENV === "production";
   
   if (provider === "console") {
+    if (isProduction) {
+      throw new Error("Production ortamında EMAIL_PROVIDER geçerli bir sağlayıcıya (örn: resend) ayarlanmalıdır.");
+    }
     console.log(`[Alumas Email Mock] To: ${to} | Subject: ${subject}`);
     console.log(`[Content]: ${html}`);
     return { success: true, provider: "console" };

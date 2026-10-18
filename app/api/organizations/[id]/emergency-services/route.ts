@@ -17,6 +17,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const org = await managed(id, user);
   if (!org) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Acil hizmet yönetimi yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "emergency")) return NextResponse.json({ error: CAPABILITY_DENIED.emergency }, { status: 400 });
   const body = await req.json();
   const name = String(body.name || "").trim();
@@ -40,6 +43,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const org = await managed(id, user);
   if (!org) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json({ error: "Acil hizmet yönetimi yalnızca yönetici onaylı kurumlar için aktiftir." }, { status: 403 });
+  }
   if (!organizationAllows(org.type, "emergency")) return NextResponse.json({ error: CAPABILITY_DENIED.emergency }, { status: 400 });
   const body = await req.json();
   const row = await prisma.organizationEmergencyService.findFirst({

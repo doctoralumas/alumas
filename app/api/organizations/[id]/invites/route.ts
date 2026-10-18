@@ -40,6 +40,12 @@ export async function POST(
   const { id } = await params;
   const org = await orgForManager(id, u);
   if (!org) return NextResponse.json({ error: "Yetki yok" }, { status: 403 });
+  if (org.status !== "APPROVED" || !org.isPublished) {
+    return NextResponse.json(
+      { error: "Doktor kadro daveti yalnızca yönetici onaylı (doğrulanmış) kurumlar tarafından gönderilebilir." },
+      { status: 403 }
+    );
+  }
   if (!organizationAllows(org.type, "doctors"))
     return NextResponse.json(
       { error: CAPABILITY_DENIED.doctors },
