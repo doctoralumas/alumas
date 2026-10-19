@@ -117,7 +117,7 @@ async function run() {
       console.log(`[Card Check: Aylin Eczanesi] Blue: ${!!blueBadge}, Grey: ${!!greyBadge}, ExtLink: ${!!websiteLink}, NoWebPill: ${!!noWebsitePill}, Claim: ${!!claimLink}`);
       if (blueBadge) results.defects.push("Aylin Eczanesi unexpectedly has ALUMAS verified badge!");
       if (websiteLink) results.defects.push("Aylin Eczanesi unexpectedly has external website link!");
-      if (!noWebsitePill) results.defects.push("Aylin Eczanesi missing 'Web Sitesi Bulunmuyor' disabled pill!");
+      if (noWebsitePill) results.defects.push("Aylin Eczanesi unexpectedly has confusing disabled website pill!");
     } else {
       results.defects.push("Aylin Eczanesi card not found!");
     }

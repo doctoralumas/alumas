@@ -538,111 +538,91 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    padding: "16px 24px",
-                    background: "#fff",
-                    borderTop: "1px solid #f1f5f9",
-                    display: "flex",
-                    gap: "12px",
-                  }}
-                >
-                  {o.latitude != null && o.longitude != null && (
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${o.latitude},${o.longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        flex: 1,
-                        padding: "12px",
-                        borderRadius: "12px",
-                        border: "1px solid #cbd5e1",
-                        background: "#f8fafc",
-                        color: "#0f172a",
-                        textDecoration: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                      }}
-                    >
-                      {t("directions")} <NavigationArrow size={16} weight="bold" />
-                    </a>
-                  )}
+                {(o.latitude != null || primaryHref) && (
+                  <div
+                    style={{
+                      padding: "16px 24px",
+                      background: "#fff",
+                      borderTop: "1px solid #f1f5f9",
+                      display: "flex",
+                      gap: "12px",
+                    }}
+                  >
+                    {o.latitude != null && o.longitude != null && (
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${o.latitude},${o.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          flex: 1,
+                          padding: "12px",
+                          borderRadius: "12px",
+                          border: "1px solid #cbd5e1",
+                          background: "#f8fafc",
+                          color: "#0f172a",
+                          textDecoration: "none",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                      >
+                        {t("directions")} <NavigationArrow size={16} weight="bold" />
+                      </a>
+                    )}
 
-                  {navMode === "INTERNAL" && primaryHref ? (
-                    <Link
-                      data-testid="internal-profile-link"
-                      href={primaryHref}
-                      style={{
-                        flex: 1,
-                        padding: "12px",
-                        borderRadius: "12px",
-                        background: "#0f172a",
-                        color: "#fff",
-                        textDecoration: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                      }}
-                    >
-                      {t("inspect")} <CaretRight size={16} weight="bold" />
-                    </Link>
-                  ) : navMode === "EXTERNAL" && primaryHref ? (
-                    <a
-                      data-testid="external-website-link"
-                      href={primaryHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={t("externalSiteNotice")}
-                      aria-label={`${o.name} - ${t("visitOfficialWebsite")} (${t("externalSiteNotice")})`}
-                      style={{
-                        flex: 1,
-                        padding: "12px",
-                        borderRadius: "12px",
-                        background: "#ffffff",
-                        color: "#0f172a",
-                        border: "1px solid #0f172a",
-                        textDecoration: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                      }}
-                    >
-                      {t("visitOfficialWebsite")} <ArrowSquareOut size={16} weight="bold" />
-                    </a>
-                  ) : (
-                    <span
-                      data-testid="website-unavailable-pill"
-                      aria-disabled="true"
-                      style={{
-                        flex: 1,
-                        padding: "12px",
-                        borderRadius: "12px",
-                        background: "#f1f5f9",
-                        color: "#64748b",
-                        border: "1px solid #e2e8f0",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "6px",
-                        fontWeight: 500,
-                        fontSize: "13px",
-                        textAlign: "center",
-                      }}
-                    >
-                      {t("websiteUnavailable")}
-                    </span>
-                  )}
-                </div>
+                    {navMode === "INTERNAL" && primaryHref ? (
+                      <Link
+                        data-testid="internal-profile-link"
+                        href={primaryHref}
+                        style={{
+                          flex: 1,
+                          padding: "12px",
+                          borderRadius: "12px",
+                          background: "#0f172a",
+                          color: "#fff",
+                          textDecoration: "none",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                      >
+                        {t("inspect")} <CaretRight size={16} weight="bold" />
+                      </Link>
+                    ) : navMode === "EXTERNAL" && primaryHref ? (
+                      <a
+                        data-testid="external-website-link"
+                        href={primaryHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t("externalSiteNotice")}
+                        aria-label={`${o.name} - ${t("visitOfficialWebsite")} (${t("externalSiteNotice")})`}
+                        style={{
+                          flex: 1,
+                          padding: "12px",
+                          borderRadius: "12px",
+                          background: "#ffffff",
+                          color: "#0f172a",
+                          border: "1px solid #0f172a",
+                          textDecoration: "none",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                      >
+                        {t("visitOfficialWebsite")} <ArrowSquareOut size={16} weight="bold" />
+                      </a>
+                    ) : null}
+                  </div>
+                )}
               </div>
             );
           })}

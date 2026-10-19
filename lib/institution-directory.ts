@@ -484,6 +484,7 @@ export async function loadDirectoryInstitutionRecords(): Promise<DirectoryInstit
   // Load authoritative records from PostgreSQL DirectoryInstitution table
   try {
     const dbRows = await prisma.directoryInstitution.findMany({
+      where: { isActive: true },
       include: {
         organization: {
           include: {

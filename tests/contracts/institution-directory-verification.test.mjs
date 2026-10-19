@@ -714,9 +714,17 @@ test("6, 10-14: Security, RBAC, Claim Onboarding Gate, Branch Tampering Protecti
   const directoryUi = read("components/organization-directory.tsx");
   assert.match(directoryUi, /rel="noopener noreferrer"/);
   assert.match(directoryUi, /visitOfficialWebsite/);
-  assert.match(directoryUi, /websiteUnavailable/);
+  assert.doesNotMatch(directoryUi, /websiteUnavailable/, "Directory UI must omit website unavailable pill to prevent user confusion");
   assert.match(directoryUi, /alumasVerified/);
   assert.match(directoryUi, /claimInstitution/);
+
+  // Active filter invariant: public directory must only load active institutions
+  const institutionDirectorySrc = read("lib/institution-directory.ts");
+  assert.match(
+    institutionDirectorySrc,
+    /where:\s*\{\s*isActive:\s*true\s*\}/,
+    "loadDirectoryInstitutionRecords must filter DirectoryInstitution by isActive: true"
+  );
 });
 
 test("16: Localization parity for TR and EN directory, verification badge, and claim onboarding keys", () => {
