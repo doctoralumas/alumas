@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const phone = normalizePhone(body.phone);
   if (!phone || !isValidPhone(phone)) {
-    return NextResponse.json({ error: "Geçerli bir telefon numarası giriniz." }, { status: 400 });
+    return NextResponse.json({ error: "Geçerli bir telefon numarası giriniz.", code: "INVALID_PHONE" }, { status: 400 });
   }
 
   const authUser = await currentUser();
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const existing = await findUserByPhone(phone);
     if (existing && existing.id !== authUser.id) {
       return NextResponse.json(
-        { error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor." },
+        { error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor.", code: "PHONE_IN_USE" },
         { status: 409 }
       );
     }
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
   ]);
 
   if (recent >= 5 || ipRecent >= 20) {
-    return NextResponse.json({ error: "Çok fazla kod istendi. Daha sonra tekrar deneyin." }, { status: 429 });
+    return NextResponse.json({ error: "Çok fazla kod istendi. Daha sonra tekrar deneyin.", code: "RATE_LIMITED" }, { status: 429 });
   }
 
   await prisma.otpCode.updateMany({
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       metadata: { reason: e.message },
       req
     });
-    return NextResponse.json({ error: "SMS gönderilemedi" }, { status: 502 });
+    return NextResponse.json({ error: "SMS gönderilemedi", code: "SMS_SEND_FAILED" }, { status: 502 });
   }
 }
 

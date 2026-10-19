@@ -46,7 +46,18 @@
       "saved": "Kaydedildi",
       "saveButton": "Değişiklikleri Kaydet",
       "successMsg": "Bilgileriniz başarıyla güncellendi.",
-      "errorMsg": "Bir hata oluştu."
+      "errorMsg": "Bir hata oluştu.",
+      "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
+      "enterEmailCode": "Lütfen e-postanıza gönderilen 6 haneli doğrulama kodunu girin.",
+      "emailAlreadyUsed": "Bu e-posta adresi zaten başka bir hesaba kayıtlı.",
+      "currentPasswordWrong": "Mevcut şifreniz hatalı veya girilmedi.",
+      "codeExpiredOrInvalid": "Doğrulama kodu geçersiz veya süresi dolmuş.",
+      "codeAlreadyUsed": "Bu kod zaten kullanılmış veya geçersiz.",
+      "rateLimited": "Çok fazla kod talep edildi. Lütfen 10 dakika sonra tekrar deneyin.",
+      "emailSendFailed": "E-posta gönderilemedi. Lütfen daha sonra tekrar deneyiniz.",
+      "passwordRequiredForEmail": "E-posta ile giriş yapabilmek için lütfen bir şifre belirleyin.",
+      "passwordPolicyViolation": "Şifre en az 6 karakter olmalıdır.",
+      "emailVerificationRequired": "Şifre belirlemek için lütfen önce geçerli bir e-posta adresini doğrulayınız."
     },
     "accountControls": {
       "exportTitle": "Verileri Dışa Aktar",

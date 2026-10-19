@@ -92,6 +92,14 @@ export function resolvePostAuthDestination(options: {
     if (kind === "AGENCY") return "/agency/apply";
   }
 
+  if (options.accountType) {
+    const role = String(options.accountType).toUpperCase();
+    if (role === "DOCTOR") return "/doctor";
+    if (role === "ORGANIZATION") return "/business";
+    if (role === "ADMIN") return "/admin";
+    if (role === "AGENCY") return "/agency";
+  }
+
   return "/profile";
 }
 

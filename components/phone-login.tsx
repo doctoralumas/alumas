@@ -22,6 +22,60 @@ export default function PhoneLogin({
   );
 }
 
+type AuthNotice =
+  | { type: "code"; code: string; fallback?: string }
+  | { type: "key"; key: string; params?: Record<string, string | number> }
+  | { type: "raw"; text: string }
+  | null;
+
+function resolveNotice(
+  notice: AuthNotice,
+  t: (key: string, params?: any) => string
+): string {
+  if (!notice) return "";
+  if (notice.type === "key") {
+    try {
+      return t(notice.key, notice.params);
+    } catch {
+      return notice.key;
+    }
+  }
+  if (notice.type === "code") {
+    const codeMap: Record<string, string> = {
+      ACCOUNT_NOT_FOUND: "accountNotFoundPrompt",
+      PHONE_ALREADY_REGISTERED: "phoneAlreadyRegistered",
+      INVALID_OR_EXPIRED_CODE: "errorVerify",
+      CODE_ALREADY_USED: "codeAlreadyUsed",
+      PHONE_IN_USE: "phoneInUse",
+      RATE_LIMITED: "rateLimited",
+      INVALID_PHONE: "invalidPhone",
+      INVALID_INPUT: "invalidPhone",
+      UNAUTHORIZED_OTP: "unauthorizedOtp",
+      SMS_SEND_FAILED: "smsSendFailed",
+    };
+    const key = codeMap[notice.code];
+    if (key) {
+      try {
+        return t(key);
+      } catch {}
+    }
+    return notice.fallback || t("errorVerify");
+  }
+  if (notice.type === "raw") {
+    if (notice.text.includes("hesap bulunamadı")) return t("accountNotFoundPrompt");
+    if (notice.text.includes("başka bir hesaba kayıtlı")) return t("phoneAlreadyRegistered");
+    if (notice.text.includes("başka bir hesap tarafından kullanılıyor")) return t("phoneInUse");
+    if (notice.text.includes("zaten kullanılmış")) return t("codeAlreadyUsed");
+    if (notice.text.includes("süresi dolmuş") || notice.text.includes("geçersiz")) return t("errorVerify");
+    if (notice.text.includes("Çok fazla")) return t("rateLimited");
+    if (notice.text.includes("SMS gönderilemedi")) return t("smsSendFailed");
+    if (notice.text.includes("Geçerli bir telefon")) return t("invalidPhone");
+    if (notice.text.includes("yetkisi uyuşmuyor")) return t("unauthorizedOtp");
+    return notice.text;
+  }
+  return "";
+}
+
 function PhoneLoginContent({
   claimInstitutionName,
 }: {
@@ -33,46 +87,88 @@ function PhoneLoginContent({
   const claimDirectoryId = sanitizeClaimDirectoryId(params.get("claimDirectoryId"));
   const nextUrl = sanitizeInternalReturnUrl(params.get("next"));
 
+  const [authMode, setAuthMode] = useState<"login" | "register">(
+    params.get("mode") === "register" ? "register" : "login"
+  );
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
-  const [msg, setMsg] = useState("");
+  const [notice, setNotice] = useState<AuthNotice>(null);
+  const [canRegisterDirectly, setCanRegisterDirectly] = useState(false);
+  const [canLoginDirectly, setCanLoginDirectly] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const displayMessage = resolveNotice(notice, t);
 
   async function request() {
-    setMsg("");
+    setNotice(null);
+    setCanRegisterDirectly(false);
+    setCanLoginDirectly(false);
     const x = await fetch("/api/auth/otp/request", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone }),
     });
     const j = await x.json();
-    if (!x.ok) return setMsg(j.error || t("errorSend"));
+    if (!x.ok) {
+      return setNotice({ type: "code", code: j.code || "SMS_SEND_FAILED", fallback: j.error });
+    }
     setStep("code");
-    setMsg(j.devCode ? t("devCode", { code: j.devCode }) : t("codeSent"));
+    if (j.devCode) {
+      setNotice({ type: "key", key: "devCode", params: { code: j.devCode } });
+    } else {
+      setNotice({ type: "key", key: "codeSent" });
+    }
   }
 
-  async function verify() {
-    const x = await fetch("/api/auth/otp/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone, code, login: true }),
-    });
-    const j = await x.json();
-    if (!x.ok) return setMsg(j.error || t("errorVerify"));
-    const userRole = String(j.user?.role || "PATIENT").toUpperCase();
-    let destination = resolvePostAuthDestination({
-      mode: "login",
-      claimDirectoryId,
-      next: nextUrl,
-    });
-    if (!claimDirectoryId && !nextUrl) {
-      if (userRole === "DOCTOR") destination = "/doctor";
-      else if (userRole === "ORGANIZATION") destination = "/business";
-      else if (userRole === "ADMIN") destination = "/admin";
-      else if (userRole === "AGENCY") destination = "/agency";
-      else destination = "/profile";
+  async function verify(targetMode?: "login" | "register") {
+    const activeMode = targetMode || authMode;
+    setLoading(true);
+    setNotice(null);
+    setCanRegisterDirectly(false);
+    setCanLoginDirectly(false);
+
+    try {
+      const x = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone,
+          code,
+          mode: activeMode,
+          name: activeMode === "register" ? (name.trim() || undefined) : undefined,
+        }),
+      });
+      const j = await x.json();
+      if (!x.ok) {
+        if (j.code === "ACCOUNT_NOT_FOUND") {
+          setCanRegisterDirectly(true);
+        } else if (j.code === "PHONE_ALREADY_REGISTERED") {
+          setCanLoginDirectly(true);
+        }
+        setLoading(false);
+        return setNotice({ type: "code", code: j.code || "INVALID_OR_EXPIRED_CODE", fallback: j.error });
+      }
+
+      const userRole = String(j.user?.role || "PATIENT").toUpperCase();
+      let destination = resolvePostAuthDestination({
+        mode: activeMode,
+        claimDirectoryId,
+        next: nextUrl,
+      });
+      if (!claimDirectoryId && !nextUrl) {
+        if (userRole === "DOCTOR") destination = "/doctor";
+        else if (userRole === "ORGANIZATION") destination = "/business";
+        else if (userRole === "ADMIN") destination = "/admin";
+        else if (userRole === "AGENCY") destination = "/agency";
+        else destination = "/profile";
+      }
+      window.location.href = destination;
+    } catch {
+      setNotice({ type: "key", key: "errorVerify" });
     }
-    window.location.href = destination;
+    setLoading(false);
   }
 
   return (
@@ -99,8 +195,63 @@ function PhoneLoginContent({
           {t("claimContextSubtitle")}
         </div>
       )}
-      <span className="kicker">{t("phoneLogin")}</span>
-      <h1>{t("enterApp")}</h1>
+
+      {/* Mode Selector Tabs */}
+      <div style={{ display: "flex", gap: "6px", marginBottom: "20px", background: "#f1f5f9", padding: "4px", borderRadius: "12px" }}>
+        <button
+          type="button"
+          onClick={() => { setAuthMode("login"); setCanRegisterDirectly(false); setCanLoginDirectly(false); setNotice(null); }}
+          style={{
+            flex: 1,
+            padding: "8px 12px",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: 600,
+            fontSize: "14px",
+            cursor: "pointer",
+            background: authMode === "login" ? "#fff" : "transparent",
+            color: authMode === "login" ? "#0f172a" : "#64748b",
+            boxShadow: authMode === "login" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+            transition: "all 0.2s"
+          }}
+        >
+          {t("submitLogin")}
+        </button>
+        <button
+          type="button"
+          onClick={() => { setAuthMode("register"); setCanRegisterDirectly(false); setCanLoginDirectly(false); setNotice(null); }}
+          style={{
+            flex: 1,
+            padding: "8px 12px",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: 600,
+            fontSize: "14px",
+            cursor: "pointer",
+            background: authMode === "register" ? "#fff" : "transparent",
+            color: authMode === "register" ? "#0f172a" : "#64748b",
+            boxShadow: authMode === "register" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+            transition: "all 0.2s"
+          }}
+        >
+          {t("submitRegister")}
+        </button>
+      </div>
+
+      <span className="kicker">{authMode === "register" ? t("phoneRegister") : t("phoneLogin")}</span>
+      <h1>{authMode === "register" ? t("registerTitle") : t("enterApp")}</h1>
+
+      {authMode === "register" && step === "phone" && (
+        <label>
+          {t("nameLabel")}
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t("namePlaceholder")}
+          />
+        </label>
+      )}
+
       <label>
         {t("phoneLabel")}
         <input
@@ -110,6 +261,7 @@ function PhoneLoginContent({
           disabled={step === "code"}
         />
       </label>
+
       {step === "code" && (
         <label>
           {t("codeLabel")}
@@ -122,17 +274,46 @@ function PhoneLoginContent({
           />
         </label>
       )}
-      {msg && <div className="inline-message">{msg}</div>}
+
+      {displayMessage && <div className="inline-message">{displayMessage}</div>}
+
+      {/* Smart Fallback Recovery Buttons */}
+      {canRegisterDirectly && step === "code" && (
+        <button
+          type="button"
+          className="primary full"
+          style={{ marginBottom: "12px", background: "#059669" }}
+          disabled={loading}
+          onClick={() => verify("register")}
+        >
+          {t("registerWithThisPhone")}
+        </button>
+      )}
+
+      {canLoginDirectly && step === "code" && (
+        <button
+          type="button"
+          className="primary full"
+          style={{ marginBottom: "12px", background: "#0ea5e9" }}
+          disabled={loading}
+          onClick={() => verify("login")}
+        >
+          {t("submitLogin")}
+        </button>
+      )}
+
       <button
         className="primary full"
-        onClick={step === "phone" ? request : verify}
+        disabled={loading}
+        onClick={step === "phone" ? request : () => verify()}
       >
-        {step === "phone" ? t("sendCode") : t("submitLogin")}
+        {loading ? t("loading") : step === "phone" ? t("sendCode") : authMode === "register" ? t("submitRegister") : t("submitLogin")}
       </button>
+
       {step === "code" && (
         <button
           className="secondary full auth-secondary"
-          onClick={() => setStep("phone")}
+          onClick={() => { setStep("phone"); setCanRegisterDirectly(false); setCanLoginDirectly(false); setNotice(null); }}
         >
           {t("changePhone")}
         </button>

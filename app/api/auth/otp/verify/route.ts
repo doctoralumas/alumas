@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const canonicalPhone = normalizePhone(body.phone);
 
   if (!canonicalPhone || !isValidPhone(canonicalPhone) || !code) {
-    return NextResponse.json({ error: "Geçerli bir telefon numarası ve kod giriniz." }, { status: 400 });
+    return NextResponse.json({ error: "Geçerli bir telefon numarası ve kod giriniz.", code: "INVALID_INPUT" }, { status: 400 });
   }
 
   const variants = getPhoneLookupVariants(canonicalPhone);
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   });
 
   if (!row || row.attempts >= 5) {
-    return NextResponse.json({ error: "Kod geçersiz veya süresi dolmuş" }, { status: 400 });
+    return NextResponse.json({ error: "Kod geçersiz veya süresi dolmuş", code: "INVALID_OR_EXPIRED_CODE" }, { status: 400 });
   }
 
   const got = Buffer.from(createHash("sha256").update(String(code).trim()).digest("hex"));
@@ -41,27 +41,28 @@ export async function POST(req: Request) {
         ...(row.attempts >= 4 ? { usedAt: new Date() } : {}),
       },
     });
-    return NextResponse.json({ error: "Kod geçersiz veya süresi dolmuş" }, { status: 400 });
+    return NextResponse.json({ error: "Kod geçersiz veya süresi dolmuş", code: "INVALID_OR_EXPIRED_CODE" }, { status: 400 });
   }
 
   const authUser = await currentUser();
 
   // If the OTP was requested by a specific authenticated user, ensure the verifying session matches
   if (row.userId && authUser && row.userId !== authUser.id) {
-    return NextResponse.json({ error: "Doğrulama yetkisi uyuşmuyor." }, { status: 403 });
+    return NextResponse.json({ error: "Doğrulama yetkisi uyuşmuyor.", code: "UNAUTHORIZED_OTP" }, { status: 403 });
   }
 
-  // ATOMIC CONSUMPTION: Prevent concurrent replay attacks
-  const consumed = await prisma.otpCode.updateMany({
-    where: { id: row.id, usedAt: null },
-    data: {
-      usedAt: new Date(),
-      userId: authUser?.id ?? row.userId ?? null,
-    },
-  });
+  const otpId = row.id;
+  const otpUserId = row.userId;
 
-  if (consumed.count === 0) {
-    return NextResponse.json({ error: "Kod zaten kullanılmış veya geçersiz." }, { status: 400 });
+  // Helper to atomically consume OTP code
+  async function consumeOtp() {
+    return prisma.otpCode.updateMany({
+      where: { id: otpId, usedAt: null },
+      data: {
+        usedAt: new Date(),
+        userId: authUser?.id ?? otpUserId ?? null,
+      },
+    });
   }
 
   // FLOW 1: Explicit LOGIN
@@ -76,6 +77,11 @@ export async function POST(req: Request) {
         },
         { status: 404 }
       );
+    }
+
+    const consumed = await consumeOtp();
+    if (consumed.count === 0) {
+      return NextResponse.json({ error: "Kod zaten kullanılmış veya geçersiz.", code: "CODE_ALREADY_USED" }, { status: 400 });
     }
 
     // Ensure user's phone is healed to canonical E.164 if stored in legacy format
@@ -127,6 +133,11 @@ export async function POST(req: Request) {
       );
     }
 
+    const consumed = await consumeOtp();
+    if (consumed.count === 0) {
+      return NextResponse.json({ error: "Kod zaten kullanılmış veya geçersiz.", code: "CODE_ALREADY_USED" }, { status: 400 });
+    }
+
     const name = String(body.name || "").trim() || `Alumas Kullanıcısı ${canonicalPhone.slice(-4)}`;
     const role = ["PATIENT", "DOCTOR", "ORGANIZATION", "AGENCY"].includes(
       String(body.role || "").toUpperCase()
@@ -173,9 +184,14 @@ export async function POST(req: Request) {
     const existingWithPhone = await findUserByPhone(canonicalPhone);
     if (existingWithPhone && existingWithPhone.id !== authUser.id) {
       return NextResponse.json(
-        { error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor." },
+        { error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor.", code: "PHONE_IN_USE" },
         { status: 409 }
       );
+    }
+
+    const consumed = await consumeOtp();
+    if (consumed.count === 0) {
+      return NextResponse.json({ error: "Kod zaten kullanılmış veya geçersiz.", code: "CODE_ALREADY_USED" }, { status: 400 });
     }
 
     const updated = await prisma.user.update({
@@ -202,5 +218,10 @@ export async function POST(req: Request) {
   }
 
   // FLOW 4: Standalone OTP verification (guest proving phone control without immediate session creation)
+  const consumed = await consumeOtp();
+  if (consumed.count === 0) {
+    return NextResponse.json({ error: "Kod zaten kullanılmış veya geçersiz.", code: "CODE_ALREADY_USED" }, { status: 400 });
+  }
+
   return NextResponse.json({ ok: true, verified: true, phone: canonicalPhone });
 }

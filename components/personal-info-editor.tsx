@@ -3,6 +3,66 @@ import { useState } from "react";
 import { UserCircle, EnvelopeSimple, Lock, Key, CheckCircle, FloppyDisk, PaperPlaneTilt } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 
+type EditorFeedback = {
+  type: "success" | "error" | "";
+  key?: string;
+  code?: string;
+  fallback?: string;
+  suffix?: string;
+} | null;
+
+function resolveEditorMessage(
+  feedback: EditorFeedback,
+  t: (key: string, params?: any) => string
+): string {
+  if (!feedback || !feedback.type) return "";
+  if (feedback.key) {
+    try {
+      return `${t(feedback.key)}${feedback.suffix || ""}`;
+    } catch {
+      return feedback.key;
+    }
+  }
+  if (feedback.code) {
+    const codeMap: Record<string, string> = {
+      INVALID_EMAIL: "invalidEmail",
+      INVALID_CODE: "enterEmailCode",
+      EMAIL_IN_USE: "emailAlreadyUsed",
+      CURRENT_PASSWORD_REQUIRED: "currentPasswordWrong",
+      INVALID_OR_EXPIRED_CODE: "codeExpiredOrInvalid",
+      CODE_ALREADY_USED: "codeAlreadyUsed",
+      RATE_LIMITED: "rateLimited",
+      EMAIL_SEND_FAILED: "emailSendFailed",
+      AUTH_REQUIRED: "errorMsg",
+      PASSWORD_REQUIRED_FOR_EMAIL: "passwordRequiredForEmail",
+      PASSWORD_POLICY_VIOLATION: "passwordPolicyViolation",
+      EMAIL_VERIFICATION_REQUIRED: "emailVerificationRequired",
+    };
+    const key = codeMap[feedback.code];
+    if (key) {
+      try {
+        return t(key);
+      } catch {}
+    }
+    return feedback.fallback || t("errorMsg");
+  }
+  if (feedback.fallback) {
+    if (feedback.fallback.includes("geçerli bir e-posta adresi girin")) return t("invalidEmail");
+    if (feedback.fallback.includes("6 haneli")) return t("enterEmailCode");
+    if (feedback.fallback.includes("zaten başka bir hesaba")) return t("emailAlreadyUsed");
+    if (feedback.fallback.includes("Mevcut şifreniz")) return t("currentPasswordWrong");
+    if (feedback.fallback.includes("süresi dolmuş") || feedback.fallback.includes("geçersiz")) return t("codeExpiredOrInvalid");
+    if (feedback.fallback.includes("kullanılmış")) return t("codeAlreadyUsed");
+    if (feedback.fallback.includes("Çok fazla")) return t("rateLimited");
+    if (feedback.fallback.includes("E-posta gönderilemedi")) return t("emailSendFailed");
+    if (feedback.fallback.includes("şifre belirleyin")) return t("passwordRequiredForEmail");
+    if (feedback.fallback.includes("en az 6 karakter")) return t("passwordPolicyViolation");
+    if (feedback.fallback.includes("geçerli bir e-posta adresini doğrulayınız")) return t("emailVerificationRequired");
+    return feedback.fallback;
+  }
+  return "";
+}
+
 export default function PersonalInfoEditor({
   initialName,
   initialEmail,
@@ -15,24 +75,28 @@ export default function PersonalInfoEditor({
   const t = useTranslations("profile.personalInfo");
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
+  const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [password, setPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [emailCode, setEmailCode] = useState("");
   const [codeRequested, setCodeRequested] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState({ type: "", text: "" });
+  const [feedback, setFeedback] = useState<EditorFeedback>(null);
 
   const displayEmail = email.includes("@alumas.local") ? "" : email;
   const [editEmail, setEditEmail] = useState(displayEmail);
   const isEmailChanged = editEmail.trim().toLowerCase() !== displayEmail.trim().toLowerCase();
+  const requiresCurrentPassword = hasPassword && (Boolean(password) || (isEmailChanged && Boolean(editEmail)));
+
+  const displayFeedback = resolveEditorMessage(feedback, t);
 
   async function requestCode() {
     if (!editEmail || !editEmail.includes("@")) {
-      return setMsg({ type: "error", text: "Lütfen geçerli bir e-posta adresi girin." });
+      return setFeedback({ type: "error", key: "invalidEmail" });
     }
     setSendingCode(true);
-    setMsg({ type: "", text: "" });
+    setFeedback(null);
 
     try {
       const res = await fetch("/api/auth/email/request", {
@@ -44,12 +108,12 @@ export default function PersonalInfoEditor({
       if (res.ok) {
         setCodeRequested(true);
         const codeNote = data.devCode ? ` (Test Kodu: ${data.devCode})` : "";
-        setMsg({ type: "success", text: `${t("emailCodeSent")}${codeNote}` });
+        setFeedback({ type: "success", key: "emailCodeSent", suffix: codeNote });
       } else {
-        setMsg({ type: "error", text: data.error || t("errorMsg") });
+        setFeedback({ type: "error", code: data.code, fallback: data.error });
       }
     } catch {
-      setMsg({ type: "error", text: t("errorMsg") });
+      setFeedback({ type: "error", key: "errorMsg" });
     }
     setSendingCode(false);
   }
@@ -57,14 +121,20 @@ export default function PersonalInfoEditor({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setMsg({ type: "", text: "" });
+    setFeedback(null);
 
     try {
       // Flow 1: Linking or updating email address requires server-verified email OTP
       if (isEmailChanged && editEmail) {
         if (!emailCode || emailCode.length < 6) {
           setLoading(false);
-          return setMsg({ type: "error", text: "Lütfen e-postanıza gönderilen 6 haneli doğrulama kodunu girin." });
+          return setFeedback({ type: "error", key: "enterEmailCode" });
+        }
+
+        // When linking a real email to a passwordless account, require password so user can immediately log in with email
+        if (!hasPassword && (!password || password.length < 6)) {
+          setLoading(false);
+          return setFeedback({ type: "error", key: "passwordRequiredForEmail" });
         }
 
         const res = await fetch("/api/auth/email/verify", {
@@ -88,16 +158,24 @@ export default function PersonalInfoEditor({
             });
           }
           setEmail(data.user.email);
+          if (typeof data.user?.hasPassword === "boolean") {
+            setHasPassword(data.user.hasPassword);
+          }
           setCodeRequested(false);
           setEmailCode("");
           setPassword("");
           setCurrentPassword("");
-          setMsg({ type: "success", text: t("successMsg") });
+          setFeedback({ type: "success", key: "successMsg" });
         } else {
-          setMsg({ type: "error", text: data.error || t("errorMsg") });
+          setFeedback({ type: "error", code: data.code, fallback: data.error });
         }
       } else {
         // Flow 2: Standard personal info update (Name or Password change with reauth)
+        if (!hasPassword && !displayEmail && password) {
+          setLoading(false);
+          return setFeedback({ type: "error", key: "emailVerificationRequired" });
+        }
+
         const payload: { name: string; password?: string; currentPassword?: string } = { name };
         if (password) {
           payload.password = password;
@@ -111,15 +189,18 @@ export default function PersonalInfoEditor({
         });
         const data = await res.json().catch(() => ({}));
         if (res.ok) {
-          setMsg({ type: "success", text: t("successMsg") });
+          if (typeof data.user?.hasPassword === "boolean") {
+            setHasPassword(data.user.hasPassword);
+          }
+          setFeedback({ type: "success", key: "successMsg" });
           setPassword("");
           setCurrentPassword("");
         } else {
-          setMsg({ type: "error", text: data.error || t("errorMsg") });
+          setFeedback({ type: "error", code: data.code, fallback: data.error });
         }
       }
     } catch {
-      setMsg({ type: "error", text: t("errorMsg") });
+      setFeedback({ type: "error", key: "errorMsg" });
     }
     setLoading(false);
   }
@@ -197,7 +278,7 @@ export default function PersonalInfoEditor({
           </div>
         )}
 
-        {(password || initialHasPassword) && (
+        {requiresCurrentPassword && (
           <div>
             <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>{t("currentPasswordLabel")}</label>
             <div style={{ position: "relative" }}>
@@ -234,13 +315,13 @@ export default function PersonalInfoEditor({
           disabled={loading} 
           style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "12px", borderRadius: "10px", background: "#0ea5e9", color: "#fff", border: "none", fontWeight: 600, fontSize: "15px", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, transition: "background 0.2s", marginTop: "8px" }}
         >
-          {msg.type === "success" ? <CheckCircle size={20} weight="bold" /> : <FloppyDisk size={20} weight="bold" />}
-          {loading ? t("saving") : isEmailChanged ? t("verifyAndSave") : msg.type === "success" ? t("saved") : t("saveButton")}
+          {feedback?.type === "success" ? <CheckCircle size={20} weight="bold" /> : <FloppyDisk size={20} weight="bold" />}
+          {loading ? t("saving") : isEmailChanged ? t("verifyAndSave") : feedback?.type === "success" ? t("saved") : t("saveButton")}
         </button>
 
-        {msg.text && (
-          <div style={{ padding: "12px 16px", borderRadius: "10px", background: msg.type === "success" ? "#ecfdf5" : "#fef2f2", color: msg.type === "success" ? "#047857" : "#b91c1c", fontSize: "14px", fontWeight: 500, textAlign: "center", marginTop: "4px" }}>
-            {msg.text}
+        {displayFeedback && (
+          <div style={{ padding: "12px 16px", borderRadius: "10px", background: feedback?.type === "success" ? "#ecfdf5" : "#fef2f2", color: feedback?.type === "success" ? "#047857" : "#b91c1c", fontSize: "14px", fontWeight: 500, textAlign: "center", marginTop: "4px" }}>
+            {displayFeedback}
           </div>
         )}
       </form>

@@ -49,16 +49,24 @@ export async function PATCH(req: Request) {
   if (password) {
     if (u.passwordHash) {
       if (!currentPassword || !verifyPassword(currentPassword, u.passwordHash)) {
-        return NextResponse.json({ error: "Mevcut şifreniz hatalı veya girilmedi." }, { status: 403 });
+        return NextResponse.json({ error: "Mevcut şifreniz hatalı veya girilmedi.", code: "CURRENT_PASSWORD_REQUIRED" }, { status: 403 });
       }
     } else {
-      return NextResponse.json(
-        { error: "Şifre belirlemek için lütfen e-posta doğrulama sürecini kullanınız." },
-        { status: 400 }
-      );
+      // User has no password yet (phone-created account).
+      // If user still has an unverified placeholder email (@alumas.local), require linking a real email first.
+      if (u.email.includes("@alumas.local")) {
+        return NextResponse.json(
+          {
+            error: "Şifre belirlemek için lütfen önce geçerli bir e-posta adresini doğrulayınız.",
+            code: "EMAIL_VERIFICATION_REQUIRED",
+          },
+          { status: 400 }
+        );
+      }
+      // If user already has a real verified email address, allow setting the initial password!
     }
     const policyErr = passwordPolicy(password);
-    if (policyErr) return NextResponse.json({ error: policyErr }, { status: 400 });
+    if (policyErr) return NextResponse.json({ error: policyErr, code: "PASSWORD_POLICY_VIOLATION" }, { status: 400 });
     passwordHash = hashPassword(password);
   }
 

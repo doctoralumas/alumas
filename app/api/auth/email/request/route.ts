@@ -9,7 +9,7 @@ import { normalizeEmail, requestIp, securityHash } from "@/lib/security";
 export async function POST(req: Request) {
   const u = await currentUser();
   if (!u) {
-    return NextResponse.json({ error: "Giriş yapmanız gerekiyor." }, { status: 401 });
+    return NextResponse.json({ error: "Giriş yapmanız gerekiyor.", code: "AUTH_REQUIRED" }, { status: 401 });
   }
 
   const body = await req.json();
@@ -17,19 +17,19 @@ export async function POST(req: Request) {
   const currentPassword = body.currentPassword ? String(body.currentPassword) : undefined;
 
   if (!email || !email.includes("@") || email.length < 5) {
-    return NextResponse.json({ error: "Geçerli bir e-posta adresi giriniz." }, { status: 400 });
+    return NextResponse.json({ error: "Geçerli bir e-posta adresi giriniz.", code: "INVALID_EMAIL" }, { status: 400 });
   }
 
   // Reject if email is already used by another user
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing && existing.id !== u.id) {
-    return NextResponse.json({ error: "Bu e-posta adresi zaten başka bir hesaba kayıtlı." }, { status: 409 });
+    return NextResponse.json({ error: "Bu e-posta adresi zaten başka bir hesaba kayıtlı.", code: "EMAIL_IN_USE" }, { status: 409 });
   }
 
   // Step-up / Reauthentication: If the user already has a password, require current password
   if (u.passwordHash) {
     if (!currentPassword || !verifyPassword(currentPassword, u.passwordHash)) {
-      return NextResponse.json({ error: "Mevcut şifreniz hatalı veya girilmedi." }, { status: 403 });
+      return NextResponse.json({ error: "Mevcut şifreniz hatalı veya girilmedi.", code: "CURRENT_PASSWORD_REQUIRED" }, { status: 403 });
     }
   }
 
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   });
 
   if (recent >= 5) {
-    return NextResponse.json({ error: "Çok fazla kod talep edildi. Lütfen 10 dakika sonra tekrar deneyin." }, { status: 429 });
+    return NextResponse.json({ error: "Çok fazla kod talep edildi. Lütfen 10 dakika sonra tekrar deneyin.", code: "RATE_LIMITED" }, { status: 429 });
   }
 
   // Invalidate previous unused codes for this email
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
       metadata: { error: err.message },
       req,
     });
-    return NextResponse.json({ error: "E-posta gönderilemedi. Lütfen daha sonra tekrar deneyiniz." }, { status: 502 });
+    return NextResponse.json({ error: "E-posta gönderilemedi. Lütfen daha sonra tekrar deneyiniz.", code: "EMAIL_SEND_FAILED" }, { status: 502 });
   }
 }
 

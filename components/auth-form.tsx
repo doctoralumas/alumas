@@ -32,6 +32,53 @@ export default function AuthForm({
   );
 }
 
+type AuthFormError = {
+  code?: string;
+  key?: string;
+  fallback?: string;
+  details?: string;
+} | null;
+
+function resolveAuthFormError(
+  error: AuthFormError,
+  t: (key: string, params?: any) => string
+): string {
+  if (!error) return "";
+  let text = "";
+  if (error.key) {
+    try {
+      text = t(error.key);
+    } catch {
+      text = error.key;
+    }
+  } else if (error.code) {
+    const codeMap: Record<string, string> = {
+      INVALID_CREDENTIALS: "invalidCredentials",
+      CONFLICT: "emailInUse",
+      RATE_LIMITED: "rateLimited",
+      VALIDATION_ERROR: "authFailed",
+      INTERNAL_ERROR: "authFailed",
+    };
+    const key = codeMap[error.code];
+    if (key) {
+      try {
+        text = t(key);
+      } catch {}
+    }
+    if (!text) text = error.fallback || t("authFailed");
+  } else if (error.fallback) {
+    if (error.fallback.includes("E-posta veya parola")) text = t("invalidCredentials");
+    else if (error.fallback.includes("zaten kayıtlı")) text = t("emailInUse");
+    else if (error.fallback.includes("Çok fazla")) text = t("rateLimited");
+    else text = error.fallback;
+  }
+  if (!text) text = t("authFailed");
+  if (error.details) {
+    text += ` (${error.details})`;
+  }
+  return text;
+}
+
 function AuthFormContent({
   mode,
   isProfessional,
@@ -62,10 +109,12 @@ function AuthFormContent({
       ? "ORGANIZATION"
       : "DOCTOR"
     : "PATIENT";
-  const [error, setError] = useState("");
+  const [errorNotice, setErrorNotice] = useState<AuthFormError>(null);
   const [loading, setLoading] = useState(false);
 
   const [accountType, setAccountType] = useState(initialType);
+
+  const displayError = resolveAuthFormError(errorNotice, t);
 
   const proOptions = [
     { id: "DOCTOR", label: t("doctorType"), sub: t("doctorSub"), icon: "👨‍⚕️" },
@@ -78,7 +127,7 @@ function AuthFormContent({
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setErrorNotice(null);
     const data = Object.fromEntries(new FormData(e.currentTarget));
 
     if (!isProfessional && mode === "register") {
@@ -95,11 +144,12 @@ function AuthFormContent({
     const json = await res.json().catch(() => ({}));
     setLoading(false);
     if (!res.ok) {
-      let msg = typeof json.error === "string" ? json.error : json.error?.message || t("authFailed");
+      let fallback = typeof json.error === "string" ? json.error : json.error?.message || t("authFailed");
+      let details = "";
       if (json.details && Array.isArray(json.details)) {
-        msg += " (" + json.details.map((d: any) => `${d.path}: ${d.message}`).join(", ") + ")";
+        details = json.details.map((d: any) => `${d.path}: ${d.message}`).join(", ");
       }
-      setError(msg);
+      setErrorNotice({ code: json.code, fallback, details });
       return;
     }
 
@@ -435,7 +485,7 @@ function AuthFormContent({
         </div>
       )}
 
-      {error && (
+      {displayError && (
         <div
           className="form-error"
           style={{
@@ -450,7 +500,7 @@ function AuthFormContent({
             textAlign: "center",
           }}
         >
-          {error}
+          {displayError}
         </div>
       )}
 

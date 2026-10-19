@@ -46,7 +46,18 @@
       "saved": "Saved",
       "saveButton": "Save Changes",
       "successMsg": "Your information has been successfully updated.",
-      "errorMsg": "An error occurred."
+      "errorMsg": "An error occurred.",
+      "invalidEmail": "Please enter a valid email address.",
+      "enterEmailCode": "Please enter the 6-digit verification code sent to your email.",
+      "emailAlreadyUsed": "This email address is already registered to another account.",
+      "currentPasswordWrong": "Current password is incorrect or missing.",
+      "codeExpiredOrInvalid": "Verification code is invalid or has expired.",
+      "codeAlreadyUsed": "This code has already been used or is invalid.",
+      "rateLimited": "Too many code requests. Please try again in 10 minutes.",
+      "emailSendFailed": "Failed to send email. Please try again later.",
+      "passwordRequiredForEmail": "Please set a password to enable email login.",
+      "passwordPolicyViolation": "Password must be at least 6 characters.",
+      "emailVerificationRequired": "Please verify a valid email address first to set a password."
     },
     "accountControls": {
       "exportTitle": "Export Data",

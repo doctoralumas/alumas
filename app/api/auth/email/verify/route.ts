@@ -8,7 +8,7 @@ import { normalizeEmail, passwordPolicy } from "@/lib/security";
 export async function POST(req: Request) {
   const u = await currentUser();
   if (!u) {
-    return NextResponse.json({ error: "Giriş yapmanız gerekiyor." }, { status: 401 });
+    return NextResponse.json({ error: "Giriş yapmanız gerekiyor.", code: "AUTH_REQUIRED" }, { status: 401 });
   }
 
   const body = await req.json();
@@ -18,23 +18,23 @@ export async function POST(req: Request) {
   const currentPassword = body.currentPassword ? String(body.currentPassword) : undefined;
 
   if (!email || !email.includes("@")) {
-    return NextResponse.json({ error: "Geçerli bir e-posta adresi giriniz." }, { status: 400 });
+    return NextResponse.json({ error: "Geçerli bir e-posta adresi giriniz.", code: "INVALID_EMAIL" }, { status: 400 });
   }
 
   if (!code || code.length < 6) {
-    return NextResponse.json({ error: "Lütfen 6 haneli doğrulama kodunu giriniz." }, { status: 400 });
+    return NextResponse.json({ error: "Lütfen 6 haneli doğrulama kodunu giriniz.", code: "INVALID_CODE" }, { status: 400 });
   }
 
   // Cross-account conflict safety check
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing && existing.id !== u.id) {
-    return NextResponse.json({ error: "Bu e-posta adresi zaten başka bir hesaba kayıtlı." }, { status: 409 });
+    return NextResponse.json({ error: "Bu e-posta adresi zaten başka bir hesaba kayıtlı.", code: "EMAIL_IN_USE" }, { status: 409 });
   }
 
   // Reauthentication: existing password accounts must provide currentPassword
   if (u.passwordHash) {
     if (!currentPassword || !verifyPassword(currentPassword, u.passwordHash)) {
-      return NextResponse.json({ error: "Mevcut şifreniz hatalı veya girilmedi." }, { status: 403 });
+      return NextResponse.json({ error: "Mevcut şifreniz hatalı veya girilmedi.", code: "CURRENT_PASSWORD_REQUIRED" }, { status: 403 });
     }
   }
 
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
   });
 
   if (!row || row.attempts >= 5) {
-    return NextResponse.json({ error: "Doğrulama kodu geçersiz veya süresi dolmuş." }, { status: 400 });
+    return NextResponse.json({ error: "Doğrulama kodu geçersiz veya süresi dolmuş.", code: "INVALID_OR_EXPIRED_CODE" }, { status: 400 });
   }
 
   const got = Buffer.from(createHash("sha256").update(code).digest("hex"));
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         ...(row.attempts >= 4 ? { usedAt: new Date() } : {}),
       },
     });
-    return NextResponse.json({ error: "Doğrulama kodu geçersiz veya süresi dolmuş." }, { status: 400 });
+    return NextResponse.json({ error: "Doğrulama kodu geçersiz veya süresi dolmuş.", code: "INVALID_OR_EXPIRED_CODE" }, { status: 400 });
   }
 
   // ATOMIC CONSUMPTION: Single-use consumption preventing replay & concurrency
@@ -75,13 +75,13 @@ export async function POST(req: Request) {
   });
 
   if (consumed.count === 0) {
-    return NextResponse.json({ error: "Bu kod zaten kullanılmış." }, { status: 400 });
+    return NextResponse.json({ error: "Bu kod zaten kullanılmış.", code: "CODE_ALREADY_USED" }, { status: 400 });
   }
 
   let newPasswordHash: string | undefined = undefined;
   if (password) {
     const policyErr = passwordPolicy(password);
-    if (policyErr) return NextResponse.json({ error: policyErr }, { status: 400 });
+    if (policyErr) return NextResponse.json({ error: policyErr, code: "PASSWORD_POLICY_VIOLATION" }, { status: 400 });
     newPasswordHash = hashPassword(password);
   }
 

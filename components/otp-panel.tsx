@@ -20,6 +20,55 @@ function formatDisplayPhone(raw: string): string {
   return raw;
 }
 
+type OtpNotice = {
+  key?: string;
+  code?: string;
+  fallback?: string;
+} | null;
+
+function resolveOtpNotice(notice: OtpNotice, t: (k: string) => string): string {
+  if (!notice) return "";
+  if (notice.key) {
+    try {
+      return t(notice.key);
+    } catch {
+      return notice.key;
+    }
+  }
+  if (notice.code) {
+    const codeMap: Record<string, string> = {
+      ACCOUNT_NOT_FOUND: "accountNotFoundPrompt",
+      PHONE_ALREADY_REGISTERED: "phoneAlreadyRegistered",
+      INVALID_OR_EXPIRED_CODE: "errorVerify",
+      CODE_ALREADY_USED: "codeAlreadyUsed",
+      PHONE_IN_USE: "phoneInUse",
+      RATE_LIMITED: "rateLimited",
+      INVALID_PHONE: "invalidPhone",
+      INVALID_INPUT: "invalidPhone",
+      UNAUTHORIZED_OTP: "unauthorizedOtp",
+      SMS_SEND_FAILED: "smsSendFailed",
+    };
+    const k = codeMap[notice.code];
+    if (k) {
+      try {
+        return t(k);
+      } catch {}
+    }
+    return notice.fallback || t("errorVerify");
+  }
+  if (notice.fallback) {
+    if (notice.fallback.includes("başka bir hesap tarafından")) return t("phoneInUse");
+    if (notice.fallback.includes("başka bir hesaba")) return t("phoneAlreadyRegistered");
+    if (notice.fallback.includes("zaten kullanılmış")) return t("codeAlreadyUsed");
+    if (notice.fallback.includes("süresi dolmuş") || notice.fallback.includes("geçersiz")) return t("errorVerify");
+    if (notice.fallback.includes("Çok fazla")) return t("rateLimited");
+    if (notice.fallback.includes("SMS gönderilemedi")) return t("smsSendFailed");
+    if (notice.fallback.includes("Geçerli bir telefon")) return t("invalidPhone");
+    return notice.fallback;
+  }
+  return "";
+}
+
 export default function OtpPanel({ initialPhone = null }: { initialPhone?: string | null }) {
   const t = useTranslations("auth");
   const router = useRouter();
@@ -28,15 +77,17 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
   const [phone, setPhone] = useState<string>(initialPhone ? formatDisplayPhone(initialPhone) : "");
   const [code, setCode] = useState("");
   const [devCode, setDevCode] = useState("");
-  const [msg, setMsg] = useState("");
+  const [notice, setNotice] = useState<OtpNotice>(null);
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<number>(initialPhone ? 3 : 1);
 
+  const displayNotice = resolveOtpNotice(notice, t);
+
   async function request() {
     if (!phone.trim()) return;
     setLoading(true);
-    setMsg("");
+    setNotice(null);
     setIsError(false);
 
     try {
@@ -48,14 +99,14 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
       const j = await r.json().catch(() => ({}));
       if (!r.ok) {
         setIsError(true);
-        setMsg(j.error || t("errorSend"));
+        setNotice({ code: j.code, fallback: j.error });
       } else {
         if (j.devCode) setDevCode(j.devCode);
         setStep(2);
       }
     } catch {
       setIsError(true);
-      setMsg(t("errorSend"));
+      setNotice({ key: "errorSend" });
     } finally {
       setLoading(false);
     }
@@ -78,16 +129,16 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
         setIsError(false);
         setVerifiedPhone(canonicalPhone);
         setPhone(formatDisplayPhone(canonicalPhone));
-        setMsg(t("phoneVerified"));
+        setNotice({ key: "phoneVerified" });
         setStep(3);
         router.refresh();
       } else {
         setIsError(true);
-        setMsg(j.error || t("authFailed"));
+        setNotice({ code: j.code, fallback: j.error });
       }
     } catch {
       setIsError(true);
-      setMsg(t("authFailed"));
+      setNotice({ key: "authFailed" });
     } finally {
       setLoading(false);
     }
@@ -126,7 +177,7 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
           onClick={() => {
             setPhone("");
             setCode("");
-            setMsg("");
+            setNotice(null);
             setIsError(false);
             setStep(1);
           }}
@@ -171,7 +222,7 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
                 onClick={() => {
                   setPhone(formatDisplayPhone(verifiedPhone));
                   setStep(3);
-                  setMsg("");
+                  setNotice(null);
                   setIsError(false);
                 }}
                 style={{
@@ -283,7 +334,7 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
               onClick={() => {
                 setStep(1);
                 setCode("");
-                setMsg("");
+                setNotice(null);
                 setIsError(false);
               }}
               type="button"
@@ -386,7 +437,7 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
       )}
 
       {/* Error notification banner */}
-      {isError && msg && (
+      {isError && displayNotice && (
         <div
           style={{
             padding: "10px 14px",
@@ -403,7 +454,7 @@ export default function OtpPanel({ initialPhone = null }: { initialPhone?: strin
           }}
         >
           <WarningCircle size={18} weight="fill" style={{ flexShrink: 0 }} />
-          <span>{msg}</span>
+          <span>{displayNotice}</span>
         </div>
       )}
     </div>

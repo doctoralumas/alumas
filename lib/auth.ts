@@ -24,7 +24,15 @@ export async function createSession(userId:string) {
   await prisma.session.create({data:{userId,tokenHash:tokenHash(token),expiresAt}});
   const jar = await cookies();
   await prisma.session.deleteMany({where:{userId,expiresAt:{lt:new Date()}}}).catch(()=>{});
-  jar.set(SESSION_COOKIE, token, {httpOnly:true,sameSite:"lax",secure:process.env.NODE_ENV==="production",path:"/",expires:expiresAt,priority:"high"});
+  jar.set(SESSION_COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    expires: expiresAt,
+    maxAge: SESSION_DAYS * 86400,
+    priority: "high",
+  });
 }
 export async function destroySession() {
   const jar=await cookies(); const token=jar.get(SESSION_COOKIE)?.value;

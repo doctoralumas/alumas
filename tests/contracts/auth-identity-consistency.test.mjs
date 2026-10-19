@@ -457,5 +457,46 @@ test("Architecture Contract: Static Code Invariants for Auth Flow Separation & S
   assert.match(personalInfoEditor, /\/api\/auth\/email\/request/);
   assert.match(personalInfoEditor, /\/api\/auth\/email\/verify/);
   assert.match(personalInfoEditor, /password/);
+
+  // 10. Dynamic error translation in components/phone-login.tsx & auth dictionaries:
+  // - Must implement resolveNotice / dynamic code mapping to prevent static error string lock
+  // - Auth locale dictionaries must contain accountNotFoundPrompt & phoneAlreadyRegistered in both TR & EN
+  assert.match(phoneLoginComponent, /resolveNotice/);
+  assert.match(phoneLoginComponent, /accountNotFoundPrompt/);
+  assert.match(phoneLoginComponent, /phoneAlreadyRegistered/);
+
+  const authTr = JSON.parse(read("locales/features/auth/tr.json"));
+  const authEn = JSON.parse(read("locales/features/auth/en.json"));
+  assert.ok(authTr.auth.accountNotFoundPrompt);
+  assert.ok(authEn.auth.accountNotFoundPrompt);
+  assert.ok(authTr.auth.phoneAlreadyRegistered);
+  assert.ok(authEn.auth.phoneAlreadyRegistered);
+
+  // 11. Initial password creation for verified email accounts in app/api/auth/me/route.ts:
+  // - Users with verified real email can set initial password (no dead-end)
+  // - Dummy emails (@alumas.local) are blocked with EMAIL_VERIFICATION_REQUIRED
+  // - Existing password accounts require CURRENT_PASSWORD_REQUIRED (403)
+  assert.match(meRoute, /u\.email\.includes\(["']@alumas\.local["']\)/);
+  assert.match(meRoute, /code:\s*["']CURRENT_PASSWORD_REQUIRED["']/);
+  assert.match(personalInfoEditor, /passwordRequiredForEmail/);
+
+  // 12. Persistent session cookies & auth entry page bouncing:
+  // - lib/auth.ts must specify maxAge alongside expires for bulletproof cross-browser persistence
+  // - Auth entry pages must inspect currentUser() and redirect authenticated sessions immediately
+  assert.match(authLib, /maxAge:\s*SESSION_DAYS\s*\*\s*86400/);
+  assert.match(authLib, /expires:\s*expiresAt/);
+
+  for (const pagePath of [
+    "app/phone-login/page.tsx",
+    "app/login/page.tsx",
+    "app/register/page.tsx",
+    "app/pro/login/page.tsx",
+    "app/pro/register/page.tsx",
+  ]) {
+    const pageContent = read(pagePath);
+    assert.match(pageContent, /currentUser\(\)/, `${pagePath} must check currentUser()`);
+    assert.match(pageContent, /resolvePostAuthDestination/, `${pagePath} must resolve destination`);
+    assert.match(pageContent, /redirect\(dest\)/, `${pagePath} must redirect authenticated users`);
+  }
 });
 
