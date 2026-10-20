@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Retrieve user with attached assets and organization ownership
+    // Retrieve user with attached assets, messages, agencies, and organization ownership
     const full = await prisma.user.findUnique({
       where: { id: u.id },
       include: {
@@ -56,6 +56,13 @@ export async function POST(req: Request) {
         doctorProfile: true,
         organizations: {
           select: { id: true, isPublished: true, status: true, name: true },
+        },
+        tourismAgencies: {
+          select: { id: true, isActive: true, status: true, name: true },
+        },
+        sentMessages: {
+          where: { attachmentPath: { not: null } },
+          select: { attachmentPath: true },
         },
       },
     });
@@ -83,11 +90,14 @@ export async function POST(req: Request) {
       }
     }
 
-    // Safety guard: prevent accidental deletion if user owns active/published organizations
+    // Safety guard: prevent accidental deletion if user owns active/published organizations or agencies
     const activeOrgs = full.organizations.filter(
       (o) => o.isPublished || o.status === "APPROVED"
     );
-    if (activeOrgs.length > 0) {
+    const activeAgencies = full.tourismAgencies.filter(
+      (a) => a.isActive || a.status === "APPROVED"
+    );
+    if (activeOrgs.length > 0 || activeAgencies.length > 0) {
       return NextResponse.json(
         {
           ok: false,
@@ -96,6 +106,18 @@ export async function POST(req: Request) {
         },
         { status: 409 }
       );
+    }
+
+    // Collect all personal file storage paths across documents, imaging, and message attachments
+    const storagePaths: string[] = [];
+    for (const doc of full.documents) {
+      if (doc.storagePath) storagePaths.push(doc.storagePath);
+    }
+    for (const img of full.imagingResults) {
+      if (img.storagePath) storagePaths.push(img.storagePath);
+    }
+    for (const msg of full.sentMessages) {
+      if (msg.attachmentPath) storagePaths.push(msg.attachmentPath);
     }
 
     // Audit log before deletion to preserve immutable compliance trail
@@ -108,25 +130,13 @@ export async function POST(req: Request) {
         confirmationLanguage: validation.matchedLanguage,
         documentCount: full.documents.length,
         imagingCount: full.imagingResults.length,
+        attachmentCount: full.sentMessages.length,
         hadDoctorProfile: Boolean(full.doctorProfile),
       },
       req,
     }).catch((e) => {
       console.warn("Account deletion audit logging warning:", e);
     });
-
-    // Cleanup private storage files for KVKK/GDPR compliance
-    const storagePaths: string[] = [];
-    for (const doc of full.documents) {
-      if (doc.storagePath) storagePaths.push(doc.storagePath);
-    }
-    for (const img of full.imagingResults) {
-      if (img.storagePath) storagePaths.push(img.storagePath);
-    }
-
-    for (const p of storagePaths) {
-      await deletePrivateFile(p).catch(() => {});
-    }
 
     // Execute atomic database deletion in a transaction
     await prisma.$transaction(async (tx) => {
@@ -142,6 +152,17 @@ export async function POST(req: Request) {
         }).catch(() => {});
       }
 
+      // If user owns pending/draft tourism agencies, deactivate them
+      if (full.tourismAgencies.length > 0) {
+        await tx.healthTourismAgency.updateMany({
+          where: { ownerUserId: u.id },
+          data: {
+            isActive: false,
+            status: "SUSPENDED",
+          },
+        }).catch(() => {});
+      }
+
       // Delete the User record
       // Postgres CASCADE deletes sessions, appointments, healthEntries, etc.
       // Postgres SET NULL unlinks doctor invites, reviews, agency owners, etc.
@@ -149,6 +170,15 @@ export async function POST(req: Request) {
         where: { id: u.id },
       });
     });
+
+    // Cleanup private storage files after database transaction succeeds
+    for (const p of storagePaths) {
+      try {
+        await deletePrivateFile(p);
+      } catch (err) {
+        console.warn(`[STORAGE_CLEANUP_FAILURE] Could not delete file at ${p}:`, err);
+      }
+    }
 
     // Revoke active session and clear cookie
     await destroySession().catch(() => {});
