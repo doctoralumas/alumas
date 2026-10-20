@@ -1,33 +1,42 @@
 "use client";
 import { useState } from "react";
 import { WarningCircle, DownloadSimple, Trash } from "@phosphor-icons/react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { validateAccountDeletionConfirmation } from "@/lib/account-deletion";
 
 export default function AccountControls() {
   const t = useTranslations("profile.accountControls");
+  const locale = useLocale();
   const [confirm, setConfirm] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const validation = validateAccountDeletionConfirmation(confirm);
+  const isConfirmed = validation.isValid;
+
   async function del() {
     if (!window.confirm(t("confirmPrompt"))) return;
     setLoading(true);
-    const r = await fetch('/api/account/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ confirmation: confirm, password })
-    });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      setMsg(d.error || t("deleteFailed"));
+    setMsg("");
+    try {
+      const r = await fetch('/api/account/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmation: confirm, password, locale })
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setMsg(d.error || t("deleteFailed"));
+        setLoading(false);
+        return;
+      }
+      location.href = '/';
+    } catch {
+      setMsg(t("deleteFailed"));
       setLoading(false);
-      return;
     }
-    location.href = '/';
   }
-
-  const isConfirmed = confirm.trim().toUpperCase() === "HESABIMI SİL" || confirm.trim().toUpperCase() === "DELETE MY ACCOUNT";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -59,14 +68,22 @@ export default function AccountControls() {
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <input 
             value={confirm} 
-            onChange={e => setConfirm(e.target.value)} 
+            onChange={e => {
+              setConfirm(e.target.value);
+              if (msg) setMsg("");
+            }} 
             placeholder={t("confirmPlaceholder")}
+            aria-label={t("confirmPlaceholder")}
             style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", border: "1px solid #fecaca", background: "#fff", outline: "none", fontSize: "14px", color: "#0f172a" }}
           />
           <input 
             value={password} 
-            onChange={e => setPassword(e.target.value)} 
+            onChange={e => {
+              setPassword(e.target.value);
+              if (msg) setMsg("");
+            }} 
             placeholder={t("passwordPlaceholder")} 
+            aria-label={t("passwordPlaceholder")}
             type="password"
             style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", border: "1px solid #fecaca", background: "#fff", outline: "none", fontSize: "14px", color: "#0f172a" }}
           />
