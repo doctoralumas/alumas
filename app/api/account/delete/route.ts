@@ -8,6 +8,7 @@ import {
   getDeletionMessages,
 } from "@/lib/account-deletion";
 import { getUserLocale } from "@/lib/locale";
+import { isOfficialRegistrySource } from "@/lib/expert-directory";
 
 export async function POST(req: Request) {
   try {
@@ -140,16 +141,40 @@ export async function POST(req: Request) {
 
     // Execute atomic database deletion in a transaction
     await prisma.$transaction(async (tx) => {
-      // If doctor profile exists, deactivate and unpublish it
+      // If doctor profile exists, deactivate, unpublish and inspect directory linkages
       if (full.doctorProfile) {
         await tx.doctor.update({
           where: { id: full.doctorProfile.id },
           data: {
             userId: null,
             isPublished: false,
+            isVerified: false,
             presenceStatus: "OFFLINE",
           },
         }).catch(() => {});
+
+        // Safely inspect linked directory doctor records before determining publish state.
+        // Never automatically republish an external listing if it lacks an independent official source
+        // or if the user's deletion scope includes directory de-listing / privacy removal.
+        const linkedDirs = await tx.directoryDoctor.findMany({
+          where: { doctorId: full.doctorProfile.id },
+        });
+
+        const requestedDirectoryRemoval = Boolean(body?.removeDirectoryListing ?? true);
+
+        for (const dir of linkedDirs) {
+          const isAuthoritativeOfficial = isOfficialRegistrySource(dir.source);
+          // If not an independent official government registry, or if privacy removal requested, de-list.
+          const shouldRemainActive = isAuthoritativeOfficial && !requestedDirectoryRemoval;
+
+          await tx.directoryDoctor.update({
+            where: { id: dir.id },
+            data: {
+              doctorId: null,
+              isActive: shouldRemainActive,
+            },
+          });
+        }
       }
 
       // If user owns pending/draft tourism agencies, deactivate them
@@ -169,7 +194,7 @@ export async function POST(req: Request) {
       await tx.user.delete({
         where: { id: u.id },
       });
-    });
+    }, { maxWait: 10000, timeout: 25000 });
 
     // Cleanup private storage files after database transaction succeeds
     for (const p of storagePaths) {

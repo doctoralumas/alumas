@@ -366,7 +366,11 @@
     "claimContextTitle": "{name} için kurum yetkilisi başvurusu yapıyorsunuz.",
     "claimContextGenericTitle": "Sağlık kurumu yetkilisi başvurusu yapıyorsunuz.",
     "claimContextSubtitle": "Devam ettiğinizde doğrulama belgelerini yükleyeceğiniz başvuru ekranına otomatik olarak yönlendirileceksiniz.",
-    "claimExistingAccountHint": "Mevcut bir ALUMAS hesabınız (bireysel/hasta veya kurumsal) varsa ikinci bir hesap açmadan giriş yaparak devam edebilirsiniz."
+    "claimExistingAccountHint": "Mevcut bir ALUMAS hesabınız (bireysel/hasta veya kurumsal) varsa ikinci bir hesap açmadan giriş yaparak devam edebilirsiniz.",
+    "claimDoctorContextKicker": "Uzman Profili Sahiplenme",
+    "claimDoctorContextTitle": "{name} için uzman profili sahiplenme başvurusu yapıyorsunuz.",
+    "claimDoctorContextGenericTitle": "Sağlık uzmanı profili sahiplenme başvurusu yapıyorsunuz.",
+    "claimDoctorContextSubtitle": "Devam ettiğinizde kimlik ve uzmanlık tescil belgelerinizi yükleyeceğiniz başvuru ekranına otomatik olarak yönlendirileceksiniz."
   },
   "discovery": {
     "doctorsTitle": "Doktor ve Uzmanlar",
@@ -478,7 +482,14 @@
     "stockInStock": "Stokta var",
     "stockLimited": "Sınırlı",
     "stockOut": "Yok",
-    "pharmacyNoResults": "Bu arama için doğrulanmış eczane kaydı bulunamadı."
+    "pharmacyNoResults": "Bu arama için doğrulanmış eczane kaydı bulunamadı.",
+    "claimDoctor": "Bu Profili Sahiplen",
+    "claimDoctorPending": "Sahiplenme İncelemede",
+    "claimDoctorTitle": "Uzman Profilini Sahiplenin",
+    "claimDoctorDesc": "Bu profilin size ait olduğunu doğrulayarak ALUMAS üzerinden hasta randevuları kabul edebilir, profilinizi ve çalışma saatlerinizi yönetebilirsiniz.",
+    "doctorClaimSuccess": "Sahiplenme başvurunuz başarıyla alındı. İnceleme sonrası profiliniz doğrulanacaktır.",
+    "externalDoctorNotice": "Resmî uzman dizin kaydı",
+    "claimedByVerifiedDoctor": "ALUMAS Doğrulanmış Uzman"
   },
   "liveSearch": {
     "placeholder": "Doktor, hastane veya hizmet ara...",
@@ -3061,9 +3072,9 @@
       "submitError": "Profil oluşturulamadı",
       "submitSuccess": "Profil oluşturuldu. Doğrulama sonrası halka açık listede yayınlanacak.",
       "titleLabel": "Unvan",
-      "titlePlaceholder": "Örn: Prof. Dr. veya Uzm. Dyt.",
+      "titlePlaceholder": "Örn: Prof. Dr., Dt., Uzm. Dyt., Fzt. veya Uzm. Psk.",
       "specialtyLabel": "Uzmanlık alanı",
-      "specialtyPlaceholder": "Örn: İç Hastalıkları, Kardiyoloji",
+      "specialtyPlaceholder": "Örn: İç Hastalıkları, Diş Hekimliği, Beslenme ve Diyetetik, Fizyoterapi, Psikoloji",
       "cityLabel": "Şehir",
       "cityPlaceholder": "Örn: İstanbul",
       "hospitalLabel": "Çalıştığı kurum / Bağımsız",
@@ -3073,7 +3084,14 @@
       "bioLabel": "Kısa biyografi",
       "bioPlaceholder": "Uzmanlığınız, eğitim geçmişiniz ve profesyonel ilgi alanlarınız hakkında kısa bir yazı...",
       "priceLabel": "Görüşme başlangıç fiyatı (₺)",
-      "submitButton": "Uzman profilimi oluştur"
+      "submitButton": "Uzman profilimi oluştur",
+      "existingMatchesNotice": "Mevcut Dizin Kaydı Eşleşmesi Bulundu",
+      "existingMatchesDesc": "Adınızla eşleşen dizin kayıtları bulundu. Bu kayıtlardan biri size aitse doğrudan sahiplenme başvurusu yapabilir veya bağımsız yeni profil oluşturmaya devam edebilirsiniz:",
+      "claimThisProfile": "Bu Profili Sahiplen",
+      "cancelClaim": "Sahiplenmeyi Kaldır (Bağımsız Profil Oluştur)",
+      "claimSelectedNotice": "Sahiplenilmek İstenen Dizin Uzmanı",
+      "claimSelectedHint": "Kimlik ve mesleki belgeleriniz doğrulandığında dizin kaydı hesabınızla eşleştirilecek ve mavi ALUMAS onay rozeti verilecektir.",
+      "independentNotice": "Hiçbiri size ait değilse aşağıdaki formu doldurarak bağımsız yeni profil oluşturabilirsiniz."
     },
     "verificationFields": {
       "title": "Doğrulama belgeleri",
@@ -3755,7 +3773,22 @@
       "statusVerified": "DOĞRULANDI",
       "statusPending": "BEKLİYOR",
       "unpublish": "Yayından kaldır",
-      "approve": "Onayla"
+      "approve": "Onayla",
+      "tabDoctors": "Kayıtlı Uzmanlar",
+      "tabClaims": "Dizin Sahiplenme Talepleri",
+      "noDoctors": "Kayıtlı uzman bulunamadı.",
+      "noClaims": "Bekleyen sahiplenme talebi bulunmuyor.",
+      "claimDoctorTarget": "Hedef Dizin Uzmanı",
+      "claimApplicant": "Başvuran",
+      "claimStatusApproved": "ONAYLANDI",
+      "claimStatusRejected": "REDDEDİLDİ",
+      "claimStatusPending": "BEKLİYOR",
+      "approveClaim": "Sahiplenmeyi Onayla",
+      "rejectClaim": "Sahiplenmeyi Reddet",
+      "promptClaimRejectReason": "Reddetme nedeni (Opsiyonel)",
+      "claimedDirectoryTarget": "Hedef Dizin Kaydı",
+      "officialSource": "Resmî Kaynak",
+      "externalSource": "Harici Kaynak"
     },
     "organizationsPage": {
       "kicker": "Yönetim",
@@ -4958,7 +4991,11 @@
       "claimContextTitle": "{name} için kurum yetkilisi başvurusu yapıyorsunuz.",
       "claimContextGenericTitle": "Sağlık kurumu yetkilisi başvurusu yapıyorsunuz.",
       "claimContextSubtitle": "Devam ettiğinizde doğrulama belgelerini yükleyeceğiniz başvuru ekranına otomatik olarak yönlendirileceksiniz.",
-      "claimExistingAccountHint": "Mevcut bir ALUMAS hesabınız (bireysel/hasta veya kurumsal) varsa ikinci bir hesap açmadan giriş yaparak devam edebilirsiniz."
+      "claimExistingAccountHint": "Mevcut bir ALUMAS hesabınız (bireysel/hasta veya kurumsal) varsa ikinci bir hesap açmadan giriş yaparak devam edebilirsiniz.",
+    "claimDoctorContextKicker": "Uzman Profili Sahiplenme",
+    "claimDoctorContextTitle": "{name} için uzman profili sahiplenme başvurusu yapıyorsunuz.",
+    "claimDoctorContextGenericTitle": "Sağlık uzmanı profili sahiplenme başvurusu yapıyorsunuz.",
+    "claimDoctorContextSubtitle": "Devam ettiğinizde kimlik ve uzmanlık tescil belgelerinizi yükleyeceğiniz başvuru ekranına otomatik olarak yönlendirileceksiniz."
     },
     "search": {
       "discovery": {

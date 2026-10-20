@@ -86,6 +86,8 @@ model User {
   aiConversations AiConversation[]
   organizationClaims OrganizationClaim[] @relation("UserOrganizationClaims")
   reviewedOrganizationClaims OrganizationClaim[] @relation("AdminReviewedClaims")
+  doctorClaims DoctorClaim[] @relation("UserDoctorClaims")
+  reviewedDoctorClaims DoctorClaim[] @relation("AdminReviewedDoctorClaims")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -142,6 +144,8 @@ model Doctor {
   isVerified Boolean @default(false)
   isPublished Boolean @default(false)
   verificationDocuments VerificationDocument[]
+  directoryDoctor DirectoryDoctor?
+  claims DoctorClaim[]
   createdAt     DateTime       @default(now())
 
   @@index([isPublished, isVerified])
@@ -1591,6 +1595,59 @@ model OrganizationClaim {
   reviewedBy             User?                   @relation("AdminReviewedClaims", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
 
   @@index([directoryInstitutionId, status])
+  @@index([claimantUserId, status])
+  @@index([status, createdAt])
+}
+
+model DirectoryDoctor {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  name            String
+  title           String        @default("Uzm. Dr.")
+  specialty       String
+  hospital        String?
+  city            String        @default("İstanbul")
+  district        String?
+  address         String?
+  phone           String?
+  officialWebsite String?
+  description     String?
+  source          String        @default("CURATED_PUBLIC_DIRECTORY")
+  externalRef     String?       @unique
+  lastVerifiedAt  DateTime?
+  isActive        Boolean       @default(true)
+
+  doctorId        String?       @unique
+  doctor          Doctor?       @relation(fields: [doctorId], references: [id], onDelete: SetNull)
+  claims          DoctorClaim[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([isActive, specialty, city])
+  @@index([name])
+}
+
+model DoctorClaim {
+  id                String                  @id @default(cuid())
+  directoryDoctorId String
+  doctorId          String                  @unique
+  claimantUserId    String
+  status            OrganizationClaimStatus @default(PENDING)
+  applicantTitle    String?
+  applicantNote     String?
+  reviewerNote      String?
+  reviewedAt        DateTime?
+  reviewedByUserId  String?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+
+  directoryDoctor   DirectoryDoctor         @relation(fields: [directoryDoctorId], references: [id], onDelete: Cascade)
+  doctor            Doctor                  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  claimant          User                    @relation("UserDoctorClaims", fields: [claimantUserId], references: [id], onDelete: Cascade)
+  reviewedBy        User?                   @relation("AdminReviewedDoctorClaims", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([directoryDoctorId, status])
   @@index([claimantUserId, status])
   @@index([status, createdAt])
 }

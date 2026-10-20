@@ -63,12 +63,63 @@ export const SPECIALTY_ALIASES: SpecialtyAlias[] = [
   {
     canonicalTr: "Psikiyatri",
     canonicalEn: "Psychiatry",
-    keywords: ["psychiatry", "psychiatrist", "mental health", "psikiyatri", "psikolog", "ruh sağlığı"],
+    keywords: ["psychiatry", "psychiatrist", "mental health", "psikiyatri", "ruh sağlığı"],
+  },
+  {
+    canonicalTr: "Psikoloji",
+    canonicalEn: "Psychology & Psychotherapy",
+    keywords: [
+      "psychology",
+      "psychologist",
+      "clinical psychologist",
+      "psikolog",
+      "klinik psikolog",
+      "psikoloji",
+      "terapi",
+      "psikoterapi",
+      "psikolojik danışmanlık",
+      "ruh sağlığı",
+    ],
+  },
+  {
+    canonicalTr: "Beslenme ve Diyetetik",
+    canonicalEn: "Nutrition & Dietetics",
+    keywords: [
+      "dietitian",
+      "nutrition",
+      "dietetics",
+      "nutritionist",
+      "diyetisyen",
+      "uzman diyetisyen",
+      "dyt",
+      "diyet",
+      "beslenme",
+      "kilo kontrolü",
+      "obezite",
+    ],
   },
   {
     canonicalTr: "Diş Hekimliği",
     canonicalEn: "Dentistry",
-    keywords: ["dentistry", "dentist", "dental", "tooth", "teeth", "diş", "dis", "implant", "ortodonti"],
+    keywords: [
+      "dentistry",
+      "dentist",
+      "dental",
+      "tooth",
+      "teeth",
+      "diş",
+      "dis",
+      "diş hekimi",
+      "dis hekimi",
+      "ağız ve diş sağlığı",
+      "agiz ve dis sagligi",
+      "dt",
+      "implant",
+      "ortodonti",
+      "periodontoloji",
+      "endodonti",
+      "pedodonti",
+    ],
   },
   {
     canonicalTr: "Üroloji",
@@ -78,7 +129,17 @@ export const SPECIALTY_ALIASES: SpecialtyAlias[] = [
   {
     canonicalTr: "Fizik Tedavi ve Rehabilitasyon",
     canonicalEn: "Physical Therapy & Rehabilitation",
-    keywords: ["physical therapy", "physiotherapy", "rehabilitation", "fizik tedavi", "fizyoterapi"],
+    keywords: [
+      "physical therapy",
+      "physiotherapy",
+      "rehabilitation",
+      "fizik tedavi",
+      "fizyoterapi",
+      "fizyoterapist",
+      "fzt",
+      "uzman fizyoterapist",
+      "manuel terapi",
+    ],
   },
 ];
 
@@ -102,4 +163,3 @@ export function resolveSearchSpecialties(query: string): string[] {
 
   return Array.from(matched);
 }
-

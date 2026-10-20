@@ -8,6 +8,7 @@ import {
   buildAuthHref,
   resolvePostAuthDestination,
   sanitizeClaimDirectoryId,
+  sanitizeClaimDoctorId,
   sanitizeInternalReturnUrl,
 } from "@/lib/claim-onboarding";
 
@@ -15,10 +16,12 @@ export default function AuthForm({
   mode,
   isProfessional = false,
   claimInstitutionName = null,
+  claimDoctorName = null,
 }: {
   mode: "login" | "register";
   isProfessional?: boolean;
   claimInstitutionName?: string | null;
+  claimDoctorName?: string | null;
 }) {
   const tCommon = useTranslations("common");
   return (
@@ -27,6 +30,7 @@ export default function AuthForm({
         mode={mode}
         isProfessional={isProfessional}
         claimInstitutionName={claimInstitutionName}
+        claimDoctorName={claimDoctorName}
       />
     </Suspense>
   );
@@ -83,17 +87,20 @@ function AuthFormContent({
   mode,
   isProfessional,
   claimInstitutionName,
+  claimDoctorName,
 }: {
   mode: "login" | "register";
   isProfessional: boolean;
   claimInstitutionName?: string | null;
+  claimDoctorName?: string | null;
 }) {
   const t = useTranslations("auth");
   const params = useSearchParams();
   const claimDirectoryId = sanitizeClaimDirectoryId(params.get("claimDirectoryId"));
+  const claimDoctorId = sanitizeClaimDoctorId(params.get("claimDoctorId"));
   const nextUrl = sanitizeInternalReturnUrl(params.get("next"));
   const requested = String(
-    params.get("type") || (claimDirectoryId ? "organization" : "patient")
+    params.get("type") || (claimDoctorId ? "doctor" : claimDirectoryId ? "organization" : "patient")
   ).toLowerCase();
 
   const initialType = isProfessional
@@ -105,6 +112,8 @@ function AuthFormContent({
       ? "IMAGING_CENTER"
       : requested === "laboratory"
       ? "LABORATORY"
+      : requested === "doctor" || claimDoctorId
+      ? "DOCTOR"
       : claimDirectoryId
       ? "ORGANIZATION"
       : "DOCTOR"
@@ -157,6 +166,7 @@ function AuthFormContent({
       mode,
       accountType: String((data as any).accountType || "PATIENT"),
       claimDirectoryId,
+      claimDoctorId,
       next: nextUrl,
     });
     window.location.href = destination;
@@ -166,11 +176,13 @@ function AuthFormContent({
     mode === "login"
       ? buildAuthHref(isProfessional ? "/pro/register" : "/register", {
           claimDirectoryId,
+          claimDoctorId,
           next: nextUrl,
-          type: claimDirectoryId ? "organization" : params.get("type"),
+          type: claimDoctorId ? "doctor" : claimDirectoryId ? "organization" : params.get("type"),
         })
       : buildAuthHref(isProfessional ? "/pro/login" : "/login", {
           claimDirectoryId,
+          claimDoctorId,
           next: nextUrl,
           type: params.get("type"),
         });
@@ -189,7 +201,47 @@ function AuthFormContent({
         maxWidth: isProfessional && mode === "register" ? "540px" : "440px",
       }}
     >
-      {claimDirectoryId && (
+      {claimDoctorId && (
+        <div
+          data-testid="auth-claim-context-banner"
+          style={{
+            marginBottom: "20px",
+            padding: "14px 16px",
+            borderRadius: "16px",
+            background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            color: "#1e3a8a",
+            fontSize: "13px",
+            lineHeight: 1.5,
+          }}
+        >
+          <span
+            style={{
+              display: "inline-block",
+              fontSize: "11px",
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
+              color: "#1d4ed8",
+              marginBottom: "4px",
+            }}
+          >
+            {t("claimDoctorContextKicker")}
+          </span>
+          <div style={{ fontWeight: 700, fontSize: "14px", color: "#0f172a", marginBottom: "4px" }}>
+            {claimDoctorName
+              ? t("claimDoctorContextTitle", { name: claimDoctorName })
+              : t("claimDoctorContextGenericTitle")}
+          </div>
+          <div>{t("claimDoctorContextSubtitle")}</div>
+          {mode === "register" && (
+            <div style={{ marginTop: "6px", fontSize: "12px", color: "#1e40af" }}>
+              {t("claimExistingAccountHint")}
+            </div>
+          )}
+        </div>
+      )}
+      {claimDirectoryId && !claimDoctorId && (
         <div
           data-testid="auth-claim-context-banner"
           style={{

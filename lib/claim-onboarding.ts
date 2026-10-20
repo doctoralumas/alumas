@@ -8,7 +8,7 @@ const DISALLOWED_RETURN_PREFIXES = [
 ];
 
 /**
- * Validates that a `claimDirectoryId` parameter is a safe slug or CUID/ID token.
+ * Validates that a claim ID parameter is a safe slug or CUID/ID token.
  */
 export function sanitizeClaimDirectoryId(raw: string | null | undefined): string | null {
   if (typeof raw !== "string") return null;
@@ -17,6 +17,8 @@ export function sanitizeClaimDirectoryId(raw: string | null | undefined): string
   if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) return null;
   return trimmed;
 }
+
+export const sanitizeClaimDoctorId = sanitizeClaimDirectoryId;
 
 /**
  * Validates and normalizes an internal return URL (`next` parameter).
@@ -55,15 +57,21 @@ export function sanitizeInternalReturnUrl(rawNext: string | null | undefined): s
 }
 
 /**
- * Resolves the post-authentication destination URL, prioritizing any active institution claim
+ * Resolves the post-authentication destination URL, prioritizing any active institution or doctor claim
  * or validated internal `next` return URL.
  */
 export function resolvePostAuthDestination(options: {
   mode: "login" | "register";
   accountType?: string | null;
   claimDirectoryId?: string | null;
+  claimDoctorId?: string | null;
   next?: string | null;
 }): string {
+  const safeDoctorClaimId = sanitizeClaimDoctorId(options.claimDoctorId);
+  if (safeDoctorClaimId) {
+    return `/onboarding/doctor?claimDoctorId=${encodeURIComponent(safeDoctorClaimId)}`;
+  }
+
   const safeClaimId = sanitizeClaimDirectoryId(options.claimDirectoryId);
   const safeNext = sanitizeInternalReturnUrl(options.next);
 
@@ -104,22 +112,27 @@ export function resolvePostAuthDestination(options: {
 }
 
 /**
- * Builds an internal authentication link while preserving `claimDirectoryId`, `next`, and `type`.
+ * Builds an internal authentication link while preserving `claimDirectoryId`, `claimDoctorId`, `next`, and `type`.
  */
 export function buildAuthHref(
   basePath: "/login" | "/register" | "/pro/login" | "/pro/register" | "/phone-login",
   params: {
     claimDirectoryId?: string | null;
+    claimDoctorId?: string | null;
     next?: string | null;
     type?: string | null;
   }
 ): string {
   const sp = new URLSearchParams();
   const safeClaimId = sanitizeClaimDirectoryId(params.claimDirectoryId);
+  const safeDoctorClaimId = sanitizeClaimDoctorId(params.claimDoctorId);
   const safeNext = sanitizeInternalReturnUrl(params.next);
   const safeType = typeof params.type === "string" && params.type.trim() ? params.type.trim() : null;
 
-  if (safeType) {
+  if (safeDoctorClaimId) {
+    sp.set("claimDoctorId", safeDoctorClaimId);
+    if (!safeType) sp.set("type", "doctor");
+  } else if (safeType) {
     sp.set("type", safeType);
   } else if (safeClaimId && (basePath === "/pro/register" || basePath === "/register")) {
     sp.set("type", "organization");
@@ -131,8 +144,10 @@ export function buildAuthHref(
 
   if (safeNext) {
     sp.set("next", safeNext);
+  } else if (safeDoctorClaimId) {
+    sp.set("next", `/onboarding/doctor?claimDoctorId=${safeDoctorClaimId}`);
   } else if (safeClaimId) {
-    sp.set("next", `/business/apply?claimDirectoryId=${ safeClaimId }`);
+    sp.set("next", `/business/apply?claimDirectoryId=${safeClaimId}`);
   }
 
   const qs = sp.toString();

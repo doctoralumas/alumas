@@ -109,7 +109,14 @@
     "stockInStock": "In stock",
     "stockLimited": "Limited",
     "stockOut": "Out of stock",
-    "pharmacyNoResults": "No verified pharmacy records found for this search."
+    "pharmacyNoResults": "No verified pharmacy records found for this search.",
+    "claimDoctor": "Claim Profile",
+    "claimDoctorPending": "Claim In Review",
+    "claimDoctorTitle": "Claim Expert Profile",
+    "claimDoctorDesc": "Verify ownership of this profile to accept appointments, manage your hours, and customize your profile on ALUMAS.",
+    "doctorClaimSuccess": "Your profile claim has been submitted and is pending review.",
+    "externalDoctorNotice": "Official expert directory listing",
+    "claimedByVerifiedDoctor": "ALUMAS Verified Expert"
   },
   "liveSearch": {
     "placeholder": "Search doctors, hospitals, or services...",

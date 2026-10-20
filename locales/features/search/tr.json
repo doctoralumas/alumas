@@ -109,7 +109,14 @@
     "stockInStock": "Stokta var",
     "stockLimited": "Sınırlı",
     "stockOut": "Yok",
-    "pharmacyNoResults": "Bu arama için doğrulanmış eczane kaydı bulunamadı."
+    "pharmacyNoResults": "Bu arama için doğrulanmış eczane kaydı bulunamadı.",
+    "claimDoctor": "Bu Profili Sahiplen",
+    "claimDoctorPending": "Sahiplenme İncelemede",
+    "claimDoctorTitle": "Uzman Profilini Sahiplenin",
+    "claimDoctorDesc": "Bu profilin size ait olduğunu doğrulayarak ALUMAS üzerinden hasta randevuları kabul edebilir, profilinizi ve çalışma saatlerinizi yönetebilirsiniz.",
+    "doctorClaimSuccess": "Sahiplenme başvurunuz başarıyla alındı. İnceleme sonrası profiliniz doğrulanacaktır.",
+    "externalDoctorNotice": "Resmî uzman dizin kaydı",
+    "claimedByVerifiedDoctor": "ALUMAS Doğrulanmış Uzman"
   },
   "liveSearch": {
     "placeholder": "Doktor, hastane veya hizmet ara...",

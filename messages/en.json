@@ -366,7 +366,11 @@
     "claimContextTitle": "You are applying as an authorized representative for {name}.",
     "claimContextGenericTitle": "You are applying as an authorized healthcare institution representative.",
     "claimContextSubtitle": "After signing in or creating an account, you will automatically return to this institution's verification application.",
-    "claimExistingAccountHint": "If you already have an ALUMAS account (patient/individual or professional), you can sign in directly without creating a second account."
+    "claimExistingAccountHint": "If you already have an ALUMAS account (patient/individual or professional), you can sign in directly without creating a second account.",
+    "claimDoctorContextKicker": "Claim Expert Profile",
+    "claimDoctorContextTitle": "You are applying to claim the profile of {name}.",
+    "claimDoctorContextGenericTitle": "You are applying to claim a healthcare specialist profile.",
+    "claimDoctorContextSubtitle": "When you proceed, you will be automatically directed to the verification screen to upload your medical credentials."
   },
   "discovery": {
     "doctorsTitle": "Doctors & Specialists",
@@ -478,7 +482,14 @@
     "stockInStock": "In stock",
     "stockLimited": "Limited",
     "stockOut": "Out of stock",
-    "pharmacyNoResults": "No verified pharmacy records found for this search."
+    "pharmacyNoResults": "No verified pharmacy records found for this search.",
+    "claimDoctor": "Claim Profile",
+    "claimDoctorPending": "Claim In Review",
+    "claimDoctorTitle": "Claim Expert Profile",
+    "claimDoctorDesc": "Verify ownership of this profile to accept appointments, manage your hours, and customize your profile on ALUMAS.",
+    "doctorClaimSuccess": "Your profile claim has been submitted and is pending review.",
+    "externalDoctorNotice": "Official expert directory listing",
+    "claimedByVerifiedDoctor": "ALUMAS Verified Expert"
   },
   "liveSearch": {
     "placeholder": "Search doctors, hospitals, or services...",
@@ -3061,9 +3072,9 @@
       "submitError": "Failed to create profile",
       "submitSuccess": "Profile created successfully. It will be published after verification.",
       "titleLabel": "Professional Title",
-      "titlePlaceholder": "e.g. Prof. MD or Specialist Dietitian",
+      "titlePlaceholder": "e.g. Prof. MD, DDS, Specialist Dietitian, PT or Psychologist",
       "specialtyLabel": "Medical Specialty",
-      "specialtyPlaceholder": "e.g. Internal Medicine, Cardiology",
+      "specialtyPlaceholder": "e.g. Internal Medicine, Dentistry, Nutrition & Dietetics, Physiotherapy, Psychology",
       "cityLabel": "City",
       "cityPlaceholder": "e.g. Istanbul",
       "hospitalLabel": "Affiliated Facility / Independent",
@@ -3073,7 +3084,14 @@
       "bioLabel": "Short Biography",
       "bioPlaceholder": "A brief summary of your specialty, educational background, and clinical interests...",
       "priceLabel": "Initial Consultation Fee (₺)",
-      "submitButton": "Create Specialist Profile"
+      "submitButton": "Create Specialist Profile",
+      "existingMatchesNotice": "Matching Directory Record Found",
+      "existingMatchesDesc": "We found existing directory records matching your name. If one of these belongs to you, you can claim it directly, or continue creating an independent new profile:",
+      "claimThisProfile": "Claim This Profile",
+      "cancelClaim": "Remove Claim (Create Independent Profile)",
+      "claimSelectedNotice": "Selected Directory Specialist to Claim",
+      "claimSelectedHint": "Once your identity and credentials are verified, this directory listing will be linked to your account and awarded the verified ALUMAS badge.",
+      "independentNotice": "If none of these belong to you, you can fill out the form below to create an independent new profile."
     },
     "verificationFields": {
       "title": "Verification Documents",
@@ -3755,7 +3773,22 @@
       "statusVerified": "VERIFIED",
       "statusPending": "PENDING",
       "unpublish": "Unpublish",
-      "approve": "Approve"
+      "approve": "Approve",
+      "tabDoctors": "Registered Specialists",
+      "tabClaims": "Directory Claim Requests",
+      "noDoctors": "No registered specialists found.",
+      "noClaims": "No pending directory claim requests found.",
+      "claimDoctorTarget": "Target Directory Specialist",
+      "claimApplicant": "Applicant",
+      "claimStatusApproved": "APPROVED",
+      "claimStatusRejected": "REJECTED",
+      "claimStatusPending": "PENDING",
+      "approveClaim": "Approve Claim",
+      "rejectClaim": "Reject Claim",
+      "promptClaimRejectReason": "Rejection reason (Optional)",
+      "claimedDirectoryTarget": "Target Directory Listing",
+      "officialSource": "Official Source",
+      "externalSource": "External Source"
     },
     "organizationsPage": {
       "kicker": "Administration",
@@ -4958,7 +4991,11 @@
       "claimContextTitle": "You are applying as an authorized representative for {name}.",
       "claimContextGenericTitle": "You are applying as an authorized healthcare institution representative.",
       "claimContextSubtitle": "After signing in or creating an account, you will automatically return to this institution's verification application.",
-      "claimExistingAccountHint": "If you already have an ALUMAS account (patient/individual or professional), you can sign in directly without creating a second account."
+      "claimExistingAccountHint": "If you already have an ALUMAS account (patient/individual or professional), you can sign in directly without creating a second account.",
+    "claimDoctorContextKicker": "Claim Expert Profile",
+    "claimDoctorContextTitle": "You are applying to claim the profile of {name}.",
+    "claimDoctorContextGenericTitle": "You are applying to claim a healthcare specialist profile.",
+    "claimDoctorContextSubtitle": "When you proceed, you will be automatically directed to the verification screen to upload your medical credentials."
     },
     "search": {
       "discovery": {
