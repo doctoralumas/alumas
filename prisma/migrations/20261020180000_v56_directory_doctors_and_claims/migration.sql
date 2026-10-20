@@ -44,14 +44,12 @@ CREATE TABLE "DoctorClaim" (
 CREATE UNIQUE INDEX "DirectoryDoctor_slug_key" ON "DirectoryDoctor"("slug");
 CREATE UNIQUE INDEX "DirectoryDoctor_externalRef_key" ON "DirectoryDoctor"("externalRef");
 CREATE UNIQUE INDEX "DirectoryDoctor_doctorId_key" ON "DirectoryDoctor"("doctorId");
-CREATE INDEX "DirectoryDoctor_isActive_idx" ON "DirectoryDoctor"("isActive");
-CREATE INDEX "DirectoryDoctor_city_idx" ON "DirectoryDoctor"("city");
-CREATE INDEX "DirectoryDoctor_specialty_idx" ON "DirectoryDoctor"("specialty");
-CREATE INDEX "DirectoryDoctor_isActive_city_specialty_idx" ON "DirectoryDoctor"("isActive", "city", "specialty");
+CREATE INDEX "DirectoryDoctor_isActive_specialty_city_idx" ON "DirectoryDoctor"("isActive", "specialty", "city");
+CREATE INDEX "DirectoryDoctor_name_idx" ON "DirectoryDoctor"("name");
 
+CREATE UNIQUE INDEX "DoctorClaim_doctorId_key" ON "DoctorClaim"("doctorId");
 CREATE INDEX "DoctorClaim_directoryDoctorId_status_idx" ON "DoctorClaim"("directoryDoctorId", "status");
 CREATE INDEX "DoctorClaim_claimantUserId_status_idx" ON "DoctorClaim"("claimantUserId", "status");
-CREATE INDEX "DoctorClaim_doctorId_status_idx" ON "DoctorClaim"("doctorId", "status");
 CREATE INDEX "DoctorClaim_status_createdAt_idx" ON "DoctorClaim"("status", "createdAt");
 
 ALTER TABLE "DirectoryDoctor" ADD CONSTRAINT "DirectoryDoctor_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "Doctor"("id") ON DELETE SET NULL ON UPDATE CASCADE;
