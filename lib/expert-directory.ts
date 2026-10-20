@@ -95,11 +95,17 @@ export function isOfficialRegistrySource(source: string | null | undefined): boo
  */
 export function cleanProfessionalName(rawName: string | null | undefined): string {
   if (!rawName) return "";
-  return rawName
-    .replace(
-      /\b(prof\s*\.?\s*dr\s*\.?|doç\s*\.?\s*dr\s*\.?|doc\s*\.?\s*dr\s*\.?|uzm\s*\.?\s*dr\s*\.?|op\s*\.?\s*dr\s*\.?|dr\s*\.?|uzm\s*\.?\s*dt\s*\.?|dt\s*\.?|uzm\s*\.?\s*dyt\s*\.?|dyt\s*\.?|uzm\s*\.?\s*fzt\s*\.?|fzt\s*\.?|uzm\s*\.?\s*psk\s*\.?|psk\s*\.?|klinik\s+psk\s*\.?)\b/gi,
-      ""
-    )
+  let current = rawName;
+  let prev = "";
+  const titleRegex = /(?:^|\s+)(prof\s*\.?\s*dr\s*\.?|doç\s*\.?\s*dr\s*\.?|doc\s*\.?\s*dr\s*\.?|uzm\s*\.?\s*dr\s*\.?|op\s*\.?\s*dr\s*\.?|dr\s*\.?|uzm\s*\.?\s*dt\s*\.?|dt\s*\.?|uzm\s*\.?\s*dyt\s*\.?|dyt\s*\.?|uzm\s*\.?\s*fzt\s*\.?|fzt\s*\.?|uzm\s*\.?\s*psk\s*\.?|psk\s*\.?|klinik\s+psk\s*\.?)(?=\s+|$)/giu;
+
+  while (current !== prev) {
+    prev = current;
+    current = current.replace(titleRegex, " ");
+  }
+
+  return current
+    .replace(/^[\s.,;:\-]+|[\s.,;:\-]+$/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
