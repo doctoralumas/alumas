@@ -15,11 +15,11 @@ function assert(condition: boolean, testName: string, detail?: any) {
 
 async function runRegressionSuite() {
   console.log("===============================================================================");
-  console.log("ALUMAS EXPERTS VALIDATOR — REGRESSION TEST SUITE");
-  console.log("Testing generic redirects, 404s, false matches, mismatched geo & positive controls");
+  console.log("ALUMAS EXPERTS VALIDATOR — REGRESSION TEST SUITE (QUALITY V2)");
+  console.log("Testing generic redirects, 404s, false matches, Hospitadent branches & quarantine");
   console.log("===============================================================================\n");
 
-  // 1. URL pattern and generic detector
+  // 1. Generic listing detector
   assert(isGenericDirectoryUrl("https://www.medicana.com.tr/hekimlerimiz"), "Detects /hekimlerimiz as generic directory");
   assert(isGenericDirectoryUrl("https://www.acibadem.com.tr/doktorlar/"), "Detects /doktorlar/ as generic directory");
   assert(isGenericDirectoryUrl("https://www.hospitadent.com/tibbi-yayin-kurulu"), "Detects /tibbi-yayin-kurulu as generic directory");
@@ -27,7 +27,7 @@ async function runRegressionSuite() {
   assert(!isGenericDirectoryUrl("https://www.acibadem.com.tr/doktor/berna-ozkan/"), "Accepts individual Acibadem profile URL as non-generic");
   assert(!isGenericDirectoryUrl("https://www.hospitadent.com/hekimlerimiz/dt-irem-cetinbak-guvenc"), "Accepts individual Hospitadent profile URL as non-generic");
 
-  // 2. Medicana generic redirect rejection
+  // 2. Generic redirect rejection
   console.log("\n--- Testing Medicana Generic Redirects ---");
   const medRedirect = await verifyExpertProfile({
     name: "Ahmet Bilge",
@@ -40,7 +40,7 @@ async function runRegressionSuite() {
     medRedirect.exclusionReason
   );
 
-  // 3. Acibadem 404 broken URL rejection
+  // 3. Acibadem 404 URL rejection
   console.log("\n--- Testing Acibadem 404 URL ---");
   const aci404 = await verifyExpertProfile({
     name: "Ali Akman",
@@ -53,7 +53,7 @@ async function runRegressionSuite() {
     aci404.exclusionReason
   );
 
-  // 4. False identity match rejection (wrong name for actual profile)
+  // 4. False identity match rejection
   console.log("\n--- Testing False Identity Match Prevention ---");
   const falseName = await verifyExpertProfile({
     name: "Tamamen Farkli Bir Isim",
@@ -66,7 +66,52 @@ async function runRegressionSuite() {
     falseName.exclusionReason
   );
 
-  // 5. Positive Control: Medicana individual profile
+  // 5. Hospitadent branch extraction: Kocaeli branch (Dt. İrem Çetinbak Güvenç)
+  console.log("\n--- Testing Hospitadent Non-Istanbul Branch Extraction ---");
+  const iremKocaeli = await verifyExpertProfile({
+    name: "İrem Çetinbak Güvenç",
+    sourceId: "SRC-HOSPITADENT-01",
+    sourceUrl: "https://www.hospitadent.com/hekimlerimiz/dt-irem-cetinbak-guvenc",
+  });
+  assert(
+    iremKocaeli.isEligible &&
+    iremKocaeli.extractedCity === "Kocaeli" &&
+    iremKocaeli.extractedDistrict === "İzmit" &&
+    iremKocaeli.extractedHospital === "Hospitadent Kocaeli Diş Hastanesi",
+    "Correctly extracts Kocaeli / İzmit location for Dt. İrem Çetinbak Güvenç from 'Çalıştığı Şube' block",
+    iremKocaeli
+  );
+
+  // 6. Hospitadent branch extraction: Kayseri branch (Ahmet Turan Pekyürek)
+  const ahmetKayseri = await verifyExpertProfile({
+    name: "Ahmet Turan Pekyürek",
+    sourceId: "SRC-HOSPITADENT-01",
+    sourceUrl: "https://www.hospitadent.com/hekimlerimiz/dt-ahmet-turan-pekyurek",
+  });
+  assert(
+    ahmetKayseri.isEligible &&
+    ahmetKayseri.extractedCity === "Kayseri" &&
+    ahmetKayseri.extractedDistrict === "Melikgazi" &&
+    ahmetKayseri.extractedHospital === "Hospitadent Kayseri Diş Hastanesi",
+    "Correctly extracts Kayseri / Melikgazi location for Dt. Ahmet Turan Pekyürek",
+    ahmetKayseri
+  );
+
+  // 7. Hospitadent Quarantine Check: Serinhisar without street address (Feride Ertuğrul)
+  console.log("\n--- Testing Hospitadent Quarantine on Insufficient Location Evidence ---");
+  const ferideQuarantine = await verifyExpertProfile({
+    name: "Feride Ertuğrul",
+    sourceId: "SRC-HOSPITADENT-01",
+    sourceUrl: "https://www.hospitadent.com/hekimlerimiz/dt-feride-ertugrul",
+  });
+  assert(
+    !ferideQuarantine.isEligible &&
+    ferideQuarantine.rejectionCode === "INSUFFICIENT_LOCATION_EVIDENCE",
+    "Quarantines profile lacking street address / localized contact",
+    ferideQuarantine.exclusionReason
+  );
+
+  // 8. Positive Control: Medicana individual profile
   console.log("\n--- Testing Positive Controls ---");
   const medValid = await verifyExpertProfile({
     name: "Orçun Gürbüz",
@@ -78,12 +123,12 @@ async function runRegressionSuite() {
     sourceUrl: "https://www.medicana.com.tr/hekim-detay/21039/orcun-gurbuz",
   });
   assert(
-    medValid.isEligible && medValid.httpStatus === 200 && medValid.extractedCity === "Bursa",
-    "Accepts valid Medicana doctor with attributed Bursa location",
+    medValid.isEligible && medValid.extractedCity === "Bursa" && medValid.extractedDistrict === "Nilüfer",
+    "Accepts valid Medicana doctor with attributed Bursa / Nilüfer location",
     medValid
   );
 
-  // 6. Positive Control: Acibadem individual profile
+  // 9. Positive Control: Acibadem individual profile
   const aciValid = await verifyExpertProfile({
     name: "Berna Özkan",
     title: "Prof. Dr.",
@@ -94,25 +139,9 @@ async function runRegressionSuite() {
     sourceUrl: "https://www.acibadem.com.tr/doktor/berna-ozkan/",
   });
   assert(
-    aciValid.isEligible && aciValid.httpStatus === 200 && aciValid.extractedCity === "İstanbul",
-    "Accepts valid Acibadem doctor with attributed Istanbul location",
+    aciValid.isEligible && aciValid.extractedCity === "İstanbul" && aciValid.extractedDistrict === "Ataşehir",
+    "Accepts valid Acibadem doctor with attributed Istanbul / Ataşehir location",
     aciValid
-  );
-
-  // 7. Positive Control: Hospitadent individual profile
-  const hospValid = await verifyExpertProfile({
-    name: "İrem Çetinbak Güvenç",
-    title: "Dt.",
-    specialty: "Diş Hekimliği",
-    hospital: "Hospitadent Diş Hastanesi",
-    city: "İstanbul",
-    sourceId: "SRC-HOSPITADENT-01",
-    sourceUrl: "https://www.hospitadent.com/hekimlerimiz/dt-irem-cetinbak-guvenc",
-  });
-  assert(
-    hospValid.isEligible && hospValid.httpStatus === 200 && hospValid.extractedCity === "İstanbul",
-    "Accepts valid Hospitadent dentist with attributed Istanbul location",
-    hospValid
   );
 
   console.log("\n===============================================================================");
@@ -129,4 +158,3 @@ runRegressionSuite().catch((err) => {
   console.error("FATAL ERROR in regression suite:", err);
   process.exit(1);
 });
-

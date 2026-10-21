@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { verifyExpertProfile, formatTurkishProperCase } from "../lib/expert-validator";
-import { normalizeProfessionalTitle, normalizeProvinceName } from "../lib/expert-importer";
-import { cleanProfessionalName, normalizeTextKey } from "../lib/expert-directory";
+import { normalizeProfessionalTitle } from "../lib/expert-importer";
+import { cleanProfessionalName } from "../lib/expert-directory";
 
 interface EvidenceLedgerRow {
   source_id: string;
@@ -21,6 +21,7 @@ interface EvidenceLedgerRow {
   institution_match_result: string;
   eligibility_status:
     | "VERIFIED_FOR_DIRECTORY"
+    | "QUARANTINED"
     | "INACCESSIBLE"
     | "INSUFFICIENT_EVIDENCE"
     | "DUPLICATE"
@@ -57,8 +58,8 @@ function parseCsvLine(line: string): string[] {
 
 async function reconcileAndStage() {
   console.log("===============================================================================");
-  console.log("ALUMAS EXPERTS DIRECTORY — RIGOROUS RE-AUDIT & RECONCILIATION");
-  console.log("Auditing all 150 staged candidates with strict individual profile validation");
+  console.log("ALUMAS EXPERTS DIRECTORY — RIGOROUS RE-AUDIT & RECONCILIATION (QUALITY V2)");
+  console.log("Auditing all 150 candidates with professional-specific location verification");
   console.log("===============================================================================\n");
 
   const csvPath = path.resolve("data/imports/alumas_experts_phase2_VERIFIED_STAGED.csv");
@@ -90,6 +91,7 @@ async function reconcileAndStage() {
 
   const ledger: EvidenceLedgerRow[] = [];
   const approvedStagedRows: any[] = [];
+  const quarantinedRows: any[] = [];
   const concurrency = 6;
   const queue = [...candidatesToAudit];
   let processed = 0;
@@ -121,13 +123,24 @@ async function reconcileAndStage() {
       }
 
       if (!verified.isEligible) {
+        const isQuarantine = verified.rejectionCode === "INSUFFICIENT_LOCATION_EVIDENCE";
+        const status = isQuarantine
+          ? "QUARANTINED"
+          : verified.rejectionCode === "GENERIC_PAGE_REDIRECT"
+          ? "GENERIC_PAGE_REDIRECT"
+          : verified.rejectionCode === "MISMATCHED_GEOGRAPHY"
+          ? "MISMATCHED_GEOGRAPHY"
+          : verified.httpStatus === 403
+          ? "INACCESSIBLE"
+          : "INSUFFICIENT_EVIDENCE";
+
         ledger.push({
           source_id: c.sourceId,
           professional_name: c.rawName,
           profession,
           specialty: c.rawSpecialty,
-          city: c.rawCity,
-          institution: c.rawHospital,
+          city: verified.extractedCity || c.rawCity || "UNSPECIFIED",
+          institution: verified.extractedHospital || c.rawHospital || "Hospitadent Diş Hastanesi",
           actual_profile_url: c.sourceUrl,
           final_resolved_url: verified.finalResolvedUrl,
           source_page_url: c.sourceUrl,
@@ -136,37 +149,28 @@ async function reconcileAndStage() {
           identity_match_result: verified.nameMatchedInEntity ? "MATCHED" : "FAILED",
           profession_match_result: "UNVERIFIED",
           institution_match_result: "UNVERIFIED",
-          eligibility_status:
-            verified.rejectionCode === "GENERIC_PAGE_REDIRECT"
-              ? "GENERIC_PAGE_REDIRECT"
-              : verified.rejectionCode === "MISMATCHED_GEOGRAPHY"
-              ? "MISMATCHED_GEOGRAPHY"
-              : verified.httpStatus === 403
-              ? "INACCESSIBLE"
-              : "INSUFFICIENT_EVIDENCE",
+          eligibility_status: status,
           exclusion_reason: verified.exclusionReason,
         });
+
+        if (isQuarantine) {
+          quarantinedRows.push({
+            name: c.rawName,
+            source: c.sourceId,
+            url: c.sourceUrl,
+            reason: verified.exclusionReason,
+          });
+        }
       } else {
         // Individual-attributable values
-        let finalTitle = verified.extractedTitle || c.rawTitle;
-        let finalSpecialty = verified.extractedSpecialty || c.rawSpecialty;
-        let finalHospital = verified.extractedHospital || c.rawHospital;
-        let finalCity = verified.extractedCity || c.rawCity;
-        let finalDistrict = verified.extractedDistrict || c.rawDistrict;
-        let finalAddress = c.rawAddress;
-        let finalPhone = c.rawPhone;
+        const finalTitle = verified.extractedTitle || c.rawTitle;
+        const finalSpecialty = verified.extractedSpecialty || c.rawSpecialty;
+        const finalHospital = verified.extractedHospital || c.rawHospital;
+        const finalCity = verified.extractedCity || c.rawCity;
+        const finalDistrict = verified.extractedDistrict || c.rawDistrict;
+        const finalAddress = verified.extractedAddress || c.rawAddress;
+        const finalPhone = verified.extractedPhone || c.rawPhone;
 
-        // Specific Hospitadent individual normalization
-        if (c.sourceId === "SRC-HOSPITADENT-01") {
-          finalCity = "İstanbul"; // All 45 tested profiles are based at Hospitadent Mecidiyeköy/Fulya Headquarters
-          finalDistrict = "Şişli";
-          finalHospital = "Hospitadent Diş Hastanesi";
-          finalAddress = "Fulya Mah. Akıncıbayırı Sok. No:8 Eski Ali Sami Yen Stadı Yanı Mecidiyeköy";
-          finalPhone = "+90 212 444 99 91";
-          if (!finalTitle || finalTitle === "Dr.") finalTitle = "Dt.";
-        }
-
-        // Clean names
         const cleanName = formatTurkishProperCase(cleanProfessionalName(verified.extractedName || c.rawName));
 
         ledger.push({
@@ -198,7 +202,9 @@ async function reconcileAndStage() {
           address: finalAddress,
           phone: finalPhone,
           officialWebsite: c.sourceUrl,
-          description: `${finalHospital} bünyesinde ${finalSpecialty} alanında görev yapan ${profession === "Dentist" ? "diş hekimi" : "hekim"}.`,
+          description: `${finalHospital} bünyesinde ${finalSpecialty} alanında görev yapan ${
+            profession === "Dentist" ? "diş hekimi" : "hekim"
+          }.`,
           source: c.sourceId,
           externalRef: c.externalRef,
           lastVerifiedAt: timestamp,
@@ -215,9 +221,18 @@ async function reconcileAndStage() {
   await Promise.all(Array.from({ length: concurrency }, () => worker()));
 
   console.log("\n================ RE-AUDIT SUMMARY ================");
-  console.log(`Total candidates audited: ${candidatesToAudit.length}`);
-  console.log(`Genuinely Approved Candidates: ${approvedStagedRows.length}`);
-  console.log(`Excluded Candidates: ${candidatesToAudit.length - approvedStagedRows.length}`);
+  console.log(`Total candidates audited:   ${candidatesToAudit.length}`);
+  console.log(`Genuinely Approved Records: ${approvedStagedRows.length}`);
+  console.log(`Quarantined Records:        ${quarantinedRows.length}`);
+  console.log(`Excluded Other Records:     ${candidatesToAudit.length - approvedStagedRows.length - quarantinedRows.length}`);
+
+  if (quarantinedRows.length > 0) {
+    console.log("\n--- QUARANTINED RECORDS DETAIL ---");
+    for (const q of quarantinedRows) {
+      console.log(`  - [${q.source}] ${q.name} | URL: ${q.url}`);
+      console.log(`    Reason: ${q.reason}`);
+    }
+  }
 
   // Write Evidence Ledger CSV
   const ledgerHeader =
@@ -231,7 +246,7 @@ async function reconcileAndStage() {
     ledgerHeader + ledgerLines.join("\n"),
     "utf-8"
   );
-  console.log("Updated evidence ledger: data/sources/alumas_experts_phase2_evidence_ledger.csv");
+  console.log("\nUpdated evidence ledger: data/sources/alumas_experts_phase2_evidence_ledger.csv");
 
   // Write Approved Staging CSV
   const stagedHeader =
@@ -284,7 +299,7 @@ async function reconcileAndStage() {
   // Output markdown table for report
   const sortedCities = Object.keys(cityTotals).sort((a, b) => cityTotals[b] - cityTotals[a]);
   const tableRows: string[] = [];
-  tableRows.push("| İl | Hospitadent (Diş) | Acıbadem (Hastane) | Medicana (Hastane) | Toplam |");
+  tableRows.push("| İl | Hospitadent (Diş) | Acıbadem (Hastane) | Medicana (Hastane) | Toplam Onaylı |");
   tableRows.push("| :--- | :---: | :---: | :---: | :---: |");
   for (const c of sortedCities) {
     const h = geoBreakdown[c]?.["SRC-HOSPITADENT-01"] || 0;
@@ -306,4 +321,3 @@ reconcileAndStage().catch((err) => {
   console.error("FATAL ERROR during reconciliation:", err);
   process.exit(1);
 });
-

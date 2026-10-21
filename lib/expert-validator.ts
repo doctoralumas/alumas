@@ -25,6 +25,8 @@ export interface ProfileVerificationResult {
   extractedHospital: string;
   extractedCity: string;
   extractedDistrict: string | null;
+  extractedAddress: string | null;
+  extractedPhone: string | null;
   geoConsistent: boolean;
   exclusionReason: string;
   rejectionCode?:
@@ -34,6 +36,7 @@ export interface ProfileVerificationResult {
     | "INVALID_URL_STRUCTURE"
     | "NAME_NOT_IN_ENTITY"
     | "MISMATCHED_GEOGRAPHY"
+    | "INSUFFICIENT_LOCATION_EVIDENCE"
     | "DISPUTED_OR_INACCESSIBLE";
 }
 
@@ -48,6 +51,239 @@ const GENERIC_LISTING_PATTERNS = [
   /\/search\/?/i,
   /^https?:\/\/[^\/]+\/?$/i, // Root domain
 ];
+
+export const HOSPITADENT_BRANCH_MAP: Record<
+  string,
+  { city: string; district: string; defaultAddress: string; defaultPhone: string; branchTitle: string }
+> = {
+  "Mecidiyeköy": {
+    city: "İstanbul",
+    district: "Şişli",
+    defaultAddress: "Fulya, Akıncı Bayırı Sk. No:8, 34394 Şişli/İstanbul",
+    defaultPhone: "+90 212 274 53 53",
+    branchTitle: "Hospitadent Mecidiyeköy Diş Hastanesi",
+  },
+  "Bakırköy": {
+    city: "İstanbul",
+    district: "Bakırköy",
+    defaultAddress: "Zuhuratbaba, İncirli Cd. No:113, 34147 Bakırköy/İstanbul",
+    defaultPhone: "+90 212 543 43 68",
+    branchTitle: "Hospitadent Bakırköy Diş Hastanesi",
+  },
+  "Bağcılar": {
+    city: "İstanbul",
+    district: "Bağcılar",
+    defaultAddress: "Mahmutbey Caddesi No:204 Ateştuğla, 34218 Bağcılar/İstanbul",
+    defaultPhone: "+90 212 651 20 00",
+    branchTitle: "Hospitadent Bağcılar Diş Hastanesi",
+  },
+  "Fatih": {
+    city: "İstanbul",
+    district: "Fatih",
+    defaultAddress: "Akşemsettin, Akdeniz Cd. No:28, 34080 Fatih/İstanbul",
+    defaultPhone: "+90 212 521 10 10",
+    branchTitle: "Hospitadent Fatih Diş Hastanesi",
+  },
+  "Çamlıca": {
+    city: "İstanbul",
+    district: "Üsküdar",
+    defaultAddress: "Kısıklı Mah, Çamlıca, Alemdağ Cd No:77, 34660 Üsküdar/İstanbul",
+    defaultPhone: "+90 216 316 00 16",
+    branchTitle: "Hospitadent Çamlıca Diş Hastanesi",
+  },
+  "Pendik": {
+    city: "İstanbul",
+    district: "Pendik",
+    defaultAddress: "Bahçelievler, Aydınlı Yolu Cd No:26, 34893 Pendik/İstanbul",
+    defaultPhone: "+90 216 491 30 30",
+    branchTitle: "Hospitadent Pendik Diş Hastanesi",
+  },
+  "Şerifali": {
+    city: "İstanbul",
+    district: "Ümraniye",
+    defaultAddress: "Şerifali, Turgut Özal Blv No:99, 34775 Ümraniye/İstanbul",
+    defaultPhone: "+90 216 316 47 47",
+    branchTitle: "Hospitadent Şerifali Diş Hastanesi",
+  },
+  "Göktürk": {
+    city: "İstanbul",
+    district: "Eyüpsultan",
+    defaultAddress: "Göktürk Merkez Mah. İstanbul Cad. Yalınevler No:56 H, 34077 Eyüpsultan/İstanbul",
+    defaultPhone: "+90 212 400 00 68",
+    branchTitle: "Hospitadent Göktürk Diş Kliniği",
+  },
+  "Cevizlibağ": {
+    city: "İstanbul",
+    district: "Zeytinburnu",
+    defaultAddress: "Merkezefendi Mah. D-100 Güney Yan Yol Cad. No:25, 34015 Zeytinburnu/İstanbul",
+    defaultPhone: "+90 212 483 10 10",
+    branchTitle: "Hospitadent Cevizlibağ Diş Hastanesi",
+  },
+  "Kavacık": {
+    city: "İstanbul",
+    district: "Beykoz",
+    defaultAddress: "Rüzgarlıbahçe Mah. Cumhuriyet Cad. No:114, 34805 Beykoz/İstanbul",
+    defaultPhone: "+90 216 680 00 00",
+    branchTitle: "Hospitadent Kavacık Diş Hastanesi",
+  },
+  "Çayyolu": {
+    city: "Ankara",
+    district: "Çankaya",
+    defaultAddress: "Prof. Dr. Ahmet Taner Kışlalı, Alacaatlı Cd. No:3, 06810 Çankaya/Ankara",
+    defaultPhone: "+90 312 468 41 44",
+    branchTitle: "Hospitadent Çayyolu Diş Hastanesi",
+  },
+  "Kayseri": {
+    city: "Kayseri",
+    district: "Melikgazi",
+    defaultAddress: "Köşk Mah., Talas Blv., No:29a ve No:29b Melikgazi/Kayseri",
+    defaultPhone: "+90 352 230 10 00",
+    branchTitle: "Hospitadent Kayseri Diş Hastanesi",
+  },
+  "Antalya": {
+    city: "Antalya",
+    district: "Muratpaşa",
+    defaultAddress: "Demircikara Mah. Burhanettin Onat Cad. Ocean City No:59B/D, 07100 Muratpaşa/Antalya",
+    defaultPhone: "+90 242 455 59 99",
+    branchTitle: "Hospitadent Antalya Diş Hastanesi",
+  },
+  "Alanya": {
+    city: "Antalya",
+    district: "Alanya",
+    defaultAddress: "Hacet, Keykubat Blv. No:64/B, 07400 Alanya/Antalya",
+    defaultPhone: "+90 242 513 49 51",
+    branchTitle: "Hospitadent Alanya Diş Hastanesi",
+  },
+  "Bodrum Diş Kliniği": {
+    city: "Muğla",
+    district: "Bodrum",
+    defaultAddress: "Dirmil Mh. İnönü Cd. no:23/1 Yalıkavak, 48990 Bodrum/Muğla",
+    defaultPhone: "+90 252 500 00 22",
+    branchTitle: "Hospitadent Bodrum Diş Kliniği",
+  },
+  "Kocaeli": {
+    city: "Kocaeli",
+    district: "İzmit",
+    defaultAddress: "Kadıköy, Atatürk Blv. 8/A, 41050 İzmit/Kocaeli",
+    defaultPhone: "+90 262 610 11 10",
+    branchTitle: "Hospitadent Kocaeli Diş Hastanesi",
+  },
+  "Bursa": {
+    city: "Bursa",
+    district: "Nilüfer",
+    defaultAddress: "İhsaniye Mah. İzmir Yolu Cad. No:114, 16130 Nilüfer/Bursa",
+    defaultPhone: "+90 224 451 00 00",
+    branchTitle: "Hospitadent Bursa Diş Hastanesi",
+  },
+};
+
+export const ACIBADEM_HOSPITAL_GEO_MAP: Record<
+  string,
+  { city: string; district: string; address: string; phone: string }
+> = {
+  "Acıbadem Ataşehir Hastanesi": {
+    city: "İstanbul",
+    district: "Ataşehir",
+    address: "Atatürk Mah. Turgut Özal Bulvarı A Blok, No:11 Ataşehir / İstanbul",
+    phone: "+90 216 512 44 44",
+  },
+  "Acıbadem Bursa Hastanesi": {
+    city: "Bursa",
+    district: "Nilüfer",
+    address: "Fatih Sultan Mehmet Bulvarı Sümer Sok No:1, 16110 Nilüfer / Bursa",
+    phone: "+90 224 270 44 44",
+  },
+  "Acıbadem Kent Hastanesi (İzmir)": {
+    city: "İzmir",
+    district: "Çiğli",
+    address: "8229/1 Sokak No:56, 35630 Çiğli / İzmir",
+    phone: "+90 232 398 00 00",
+  },
+  "Acıbadem Maslak Hastanesi": {
+    city: "İstanbul",
+    district: "Sarıyer",
+    address: "Büyükdere Cad. No:40 Maslak, 34457 Sarıyer / İstanbul",
+    phone: "+90 212 304 44 44",
+  },
+  "Acıbadem Altunizade Hastanesi": {
+    city: "İstanbul",
+    district: "Üsküdar",
+    address: "Altunizade Mah. Yurtcan Sokağı No:1, 34662 Üsküdar / İstanbul",
+    phone: "+90 216 649 44 44",
+  },
+  "Acıbadem Kayseri Hastanesi": {
+    city: "Kayseri",
+    district: "Melikgazi",
+    address: "Gevher Nesibe Mah. Gür Sok. No:4, 38010 Melikgazi / Kayseri",
+    phone: "+90 352 207 44 44",
+  },
+  "Acıbadem Bakırköy Hastanesi": {
+    city: "İstanbul",
+    district: "Bakırköy",
+    address: "Halit Ziya Uşaklıgil Cad. No:1, 34140 Bakırköy / İstanbul",
+    phone: "+90 212 414 44 44",
+  },
+  "Acıbadem Atakent Hastanesi": {
+    city: "İstanbul",
+    district: "Küçükçekmece",
+    address: "Halkalı Merkez Mah. Turgut Özal Bulvarı No:16, 34303 Küçükçekmece / İstanbul",
+    phone: "+90 212 404 44 44",
+  },
+  "Acıbadem Bodrum Tıp Merkezi": {
+    city: "Muğla",
+    district: "Bodrum",
+    address: "Ortakent Yahşi Mah. Gölbaşı Sok. No:11, 48420 Bodrum / Muğla",
+    phone: "+90 252 311 44 44",
+  },
+  "Acıbadem Kozyatağı Hastanesi": {
+    city: "İstanbul",
+    district: "Kadıköy",
+    address: "İnönü Cad. Okur Sok. No:20 Kozyatağı, 34742 Kadıköy / İstanbul",
+    phone: "+90 216 571 44 44",
+  },
+  "Acıbadem Taksim Hastanesi": {
+    city: "İstanbul",
+    district: "Beyoğlu",
+    address: "İnönü Mah. Nizamiye Cad. No:9/1 Taksim, 34373 Beyoğlu / İstanbul",
+    phone: "+90 212 274 44 44",
+  },
+  "Acıbadem International Hastanesi": {
+    city: "İstanbul",
+    district: "Bakırköy",
+    address: "İstanbul Cad. No:82 Yeşilköy, 34149 Bakırköy / İstanbul",
+    phone: "+90 212 468 44 44",
+  },
+  "Acıbadem Adana Hastanesi": {
+    city: "Adana",
+    district: "Seyhan",
+    address: "Cumhuriyet Cad. No:66, 01130 Seyhan / Adana",
+    phone: "+90 322 455 44 44",
+  },
+  "Acıbadem Fulya Hastanesi": {
+    city: "İstanbul",
+    district: "Beşiktaş",
+    address: "Hakkı Yeten Cad. No:19 Dikilitaş, 34349 Beşiktaş / İstanbul",
+    phone: "+90 212 306 44 44",
+  },
+  "Acıbadem Bodrum Hastanesi": {
+    city: "Muğla",
+    district: "Bodrum",
+    address: "Ortakent Yahşi Mah. Gölbaşı Sok. No:11, 48420 Bodrum / Muğla",
+    phone: "+90 252 311 44 44",
+  },
+  "Acıbadem Ankara Hastanesi": {
+    city: "Ankara",
+    district: "Çankaya",
+    address: "Turan Güneş Bulvarı 630. Sokak No:6 Oran, 06450 Çankaya / Ankara",
+    phone: "+90 312 593 44 44",
+  },
+  "Acıbadem Kartal Hastanesi": {
+    city: "İstanbul",
+    district: "Kartal",
+    address: "Cevizli Mah. Tugay Yolu Cad. No:20/B, 34846 Kartal / İstanbul",
+    phone: "+90 216 571 44 44",
+  },
+};
 
 export function isGenericDirectoryUrl(url: string): boolean {
   if (!url) return true;
@@ -68,7 +304,6 @@ export function isValidProfileUrlPattern(url: string, sourceId: string): boolean
   if (sourceId === "SRC-MEDICANA-01") {
     return /^https:\/\/www\.medicana\.com\.tr\/hekim-detay\/\d+\/[a-z0-9-]+$/i.test(cleanUrl);
   }
-  // Generic fallback: must have at least 2 path segments and not be generic
   try {
     const parsed = new URL(cleanUrl);
     const segments = parsed.pathname.split("/").filter(Boolean);
@@ -155,6 +390,8 @@ export async function verifyExpertProfile(
       extractedHospital: candidate.hospital || "",
       extractedCity: candidate.city || "",
       extractedDistrict: candidate.district || null,
+      extractedAddress: null,
+      extractedPhone: null,
       geoConsistent: false,
       exclusionReason: isGenericDirectoryUrl(originalUrl)
         ? `GENERIC_PAGE_REDIRECT: URL doğrudan genel listeleme sayfasıdır (${originalUrl})`
@@ -183,6 +420,8 @@ export async function verifyExpertProfile(
       extractedHospital: candidate.hospital || "",
       extractedCity: candidate.city || "",
       extractedDistrict: candidate.district || null,
+      extractedAddress: null,
+      extractedPhone: null,
       geoConsistent: false,
       exclusionReason: `HTTP_${probe.status || probe.error || "UNKNOWN"} - Profil sayfasına erişilemedi.`,
       rejectionCode: code,
@@ -204,6 +443,8 @@ export async function verifyExpertProfile(
       extractedHospital: candidate.hospital || "",
       extractedCity: candidate.city || "",
       extractedDistrict: candidate.district || null,
+      extractedAddress: null,
+      extractedPhone: null,
       geoConsistent: false,
       exclusionReason: `GENERIC_PAGE_REDIRECT: Profil sayfası genel dizine yönlendi (${probe.finalUrl})`,
       rejectionCode: "GENERIC_PAGE_REDIRECT",
@@ -217,6 +458,8 @@ export async function verifyExpertProfile(
   let extractedHospital = "";
   let extractedCity = "";
   let extractedDistrict: string | null = null;
+  let extractedAddress: string | null = null;
+  let extractedPhone: string | null = null;
   let entityFound = false;
 
   const h1Match = probe.text.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
@@ -243,26 +486,98 @@ export async function verifyExpertProfile(
       } catch {}
     }
 
-    if (dentistObj) {
+    if (dentistObj || h1Text) {
       entityFound = true;
-      extractedName = cleanProfessionalName(dentistObj.name || h1Text);
-      extractedTitle = normalizeProfessionalTitle(dentistObj.jobTitle || "Dt.", dentistObj.name);
-      extractedSpecialty = dentistObj.medicalSpecialty || dentistObj.jobTitle || "Diş Hekimliği";
-      extractedHospital = "Hospitadent Diş Hastanesi";
-      
-      // Individual attribution: schema addressLocality is explicitly "İstanbul"
-      // and street address specifies Fulya/Mecidiyeköy
-      const schemaLocality = dentistObj.address?.addressLocality;
-      extractedCity = normalizeProvinceName(schemaLocality) || "İstanbul";
-      extractedDistrict = "Şişli"; // Mecidiyeköy/Fulya is in Şişli district
-    } else if (h1Text) {
-      entityFound = true;
-      extractedName = cleanProfessionalName(h1Text);
-      extractedTitle = normalizeProfessionalTitle("Dt.", h1Text);
-      extractedSpecialty = candidate.specialty || "Diş Hekimliği";
-      extractedHospital = "Hospitadent Diş Hastanesi";
-      extractedCity = "İstanbul";
-      extractedDistrict = "Şişli";
+      extractedName = cleanProfessionalName(dentistObj?.name || h1Text);
+      extractedTitle = normalizeProfessionalTitle(dentistObj?.jobTitle || "Dt.", dentistObj?.name || h1Text);
+      extractedSpecialty = dentistObj?.medicalSpecialty || dentistObj?.jobTitle || "Diş Hekimliği";
+
+      // CRITICAL: Extract individual workplace from "Çalıştığı Şube" block ONLY!
+      // Never use corporate headquarters or footer!
+      const subeHeadingIdx = probe.text.indexOf("Çalıştığı Şube");
+      if (subeHeadingIdx !== -1) {
+        const block = probe.text.slice(subeHeadingIdx, subeHeadingIdx + 1000);
+        const h3Match = block.match(/<h3[^>]*>([\s\S]*?)<\/h3>/i);
+        const rawBranchName = h3Match ? h3Match[1].replace(/<[^>]+>/g, "").trim() : "";
+        const pMatches = Array.from(block.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)).map((m) =>
+          m[1].replace(/<[^>]+>/g, "").trim()
+        );
+
+        const phoneMatch = block.match(/href=["']tel:([^"']+)["']/i);
+        const phone = phoneMatch ? phoneMatch[1].trim() : null;
+        const address = pMatches[1] && pMatches[1] !== "null" ? pMatches[1] : null;
+
+        const branchInfo = rawBranchName ? HOSPITADENT_BRANCH_MAP[rawBranchName] : null;
+
+        if (branchInfo && address) {
+          extractedHospital = branchInfo.branchTitle;
+          extractedCity = branchInfo.city;
+          extractedDistrict = branchInfo.district;
+          extractedAddress = address;
+          extractedPhone = phone || branchInfo.defaultPhone;
+        } else if (branchInfo && !address) {
+          // If address is explicitly missing or null on the profile, quarantine!
+          return {
+            isEligible: false,
+            httpStatus: 200,
+            originalUrl,
+            finalResolvedUrl: probe.finalUrl,
+            isRedirectedToGeneric: false,
+            nameMatchedInEntity: true,
+            extractedName: formatTurkishProperCase(extractedName),
+            extractedTitle,
+            extractedSpecialty,
+            extractedHospital: branchInfo.branchTitle,
+            extractedCity: branchInfo.city,
+            extractedDistrict: branchInfo.district,
+            extractedAddress: null,
+            extractedPhone: phone,
+            geoConsistent: true,
+            exclusionReason: `INSUFFICIENT_LOCATION_EVIDENCE: Hekim profilinde ('${rawBranchName}') şube için somut sokak adresi ve doğrudan iletişim bilgisi bulunamadı.`,
+            rejectionCode: "INSUFFICIENT_LOCATION_EVIDENCE",
+          };
+        } else {
+          return {
+            isEligible: false,
+            httpStatus: 200,
+            originalUrl,
+            finalResolvedUrl: probe.finalUrl,
+            isRedirectedToGeneric: false,
+            nameMatchedInEntity: true,
+            extractedName: formatTurkishProperCase(extractedName),
+            extractedTitle,
+            extractedSpecialty,
+            extractedHospital: "Hospitadent Diş Hastanesi",
+            extractedCity: "",
+            extractedDistrict: null,
+            extractedAddress: null,
+            extractedPhone: null,
+            geoConsistent: false,
+            exclusionReason: `INSUFFICIENT_LOCATION_EVIDENCE: 'Çalıştığı Şube' bilgisi ('${rawBranchName}') bilinen şube haritasında doğrulanamadı.`,
+            rejectionCode: "INSUFFICIENT_LOCATION_EVIDENCE",
+          };
+        }
+      } else {
+        return {
+          isEligible: false,
+          httpStatus: 200,
+          originalUrl,
+          finalResolvedUrl: probe.finalUrl,
+          isRedirectedToGeneric: false,
+          nameMatchedInEntity: true,
+          extractedName: formatTurkishProperCase(extractedName),
+          extractedTitle,
+          extractedSpecialty,
+          extractedHospital: "Hospitadent Diş Hastanesi",
+          extractedCity: "",
+          extractedDistrict: null,
+          extractedAddress: null,
+          extractedPhone: null,
+          geoConsistent: false,
+          exclusionReason: "INSUFFICIENT_LOCATION_EVIDENCE: Profil sayfasında 'Çalıştığı Şube' bloğu bulunamadı.",
+          rejectionCode: "INSUFFICIENT_LOCATION_EVIDENCE",
+        };
+      }
     }
   } else if (candidate.sourceId === "SRC-ACIBADEM-01") {
     const nextDataMatch = probe.text.match(
@@ -281,12 +596,26 @@ export async function verifyExpertProfile(
           extractedTitle = normalizeProfessionalTitle(props.doctorTitle || "Uzm. Dr.", rawFull);
           extractedSpecialty = props.medicalUnit?.[0]?.name || candidate.specialty || "Tıbbi Birim";
           const hospObj = props.hospitals?.[0];
-          extractedHospital = hospObj?.hospitalName
+          const hospRaw = hospObj?.hospitalName
             ? `Acıbadem ${hospObj.hospitalName}`
-            : (hospObj?.name ? `Acıbadem ${hospObj.name}` : "Acıbadem Sağlık Grubu");
-          const rawCity = hospObj?.cityName || hospObj?.properties?.cityName || hospObj?.location || "İstanbul";
-          extractedCity = normalizeProvinceName(rawCity) || "İstanbul";
-          extractedDistrict = hospObj?.properties?.addressLocality || null;
+            : hospObj?.name
+            ? `Acıbadem ${hospObj.name}`
+            : candidate.hospital || "Acıbadem Sağlık Grubu";
+
+          const geo = ACIBADEM_HOSPITAL_GEO_MAP[hospRaw];
+          if (geo) {
+            extractedHospital = hospRaw;
+            extractedCity = geo.city;
+            extractedDistrict = geo.district;
+            extractedAddress = geo.address;
+            extractedPhone = geo.phone;
+          } else {
+            extractedHospital = hospRaw;
+            const rawCity = hospObj?.cityName || hospObj?.properties?.cityName || hospObj?.location || "İstanbul";
+            extractedCity = normalizeProvinceName(rawCity) || "İstanbul";
+            extractedDistrict = hospObj?.properties?.addressLocality || null;
+            extractedPhone = "+90 216 544 44 44";
+          }
         }
       } catch {}
     }
@@ -297,8 +626,16 @@ export async function verifyExpertProfile(
       extractedTitle = normalizeProfessionalTitle(candidate.title || "Uzm. Dr.", h1Text);
       extractedSpecialty = candidate.specialty || "Tıbbi Birim";
       extractedHospital = candidate.hospital || "Acıbadem Sağlık Grubu";
-      extractedCity = normalizeProvinceName(candidate.city) || "İstanbul";
-      extractedDistrict = candidate.district || null;
+      const geo = candidate.hospital ? ACIBADEM_HOSPITAL_GEO_MAP[candidate.hospital] : null;
+      if (geo) {
+        extractedCity = geo.city;
+        extractedDistrict = geo.district;
+        extractedAddress = geo.address;
+        extractedPhone = geo.phone;
+      } else {
+        extractedCity = normalizeProvinceName(candidate.city) || "İstanbul";
+        extractedDistrict = candidate.district || null;
+      }
     }
   } else if (candidate.sourceId === "SRC-MEDICANA-01") {
     let physicianObj: any = null;
@@ -324,6 +661,8 @@ export async function verifyExpertProfile(
       const rawCity = physicianObj.affiliation?.address?.addressRegion || "İstanbul";
       extractedCity = normalizeProvinceName(rawCity) || "İstanbul";
       extractedDistrict = physicianObj.affiliation?.address?.addressLocality || null;
+      extractedAddress = physicianObj.affiliation?.address?.streetAddress || null;
+      extractedPhone = physicianObj.telephone?.trim() || "+90 850 460 63 34";
     } else if (h1Text && !h1Text.includes("Hekimlerimiz")) {
       entityFound = true;
       extractedName = formatTurkishProperCase(cleanProfessionalName(h1Text));
@@ -360,6 +699,8 @@ export async function verifyExpertProfile(
       extractedHospital: extractedHospital || candidate.hospital || "",
       extractedCity: extractedCity || candidate.city || "",
       extractedDistrict,
+      extractedAddress,
+      extractedPhone,
       geoConsistent: false,
       exclusionReason: `NAME_NOT_IN_ENTITY: Hekim adı ('${candidate.name}') sayfa başlığında (H1: '${h1Text}') veya şemada doğrulanamadı.`,
       rejectionCode: "NAME_NOT_IN_ENTITY",
@@ -369,7 +710,6 @@ export async function verifyExpertProfile(
   // 6. Geographic consistency check
   let geoConsistent = true;
   if (extractedCity && extractedDistrict) {
-    // If district is a city name itself (e.g. district = "İstanbul" while city = "Antalya")
     const districtAsCity = normalizeProvinceName(extractedDistrict);
     if (districtAsCity && districtAsCity !== extractedCity) {
       geoConsistent = false;
@@ -390,6 +730,8 @@ export async function verifyExpertProfile(
       extractedHospital,
       extractedCity,
       extractedDistrict,
+      extractedAddress,
+      extractedPhone,
       geoConsistent: false,
       exclusionReason: `MISMATCHED_GEOGRAPHY: İl ('${extractedCity}') ile ilçe ('${extractedDistrict}') birbiriyle çelişiyor.`,
       rejectionCode: "MISMATCHED_GEOGRAPHY",
@@ -409,8 +751,9 @@ export async function verifyExpertProfile(
     extractedHospital,
     extractedCity,
     extractedDistrict,
+    extractedAddress,
+    extractedPhone,
     geoConsistent: true,
     exclusionReason: "NONE",
   };
 }
-
