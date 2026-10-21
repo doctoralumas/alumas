@@ -896,3 +896,4 @@ runPhase3Ingestion().catch(err => {
   console.error("FATAL ERROR in Phase 3 Ingestion:", err);
   process.exit(1);
 });
+
