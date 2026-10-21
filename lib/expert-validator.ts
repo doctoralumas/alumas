@@ -285,14 +285,20 @@ export const ACIBADEM_HOSPITAL_GEO_MAP: Record<
   },
 };
 
-export function isGenericDirectoryUrl(url: string): boolean {
+export function isGenericDirectoryUrl(url: string, isPersonalWebsite = false): boolean {
   if (!url) return true;
   const cleanUrl = url.split("?")[0].split("#")[0].trim();
+  if (isPersonalWebsite) {
+    return GENERIC_LISTING_PATTERNS.filter(
+      (p) => p.source !== "^https?:\\/\\/[^\\/]+\\/?$"
+    ).some((pattern) => pattern.test(cleanUrl));
+  }
   return GENERIC_LISTING_PATTERNS.some((pattern) => pattern.test(cleanUrl));
 }
 
 export function isValidProfileUrlPattern(url: string, sourceId: string): boolean {
-  if (!url || isGenericDirectoryUrl(url)) return false;
+  const isPersonalWebsite = sourceId === "SRC-INDEPENDENT-WEBSITE" || sourceId.startsWith("SRC-PERSONAL-");
+  if (!url || isGenericDirectoryUrl(url, isPersonalWebsite)) return false;
   const cleanUrl = url.split("?")[0].split("#")[0].trim();
 
   if (sourceId === "SRC-HOSPITADENT-01") {
@@ -303,6 +309,17 @@ export function isValidProfileUrlPattern(url: string, sourceId: string): boolean
   }
   if (sourceId === "SRC-MEDICANA-01") {
     return /^https:\/\/www\.medicana\.com\.tr\/hekim-detay\/\d+\/[a-z0-9-]+$/i.test(cleanUrl);
+  }
+  if (sourceId === "SRC-DOKTORSITESI-01") {
+    return /^https:\/\/www\.doktorsitesi\.com\/[a-z0-9-çğıöşü]+\/[a-z0-9-çğıöşü]+\/[a-z0-9-çğıöşü]+$/i.test(cleanUrl);
+  }
+  if (isPersonalWebsite) {
+    try {
+      new URL(cleanUrl);
+      return true;
+    } catch {
+      return false;
+    }
   }
   try {
     const parsed = new URL(cleanUrl);
