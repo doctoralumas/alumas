@@ -183,7 +183,24 @@
       "bioLabel": "Short Biography",
       "bioPlaceholder": "A brief summary of your specialty, educational background, and clinical interests...",
       "priceLabel": "Initial Consultation Fee (₺)",
-      "submitButton": "Create Specialist Profile"
+      "submitButton": "Create Specialist Profile",
+      "claimSelectedNotice": "Directory Profile Selected",
+      "claimSelectedHint": "If this profile belongs to you, verify your details and complete the application. Upon approval, the directory listing will be linked to your account.",
+      "cancelClaim": "Remove Selection",
+      "existingMatchesNotice": "Existing Directory Matches Found",
+      "existingMatchesDesc": "Directory records matching your name were found. If any of these belong to you, you can claim it directly or create a new independent profile.",
+      "claimThisProfile": "Claim This Profile",
+      "independentNotice": "If none of the above profiles belong to you, you can skip this step and continue with your independent application.",
+      "sectionProfile": "Professional Profile Information",
+      "sectionProfileDesc": "Your title, medical specialty, and introductory bio displayed to patients.",
+      "sectionWorkplace": "Workplace & Location",
+      "sectionWorkplaceDesc": "The healthcare facility or independent clinic where you practice.",
+      "sectionPricing": "Consultation Starting Fee",
+      "sectionPricingDesc": "Base rate for patient consultations and initial assessments (Optional).",
+      "priceHint": "You can update this fee at any time from your specialist dashboard.",
+      "requiredBadge": "Required",
+      "optionalBadge": "Optional",
+      "secureSubmissionNotice": "Your information is encrypted with 256-bit SSL and verified under health regulations."
     },
     "verificationFields": {
       "title": "Verification Documents",
@@ -196,7 +213,12 @@
       "docIssuerPlaceholder": "e.g. Ministry of Health",
       "issueDate": "Issue Date",
       "expiryDate": "Expiration Date",
-      "fileLabel": "File (PDF, JPG or PNG, max 4.5 MB)"
+      "fileLabel": "Document File",
+      "fileUploadPrompt": "Choose file or drag and drop here",
+      "fileUploadHint": "PDF, JPG or PNG · Maximum 4.5 MB",
+      "fileReady": "File uploaded",
+      "changeFile": "Change",
+      "removeFile": "Remove"
     },
     "businessDashboard": {
       "kicker": "Alumas Business",

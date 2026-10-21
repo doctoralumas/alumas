@@ -183,7 +183,24 @@
       "bioLabel": "Kısa biyografi",
       "bioPlaceholder": "Uzmanlığınız, eğitim geçmişiniz ve profesyonel ilgi alanlarınız hakkında kısa bir yazı...",
       "priceLabel": "Görüşme başlangıç fiyatı (₺)",
-      "submitButton": "Uzman profilimi oluştur"
+      "submitButton": "Uzman profilimi oluştur",
+      "claimSelectedNotice": "Dizin Profili Seçildi",
+      "claimSelectedHint": "Bu profil size aitse bilgileri doğrulayıp başvurunuzu tamamlayın. Onaylandığında dizin kaydı hesabınıza bağlanacaktır.",
+      "cancelClaim": "Seçimi Kaldır",
+      "existingMatchesNotice": "Mevcut Dizin Eşleşmeleri Bulundu",
+      "existingMatchesDesc": "Adınızla eşleşen dizin kayıtları tespit edildi. Size ait olan bir kayıt varsa doğrudan sahiplenebilir veya yeni bağımsız profil oluşturabilirsiniz.",
+      "claimThisProfile": "Bu Profili Sahiplen",
+      "independentNotice": "Eğer yukarıdaki profiller size ait değilse, bu adımı atlayıp bağımsız başvurunuza devam edebilirsiniz.",
+      "sectionProfile": "Mesleki Profil Bilgileri",
+      "sectionProfileDesc": "Unvanınız, uzmanlık alanınız ve hastalarınıza görünecek tanıtım bilgileriniz.",
+      "sectionWorkplace": "Çalışma Yeri ve Lokasyon",
+      "sectionWorkplaceDesc": "Hizmet verdiğiniz sağlık kurumu veya bağımsız klinik lokasyonu.",
+      "sectionPricing": "Görüşme Taban Ücreti",
+      "sectionPricingDesc": "Hasta kabulü ve online/yüz yüze ön görüşme başlangıç taban ücreti (Opsiyonel).",
+      "priceHint": "Bu ücreti dilediğiniz zaman uzman panelinizden güncelleyebilirsiniz.",
+      "requiredBadge": "Zorunlu",
+      "optionalBadge": "İsteğe Bağlı",
+      "secureSubmissionNotice": "Bilgileriniz 256-bit SSL ile şifrelenir ve Sağlık Bakanlığı mevzuatına uygun olarak doğrulanır."
     },
     "verificationFields": {
       "title": "Doğrulama belgeleri",
@@ -196,7 +213,12 @@
       "docIssuerPlaceholder": "Örn: İl Sağlık Müdürlüğü",
       "issueDate": "Düzenlenme tarihi",
       "expiryDate": "Son kullanma tarihi",
-      "fileLabel": "Dosya (PDF, JPG veya PNG, en fazla 4.5 MB)"
+      "fileLabel": "Belge Dosyası",
+      "fileUploadPrompt": "Dosya seçin veya buraya sürükleyin",
+      "fileUploadHint": "PDF, JPG veya PNG · En fazla 4.5 MB",
+      "fileReady": "Dosya yüklendi",
+      "changeFile": "Değiştir",
+      "removeFile": "Kaldır"
     },
     "businessDashboard": {
       "kicker": "Alumas Business",
