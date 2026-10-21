@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
 import { resolveSearchSpecialties } from "@/lib/search-aliases";
 import { missingRequiredDocuments } from "@/lib/verification-requirements";
+import { matchesSpecialtyFilter } from "@/lib/specialty-taxonomy";
 
 export type ExpertVerificationState =
   | "VERIFIED"
@@ -325,7 +326,6 @@ export function buildNormalizedExpertItems(
   }
 
   // 3. Apply filtering
-  const filterSpecialty = options.specialty ? normalizeTextKey(options.specialty) : null;
   const filterCity = options.city ? normalizeTextKey(options.city) : null;
   const filterQ = options.q ? normalizeTextKey(options.q) : null;
   const filterQRaw = options.q ? options.q.trim().toLocaleLowerCase("tr-TR") : null;
@@ -333,7 +333,7 @@ export function buildNormalizedExpertItems(
 
   const filtered = items.filter((item) => {
     if (filterUnclaimedOnly && (item.isVerified || !item.canClaim)) return false;
-    if (filterSpecialty && normalizeTextKey(item.specialty) !== filterSpecialty) {
+    if (options.specialty && !matchesSpecialtyFilter(item.specialty, options.specialty)) {
       return false;
     }
     if (filterCity && normalizeTextKey(item.city) !== filterCity) return false;
