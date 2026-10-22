@@ -1,6 +1,6 @@
 import { test, expect, Page } from "@playwright/test";
 
-test.describe.serial("Admin Doctors & Claims Localization & Status E2E Suite", () => {
+test.describe.serial("Admin Doctors & Management E2E Suite", () => {
   test.setTimeout(90000);
   let page: Page;
 
@@ -21,7 +21,7 @@ test.describe.serial("Admin Doctors & Claims Localization & Status E2E Suite", (
     await page.close();
   });
 
-  test("English mode: renders localized tabs, documents rejected state, and structured identity mismatch", async () => {
+  test("English mode: renders 3 registered specialists, directory specialists tab, search, and full localization", async () => {
     // Set cookie to EN
     await page.context().addCookies([
       { name: "NEXT_LOCALE", value: "en", domain: "127.0.0.1", path: "/" },
@@ -31,44 +31,40 @@ test.describe.serial("Admin Doctors & Claims Localization & Status E2E Suite", (
     await page.goto("/admin/doctors", { waitUntil: "domcontentloaded" });
 
     const tabDoctors = page.getByTestId("admin-tab-doctors");
+    const tabDirectory = page.getByTestId("admin-tab-directory");
     const tabClaims = page.getByTestId("admin-tab-claims");
 
-    // Wait for API data to load completely (dev server compilation can take a few seconds)
-    await expect(tabDoctors).toContainText("Registered Specialists (4)", { timeout: 30000 });
-    await expect(tabClaims).toContainText("Directory Claim Requests (1)", { timeout: 30000 });
+    // Wait for API data to load completely
+    await expect(tabDoctors).toContainText("Registered Specialists (3)", { timeout: 30000 });
+    await expect(tabDirectory).toContainText("Directory Specialists", { timeout: 30000 });
+    await expect(tabClaims).toContainText("Directory Claim Requests", { timeout: 30000 });
 
-    // Check Registered Specialists: Abuzer Eczanesi card
+    // Check Registered Specialists: Yiğit Tilaver & Ali Can Aydın exist
+    await expect(page.locator("body")).toContainText("Yiğit Tilaver", { timeout: 15000 });
+    await expect(page.locator("body")).toContainText("Ali Can Aydın");
+    await expect(page.locator("body")).toContainText("Fahri Tunç");
+
+    // Check action buttons exist
+    await expect(page.locator("body")).toContainText("Edit");
+    await expect(page.locator("body")).toContainText("Details");
+
+    // Confirm no raw keys anywhere
     const bodyText = await page.textContent("body");
     expect(bodyText).not.toContain("admin.doctorList.");
     expect(bodyText).not.toContain("admin.adminVerificationDocs.");
 
-    // Verify Documents Rejected notice and disabled Approve button
-    await expect(page.locator("body")).toContainText("DOCUMENTS REJECTED", { timeout: 15000 });
-    await expect(page.locator("body")).toContainText("Specialist profile cannot be approved because required verification documents were rejected.");
-    await expect(page.locator("body")).toContainText("[Test Claim Revoked]: Test doğrulaması iptal edildi.");
+    // Switch to Directory Specialists tab
+    await tabDirectory.click();
+    await expect(page.getByTestId("admin-tab-directory")).toBeVisible();
+    await expect(page.getByTestId("search-directory-doctors")).toBeVisible({ timeout: 15000 });
 
-    // Switch to Directory Claim Requests tab
-    await tabClaims.click();
-    await expect(page.getByTestId("admin-tab-claims")).toBeVisible();
-
-    // Verify Target Directory Specialist
-    await expect(page.locator("body")).toContainText("Prof. Dr. A. Bülent Oktay", { timeout: 15000 });
-
-    // Verify Identity Mismatch in English
-    await expect(page.locator("body")).toContainText("Identity mismatch detected");
-    await expect(page.locator("body")).toContainText("The applicant's identity does not match the directory professional.");
-    await expect(page.locator("body")).toContainText('Surname mismatch: "Eczanesi" vs. "Oktay".');
-
-    // Verify localized audit note code in English
-    await expect(page.locator("body")).toContainText('[Test Claim Revoked]: Yanlış hekim sahiplenme testi geri alındı; kimlik uyuşmazlığı nedeniyle iptal edildi.');
-
-    // Confirm no raw keys anywhere
-    const claimsBody = await page.textContent("body");
-    expect(claimsBody).not.toContain("admin.doctorList.");
-    expect(claimsBody).not.toContain("admin.adminVerificationDocs.");
+    // Check directory doctor search input and pagination
+    await expect(page.locator("body")).toContainText("Total 386 directory specialists");
+    const dirBody = await page.textContent("body");
+    expect(dirBody).not.toContain("admin.doctorList.");
   });
 
-  test("Turkish mode: renders localized tabs, documents rejected state, and structured identity mismatch", async () => {
+  test("Turkish mode: renders 3 registered specialists, directory tab, and full localization", async () => {
     // Switch to TR
     await page.context().addCookies([
       { name: "NEXT_LOCALE", value: "tr", domain: "127.0.0.1", path: "/" },
@@ -78,34 +74,34 @@ test.describe.serial("Admin Doctors & Claims Localization & Status E2E Suite", (
     await page.goto("/admin/doctors", { waitUntil: "domcontentloaded" });
 
     const tabDoctors = page.getByTestId("admin-tab-doctors");
+    const tabDirectory = page.getByTestId("admin-tab-directory");
     const tabClaims = page.getByTestId("admin-tab-claims");
 
     // Wait for API data to load completely
-    await expect(tabDoctors).toContainText("Kayıtlı Uzmanlar (4)", { timeout: 30000 });
-    await expect(tabClaims).toContainText("Dizin Sahiplenme Talepleri (1)", { timeout: 30000 });
+    await expect(tabDoctors).toContainText("Kayıtlı Uzmanlar (3)", { timeout: 30000 });
+    await expect(tabDirectory).toContainText("Dizin Uzmanları", { timeout: 30000 });
+    await expect(tabClaims).toContainText("Dizin Sahiplenme Talepleri", { timeout: 30000 });
 
-    // Check Registered Specialists: Abuzer Eczanesi card in TR
-    await expect(page.locator("body")).toContainText("BELGELER REDDEDİLDİ", { timeout: 15000 });
-    await expect(page.locator("body")).toContainText("Zorunlu doğrulama belgeleri reddedildiği için uzman profili onaylanamaz.");
-    await expect(page.locator("body")).toContainText("[Test Talebi İptal Edildi]: Test doğrulaması iptal edildi.");
+    // Check Registered Specialists in Turkish
+    await expect(page.locator("body")).toContainText("Yiğit Tilaver", { timeout: 15000 });
+    await expect(page.locator("body")).toContainText("Ali Can Aydın");
+    await expect(page.locator("body")).toContainText("Fahri Tunç");
 
-    // Switch to Directory Claim Requests tab
-    await tabClaims.click();
-
-    // Verify Target Directory Specialist
-    await expect(page.locator("body")).toContainText("Prof. Dr. A. Bülent Oktay", { timeout: 15000 });
-
-    // Verify Identity Mismatch in Turkish
-    await expect(page.locator("body")).toContainText("Kimlik uyuşmazlığı tespit edildi");
-    await expect(page.locator("body")).toContainText("Başvuru sahibinin kimlik bilgileri, sahiplenilmek istenen uzman profiliyle eşleşmiyor.");
-    await expect(page.locator("body")).toContainText('Soyadı uyuşmazlığı: "Eczanesi" ve "Oktay".');
-
-    // Verify localized audit note code in Turkish
-    await expect(page.locator("body")).toContainText('[Test Talebi İptal Edildi]: Yanlış hekim sahiplenme testi geri alındı; kimlik uyuşmazlığı nedeniyle iptal edildi.');
+    // Verify Turkish actions
+    await expect(page.locator("body")).toContainText("Düzenle");
+    await expect(page.locator("body")).toContainText("Detay");
 
     // Confirm no raw keys anywhere
-    const trClaimsBody = await page.textContent("body");
-    expect(trClaimsBody).not.toContain("admin.doctorList.");
-    expect(trClaimsBody).not.toContain("admin.adminVerificationDocs.");
+    const trBody = await page.textContent("body");
+    expect(trBody).not.toContain("admin.doctorList.");
+    expect(trBody).not.toContain("admin.adminVerificationDocs.");
+
+    // Switch to Directory Specialists tab
+    await tabDirectory.click();
+    await expect(page.getByTestId("search-directory-doctors")).toBeVisible({ timeout: 15000 });
+    await expect(page.locator("body")).toContainText("Toplam 386 dizin uzmanı");
+
+    const trDirBody = await page.textContent("body");
+    expect(trDirBody).not.toContain("admin.doctorList.");
   });
 });

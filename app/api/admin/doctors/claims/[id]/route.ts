@@ -21,8 +21,8 @@ export async function PATCH(
   const forceIdentityOverride = Boolean(body?.forceIdentityOverride);
   const overrideReason = typeof body?.overrideReason === "string" ? body.overrideReason.trim() : null;
 
-  if (!["APPROVED", "REJECTED"].includes(status)) {
-    return NextResponse.json({ ok: false, error: "Geçersiz durum (APPROVED veya REJECTED olmalı)." }, { status: 400 });
+  if (!["APPROVED", "REJECTED", "REVOKED"].includes(status)) {
+    return NextResponse.json({ ok: false, error: "Geçersiz durum (APPROVED, REJECTED veya REVOKED olmalı)." }, { status: 400 });
   }
 
   const claim = await prisma.doctorClaim.findUnique({
@@ -40,6 +40,11 @@ export async function PATCH(
 
   const now = new Date();
   const isApproved = status === "APPROVED";
+  const isRevoked = status === "REVOKED";
+
+  if (isRevoked && (!reason || reason.length < 10)) {
+    return NextResponse.json({ ok: false, error: "Sahiplenmeyi iptal etmek (revoke) için en az 10 karakterlik açıklayıcı gerekçe zorunludur." }, { status: 422 });
+  }
 
   // Evaluate claimant identity against target directory doctor
   const identityMatch = evaluateClaimIdentityMatch(claim.claimant?.name, claim.directoryDoctor?.name);
@@ -75,7 +80,11 @@ export async function PATCH(
       where: { id },
       data: {
         status: isApproved ? "APPROVED" : "REJECTED",
-        reviewerNote: forceIdentityOverride && overrideReason ? `[OVERRIDE_APPROVED]: ${overrideReason}` : reason,
+        reviewerNote: isRevoked
+          ? `[REVOKED]: ${reason}`
+          : forceIdentityOverride && overrideReason
+          ? `[OVERRIDE_APPROVED]: ${overrideReason}`
+          : reason,
         reviewedAt: now,
         reviewedByUserId: user.id,
       },
@@ -124,7 +133,7 @@ export async function PATCH(
         });
       }
     } else {
-      // If rejected, ensure directory doctor is unlinked
+      // If rejected or revoked, ensure directory doctor is unlinked
       await tx.directoryDoctor.updateMany({
         where: { id: claim.directoryDoctorId, doctorId: claim.doctorId },
         data: {
@@ -162,13 +171,13 @@ export async function PATCH(
 
   await audit({
     actorUserId: user.id,
-    action: isApproved ? "doctor.claim.approved" : "doctor.claim.rejected",
+    action: isApproved ? "doctor.claim.approved" : isRevoked ? "doctor.claim.revoked" : "doctor.claim.rejected",
     entityType: "DoctorClaim",
     entityId: id,
     metadata: {
       directoryDoctorId: claim.directoryDoctorId,
       doctorId: claim.doctorId,
-      reason: forceIdentityOverride && overrideReason ? `[OVERRIDE_APPROVED]: ${overrideReason}` : reason,
+      reason: isRevoked ? reason : forceIdentityOverride && overrideReason ? `[OVERRIDE_APPROVED]: ${overrideReason}` : reason,
       identityMatchConfidence: identityMatch.confidence,
       forceIdentityOverride,
       reviewedAt: now.toISOString(),

@@ -183,3 +183,81 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     isVerified: isOrganizationVerifiedByAlumas(org),
   });
 }
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const u = await currentUser();
+  if (!u || u.role !== "ADMIN") {
+    return NextResponse.json({ error: "Yönetici hesabı gerekli" }, { status: 403 });
+  }
+
+  const { id } = await params;
+  const org = await prisma.organization.findUnique({
+    where: { id },
+    include: {
+      _count: {
+        select: {
+          doctors: true,
+          services: true,
+          reviews: true,
+          appointments: true,
+        },
+      },
+      directoryListing: true,
+      claim: true,
+    },
+  });
+
+  if (!org) {
+    return NextResponse.json({ error: "Kurum bulunamadı" }, { status: 404 });
+  }
+
+  const depCount =
+    (org._count.doctors || 0) +
+    (org._count.services || 0) +
+    (org._count.reviews || 0) +
+    (org._count.appointments || 0);
+
+  if (depCount > 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Bu kurum aktif hekimlere, hizmetlere veya klinik kayıtlara sahip olduğu için kalıcı olarak silinemez. Bunun yerine durumu SUSPENDED (Askıya alındı) yaparak yayından kaldırabilirsiniz.",
+        code: "HAS_DEPENDENCIES",
+        dependencies: org._count,
+      },
+      { status: 400 }
+    );
+  }
+
+  // Safe disposal
+  if (org.directoryListing) {
+    await prisma.directoryInstitution.update({
+      where: { id: org.directoryListing.id },
+      data: { organizationId: null },
+    });
+  }
+
+  if (org.claim) {
+    await prisma.organizationClaim.delete({ where: { organizationId: id } });
+  }
+
+  await prisma.verificationDocument.deleteMany({ where: { organizationId: id } });
+  await prisma.organization.delete({ where: { id } });
+
+  await audit({
+    actorUserId: u.id,
+    action: "organization.deleted",
+    entityType: "Organization",
+    entityId: id,
+    metadata: {
+      name: org.name,
+      slug: org.slug,
+      type: org.type,
+      city: org.city,
+      reason: "Safe disposal of organization with zero dependencies",
+    },
+    req,
+  });
+
+  return NextResponse.json({ ok: true, message: "Kurum kaydı güvenle silindi." });
+}
