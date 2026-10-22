@@ -177,7 +177,7 @@ function DocumentCard({ document, t }: { document: RequiredDocument; t: (key: st
                 gap: "3px",
               }}
             >
-              * Zorunlu
+              * {t("requiredBadge")}
             </span>
           ) : (
             <span
@@ -191,7 +191,7 @@ function DocumentCard({ document, t }: { document: RequiredDocument; t: (key: st
                 borderRadius: "100px",
               }}
             >
-              İsteğe bağlı
+              {t("optionalBadge")}
             </span>
           )}
         </div>

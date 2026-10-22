@@ -3129,7 +3129,9 @@
       "fileUploadHint": "PDF, JPG veya PNG · En fazla 4.5 MB",
       "fileReady": "Dosya yüklendi",
       "changeFile": "Değiştir",
-      "removeFile": "Kaldır"
+      "removeFile": "Kaldır",
+      "requiredBadge": "Zorunlu",
+      "optionalBadge": "İsteğe bağlı"
     },
     "businessDashboard": {
       "kicker": "Alumas Business",
@@ -3221,7 +3223,20 @@
       "invalidClaimDirectoryWarning": "Belirtilen dizin kurumu ({id}) bulunamadı veya aktif değil. Lütfen aşağıdaki listeden kurumunuzu seçin veya yeni kurum başvurusu oluşturun.",
       "alreadyClaimedWarning": "Bu şube ({name}) için zaten doğrulanmış bir kayıt veya incelemede olan aktif bir sahiplenme başvurusu bulunuyor. Mükerrer başvuru gönderilemez.",
       "existingOwnedOrgsBanner": "Hesabınıza bağlı mevcut kurum başvurularınız bulunuyor. Durumlarını görüntülemek veya reddedilen bir başvuruyu yeniden göndermek için Kurum Panelinize gidebilirsiniz.",
-      "goToBusinessDashboard": "Kurum Paneline Git →"
+      "goToBusinessDashboard": "Kurum Paneline Git →",
+      "sectionFacility": "1. Kurum ve Lokasyon Bilgileri",
+      "sectionFacilityDesc": "Sağlık kurumunuzun türü, adı ve resmi adres bilgileri",
+      "sectionContact": "2. Yetkili ve İletişim Bilgileri",
+      "sectionContactDesc": "Kurum adına işlem yapan yetkili ve resmi iletişim kanalları",
+      "sectionProfile": "3. Kurum Açıklaması ve Başvuru Notu",
+      "sectionProfileDesc": "Kurumunuz hakkında tanıtıcı bilgi ve yetkilendirme detayları",
+      "sectionDocuments": "4. Resmi Doğrulama Belgeleri",
+      "sectionDocumentsDesc": "Sağlık Bakanlığı ruhsatı ve resmi kuruluş belgeleri",
+      "secureSubmissionNotice": "Gönderilen tüm belgeler ve bilgiler 256-bit SSL şifreleme ile güvence altındadır ve yalnızca yetkili ALUMAS yöneticileri tarafından incelenir.",
+      "lockedFieldBadge": "Dizin Kaydıyla Kilitli",
+      "lockedTypeHint": "Sahiplenilen kurumun türü dizin kaydına bağlıdır",
+      "requiredBadge": "Zorunlu",
+      "optionalBadge": "İsteğe Bağlı"
     },
     "agencyDashboard": {
       "kicker": "Alumas Turizm",
@@ -6727,7 +6742,9 @@
         "fileUploadHint": "PDF, JPG veya PNG · En fazla 4.5 MB",
         "fileReady": "Dosya yüklendi",
         "changeFile": "Değiştir",
-        "removeFile": "Kaldır"
+        "removeFile": "Kaldır",
+        "requiredBadge": "Zorunlu",
+        "optionalBadge": "İsteğe bağlı"
       },
       "businessDashboard": {
         "kicker": "Alumas Business",
@@ -6819,7 +6836,20 @@
         "invalidClaimDirectoryWarning": "Belirtilen dizin kurumu ({id}) bulunamadı veya aktif değil. Lütfen aşağıdaki listeden kurumunuzu seçin veya yeni kurum başvurusu oluşturun.",
         "alreadyClaimedWarning": "Bu şube ({name}) için zaten doğrulanmış bir kayıt veya incelemede olan aktif bir sahiplenme başvurusu bulunuyor. Mükerrer başvuru gönderilemez.",
         "existingOwnedOrgsBanner": "Hesabınıza bağlı mevcut kurum başvurularınız bulunuyor. Durumlarını görüntülemek veya reddedilen bir başvuruyu yeniden göndermek için Kurum Panelinize gidebilirsiniz.",
-        "goToBusinessDashboard": "Kurum Paneline Git →"
+        "goToBusinessDashboard": "Kurum Paneline Git →",
+        "sectionFacility": "1. Kurum ve Lokasyon Bilgileri",
+        "sectionFacilityDesc": "Sağlık kurumunuzun türü, adı ve resmi adres bilgileri",
+        "sectionContact": "2. Yetkili ve İletişim Bilgileri",
+        "sectionContactDesc": "Kurum adına işlem yapan yetkili ve resmi iletişim kanalları",
+        "sectionProfile": "3. Kurum Açıklaması ve Başvuru Notu",
+        "sectionProfileDesc": "Kurumunuz hakkında tanıtıcı bilgi ve yetkilendirme detayları",
+        "sectionDocuments": "4. Resmi Doğrulama Belgeleri",
+        "sectionDocumentsDesc": "Sağlık Bakanlığı ruhsatı ve resmi kuruluş belgeleri",
+        "secureSubmissionNotice": "Gönderilen tüm belgeler ve bilgiler 256-bit SSL şifreleme ile güvence altındadır ve yalnızca yetkili ALUMAS yöneticileri tarafından incelenir.",
+        "lockedFieldBadge": "Dizin Kaydıyla Kilitli",
+        "lockedTypeHint": "Sahiplenilen kurumun türü dizin kaydına bağlıdır",
+        "requiredBadge": "Zorunlu",
+        "optionalBadge": "İsteğe Bağlı"
       },
       "agencyDashboard": {
         "kicker": "Alumas Turizm",

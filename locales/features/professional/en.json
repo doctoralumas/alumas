@@ -218,7 +218,9 @@
       "fileUploadHint": "PDF, JPG or PNG · Maximum 4.5 MB",
       "fileReady": "File uploaded",
       "changeFile": "Change",
-      "removeFile": "Remove"
+      "removeFile": "Remove",
+      "requiredBadge": "Required",
+      "optionalBadge": "Optional"
     },
     "businessDashboard": {
       "kicker": "Alumas Business",
@@ -310,7 +312,20 @@
       "invalidClaimDirectoryWarning": "The requested directory institution ({id}) was not found or is inactive. Please select your institution from the list below or switch to a new institution application.",
       "alreadyClaimedWarning": "This facility branch ({name}) already has a verified profile or an active ownership claim under review. Duplicate claims cannot be submitted.",
       "existingOwnedOrgsBanner": "You already have institution applications linked to your account. Visit your Facility Dashboard to check their status or resubmit a rejected application.",
-      "goToBusinessDashboard": "Go to Facility Dashboard →"
+      "goToBusinessDashboard": "Go to Facility Dashboard →",
+      "sectionFacility": "1. Facility & Location Information",
+      "sectionFacilityDesc": "Healthcare facility type, official name, and verified location",
+      "sectionContact": "2. Authorized Representative & Contact",
+      "sectionContactDesc": "Representative details and official institutional contact channels",
+      "sectionProfile": "3. Facility Profile & Application Notes",
+      "sectionProfileDesc": "Facility overview and additional verification context",
+      "sectionDocuments": "4. Official Verification Documents",
+      "sectionDocumentsDesc": "Operating license, trade registry, and statutory certifications",
+      "secureSubmissionNotice": "All submitted documents and information are secured with 256-bit SSL encryption and reviewed strictly by ALUMAS administrators.",
+      "lockedFieldBadge": "Locked by Directory Record",
+      "lockedTypeHint": "Facility type is fixed by the selected directory record",
+      "requiredBadge": "Required",
+      "optionalBadge": "Optional"
     },
     "agencyDashboard": {
       "kicker": "Alumas Travel",

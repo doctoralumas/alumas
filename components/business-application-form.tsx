@@ -5,6 +5,20 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DocumentUploadFields } from "@/components/verification-document-fields";
 import { useTranslations } from "next-intl";
+import {
+  Buildings,
+  Hospital,
+  FirstAid,
+  Pill,
+  Flask,
+  ShieldCheck,
+  WarningCircle,
+  ArrowRight,
+  UserCheck,
+  ChatCenteredText,
+  Lock,
+  SpinnerGap,
+} from "@phosphor-icons/react";
 
 const ORG_TYPES = ["HOSPITAL", "CLINIC", "PHARMACY", "IMAGING_CENTER", "LABORATORY"] as const;
 type OrgType = (typeof ORG_TYPES)[number];
@@ -25,6 +39,117 @@ export type ClaimedDirectorySummary = {
 };
 
 type DirectoryOption = ClaimedDirectorySummary;
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  minHeight: "44px",
+  padding: "10px 14px",
+  borderRadius: "12px",
+  border: "1px solid #cbd5e1",
+  fontSize: "14px",
+  outline: "none",
+  background: "#ffffff",
+  color: "#0f172a",
+  boxSizing: "border-box",
+  transition: "border-color 0.15s ease, box-shadow 0.15s ease",
+  fontFamily: "inherit",
+};
+
+const lockedInputStyle: React.CSSProperties = {
+  ...inputStyle,
+  background: "#f8fafc",
+  borderColor: "#e2e8f0",
+  color: "#334155",
+  cursor: "not-allowed",
+};
+
+const textareaStyle: React.CSSProperties = {
+  ...inputStyle,
+  minHeight: "88px",
+  lineHeight: "1.5",
+  resize: "vertical",
+};
+
+const labelSpanStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  fontSize: "13px",
+  fontWeight: 600,
+  color: "#334155",
+  marginBottom: "6px",
+};
+
+const lockedBadgeStyle: React.CSSProperties = {
+  fontSize: "11px",
+  fontWeight: 600,
+  color: "#0f766e",
+  background: "#ccfbf1",
+  padding: "2px 8px",
+  borderRadius: "100px",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "3px",
+};
+
+function SectionHeader({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: any;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "12px",
+        paddingBottom: "12px",
+        borderBottom: "1px solid #f1f5f9",
+        marginBottom: "16px",
+      }}
+    >
+      <div
+        style={{
+          width: "36px",
+          height: "36px",
+          borderRadius: "10px",
+          background: "#f0fdfa",
+          border: "1px solid #ccfbf1",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#0f766e",
+          flexShrink: 0,
+          marginTop: "2px",
+        }}
+      >
+        <Icon size={20} weight="duotone" />
+      </div>
+      <div>
+        <h2
+          style={{
+            margin: "0 0 4px",
+            fontSize: "16px",
+            fontWeight: 700,
+            color: "#0f172a",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {title}
+        </h2>
+        {description && (
+          <p style={{ margin: 0, color: "#64748b", fontSize: "13px", lineHeight: 1.5 }}>
+            {description}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function BusinessApplicationForm({
   initialType,
@@ -72,6 +197,7 @@ export default function BusinessApplicationForm({
   const [applicantRoleTitle, setApplicantRoleTitle] = useState("");
   const [applicantNote, setApplicantNote] = useState("");
   const [msg, setMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   function applyDirectorySelection(option: DirectoryOption | undefined) {
@@ -158,10 +284,12 @@ export default function BusinessApplicationForm({
       return;
     }
     setMsg(t("submitting"));
+    setIsSubmitting(true);
     try {
       const r = await fetch("/api/organizations", { method: "POST", body: new FormData(f) });
       if (r.status === 413) {
         setMsg(t("fileVercelLimit"));
+        setIsSubmitting(false);
         return;
       }
       if (!r.ok) {
@@ -172,6 +300,7 @@ export default function BusinessApplicationForm({
         } catch {
           setMsg(t("serverError", { status: r.status }));
         }
+        setIsSubmitting(false);
         return;
       }
       await r.json();
@@ -179,6 +308,7 @@ export default function BusinessApplicationForm({
       setTimeout(() => router.push("/business"), 700);
     } catch (err: any) {
       setMsg(err.message || t("genericError"));
+      setIsSubmitting(false);
     }
   }
 
@@ -197,26 +327,31 @@ export default function BusinessApplicationForm({
       className="business-form premium-form"
       data-testid="business-application-form"
       onSubmit={submit}
-      style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+      style={{ display: "flex", flexDirection: "column", gap: "24px" }}
     >
+      {/* Existing Organizations Banner */}
       {hasExistingOwnedOrgs && (
         <div
           data-testid="existing-owned-orgs-banner"
           style={{
-            padding: "12px 16px",
-            background: "#f0fdf4",
-            border: "1px solid #bbf7d0",
-            borderRadius: "12px",
-            color: "#166534",
-            fontSize: "13.5px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: "12px",
+            padding: "14px 18px",
+            background: "#f0fdf4",
+            border: "1px solid #bbf7d0",
+            borderRadius: "14px",
+            color: "#166534",
+            fontSize: "13.5px",
+            lineHeight: 1.5,
             flexWrap: "wrap",
-            gap: "10px",
           }}
         >
-          <span>{t("existingOwnedOrgsBanner")}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Buildings size={20} weight="duotone" color="#16a34a" />
+            <span>{t("existingOwnedOrgsBanner")}</span>
+          </div>
           <Link
             href="/business"
             style={{
@@ -235,29 +370,34 @@ export default function BusinessApplicationForm({
         <div
           data-testid="claim-invalid-id-warning"
           style={{
-            padding: "14px 16px",
-            borderRadius: "12px",
+            padding: "14px 18px",
+            borderRadius: "14px",
             background: "#fef2f2",
             border: "1px solid #fecaca",
             color: "#991b1b",
             fontSize: "13.5px",
             lineHeight: 1.5,
             fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
           }}
         >
-          {t("invalidClaimDirectoryWarning", { id: initialClaimDirectoryId })}
+          <WarningCircle size={20} weight="fill" color="#dc2626" style={{ flexShrink: 0 }} />
+          <span>{t("invalidClaimDirectoryWarning", { id: initialClaimDirectoryId })}</span>
         </div>
       )}
 
-      {/* Mode Selector: New Institution vs Claim Existing Directory Institution */}
+      {/* Mode Selector: New Institution Application vs Claim Directory Institution */}
       <div
         style={{
-          display: "flex",
-          gap: "12px",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "6px",
           padding: "6px",
           background: "#f1f5f9",
-          borderRadius: "12px",
-          flexWrap: "wrap",
+          borderRadius: "14px",
+          border: "1px solid #e2e8f0",
         }}
       >
         <button
@@ -268,14 +408,16 @@ export default function BusinessApplicationForm({
             setSelectedDirId("");
           }}
           style={{
-            flex: 1,
-            padding: "10px 16px",
-            borderRadius: "8px",
+            padding: "11px 16px",
+            borderRadius: "10px",
             border: "none",
             background: mode === "NEW" ? "#0f172a" : "transparent",
-            color: mode === "NEW" ? "#fff" : "#475569",
-            fontWeight: 600,
+            color: mode === "NEW" ? "#ffffff" : "#475569",
+            fontWeight: mode === "NEW" ? 700 : 600,
+            fontSize: "14px",
             cursor: "pointer",
+            boxShadow: mode === "NEW" ? "0 2px 8px rgba(15,23,42,0.12)" : "none",
+            transition: "all 0.15s ease",
           }}
         >
           {t("modeNewInstitution")}
@@ -285,48 +427,56 @@ export default function BusinessApplicationForm({
           data-testid="mode-claim-directory-btn"
           onClick={() => setMode("CLAIM")}
           style={{
-            flex: 1,
-            padding: "10px 16px",
-            borderRadius: "8px",
+            padding: "11px 16px",
+            borderRadius: "10px",
             border: "none",
             background: mode === "CLAIM" ? "#0f172a" : "transparent",
-            color: mode === "CLAIM" ? "#fff" : "#475569",
-            fontWeight: 600,
+            color: mode === "CLAIM" ? "#ffffff" : "#475569",
+            fontWeight: mode === "CLAIM" ? 700 : 600,
+            fontSize: "14px",
             cursor: "pointer",
+            boxShadow: mode === "CLAIM" ? "0 2px 8px rgba(15,23,42,0.12)" : "none",
+            transition: "all 0.15s ease",
           }}
         >
           {t("modeClaimDirectory")}
         </button>
       </div>
 
+      {/* Verification Policy Notice */}
       <div
         style={{
-          padding: "12px 16px",
-          background: "#eff6ff",
-          border: "1px solid #bfdbfe",
-          borderRadius: "12px",
-          color: "#1e3a8a",
+          padding: "14px 18px",
+          background: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          borderRadius: "14px",
+          color: "#334155",
           fontSize: "13px",
-          lineHeight: "1.5",
+          lineHeight: 1.5,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
         }}
       >
-        {t("verificationReviewNotice")}
+        <ShieldCheck size={20} weight="duotone" color="#0d9488" style={{ flexShrink: 0, marginTop: "2px" }} />
+        <span>{t("verificationReviewNotice")}</span>
       </div>
 
+      {/* Claim Mode: Directory Institution Selection */}
       {mode === "CLAIM" && (
         <div
           style={{
-            padding: "16px",
             background: "#f8fafc",
-            border: "1px solid #cbd5e1",
-            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "18px",
+            padding: "clamp(16px, 3vw, 20px)",
             display: "flex",
             flexDirection: "column",
-            gap: "12px",
+            gap: "14px",
           }}
         >
           <label style={{ margin: 0 }}>
-            <span style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
+            <span style={{ fontWeight: 650, display: "block", marginBottom: "8px", fontSize: "14px", color: "#0f172a" }}>
               {t("selectDirectoryInstitutionLabel")} <Req />
             </span>
             <select
@@ -336,11 +486,15 @@ export default function BusinessApplicationForm({
               required={mode === "CLAIM"}
               style={{
                 width: "100%",
-                padding: "12px",
-                borderRadius: "8px",
+                minHeight: "44px",
+                padding: "10px 14px",
+                borderRadius: "12px",
                 border: "1px solid #cbd5e1",
-                background: "#fff",
+                background: "#ffffff",
                 fontSize: "14px",
+                color: "#0f172a",
+                outline: "none",
+                fontFamily: "inherit",
               }}
             >
               <option value="">{t("selectDirectoryInstitutionPlaceholder")}</option>
@@ -361,13 +515,13 @@ export default function BusinessApplicationForm({
             <div
               data-testid="claimed-branch-summary"
               style={{
-                padding: "14px 16px",
-                borderRadius: "10px",
-                background: "#ffffff",
-                border: "1px solid #cbd5e1",
+                background: "linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%)",
+                border: "1px solid #99f6e4",
+                borderRadius: "14px",
+                padding: "16px 18px",
                 display: "flex",
                 flexDirection: "column",
-                gap: "8px",
+                gap: "10px",
               }}
             >
               <div
@@ -381,14 +535,18 @@ export default function BusinessApplicationForm({
               >
                 <span
                   style={{
-                    fontSize: "11.5px",
+                    fontSize: "11px",
                     fontWeight: 700,
-                    background: "#dbeafe",
-                    color: "#1e40af",
-                    padding: "4px 10px",
-                    borderRadius: "999px",
+                    background: "#ccfbf1",
+                    color: "#0f766e",
+                    padding: "3px 10px",
+                    borderRadius: "100px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
                   }}
                 >
+                  <ShieldCheck size={14} weight="bold" />
                   {t("claimedBranchBadge")}
                 </span>
                 <button
@@ -397,8 +555,8 @@ export default function BusinessApplicationForm({
                   style={{
                     background: "transparent",
                     border: "none",
-                    color: "#2563eb",
-                    fontSize: "12.5px",
+                    color: "#0d9488",
+                    fontSize: "13px",
                     fontWeight: 600,
                     cursor: "pointer",
                     padding: 0,
@@ -408,17 +566,35 @@ export default function BusinessApplicationForm({
                   {t("changeClaimedInstitution")}
                 </button>
               </div>
-              <div style={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}>
-                {t("claimGateTitle", { name: activeSelectedOption.name })}
+
+              <div>
+                <div style={{ fontSize: "16px", fontWeight: 800, color: "#0f172a", marginBottom: "3px" }}>
+                  {activeSelectedOption.name}
+                </div>
+                <div style={{ fontSize: "13px", color: "#475569", lineHeight: 1.45 }}>
+                  <strong>
+                    {activeSelectedOption.city}
+                    {activeSelectedOption.district ? ` / ${activeSelectedOption.district}` : ""}
+                  </strong>
+                  {activeSelectedOption.address ? ` — ${activeSelectedOption.address}` : ""}
+                </div>
               </div>
-              <div style={{ fontSize: "12.5px", color: "#475569", lineHeight: 1.45 }}>
-                {t("claimGateBranchScopeNotice", {
-                  name: activeSelectedOption.name,
-                  city: activeSelectedOption.city,
-                })}
-              </div>
-              <div style={{ fontSize: "12px", color: "#64748b" }}>
-                {t("claimedBranchLockedHint")}
+
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#0f766e",
+                  background: "#ffffff",
+                  border: "1px solid #ccfbf1",
+                  borderRadius: "8px",
+                  padding: "8px 12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <Lock size={14} weight="bold" />
+                <span>{t("claimedBranchLockedHint")}</span>
               </div>
             </div>
           )}
@@ -434,225 +610,507 @@ export default function BusinessApplicationForm({
                 color: "#92400e",
                 fontSize: "13px",
                 fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
-              {t("alreadyClaimedWarning", { name: activeSelectedOption.name })}
+              <WarningCircle size={18} weight="fill" color="#b45309" />
+              <span>{t("alreadyClaimedWarning", { name: activeSelectedOption.name })}</span>
             </div>
           )}
         </div>
       )}
 
-      <div className="org-type-select" style={{ marginBottom: "12px" }}>
-        {orgTypeOptions.map((x) => (
-          <button
-            type="button"
-            className={type === x[0] ? "selected" : ""}
-            key={x[0]}
-            disabled={isBranchIdentityLocked && type !== x[0]}
-            onClick={() => {
-              if (!isBranchIdentityLocked) setType(x[0]);
-            }}
-            style={
-              isBranchIdentityLocked && type !== x[0]
-                ? { opacity: 0.45, cursor: "not-allowed" }
-                : undefined
-            }
-          >
-            {x[1]}
-          </button>
-        ))}
-      </div>
-      <input type="hidden" name="type" value={type} />
-
-      <div className="form-pair" style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-        <label style={{ flex: 2, minWidth: "240px" }}>
-          <span style={{ fontWeight: "500" }}>
-            {t("nameLabel")} <Req />
-          </span>
-          <input
-            name="name"
-            data-testid="claim-form-name-input"
-            required
-            readOnly={isBranchIdentityLocked}
-            value={name}
-            onChange={(e) => {
-              if (!isBranchIdentityLocked) setName(e.target.value);
-            }}
-            placeholder={t("namePlaceholder")}
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              marginTop: "6px",
-              background: isBranchIdentityLocked ? "#f1f5f9" : "#ffffff",
-            }}
-          />
-        </label>
-        <label style={{ flex: 1, minWidth: "200px" }}>
-          <span style={{ fontWeight: "500" }}>
-            {t("applicantRoleLabel")} <Req />
-          </span>
-          <input
-            name="applicantRoleTitle"
-            data-testid="claim-form-role-input"
-            required
-            value={applicantRoleTitle}
-            onChange={(e) => setApplicantRoleTitle(e.target.value)}
-            placeholder={t("applicantRolePlaceholder")}
-            style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-          />
-        </label>
-      </div>
-
-      <div className="form-pair" style={{ display: "flex", gap: "16px" }}>
-        <label style={{ flex: 1 }}>
-          <span style={{ fontWeight: "500" }}>
-            {t("cityLabel")} <Req />
-          </span>
-          <input
-            name="city"
-            data-testid="claim-form-city-input"
-            required
-            readOnly={isBranchIdentityLocked}
-            value={city}
-            onChange={(e) => {
-              if (!isBranchIdentityLocked) setCity(e.target.value);
-            }}
-            placeholder={t("cityPlaceholder")}
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              marginTop: "6px",
-              background: isBranchIdentityLocked ? "#f1f5f9" : "#ffffff",
-            }}
-          />
-        </label>
-        <label style={{ flex: 1 }}>
-          <span style={{ fontWeight: "500" }}>{t("districtLabel")}</span>
-          <input
-            name="district"
-            data-testid="claim-form-district-input"
-            value={district}
-            onChange={(e) => setDistrict(e.target.value)}
-            placeholder={t("districtPlaceholder")}
-            style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-          />
-        </label>
-      </div>
-      <label>
-        <span style={{ fontWeight: "500" }}>
-          {t("addressLabel")} <Req />
-        </span>
-        <input
-          name="address"
-          data-testid="claim-form-address-input"
-          required
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          placeholder={t("addressPlaceholder")}
-          style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-        />
-      </label>
-      <div className="form-pair" style={{ display: "flex", gap: "16px" }}>
-        <label style={{ flex: 1 }}>
-          <span style={{ fontWeight: "500" }}>
-            {t("phoneLabel")} <Req />
-          </span>
-          <input
-            name="phone"
-            data-testid="claim-form-phone-input"
-            required
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder={t("phonePlaceholder")}
-            style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-          />
-        </label>
-        <label style={{ flex: 1 }}>
-          <span style={{ fontWeight: "500" }}>
-            {t("emailLabel")} <Req />
-          </span>
-          <input
-            name="email"
-            data-testid="claim-form-email-input"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t("emailPlaceholder")}
-            style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-          />
-        </label>
-      </div>
-      <label>
-        <span style={{ fontWeight: "500" }}>{t("websiteLabel")}</span>
-        <input
-          name="website"
-          data-testid="claim-form-website-input"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
-          placeholder={t("websitePlaceholder")}
-          style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-        />
-      </label>
-      <label>
-        <span style={{ fontWeight: "500" }}>{t("descLabel")}</span>
-        <textarea
-          name="description"
-          rows={3}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder={t("descPlaceholder")}
-          style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-        />
-      </label>
-      {mode === "CLAIM" && (
-        <label>
-          <span style={{ fontWeight: "500" }}>{t("claimNoteLabel")}</span>
-          <textarea
-            name="applicantNote"
-            data-testid="claim-form-note-input"
-            rows={2}
-            value={applicantNote}
-            onChange={(e) => setApplicantNote(e.target.value)}
-            placeholder={t("claimNotePlaceholder")}
-            style={{ padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "6px" }}
-          />
-        </label>
-      )}
-      <DocumentUploadFields kind="organization" entityType={type} />
-      {msg && (
-        <div
-          className="inline-message"
-          style={{
-            padding: "12px",
-            borderRadius: "8px",
-            background: msg === t("submitSuccess") ? "#dcfce3" : "#fee2e2",
-            color: msg === t("submitSuccess") ? "#166534" : "#991b1b",
-            fontWeight: "500",
-          }}
-        >
-          {msg}
-        </div>
-      )}
-      <button
-        className="primary"
-        data-testid="claim-form-submit-btn"
-        type="submit"
-        disabled={isSelectedBranchAlreadyClaimed}
+      {/* Section 1: Facility Information */}
+      <div
         style={{
-          padding: "14px",
-          fontSize: "16px",
-          fontWeight: "600",
-          marginTop: "8px",
-          borderRadius: "8px",
-          opacity: isSelectedBranchAlreadyClaimed ? 0.55 : 1,
-          cursor: isSelectedBranchAlreadyClaimed ? "not-allowed" : "pointer",
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "18px",
+          padding: "clamp(16px, 3vw, 22px)",
+          boxShadow: "0 2px 8px -2px rgba(15, 23, 42, 0.03)",
         }}
       >
-        {mode === "CLAIM" ? t("submitClaimButton") : t("submitButton")}
-      </button>
+        <SectionHeader
+          icon={Buildings}
+          title={t("sectionFacility")}
+          description={t("sectionFacilityDesc")}
+        />
+
+        {/* Facility Type Selector */}
+        <div style={{ marginBottom: "16px" }}>
+          <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "13px", color: "#334155" }}>
+            {t("tabHospital")}, {t("tabClinic")}, {t("tabPharmacy")}... <Req />
+            {isBranchIdentityLocked && (
+              <span
+                style={{
+                  marginLeft: "8px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  color: "#0f766e",
+                  background: "#ccfbf1",
+                  padding: "2px 8px",
+                  borderRadius: "100px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "3px",
+                }}
+              >
+                <Lock size={12} weight="bold" />
+                {t("lockedTypeHint")}
+              </span>
+            )}
+          </label>
+          <div
+            className="org-type-select"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+              margin: 0,
+            }}
+          >
+            {orgTypeOptions.map((x) => {
+              const isSelected = type === x[0];
+              const isLockedDisabled = isBranchIdentityLocked && !isSelected;
+              return (
+                <button
+                  type="button"
+                  key={x[0]}
+                  className={isSelected ? "selected" : ""}
+                  disabled={isLockedDisabled}
+                  onClick={() => {
+                    if (!isBranchIdentityLocked) setType(x[0]);
+                  }}
+                  style={{
+                    padding: "9px 16px",
+                    borderRadius: "100px",
+                    fontSize: "13px",
+                    fontWeight: isSelected ? 700 : 600,
+                    border: isSelected ? "1px solid #0f172a" : "1px solid #cbd5e1",
+                    background: isSelected ? "#0f172a" : "#ffffff",
+                    color: isSelected ? "#ffffff" : "#475569",
+                    cursor: isLockedDisabled ? "not-allowed" : "pointer",
+                    opacity: isLockedDisabled ? 0.45 : 1,
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {x[1]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <input type="hidden" name="type" value={type} />
+
+        {/* Facility Name */}
+        <div style={{ marginBottom: "16px" }}>
+          <label style={{ display: "block" }}>
+            <span style={labelSpanStyle}>
+              <span>{t("nameLabel")} <Req /></span>
+              {isBranchIdentityLocked && (
+                <span style={lockedBadgeStyle}>
+                  <Lock size={12} weight="bold" />
+                  {t("lockedFieldBadge")}
+                </span>
+              )}
+            </span>
+            <input
+              name="name"
+              data-testid="claim-form-name-input"
+              required
+              readOnly={isBranchIdentityLocked}
+              value={name}
+              onChange={(e) => {
+                if (!isBranchIdentityLocked) setName(e.target.value);
+              }}
+              placeholder={t("namePlaceholder")}
+              style={isBranchIdentityLocked ? lockedInputStyle : inputStyle}
+              onFocus={(e) => {
+                if (!isBranchIdentityLocked) {
+                  e.target.style.borderColor = "#0d9488";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+                }
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = isBranchIdentityLocked ? "#e2e8f0" : "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+        </div>
+
+        {/* City and District Responsive Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))",
+            gap: "16px",
+            marginBottom: "16px",
+          }}
+        >
+          <label style={{ display: "block", minWidth: 0 }}>
+            <span style={labelSpanStyle}>
+              <span>{t("cityLabel")} <Req /></span>
+              {isBranchIdentityLocked && (
+                <span style={lockedBadgeStyle}>
+                  <Lock size={12} weight="bold" />
+                  {t("lockedFieldBadge")}
+                </span>
+              )}
+            </span>
+            <input
+              name="city"
+              data-testid="claim-form-city-input"
+              required
+              readOnly={isBranchIdentityLocked}
+              value={city}
+              onChange={(e) => {
+                if (!isBranchIdentityLocked) setCity(e.target.value);
+              }}
+              placeholder={t("cityPlaceholder")}
+              style={isBranchIdentityLocked ? lockedInputStyle : inputStyle}
+              onFocus={(e) => {
+                if (!isBranchIdentityLocked) {
+                  e.target.style.borderColor = "#0d9488";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+                }
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = isBranchIdentityLocked ? "#e2e8f0" : "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+          <label style={{ display: "block", minWidth: 0 }}>
+            <span style={labelSpanStyle}>
+              <span>{t("districtLabel")}</span>
+            </span>
+            <input
+              name="district"
+              data-testid="claim-form-district-input"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              placeholder={t("districtPlaceholder")}
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#0d9488";
+                e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+        </div>
+
+        {/* Full Address */}
+        <div>
+          <label style={{ display: "block" }}>
+            <span style={labelSpanStyle}>
+              <span>{t("addressLabel")} <Req /></span>
+            </span>
+            <input
+              name="address"
+              data-testid="claim-form-address-input"
+              required
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder={t("addressPlaceholder")}
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#0d9488";
+                e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+        </div>
+      </div>
+
+      {/* Section 2: Authorized Representative & Contact */}
+      <div
+        style={{
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "18px",
+          padding: "clamp(16px, 3vw, 22px)",
+          boxShadow: "0 2px 8px -2px rgba(15, 23, 42, 0.03)",
+        }}
+      >
+        <SectionHeader
+          icon={UserCheck}
+          title={t("sectionContact")}
+          description={t("sectionContactDesc")}
+        />
+
+        {/* Applicant Role / Title */}
+        <div style={{ marginBottom: "16px" }}>
+          <label style={{ display: "block" }}>
+            <span style={labelSpanStyle}>
+              <span>{t("applicantRoleLabel")} <Req /></span>
+            </span>
+            <input
+              name="applicantRoleTitle"
+              data-testid="claim-form-role-input"
+              required
+              value={applicantRoleTitle}
+              onChange={(e) => setApplicantRoleTitle(e.target.value)}
+              placeholder={t("applicantRolePlaceholder")}
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#0d9488";
+                e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+        </div>
+
+        {/* Phone & Email Responsive Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))",
+            gap: "16px",
+            marginBottom: "16px",
+          }}
+        >
+          <label style={{ display: "block", minWidth: 0 }}>
+            <span style={labelSpanStyle}>
+              <span>{t("phoneLabel")} <Req /></span>
+            </span>
+            <input
+              name="phone"
+              data-testid="claim-form-phone-input"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder={t("phonePlaceholder")}
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#0d9488";
+                e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+          <label style={{ display: "block", minWidth: 0 }}>
+            <span style={labelSpanStyle}>
+              <span>{t("emailLabel")} <Req /></span>
+            </span>
+            <input
+              name="email"
+              data-testid="claim-form-email-input"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t("emailPlaceholder")}
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#0d9488";
+                e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+        </div>
+
+        {/* Official Website */}
+        <div>
+          <label style={{ display: "block" }}>
+            <span style={labelSpanStyle}>
+              <span>{t("websiteLabel")}</span>
+            </span>
+            <input
+              name="website"
+              data-testid="claim-form-website-input"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder={t("websitePlaceholder")}
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#0d9488";
+                e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+        </div>
+      </div>
+
+      {/* Section 3: Facility Profile & Application Notes */}
+      <div
+        style={{
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "18px",
+          padding: "clamp(16px, 3vw, 22px)",
+          boxShadow: "0 2px 8px -2px rgba(15, 23, 42, 0.03)",
+        }}
+      >
+        <SectionHeader
+          icon={ChatCenteredText}
+          title={t("sectionProfile")}
+          description={t("sectionProfileDesc")}
+        />
+
+        {/* Facility Description */}
+        <div style={{ marginBottom: mode === "CLAIM" ? "16px" : 0 }}>
+          <label style={{ display: "block" }}>
+            <span style={labelSpanStyle}>
+              <span>{t("descLabel")}</span>
+            </span>
+            <textarea
+              name="description"
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t("descPlaceholder")}
+              style={textareaStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#0d9488";
+                e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#cbd5e1";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </label>
+        </div>
+
+        {/* Claim Note */}
+        {mode === "CLAIM" && (
+          <div>
+            <label style={{ display: "block" }}>
+              <span style={labelSpanStyle}>
+                <span>{t("claimNoteLabel")}</span>
+              </span>
+              <textarea
+                name="applicantNote"
+                data-testid="claim-form-note-input"
+                rows={2}
+                value={applicantNote}
+                onChange={(e) => setApplicantNote(e.target.value)}
+                placeholder={t("claimNotePlaceholder")}
+                style={textareaStyle}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#0d9488";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(13,148,136,0.12)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#cbd5e1";
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+            </label>
+          </div>
+        )}
+      </div>
+
+      {/* Section 4: Verification Documents */}
+      <DocumentUploadFields kind="organization" entityType={type} />
+
+      {/* Section 5: Trust Banner & Submit Action */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "14px",
+          marginTop: "4px",
+        }}
+      >
+        <div
+          style={{
+            padding: "14px 18px",
+            borderRadius: "14px",
+            background: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            fontSize: "13px",
+            color: "#475569",
+            lineHeight: 1.5,
+          }}
+        >
+          <Lock size={18} weight="fill" color="#0d9488" style={{ flexShrink: 0 }} />
+          <span>{t("secureSubmissionNotice")}</span>
+        </div>
+
+        {msg && (
+          <div
+            className="inline-message"
+            style={{
+              padding: "12px 16px",
+              borderRadius: "12px",
+              background: msg === t("submitSuccess") ? "#dcfce3" : "#fee2e2",
+              color: msg === t("submitSuccess") ? "#166534" : "#991b1b",
+              fontWeight: 600,
+              fontSize: "14px",
+            }}
+          >
+            {msg}
+          </div>
+        )}
+
+        <button
+          className="primary"
+          data-testid="claim-form-submit-btn"
+          type="submit"
+          disabled={isSelectedBranchAlreadyClaimed || isSubmitting}
+          style={{
+            minHeight: "52px",
+            padding: "14px 28px",
+            fontSize: "15.5px",
+            fontWeight: 700,
+            borderRadius: "14px",
+            background: "#0f172a",
+            color: "#ffffff",
+            border: "none",
+            cursor: isSelectedBranchAlreadyClaimed || isSubmitting ? "not-allowed" : "pointer",
+            opacity: isSelectedBranchAlreadyClaimed || isSubmitting ? 0.6 : 1,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            boxShadow: "0 4px 12px rgba(15,23,42,0.15)",
+            transition: "all 0.15s ease",
+            width: "100%",
+          }}
+        >
+          {isSubmitting ? (
+            <>
+              <SpinnerGap size={18} className="animate-spin" />
+              <span>{t("submitting")}</span>
+            </>
+          ) : (
+            <>
+              <span>{mode === "CLAIM" ? t("submitClaimButton") : t("submitButton")}</span>
+              <ArrowRight size={18} weight="bold" />
+            </>
+          )}
+        </button>
+      </div>
     </form>
   );
 }

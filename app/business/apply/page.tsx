@@ -8,6 +8,7 @@ import { getTranslations } from "next-intl/server";
 import { findDirectoryInstitutionByIdOrSlug } from "@/lib/institution-directory";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
 import { buildAuthHref, sanitizeClaimDirectoryId } from "@/lib/claim-onboarding";
+import { Buildings } from "@phosphor-icons/react/dist/ssr";
 
 export default async function Apply({
   searchParams,
@@ -382,17 +383,71 @@ export default async function Apply({
   }
 
   return (
-    <div className="page">
-      <div className="page-title">
-        <span className="kicker">{t("kicker")}</span>
-        <h1>
+    <div
+      className="page"
+      style={{
+        maxWidth: "840px",
+        margin: "0 auto",
+        padding: "clamp(24px, 4vw, 44px) clamp(16px, 3vw, 24px) 80px",
+      }}
+    >
+      <div style={{ textAlign: "center", marginBottom: "clamp(24px, 4vw, 36px)" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            background: "#f0fdfa",
+            color: "#0d9488",
+            border: "1px solid #ccfbf1",
+            padding: "5px 14px",
+            borderRadius: "100px",
+            fontSize: "12px",
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            marginBottom: "12px",
+          }}
+        >
+          <Buildings size={15} weight="bold" />
+          <span>{t("kicker")}</span>
+        </div>
+        <h1
+          style={{
+            fontSize: "clamp(24px, 3.6vw, 32px)",
+            fontWeight: 800,
+            color: "#0f172a",
+            letterSpacing: "-0.025em",
+            lineHeight: 1.25,
+            margin: "0 0 10px",
+          }}
+        >
           {claimInstitution
             ? t("claimGateTitle", { name: claimInstitution.name })
             : t("title")}
         </h1>
-        <p>{t("subtitle")}</p>
+        <p
+          style={{
+            fontSize: "15px",
+            lineHeight: 1.55,
+            color: "#475569",
+            maxWidth: "640px",
+            margin: "0 auto",
+          }}
+        >
+          {t("subtitle")}
+        </p>
       </div>
-      <section className="panel">
+      <section
+        className="panel"
+        style={{
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "24px",
+          padding: "clamp(20px, 4vw, 36px)",
+          boxShadow: "0 10px 30px -10px rgba(15, 23, 42, 0.06)",
+        }}
+      >
         <BusinessApplicationForm
           initialType={claimInstitution?.type || type}
           initialClaimDirectoryId={safeClaimId || undefined}
