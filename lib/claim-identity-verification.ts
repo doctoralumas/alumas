@@ -1,4 +1,5 @@
 export type IdentityMatchConfidence = "EXACT" | "COMPATIBLE" | "MISMATCH";
+export type IdentityMismatchCode = "SURNAME_MISMATCH" | "GIVEN_NAME_MISMATCH" | "MISSING_NAME";
 
 export interface IdentityMatchResult {
   matches: boolean;
@@ -6,6 +7,13 @@ export interface IdentityMatchResult {
   cleanApplicant: string;
   cleanTarget: string;
   reason?: string;
+  mismatchCode?: IdentityMismatchCode;
+  mismatchDetails?: {
+    applicantSurname?: string;
+    targetSurname?: string;
+    applicantGiven?: string;
+    targetGiven?: string;
+  };
 }
 
 /**
@@ -81,6 +89,10 @@ export function evaluateClaimIdentityMatch(
   const appTokens = tokenizeName(applicantRaw);
   const targetTokens = tokenizeName(targetRaw);
 
+  // Extract original tokens with genuine casing & characters (e.g. "Eczanesi", "Oktay")
+  const originalAppTokens = cleanApplicant.split(/\s+/).filter(Boolean);
+  const originalTargetTokens = cleanTarget.split(/\s+/).filter(Boolean);
+
   if (appTokens.length === 0 || targetTokens.length === 0) {
     return {
       matches: false,
@@ -88,6 +100,7 @@ export function evaluateClaimIdentityMatch(
       cleanApplicant,
       cleanTarget,
       reason: "İsim bilgisi eksik veya geçersiz.",
+      mismatchCode: "MISSING_NAME",
     };
   }
 
@@ -104,6 +117,9 @@ export function evaluateClaimIdentityMatch(
   const appSurname = appTokens[appTokens.length - 1];
   const targetSurname = targetTokens[targetTokens.length - 1];
 
+  const originalAppSurname = originalAppTokens[originalAppTokens.length - 1] || appSurname;
+  const originalTargetSurname = originalTargetTokens[originalTargetTokens.length - 1] || targetSurname;
+
   // Surname must match
   if (appSurname !== targetSurname) {
     return {
@@ -111,7 +127,12 @@ export function evaluateClaimIdentityMatch(
       confidence: "MISMATCH",
       cleanApplicant,
       cleanTarget,
-      reason: `Soyadı uyuşmuyor: '${appSurname}' ile '${targetSurname}'.`,
+      reason: `Soyadı uyuşmuyor: '${originalAppSurname}' ile '${originalTargetSurname}'.`,
+      mismatchCode: "SURNAME_MISMATCH",
+      mismatchDetails: {
+        applicantSurname: originalAppSurname,
+        targetSurname: originalTargetSurname,
+      },
     };
   }
 
@@ -148,11 +169,20 @@ export function evaluateClaimIdentityMatch(
     };
   }
 
+  const originalAppGiven = originalAppTokens.slice(0, -1).join(" ") || cleanApplicant;
+  const originalTargetGiven = originalTargetTokens.slice(0, -1).join(" ") || cleanTarget;
+
   return {
     matches: false,
     confidence: "MISMATCH",
     cleanApplicant,
     cleanTarget,
     reason: `Ad bilgisi hedef hekimle eşleşmiyor: '${cleanApplicant}' ile '${cleanTarget}'.`,
+    mismatchCode: "GIVEN_NAME_MISMATCH",
+    mismatchDetails: {
+      applicantGiven: originalAppGiven,
+      targetGiven: originalTargetGiven,
+    },
   };
 }
+

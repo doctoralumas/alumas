@@ -1,20 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AdminVerificationDocuments from "@/components/admin-verification-documents";
-import { useTranslations } from "next-intl";
+import AdminVerificationDocuments, { formatReviewerNote } from "@/components/admin-verification-documents";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function AdminDoctorList() {
   const t = useTranslations("admin.doctorList");
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<"DOCTORS" | "CLAIMS">("DOCTORS");
   const [doctors, setDoctors] = useState<any[]>([]);
   const [claims, setClaims] = useState<any[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const getReasonCodeLabel = (code: string) => {
+    try {
+      return t(`reasonCodes.${code}`);
+    } catch {
+      return `[${code}]`;
+    }
+  };
+
   const loadDoctors = async () => {
     try {
-      const response = await fetch("/api/admin/doctors");
+      const response = await fetch("/api/admin/doctors", {
+        headers: { "x-locale": locale },
+      });
       const data = await response.json();
       if (!Array.isArray(data)) {
         setError(data.error || t("loadError"));
@@ -30,7 +41,9 @@ export default function AdminDoctorList() {
 
   const loadClaims = async () => {
     try {
-      const response = await fetch("/api/admin/doctors/claims");
+      const response = await fetch("/api/admin/doctors/claims", {
+        headers: { "x-locale": locale },
+      });
       const data = await response.json();
       if (data && data.ok && Array.isArray(data.data)) {
         setClaims(data.data);
@@ -56,7 +69,7 @@ export default function AdminDoctorList() {
   async function setDoctorVerified(id: string, approved: boolean) {
     const response = await fetch("/api/admin/doctors", {
       method: "PATCH",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-locale": locale },
       body: JSON.stringify({ id, approved }),
     });
     const data = await response.json().catch(() => ({}));
@@ -91,7 +104,7 @@ export default function AdminDoctorList() {
 
     const response = await fetch(`/api/admin/doctors/claims/${claim.id}`, {
       method: "PATCH",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-locale": locale },
       body: JSON.stringify({ status, reason, forceIdentityOverride, overrideReason }),
     });
     const data = await response.json().catch(() => ({}));
@@ -99,6 +112,28 @@ export default function AdminDoctorList() {
     if (!response.ok) {
       setError(data.error || t("updateError"));
     }
+  }
+
+  function getDoctorDocStatus(doctor: any) {
+    const docs: any[] = doctor.verificationDocuments || [];
+    const requiredTypes = ["IDENTITY", "MEDICAL_LICENSE"];
+    const hasRejectedRequired = docs.some(
+      (d) => requiredTypes.includes(d.documentType) && d.status === "REJECTED"
+    );
+    const hasApprovedRequired = requiredTypes.every((type) =>
+      docs.some(
+        (d) =>
+          d.documentType === type &&
+          d.status === "APPROVED" &&
+          (!d.expiresAt || new Date(d.expiresAt).getTime() > Date.now())
+      )
+    );
+    const canApprove = hasApprovedRequired;
+    return {
+      hasRejectedRequired,
+      hasApprovedRequired,
+      canApprove,
+    };
   }
 
   const pendingClaimsCount = claims.filter((c) => c.status === "PENDING").length;
@@ -110,7 +145,10 @@ export default function AdminDoctorList() {
         <button
           type="button"
           data-testid="admin-tab-doctors"
-          onClick={() => setActiveTab("DOCTORS")}
+          onClick={() => {
+            setActiveTab("DOCTORS");
+            setError("");
+          }}
           style={{
             padding: "8px 16px",
             borderRadius: "8px",
@@ -130,7 +168,10 @@ export default function AdminDoctorList() {
         <button
           type="button"
           data-testid="admin-tab-claims"
-          onClick={() => setActiveTab("CLAIMS")}
+          onClick={() => {
+            setActiveTab("CLAIMS");
+            setError("");
+          }}
           style={{
             padding: "8px 16px",
             borderRadius: "8px",
@@ -173,30 +214,117 @@ export default function AdminDoctorList() {
               {t("noDoctors")}
             </div>
           )}
-          {doctors.map((doctor) => (
-            <div className="slot-row" key={doctor.id} style={{ alignItems: "flex-start" }}>
-              <div>
-                <b>{doctor.name}</b>
-                <span>
-                  {doctor.specialty} · {doctor.city} · {doctor.user?.email}
-                </span>
-                <small>{doctor.licenseNumber ? t("licensePrefix", { num: doctor.licenseNumber }) : "—"}</small>
-                <AdminVerificationDocuments documents={doctor.verificationDocuments || []} onChanged={loadAll} />
+          {doctors.map((doctor) => {
+            const docStatus = getDoctorDocStatus(doctor);
+
+            return (
+              <div className="slot-row" key={doctor.id} style={{ alignItems: "flex-start" }}>
+                <div style={{ flex: 1 }}>
+                  <b>{doctor.name}</b>
+                  <span>
+                    {doctor.specialty} · {doctor.city} {doctor.user?.email ? `· ${doctor.user.email}` : ""}
+                  </span>
+                  <small>{doctor.licenseNumber ? t("licensePrefix", { num: doctor.licenseNumber }) : "—"}</small>
+
+                  {/* Document Warning / Guidance */}
+                  {docStatus.hasRejectedRequired && (
+                    <div
+                      style={{
+                        margin: "8px 0",
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        background: "#fef2f2",
+                        border: "1px solid #fecaca",
+                        color: "#991b1b",
+                        fontSize: "12px",
+                        fontWeight: 500,
+                      }}
+                    >
+                      ⚠️ {t("documentsRejectedNotice")}
+                    </div>
+                  )}
+                  {!docStatus.hasRejectedRequired && !doctor.isVerified && !docStatus.hasApprovedRequired && (
+                    <div
+                      style={{
+                        margin: "8px 0",
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        background: "#fefce8",
+                        border: "1px solid #fef08a",
+                        color: "#854d0e",
+                        fontSize: "12px",
+                        fontWeight: 500,
+                      }}
+                    >
+                      ℹ️ {t("documentsPendingNotice")}
+                    </div>
+                  )}
+
+                  <AdminVerificationDocuments documents={doctor.verificationDocuments || []} onChanged={loadAll} />
+                </div>
+                <div className="row" style={{ alignItems: "center", gap: "10px" }}>
+                  <span
+                    className="status"
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      padding: "4px 10px",
+                      borderRadius: "100px",
+                      background: doctor.isVerified
+                        ? "#dcfce7"
+                        : docStatus.hasRejectedRequired
+                        ? "#fee2e2"
+                        : "#fef3c7",
+                      color: doctor.isVerified
+                        ? "#15803d"
+                        : docStatus.hasRejectedRequired
+                        ? "#b91c1c"
+                        : "#b45309",
+                      border: doctor.isVerified
+                        ? "1px solid #86efac"
+                        : docStatus.hasRejectedRequired
+                        ? "1px solid #fca5a5"
+                        : "1px solid #fde68a",
+                    }}
+                  >
+                    {doctor.isVerified
+                      ? t("statusVerified")
+                      : docStatus.hasRejectedRequired
+                      ? t("statusDocumentsRejected")
+                      : t("statusPending")}
+                  </span>
+                  {doctor.isVerified ? (
+                    <button className="secondary" onClick={() => setDoctorVerified(doctor.id, false)}>
+                      {t("unpublish")}
+                    </button>
+                  ) : (
+                    <button
+                      className="primary"
+                      disabled={!docStatus.canApprove}
+                      title={
+                        !docStatus.canApprove
+                          ? docStatus.hasRejectedRequired
+                            ? t("documentsRejectedNotice")
+                            : t("documentsPendingNotice")
+                          : undefined
+                      }
+                      style={
+                        !docStatus.canApprove
+                          ? { opacity: 0.5, cursor: "not-allowed", filter: "grayscale(0.6)" }
+                          : {}
+                      }
+                      onClick={() => {
+                        if (!docStatus.canApprove) return;
+                        setDoctorVerified(doctor.id, true);
+                      }}
+                    >
+                      {t("approve")}
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="row">
-                <span className="status">{doctor.isVerified ? t("statusVerified") : t("statusPending")}</span>
-                {doctor.isVerified ? (
-                  <button className="secondary" onClick={() => setDoctorVerified(doctor.id, false)}>
-                    {t("unpublish")}
-                  </button>
-                ) : (
-                  <button className="primary" onClick={() => setDoctorVerified(doctor.id, true)}>
-                    {t("approve")}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -296,16 +424,31 @@ export default function AdminDoctorList() {
                         {t("identityMismatchWarning")}
                       </div>
                       <div>
-                        {t("identityMismatchDesc", {
-                          applicant: claim.claimant?.name || "—",
-                          target: claim.directoryDoctor?.name || "—",
-                        })}
+                        {t("identityMismatchDesc")}
                       </div>
-                      {claim.identityMatch?.reason && (
+                      {claim.identityMatch?.mismatchCode === "SURNAME_MISMATCH" && claim.identityMatch?.mismatchDetails ? (
+                        <div style={{ marginTop: "4px", fontSize: "12px", color: "#b91c1c" }}>
+                          {t("mismatchSurname", {
+                            applicant: claim.identityMatch.mismatchDetails.applicantSurname || "—",
+                            target: claim.identityMatch.mismatchDetails.targetSurname || "—",
+                          })}
+                        </div>
+                      ) : claim.identityMatch?.mismatchCode === "GIVEN_NAME_MISMATCH" && claim.identityMatch?.mismatchDetails ? (
+                        <div style={{ marginTop: "4px", fontSize: "12px", color: "#b91c1c" }}>
+                          {t("mismatchGivenName", {
+                            applicant: claim.identityMatch.mismatchDetails.applicantGiven || "—",
+                            target: claim.identityMatch.mismatchDetails.targetGiven || "—",
+                          })}
+                        </div>
+                      ) : claim.identityMatch?.mismatchCode === "MISSING_NAME" ? (
+                        <div style={{ marginTop: "4px", fontSize: "12px", color: "#b91c1c" }}>
+                          {t("mismatchMissingName")}
+                        </div>
+                      ) : claim.identityMatch?.reason ? (
                         <div style={{ marginTop: "4px", fontSize: "12px", color: "#b91c1c" }}>
                           {claim.identityMatch.reason}
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 )}
@@ -340,7 +483,7 @@ export default function AdminDoctorList() {
                   {claim.doctor && (
                     <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "8px", marginTop: "4px" }}>
                       <strong>{t("registeredProfile")}:</strong> {claim.doctor.name} ({claim.doctor.specialty} · {claim.doctor.city})
-                      {claim.doctor.licenseNumber ? ` · Sicil: ${claim.doctor.licenseNumber}` : ""}
+                      {claim.doctor.licenseNumber ? ` · ${t("licensePrefix", { num: claim.doctor.licenseNumber })}` : ""}
                       {claim.doctor.isVerified ? (
                         <span style={{ color: "#16a34a", fontWeight: 600, marginLeft: "6px" }}>[{t("badgeVerifiedDoctor")}]</span>
                       ) : (
@@ -363,9 +506,11 @@ export default function AdminDoctorList() {
                 {/* Review info if processed */}
                 {claim.reviewedAt && (
                   <div style={{ fontSize: "12px", color: "#64748b" }}>
-                    {t("reviewedAt", { date: new Date(claim.reviewedAt).toLocaleString() })}
+                    {t("reviewedAt", {
+                      date: new Date(claim.reviewedAt).toLocaleString(locale === "en" ? "en-US" : "tr-TR"),
+                    })}
                     {claim.reviewedBy?.name ? ` · ${claim.reviewedBy.name}` : ""}
-                    {claim.reviewerNote ? ` — ${t("reviewerNote", { note: claim.reviewerNote })}` : ""}
+                    {claim.reviewerNote ? ` — ${t("reviewerNote", { note: formatReviewerNote(claim.reviewerNote, getReasonCodeLabel) })}` : ""}
                   </div>
                 )}
 

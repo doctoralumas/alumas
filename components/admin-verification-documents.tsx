@@ -1,10 +1,35 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+
+export function formatReviewerNote(
+  rawNote: string | null | undefined,
+  translateCode?: (code: string) => string
+): string {
+  if (!rawNote) return "";
+  const match = rawNote.match(/^(?:\[([A-Z0-9_]+)\]|([A-Z0-9_]+)):\s*(.*)$/);
+  if (match) {
+    const code = match[1] || match[2];
+    const freeText = match[3];
+    const localizedCode = translateCode ? translateCode(code) : `[${code}]`;
+    return `${localizedCode}: ${freeText}`;
+  }
+  return rawNote;
+}
 
 export default function AdminVerificationDocuments({ documents, onChanged }: { documents: any[]; onChanged: () => void }) {
   const t = useTranslations("admin.adminVerificationDocs");
   const tDocs = useTranslations("professional.verificationManager");
+  const tDoctorList = useTranslations("admin.doctorList");
+  const locale = useLocale();
+
+  const getReasonCodeLabel = (code: string) => {
+    try {
+      return tDoctorList(`reasonCodes.${code}`);
+    } catch {
+      return `[${code}]`;
+    }
+  };
 
   const docTypeLabels: Record<string, string> = {
     IDENTITY: tDocs("docTypes.IDENTITY"),
@@ -28,7 +53,7 @@ export default function AdminVerificationDocuments({ documents, onChanged }: { d
     const note = status === "REJECTED" ? prompt(t("promptReason")) || t("defaultReason") : undefined;
     const response = await fetch(`/api/admin/verification-documents/${id}`, {
       method: "PATCH",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-locale": locale },
       body: JSON.stringify({ status, note }),
     });
     const data = await response.json().catch(() => ({}));
@@ -46,8 +71,16 @@ export default function AdminVerificationDocuments({ documents, onChanged }: { d
             <b>{docTypeLabels[document.documentType] || document.documentType}</b>
             <span> · {statusLabels[document.status] || document.status}</span>
             <span> · {document.documentNumber}</span>
-            {document.expiresAt && <span>{t("expiresAt", { date: new Date(document.expiresAt).toLocaleDateString() })}</span>}
-            {document.reviewerNote && <span> · {document.reviewerNote}</span>}
+            {document.expiresAt && (
+              <span>
+                {t("expiresAt", {
+                  date: new Date(document.expiresAt).toLocaleDateString(locale === "en" ? "en-US" : "tr-TR"),
+                })}
+              </span>
+            )}
+            {document.reviewerNote && (
+              <span> · {formatReviewerNote(document.reviewerNote, getReasonCodeLabel)}</span>
+            )}
             <div><a href={`/api/verification-documents/${document.id}/file`} target="_blank" rel="noopener noreferrer">{document.fileName}</a></div>
           </div>
           {document.status === "PENDING" && (

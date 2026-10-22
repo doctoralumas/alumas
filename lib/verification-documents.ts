@@ -69,10 +69,14 @@ export async function oneDocumentFromForm(form: FormData, kind: DocumentOwnerKin
 export function approvalBlockReason(
   kind: DocumentOwnerKind,
   entityType: string | null | undefined,
-  documents: { documentType: string; status: string; expiresAt?: Date | string | null }[]
+  documents: { documentType: string; status: string; expiresAt?: Date | string | null }[],
+  locale: string = "tr"
 ) {
-  const missing = missingRequiredDocuments(kind, entityType, documents);
+  const missing = missingRequiredDocuments(kind, entityType, documents, locale);
   if (!missing.length) return null;
+  if (locale === "en") {
+    return `For approval, the following documents must be approved and currently valid: ${missing.map((item) => item.labelEn || item.label).join(", ")}.`;
+  }
   return `Onay için şu belgeler onaylı ve süresi geçerli olmalı: ${missing.map((item) => item.label).join(", ")}.`;
 }
 

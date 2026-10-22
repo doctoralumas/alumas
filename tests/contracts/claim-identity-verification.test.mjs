@@ -8,6 +8,9 @@ test("Claim Identity Verification Contract", async (t) => {
     assert.equal(res.matches, false);
     assert.equal(res.confidence, "MISMATCH");
     assert.match(res.reason || "", /Soyadı uyuşmuyor/);
+    assert.equal(res.mismatchCode, "SURNAME_MISMATCH");
+    assert.equal(res.mismatchDetails?.applicantSurname, "Eczanesi");
+    assert.equal(res.mismatchDetails?.targetSurname, "Oktay");
   });
 
   await t.test("Exact match: identical names with honorifics stripped", () => {
@@ -40,3 +43,4 @@ test("Claim Identity Verification Contract", async (t) => {
     assert.equal(res.confidence, "MISMATCH");
   });
 });
+
