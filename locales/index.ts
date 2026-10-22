@@ -90,7 +90,15 @@ function assembleLocaleMessages(
     search: search,
     health: mergedHealth,
     professional: pro.professional || pro,
-    admin: pro.admin || {},
+    admin: {
+      ...(pro.admin || {}),
+      doctorList: (pro.admin as any)?.doctorList || (pro as any).doctorList || {},
+      adminVerificationDocs: (pro.admin as any)?.adminVerificationDocs || (pro as any).adminVerificationDocs || {},
+      organizationsList: (pro.admin as any)?.organizationsList || (pro as any).organizationsList || {},
+      agencyList: (pro.admin as any)?.agencyList || (pro as any).agencyList || {},
+    },
+    doctorList: (pro.admin as any)?.doctorList || (pro as any).doctorList || {},
+    adminVerificationDocs: (pro.admin as any)?.adminVerificationDocs || (pro as any).adminVerificationDocs || {},
 
     // Domain ownership aliases (enables modular call sites: useTranslations("shared.common"), etc.)
     shared: {

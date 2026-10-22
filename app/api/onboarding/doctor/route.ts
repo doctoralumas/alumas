@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { DocumentInputError, documentsFromForm } from "@/lib/verification-documents";
 import { audit } from "@/lib/audit";
 import { sanitizeClaimDoctorId } from "@/lib/claim-onboarding";
+import { evaluateClaimIdentityMatch } from "@/lib/claim-identity-verification";
 
 function slugify(v: string) {
   return v
@@ -74,11 +75,29 @@ export async function POST(req: Request) {
         { status: 409 }
       );
     }
+
+    // Identity match guard: applicant name must be compatible with target directory doctor name
+    const identityMatch = evaluateClaimIdentityMatch(u.name, targetDirDoctor.name);
+    if (!identityMatch.matches) {
+      return NextResponse.json(
+        {
+          error: `KİMLİK UYUŞMAZLIĞI: ALUMAS hesabınızdaki ad ('${u.name}') ile sahiplenmek istediğiniz hekim ('${targetDirDoctor.title} ${targetDirDoctor.name}') uyuşmuyor. Lütfen kendi adınıza kayıtlı hekim profilini seçin veya hesap adınızı resmi kimliğinizle eşleştirin.`,
+          code: "IDENTITY_MISMATCH",
+          applicantName: u.name,
+          targetDoctorName: targetDirDoctor.name,
+          reason: identityMatch.reason,
+        },
+        { status: 422 }
+      );
+    }
   }
 
   try {
     const documents = await documentsFromForm(form, "doctor", null, u.id);
-    let base = slugify(`${b.title}-${u.name}`) || `doktor-${u.id.slice(-6)}`;
+    const effectiveName = targetDirDoctor ? targetDirDoctor.name : u.name;
+    const effectiveTitle = targetDirDoctor ? targetDirDoctor.title : String(b.title).trim();
+
+    let base = slugify(`${effectiveTitle}-${effectiveName}`) || `doktor-${u.id.slice(-6)}`;
     let slug = base;
     let i = 2;
     while (await prisma.doctor.findUnique({ where: { slug } })) {
@@ -90,11 +109,11 @@ export async function POST(req: Request) {
         data: {
           userId: u.id,
           slug,
-          name: u.name,
-          title: String(b.title).trim(),
-          specialty: String(b.specialty).trim(),
-          hospital: String(b.hospital).trim(),
-          city: String(b.city).trim(),
+          name: effectiveName,
+          title: effectiveTitle,
+          specialty: targetDirDoctor ? targetDirDoctor.specialty : String(b.specialty).trim(),
+          hospital: String(b.hospital).trim() || targetDirDoctor?.hospital || "",
+          city: String(b.city).trim() || targetDirDoctor?.city || "İstanbul",
           bio: String(b.bio).trim(),
           price: Math.max(0, Number(b.price || 0)),
           nextSlot: "Doğrulama sonrası",
@@ -103,11 +122,6 @@ export async function POST(req: Request) {
           isPublished: false,
           verificationDocuments: { create: documents },
         },
-      });
-
-      await tx.user.update({
-        where: { id: u.id },
-        data: { role: "DOCTOR" },
       });
 
       if (targetDirDoctor) {

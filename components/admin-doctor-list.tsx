@@ -64,18 +64,35 @@ export default function AdminDoctorList() {
     if (!response.ok) setError(data.error || t("updateError"));
   }
 
-  async function handleClaimAction(claimId: string, status: "APPROVED" | "REJECTED") {
+  async function handleClaimAction(claim: any, status: "APPROVED" | "REJECTED") {
     let reason: string | undefined = undefined;
+    let forceIdentityOverride = false;
+    let overrideReason: string | undefined = undefined;
+
     if (status === "REJECTED") {
       const input = prompt(t("promptClaimRejectReason"));
       if (input === null) return; // user cancelled prompt
       reason = input.trim() || undefined;
+    } else if (status === "APPROVED") {
+      const isMismatch = claim.identityMatch && !claim.identityMatch.matches;
+      if (isMismatch) {
+        const input = prompt(t("identityMismatchPrompt"));
+        if (input === null) return;
+        if (input.trim().length < 15) {
+          alert(t("overrideReasonMinLength"));
+          return;
+        }
+        forceIdentityOverride = true;
+        overrideReason = input.trim();
+      } else {
+        if (!confirm(t("confirmApprove"))) return;
+      }
     }
 
-    const response = await fetch(`/api/admin/doctors/claims/${claimId}`, {
+    const response = await fetch(`/api/admin/doctors/claims/${claim.id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ status, reason }),
+      body: JSON.stringify({ status, reason, forceIdentityOverride, overrideReason }),
     });
     const data = await response.json().catch(() => ({}));
     await loadAll();
@@ -92,6 +109,7 @@ export default function AdminDoctorList() {
       <div style={{ display: "flex", gap: "10px", borderBottom: "1px solid #e2e8f0", paddingBottom: "12px" }}>
         <button
           type="button"
+          data-testid="admin-tab-doctors"
           onClick={() => setActiveTab("DOCTORS")}
           style={{
             padding: "8px 16px",
@@ -194,6 +212,7 @@ export default function AdminDoctorList() {
             const isPending = claim.status === "PENDING";
             const isApproved = claim.status === "APPROVED";
             const isRejected = claim.status === "REJECTED";
+            const isMismatch = claim.identityMatch && !claim.identityMatch.matches;
 
             return (
               <div
@@ -209,7 +228,7 @@ export default function AdminDoctorList() {
                   gap: "14px",
                 }}
               >
-                {/* Header row with Status */}
+                {/* Header row with Target Specialist & Status */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap" }}>
                   <div>
                     <span
@@ -255,6 +274,42 @@ export default function AdminDoctorList() {
                   </span>
                 </div>
 
+                {/* Identity Mismatch Warning Box */}
+                {isMismatch && (
+                  <div
+                    data-testid={`identity-mismatch-warning-${claim.id}`}
+                    style={{
+                      padding: "12px 14px",
+                      borderRadius: "10px",
+                      background: "#fef2f2",
+                      border: "1px solid #fecaca",
+                      color: "#991b1b",
+                      fontSize: "13px",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "10px",
+                    }}
+                  >
+                    <span style={{ fontSize: "18px", flexShrink: 0 }}>⚠️</span>
+                    <div>
+                      <div style={{ fontWeight: 700, marginBottom: "2px" }}>
+                        {t("identityMismatchWarning")}
+                      </div>
+                      <div>
+                        {t("identityMismatchDesc", {
+                          applicant: claim.claimant?.name || "—",
+                          target: claim.directoryDoctor?.name || "—",
+                        })}
+                      </div>
+                      {claim.identityMatch?.reason && (
+                        <div style={{ marginTop: "4px", fontSize: "12px", color: "#b91c1c" }}>
+                          {claim.identityMatch.reason}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Applicant and Doctor Details */}
                 <div
                   style={{
@@ -274,22 +329,22 @@ export default function AdminDoctorList() {
                   </div>
                   {claim.applicantTitle && (
                     <div>
-                      <strong>Unvan / Beyan:</strong> {claim.applicantTitle}
+                      <strong>{t("applicantTitle")}:</strong> {claim.applicantTitle}
                     </div>
                   )}
                   {claim.applicantNote && (
                     <div style={{ color: "#334155", fontStyle: "italic" }}>
-                      <strong>Not:</strong> "{claim.applicantNote}"
+                      <strong>{t("applicantNote")}:</strong> "{claim.applicantNote}"
                     </div>
                   )}
                   {claim.doctor && (
                     <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "8px", marginTop: "4px" }}>
-                      <strong>Kayıtlı Profil:</strong> {claim.doctor.name} ({claim.doctor.specialty} · {claim.doctor.city})
+                      <strong>{t("registeredProfile")}:</strong> {claim.doctor.name} ({claim.doctor.specialty} · {claim.doctor.city})
                       {claim.doctor.licenseNumber ? ` · Sicil: ${claim.doctor.licenseNumber}` : ""}
                       {claim.doctor.isVerified ? (
-                        <span style={{ color: "#16a34a", fontWeight: 600, marginLeft: "6px" }}>[Doğrulanmış Uzman]</span>
+                        <span style={{ color: "#16a34a", fontWeight: 600, marginLeft: "6px" }}>[{t("badgeVerifiedDoctor")}]</span>
                       ) : (
-                        <span style={{ color: "#d97706", fontWeight: 600, marginLeft: "6px" }}>[Belge Onayı Bekliyor]</span>
+                        <span style={{ color: "#d97706", fontWeight: 600, marginLeft: "6px" }}>[{t("badgePendingApproval")}]</span>
                       )}
                     </div>
                   )}
@@ -308,9 +363,9 @@ export default function AdminDoctorList() {
                 {/* Review info if processed */}
                 {claim.reviewedAt && (
                   <div style={{ fontSize: "12px", color: "#64748b" }}>
-                    İncelendi: {new Date(claim.reviewedAt).toLocaleString()}
+                    {t("reviewedAt", { date: new Date(claim.reviewedAt).toLocaleString() })}
                     {claim.reviewedBy?.name ? ` · ${claim.reviewedBy.name}` : ""}
-                    {claim.reviewerNote ? ` — Not: "${claim.reviewerNote}"` : ""}
+                    {claim.reviewerNote ? ` — ${t("reviewerNote", { note: claim.reviewerNote })}` : ""}
                   </div>
                 )}
 
@@ -321,7 +376,7 @@ export default function AdminDoctorList() {
                       type="button"
                       data-testid={`reject-claim-${claim.id}`}
                       className="secondary"
-                      onClick={() => handleClaimAction(claim.id, "REJECTED")}
+                      onClick={() => handleClaimAction(claim, "REJECTED")}
                       style={{ padding: "8px 16px", borderRadius: "8px", cursor: "pointer" }}
                     >
                       {t("rejectClaim")}
@@ -330,7 +385,7 @@ export default function AdminDoctorList() {
                       type="button"
                       data-testid={`approve-claim-${claim.id}`}
                       className="primary"
-                      onClick={() => handleClaimAction(claim.id, "APPROVED")}
+                      onClick={() => handleClaimAction(claim, "APPROVED")}
                       style={{ padding: "8px 16px", borderRadius: "8px", cursor: "pointer" }}
                     >
                       {t("approveClaim")}

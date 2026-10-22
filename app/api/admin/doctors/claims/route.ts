@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { evaluateClaimIdentityMatch } from "@/lib/claim-identity-verification";
 
 export async function GET() {
   const user = await currentUser();
@@ -27,10 +28,15 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
+  const annotatedClaims = claims.map((claim) => ({
+    ...claim,
+    identityMatch: evaluateClaimIdentityMatch(claim.claimant?.name, claim.directoryDoctor?.name),
+  }));
+
   return NextResponse.json({
     ok: true,
-    data: claims,
-    total: claims.length,
+    data: annotatedClaims,
+    total: annotatedClaims.length,
   });
 }
 

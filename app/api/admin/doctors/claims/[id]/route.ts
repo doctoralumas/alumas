@@ -3,6 +3,7 @@ import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { approvalBlockReason } from "@/lib/verification-documents";
+import { evaluateClaimIdentityMatch } from "@/lib/claim-identity-verification";
 
 export async function PATCH(
   req: Request,
@@ -17,6 +18,8 @@ export async function PATCH(
   const body = await req.json().catch(() => ({}));
   const status = String(body?.status || "").toUpperCase();
   const reason = typeof body?.reason === "string" ? body.reason.trim() : null;
+  const forceIdentityOverride = Boolean(body?.forceIdentityOverride);
+  const overrideReason = typeof body?.overrideReason === "string" ? body.overrideReason.trim() : null;
 
   if (!["APPROVED", "REJECTED"].includes(status)) {
     return NextResponse.json({ ok: false, error: "Geçersiz durum (APPROVED veya REJECTED olmalı)." }, { status: 400 });
@@ -27,6 +30,7 @@ export async function PATCH(
     include: {
       directoryDoctor: true,
       doctor: true,
+      claimant: true,
     },
   });
 
@@ -37,13 +41,31 @@ export async function PATCH(
   const now = new Date();
   const isApproved = status === "APPROVED";
 
-  // If approving, ensure directory doctor is not already claimed by another doctor
+  // Evaluate claimant identity against target directory doctor
+  const identityMatch = evaluateClaimIdentityMatch(claim.claimant?.name, claim.directoryDoctor?.name);
+
+  // If approving, enforce identity check & existing claim conflict checks
   if (isApproved) {
     if (claim.directoryDoctor.doctorId && claim.directoryDoctor.doctorId !== claim.doctorId) {
       return NextResponse.json(
         { ok: false, error: "Bu dizin uzmanı başka bir doktor hesabı tarafından zaten sahiplenilmiş." },
         { status: 409 }
       );
+    }
+
+    if (!identityMatch.matches) {
+      if (!forceIdentityOverride || !overrideReason || overrideReason.length < 15) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: `KİMLİK UYUŞMAZLIĞI: Başvuran kullanıcı ('${claim.claimant?.name}') ile hedef dizin hekimi ('${claim.directoryDoctor?.title} ${claim.directoryDoctor?.name}') eşleşmiyor. İstisnai onay için en az 15 karakterlik resmi gerekçe zorunludur.`,
+            code: "IDENTITY_MISMATCH",
+            claimantName: claim.claimant?.name,
+            targetDoctorName: claim.directoryDoctor?.name,
+          },
+          { status: 422 }
+        );
+      }
     }
   }
 
@@ -53,7 +75,7 @@ export async function PATCH(
       where: { id },
       data: {
         status: isApproved ? "APPROVED" : "REJECTED",
-        reviewerNote: reason,
+        reviewerNote: forceIdentityOverride && overrideReason ? `[OVERRIDE_APPROVED]: ${overrideReason}` : reason,
         reviewedAt: now,
         reviewedByUserId: user.id,
       },
@@ -78,14 +100,29 @@ export async function PATCH(
       const block = approvalBlockReason("doctor", null, docs);
       const credentialsPassed = block === null;
 
+      // Canonical Identity Protection:
+      // The authentic name and title of the DirectoryDoctor is preserved on the Doctor profile.
       await tx.doctor.update({
         where: { id: claim.doctorId },
         data: {
+          name: claim.directoryDoctor.name,
+          title: claim.directoryDoctor.title || "Uzm. Dr.",
+          specialty: claim.directoryDoctor.specialty,
+          hospital: claim.directoryDoctor.hospital || undefined,
+          city: claim.directoryDoctor.city,
           isVerified: credentialsPassed,
           isPublished: credentialsPassed,
           nextSlot: credentialsPassed ? "Müsaitlik takvimine bakın" : "Doğrulama bekleniyor",
         },
       });
+
+      // Grant professional role to user only when credentials pass
+      if (credentialsPassed && claim.claimantUserId) {
+        await tx.user.update({
+          where: { id: claim.claimantUserId },
+          data: { role: "DOCTOR" },
+        });
+      }
     } else {
       // If rejected, ensure directory doctor is unlinked
       await tx.directoryDoctor.updateMany({
@@ -94,6 +131,30 @@ export async function PATCH(
           doctorId: null,
         },
       });
+
+      // Safely unpublish doctor profile
+      if (claim.doctorId) {
+        await tx.doctor.update({
+          where: { id: claim.doctorId },
+          data: {
+            isVerified: false,
+            isPublished: false,
+          },
+        });
+      }
+
+      // If claimant has no other verified doctor profiles, ensure role is PATIENT
+      if (claim.claimantUserId) {
+        const otherVerified = await tx.doctor.findFirst({
+          where: { userId: claim.claimantUserId, isVerified: true, id: { not: claim.doctorId || undefined } },
+        });
+        if (!otherVerified) {
+          await tx.user.update({
+            where: { id: claim.claimantUserId },
+            data: { role: "PATIENT" },
+          });
+        }
+      }
     }
 
     return c;
@@ -107,7 +168,9 @@ export async function PATCH(
     metadata: {
       directoryDoctorId: claim.directoryDoctorId,
       doctorId: claim.doctorId,
-      reason,
+      reason: forceIdentityOverride && overrideReason ? `[OVERRIDE_APPROVED]: ${overrideReason}` : reason,
+      identityMatchConfidence: identityMatch.confidence,
+      forceIdentityOverride,
       reviewedAt: now.toISOString(),
     },
     req,

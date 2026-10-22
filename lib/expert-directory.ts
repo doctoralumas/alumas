@@ -3,6 +3,7 @@ import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
 import { resolveSearchSpecialties } from "@/lib/search-aliases";
 import { missingRequiredDocuments } from "@/lib/verification-requirements";
 import { matchesSpecialtyFilter } from "@/lib/specialty-taxonomy";
+import { evaluateClaimIdentityMatch } from "@/lib/claim-identity-verification";
 
 export type ExpertVerificationState =
   | "VERIFIED"
@@ -245,9 +246,10 @@ export function buildNormalizedExpertItems(
       : null;
     const linkedDoc = explicitDoc || canonicalMatchedDoc;
 
-    // If linkedDoc is an approved & verified ALUMAS doctor, transition this directory listing in-place
-    // to the verified internal ALUMAS profile without creating a duplicate card.
-    if (linkedDoc && isDoctorVerifiedByAlumas(linkedDoc, now)) {
+    // If linkedDoc is an approved & verified ALUMAS doctor, verify identity match before transition
+    const idMatch = linkedDoc ? evaluateClaimIdentityMatch(linkedDoc.name, dir.name) : { matches: false };
+
+    if (linkedDoc && idMatch.matches && isDoctorVerifiedByAlumas(linkedDoc, now)) {
       consumedDoctorIds.add(linkedDoc.id);
       emittedCanonicalKeys.add(dirCanonicalKey);
       emittedCanonicalKeys.add(

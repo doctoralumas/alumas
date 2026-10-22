@@ -50,7 +50,15 @@ function assemble(locale) {
     search: search,
     health: mergedHealth,
     professional: pro.professional || pro,
-    admin: pro.admin || {},
+    admin: {
+      ...(pro.admin || {}),
+      doctorList: pro.admin?.doctorList || pro.doctorList || {},
+      adminVerificationDocs: pro.admin?.adminVerificationDocs || pro.adminVerificationDocs || {},
+      organizationsList: pro.admin?.organizationsList || pro.organizationsList || {},
+      agencyList: pro.admin?.agencyList || pro.agencyList || {},
+    },
+    doctorList: pro.admin?.doctorList || pro.doctorList || {},
+    adminVerificationDocs: pro.admin?.adminVerificationDocs || pro.adminVerificationDocs || {},
 
     // 3. Domain ownership aliases
     shared: {
