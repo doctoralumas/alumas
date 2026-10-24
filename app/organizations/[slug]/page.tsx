@@ -64,7 +64,7 @@ export default async function OrganizationProfile({
       laboratoryTests: { where: { isActive: true }, orderBy: [{ category: "asc" }, { name: "asc" }] },
       stocks: { take: 20, orderBy: { updatedAt: "desc" } },
       reviews: { where: { status: "APPROVED" }, select: { rating: true } },
-      insuranceContracts: { include: { insuranceProvider: true } },
+      insuranceContracts: { include: { insuranceProvider: { select: { id: true, name: true, slug: true, website: true, phone: true, description: true, isActive: true } } } },
     },
   });
 

@@ -3,7 +3,8 @@ export type DirectoryOrganizationType =
   | "CLINIC"
   | "PHARMACY"
   | "IMAGING_CENTER"
-  | "LABORATORY";
+  | "LABORATORY"
+  | "INSURANCE_COMPANY";
 
 export interface DirectoryInstitutionRecord {
   id: string;

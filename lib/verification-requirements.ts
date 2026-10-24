@@ -6,6 +6,8 @@ export const DOCUMENT_TYPES = [
   "HEALTH_TOURISM_AUTHORIZATION",
   "TAX_CERTIFICATE",
   "TRADE_REGISTRY",
+  "SEDDK_LICENSE",
+  "AUTHORIZATION_LETTER",
 ] as const;
 
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
@@ -41,6 +43,12 @@ const ORGANIZATION_DOCUMENTS: Record<string, RequiredDocument[]> = {
     { type: "FACILITY_LICENSE", label: "Laboratuvar ruhsatı", labelEn: "Medical Laboratory License", required: true, expires: true },
     { type: "TRADE_REGISTRY", label: "Kurum kayıt belgesi", labelEn: "Institution Registration Certificate", required: true, expires: false },
   ],
+  INSURANCE_COMPANY: [
+    { type: "SEDDK_LICENSE", label: "SEDDK sigortacılık faaliyet ruhsatı", labelEn: "SEDDK Insurance Operating License", required: true, expires: false },
+    { type: "TRADE_REGISTRY", label: "Ticaret sicil belgesi", labelEn: "Trade Registry Gazette", required: true, expires: false },
+    { type: "TAX_CERTIFICATE", label: "Vergi levhası", labelEn: "Tax Registration Certificate", required: true, expires: false },
+    { type: "AUTHORIZATION_LETTER", label: "Kurumsal temsil yetki belgesi / imza sirküleri", labelEn: "Corporate Representative Authorization / Signature Circular", required: true, expires: true },
+  ],
 };
 
 const DOCTOR_DOCUMENTS: RequiredDocument[] = [
@@ -63,6 +71,8 @@ export const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   HEALTH_TOURISM_AUTHORIZATION: "Sağlık turizmi yetki belgesi",
   TAX_CERTIFICATE: "Vergi levhası",
   TRADE_REGISTRY: "Ticaret sicil belgesi",
+  SEDDK_LICENSE: "SEDDK faaliyet ruhsatı",
+  AUTHORIZATION_LETTER: "Kurumsal temsil yetki belgesi",
 };
 
 export const DOCUMENT_TYPE_LABELS_EN: Record<string, string> = {
@@ -73,6 +83,8 @@ export const DOCUMENT_TYPE_LABELS_EN: Record<string, string> = {
   HEALTH_TOURISM_AUTHORIZATION: "Health Tourism Authorization Certificate",
   TAX_CERTIFICATE: "Tax Registration Certificate",
   TRADE_REGISTRY: "Trade Registry Gazette",
+  SEDDK_LICENSE: "SEDDK Insurance Operating License",
+  AUTHORIZATION_LETTER: "Corporate Representative Authorization",
 };
 
 export const DOCUMENT_STATUS_LABELS: Record<string, string> = {

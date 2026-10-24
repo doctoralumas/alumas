@@ -689,7 +689,8 @@
       "CLINIC": "Klinik",
       "PHARMACY": "Eczane",
       "IMAGING_CENTER": "Görüntüleme Merkezi",
-      "LABORATORY": "Tıbbi Laboratuvar"
+      "LABORATORY": "Tıbbi Laboratuvar",
+      "INSURANCE_COMPANY": "Sigorta Kurumu"
     },
     "offerings": {
       "askPrice": "Fiyat sorunuz",
@@ -3366,7 +3367,8 @@
         "CLINIC": "Uzman kadroyu, muayene ve işlemleri buradan yönetirsiniz. Yayınlanan profil bu kayıtları gösterir.",
         "PHARMACY": "Nöbet durumunu ve stok görünürlüğünü buradan yönetirsiniz. Hastalar adet yerine stok durumunu görür.",
         "IMAGING_CENTER": "MR, BT, röntgen ve diğer tetkikleri buradan yönetirsiniz. Raporu, ilişkili hastanın görüntüleme geçmişine işlersiniz.",
-        "LABORATORY": "Kan, idrar ve diğer numune tahlillerini buradan yönetirsiniz. Sonucu, ilişkili hastanın tahlil geçmişine işlersiniz."
+        "LABORATORY": "Kan, idrar ve diğer numune tahlillerini buradan yönetirsiniz. Sonucu, ilişkili hastanın tahlil geçmişine işlersiniz.",
+        "INSURANCE_COMPANY": "Sigorta ürünlerini (TSS/ÖSS), kapsama ağlarını ve anlaşmalı sağlık kurumu ilişkilerini buradan yönetirsiniz."
       },
       "generalInfo": "Genel Bilgiler",
       "generalInfoDesc": "Kurum profilinizi, iletişim ve açıklama (Hakkında) bilgilerinizi düzenleyin.",
@@ -5216,7 +5218,8 @@
         "CLINIC": "Klinik",
         "PHARMACY": "Eczane",
         "IMAGING_CENTER": "Görüntüleme Merkezi",
-        "LABORATORY": "Tıbbi Laboratuvar"
+        "LABORATORY": "Tıbbi Laboratuvar",
+        "INSURANCE_COMPANY": "Sigorta Kurumu"
       },
       "offerings": {
         "askPrice": "Fiyat sorunuz",
@@ -6033,7 +6036,8 @@
           "CLINIC": "Klinik",
           "PHARMACY": "Eczane",
           "IMAGING_CENTER": "Görüntüleme Merkezi",
-          "LABORATORY": "Tıbbi Laboratuvar"
+          "LABORATORY": "Tıbbi Laboratuvar",
+          "INSURANCE_COMPANY": "Sigorta Kurumu"
         },
         "offerings": {
           "askPrice": "Fiyat sorunuz",
@@ -7651,7 +7655,8 @@
           "CLINIC": "Uzman kadroyu, muayene ve işlemleri buradan yönetirsiniz. Yayınlanan profil bu kayıtları gösterir.",
           "PHARMACY": "Nöbet durumunu ve stok görünürlüğünü buradan yönetirsiniz. Hastalar adet yerine stok durumunu görür.",
           "IMAGING_CENTER": "MR, BT, röntgen ve diğer tetkikleri buradan yönetirsiniz. Raporu, ilişkili hastanın görüntüleme geçmişine işlersiniz.",
-          "LABORATORY": "Kan, idrar ve diğer numune tahlillerini buradan yönetirsiniz. Sonucu, ilişkili hastanın tahlil geçmişine işlersiniz."
+          "LABORATORY": "Kan, idrar ve diğer numune tahlillerini buradan yönetirsiniz. Sonucu, ilişkili hastanın tahlil geçmişine işlersiniz.",
+          "INSURANCE_COMPANY": "Sigorta ürünlerini (TSS/ÖSS), kapsama ağlarını ve anlaşmalı sağlık kurumu ilişkilerini buradan yönetirsiniz."
         },
         "generalInfo": "Genel Bilgiler",
         "generalInfoDesc": "Kurum profilinizi, iletişim ve açıklama (Hakkında) bilgilerinizi düzenleyin.",

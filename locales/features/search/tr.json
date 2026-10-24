@@ -321,7 +321,8 @@
       "CLINIC": "Klinik",
       "PHARMACY": "Eczane",
       "IMAGING_CENTER": "Görüntüleme Merkezi",
-      "LABORATORY": "Tıbbi Laboratuvar"
+      "LABORATORY": "Tıbbi Laboratuvar",
+      "INSURANCE_COMPANY": "Sigorta Kurumu"
     },
     "offerings": {
       "askPrice": "Fiyat sorunuz",

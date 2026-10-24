@@ -321,7 +321,8 @@
       "CLINIC": "Clinic",
       "PHARMACY": "Pharmacy",
       "IMAGING_CENTER": "Imaging Center",
-      "LABORATORY": "Medical Laboratory"
+      "LABORATORY": "Medical Laboratory",
+      "INSURANCE_COMPANY": "Insurance Company"
     },
     "offerings": {
       "askPrice": "Inquire for price",

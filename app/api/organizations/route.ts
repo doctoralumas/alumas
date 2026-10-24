@@ -9,17 +9,29 @@ import {
   queryNormalizedDirectory,
 } from "@/lib/institution-directory";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
+import {
+  evaluateInsurerVerification,
+  normalizeInsurerIdentityKey,
+} from "@/lib/insurance-domain";
 
-const TYPES: Record<string, "HOSPITAL" | "CLINIC" | "PHARMACY" | "IMAGING_CENTER" | "LABORATORY"> = {
+const TYPES: Record<
+  string,
+  "HOSPITAL" | "CLINIC" | "PHARMACY" | "IMAGING_CENTER" | "LABORATORY" | "INSURANCE_COMPANY"
+> = {
   HASTANE: "HOSPITAL",
   KLINIK: "CLINIC",
   ECZANE: "PHARMACY",
   LABORATUVAR: "LABORATORY",
+  GORUNTULEME: "IMAGING_CENTER",
+  SIGORTA: "INSURANCE_COMPANY",
+  SIGORTA_SIRKETI: "INSURANCE_COMPANY",
+  SIGORTA_KURUMU: "INSURANCE_COMPANY",
   HOSPITAL: "HOSPITAL",
   CLINIC: "CLINIC",
   PHARMACY: "PHARMACY",
   IMAGING_CENTER: "IMAGING_CENTER",
   LABORATORY: "LABORATORY",
+  INSURANCE_COMPANY: "INSURANCE_COMPANY",
 };
 
 function slugify(v: string) {
@@ -175,8 +187,29 @@ export async function POST(req: Request) {
     const effectiveName = targetDir ? targetDir.name : name;
     const effectiveCity = targetDir ? targetDir.city : city;
 
+    if (effectiveType === "INSURANCE_COMPANY") {
+      const normalizedInsurerKey = normalizeInsurerIdentityKey(effectiveName);
+      if (
+        normalizedInsurerKey === "sgk" ||
+        normalizedInsurerKey === "sosyal-guvenlik-kurumu" ||
+        normalizedInsurerKey === "alumas-demo"
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Kamusal sağlık güvencesi (SGK) veya dahili test sigorta kayıtları özel şirket olarak kaydedilemez veya sahiplenilemez.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const documents = await documentsFromForm(form, "organization", effectiveType, user.id);
-    const license = documents.find((document) => document.documentType === "FACILITY_LICENSE");
+    const license = documents.find(
+      (document) =>
+        document.documentType === "FACILITY_LICENSE" ||
+        document.documentType === "SEDDK_LICENSE"
+    );
 
     const preferredBase = targetDir ? targetDir.slug : slugify(effectiveName) || "kurum";
     let slug = preferredBase;
@@ -279,6 +312,19 @@ export async function POST(req: Request) {
       return createdOrg;
     });
 
+    const insurerEval =
+      org.type === "INSURANCE_COMPANY"
+        ? evaluateInsurerVerification({
+            applicantEmail: email,
+            officialWebsite: resolvedWebsite,
+            documents: documents.map((d) => ({
+              documentType: d.documentType,
+              status: "PENDING",
+              expiresAt: d.expiresAt,
+            })),
+          })
+        : null;
+
     if (targetDir) {
       await audit({
         actorUserId: user.id,
@@ -292,6 +338,7 @@ export async function POST(req: Request) {
           directoryInstitutionName: targetDir.name,
           applicantRoleTitle,
           applicantNote,
+          ...(insurerEval ? { supportingSignals: insurerEval.supportingSignals } : {}),
         },
         req,
       });
@@ -304,6 +351,7 @@ export async function POST(req: Request) {
         metadata: {
           type: org.type,
           applicantRoleTitle,
+          ...(insurerEval ? { supportingSignals: insurerEval.supportingSignals } : {}),
         },
         req,
       });

@@ -455,7 +455,8 @@
         "CLINIC": "Manage specialist staff, examinations, and procedures here. The published profile displays these records.",
         "PHARMACY": "Manage duty status and stock visibility here. Patients see stock availability instead of exact unit quantities.",
         "IMAGING_CENTER": "Manage MRI, CT, X-ray, and other diagnostic scans here. Uploaded reports link directly to patient imaging records.",
-        "LABORATORY": "Manage blood, urine, and pathology tests here. Results link directly to patient lab histories."
+        "LABORATORY": "Manage blood, urine, and pathology tests here. Results link directly to patient lab histories.",
+        "INSURANCE_COMPANY": "Manage insurance products (TSS/ÖSS), coverage networks, and contracted healthcare provider agreements here."
       },
       "generalInfo": "General Information",
       "generalInfoDesc": "Manage your institution profile, contact details, and about information.",

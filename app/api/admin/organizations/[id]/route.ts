@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { approvalBlockReason } from "@/lib/verification-documents";
 import { isOrganizationVerifiedByAlumas, normalizeComparisonKey } from "@/lib/institution-directory";
+import { reconcileClaimedFacilityAgreementsInTx } from "@/lib/insurance-domain";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
@@ -135,7 +136,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   // --- Administrative Field Editing Branch ---
   if (b.action === "EDIT" || (b.name && !b.status)) {
-    const validTypes = ["HOSPITAL", "CLINIC", "PHARMACY", "IMAGING_CENTER", "LABORATORY"];
+    const validTypes = [
+      "HOSPITAL",
+      "CLINIC",
+      "PHARMACY",
+      "IMAGING_CENTER",
+      "LABORATORY",
+      "INSURANCE_COMPANY",
+    ];
     const name = String(b.name || "").trim();
     const type = String(b.type || "").toUpperCase();
     const city = String(b.city || "").trim();
@@ -179,7 +187,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     };
     if (description !== undefined) updateData.description = description;
     if (isPublished !== undefined) updateData.isPublished = isPublished;
-    if (isOnDuty !== undefined) updateData.isOnDuty = isOnDuty;
+    if (isOnDuty !== undefined) updateData.isOnDuty = type === "PHARMACY" ? isOnDuty : false;
 
     const updatedOrg = await prisma.organization.update({
       where: { id },
@@ -335,6 +343,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             where: { id: claimDirId },
             data: { organizationId: id, lastVerifiedAt: now },
           });
+          await reconcileClaimedFacilityAgreementsInTx(tx, claimDirId, id);
         } else if (b.status === "REJECTED" || b.status === "PENDING") {
           await tx.directoryInstitution.updateMany({
             where: { id: claimDirId, organizationId: id },

@@ -69,11 +69,15 @@ export const ORG_TYPE_MAP: Record<string, DirectoryOrganizationType> = {
   ECZANE: "PHARMACY",
   LABORATUVAR: "LABORATORY",
   GORUNTULEME: "IMAGING_CENTER",
+  SIGORTA: "INSURANCE_COMPANY",
+  SIGORTA_SIRKETI: "INSURANCE_COMPANY",
+  SIGORTA_KURUMU: "INSURANCE_COMPANY",
   HOSPITAL: "HOSPITAL",
   CLINIC: "CLINIC",
   PHARMACY: "PHARMACY",
   IMAGING_CENTER: "IMAGING_CENTER",
   LABORATORY: "LABORATORY",
+  INSURANCE_COMPANY: "INSURANCE_COMPANY",
 };
 
 export function normalizeTextKey(value: string | null | undefined): string {
@@ -273,6 +277,7 @@ export function buildNormalizedDirectoryItems(
         : null;
 
     const dutyActive =
+      dir.type === "PHARMACY" &&
       Boolean(dir.isOnDuty) &&
       (!dir.onDutyUntil || new Date(dir.onDutyUntil).getTime() >= now.getTime());
 
@@ -408,7 +413,9 @@ function formatVerifiedOrganizationItem(
       ? Number(calculateDistanceKm(lat, lng, org.latitude, org.longitude).toFixed(1))
       : null;
 
+  const isInsurer = org.type === "INSURANCE_COMPANY";
   const dutyActive =
+    org.type === "PHARMACY" &&
     Boolean(org.isOnDuty) &&
     (!org.onDutyUntil || new Date(org.onDutyUntil).getTime() >= now.getTime());
 
@@ -431,7 +438,7 @@ function formatVerifiedOrganizationItem(
     distanceKm: distance,
     rating,
     isOnDuty: dutyActive,
-    onDutyUntil: org.onDutyUntil ? new Date(org.onDutyUntil).toISOString() : null,
+    onDutyUntil: dutyActive && org.onDutyUntil ? new Date(org.onDutyUntil).toISOString() : null,
     isVerified: true,
     verificationState: "VERIFIED",
     verifiedAt: org.verifiedAt ? new Date(org.verifiedAt).toISOString() : null,
@@ -445,12 +452,12 @@ function formatVerifiedOrganizationItem(
     externalRef,
     lastVerifiedAt: org.verifiedAt ? new Date(org.verifiedAt).toISOString() : null,
     _count: {
-      doctors: org._count?.doctors ?? 0,
+      doctors: isInsurer ? 0 : org._count?.doctors ?? 0,
       reviews: org._count?.reviews ?? reviews.length,
     },
-    services: Array.isArray(org.services) ? org.services : [],
-    imagingExams: Array.isArray(org.imagingExams) ? org.imagingExams : [],
-    laboratoryTests: Array.isArray(org.laboratoryTests) ? org.laboratoryTests : [],
+    services: isInsurer ? [] : Array.isArray(org.services) ? org.services : [],
+    imagingExams: isInsurer ? [] : Array.isArray(org.imagingExams) ? org.imagingExams : [],
+    laboratoryTests: isInsurer ? [] : Array.isArray(org.laboratoryTests) ? org.laboratoryTests : [],
   };
 }
 

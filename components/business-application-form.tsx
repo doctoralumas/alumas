@@ -20,7 +20,14 @@ import {
   SpinnerGap,
 } from "@phosphor-icons/react";
 
-const ORG_TYPES = ["HOSPITAL", "CLINIC", "PHARMACY", "IMAGING_CENTER", "LABORATORY"] as const;
+const ORG_TYPES = [
+  "HOSPITAL",
+  "CLINIC",
+  "PHARMACY",
+  "IMAGING_CENTER",
+  "LABORATORY",
+  "INSURANCE_COMPANY",
+] as const;
 type OrgType = (typeof ORG_TYPES)[number];
 
 export type ClaimedDirectorySummary = {

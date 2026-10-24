@@ -27,7 +27,14 @@ export async function POST(req:NextRequest){
       where:{status:"APPROVED",isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},type:orgType as any},
       include:{
         hours:true,
-        insuranceContracts:{where:{isActive:true},include:{insuranceProvider:true}}
+        insuranceContracts:{
+          where:{isActive:true},
+          include:{
+            insuranceProvider:{
+              select:{id:true,name:true,slug:true,isActive:true}
+            }
+          }
+        }
       },
       take:100
     }),

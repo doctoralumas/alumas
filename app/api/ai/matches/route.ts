@@ -32,7 +32,11 @@ export async function POST(req:NextRequest){
           hours:true,
           insuranceContracts:{
             where:{isActive:true},
-            include:{insuranceProvider:true}
+            include:{
+              insuranceProvider:{
+                select:{id:true,name:true,slug:true,isActive:true}
+              }
+            }
           }
         }
       }

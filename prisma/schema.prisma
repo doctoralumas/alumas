@@ -388,6 +388,7 @@ enum OrganizationType {
   PHARMACY
   IMAGING_CENTER
   LABORATORY
+  INSURANCE_COMPANY
 }
 enum OrganizationStatus {
   PENDING
@@ -441,6 +442,8 @@ model Organization {
   campaigns          OrganizationCampaign[]
   emergencyServices  OrganizationEmergencyService[]
   insuranceContracts  OrganizationInsurance[]
+  insuranceAgreements InsuranceProviderAgreement[] @relation("FacilityInsuranceAgreements")
+  insurerProfile      InsuranceProvider?           @relation("InsurerOrganization")
   homeCareRequests HomeCareRequest[]
   verificationDocuments VerificationDocument[]
   directoryListing   DirectoryInstitution?
@@ -1222,17 +1225,157 @@ model HomeCareRequest {
   @@index([organizationId, status])
 }
 
+enum InsurancePayerKind {
+  COMMERCIAL_INSURER
+  PUBLIC_PAYER
+}
+
+enum InsuranceProviderLifecycleStatus {
+  ACTIVE
+  DEMO_INTERNAL
+  INACTIVE
+}
+
+enum InsuranceProductType {
+  TSS
+  OSS
+  TRAVEL
+  FOREIGN_HEALTH
+  CRITICAL_ILLNESS
+  CORPORATE_HEALTH
+  PUBLIC_SGK
+}
+
+enum CatalogLifecycleStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  RETIRED
+}
+
+enum AgreementVerificationStatus {
+  UNVERIFIED
+  PROVIDER_DECLARED
+  INSURER_DECLARED
+  MUTUALLY_CONFIRMED
+  ADMIN_VERIFIED
+  DISPUTED
+  EXPIRED
+}
+
+enum AgreementSource {
+  LEGACY_MIGRATED
+  PROVIDER_DECLARATION
+  INSURER_DECLARATION
+  ADMIN_CURATED
+  OFFICIAL_PUBLIC_SOURCE
+}
+
+enum AgreementCoverageScope {
+  ALL_BRANCHES
+  SELECTED_SPECIALTIES
+  INPATIENT_ONLY
+  OUTPATIENT_ONLY
+  EMERGENCY_ONLY
+}
+
+enum SpecialtyRuleKind {
+  INCLUDED
+  EXCLUDED
+}
+
 model InsuranceProvider {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
-  website     String?
-  phone       String?
-  description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  organizationContracts OrganizationInsurance[]
-  userPreferences      UserInsurancePreference[]
+  id                     String                           @id @default(cuid())
+  name                   String                           @unique
+  slug                   String                           @unique
+  payerKind              InsurancePayerKind               @default(COMMERCIAL_INSURER)
+  lifecycleStatus        InsuranceProviderLifecycleStatus @default(ACTIVE)
+  canonicalCode          String?                          @unique
+  legalName              String?
+  seddkLicenseRef        String?
+  tsbMemberCode          String?
+  website                String?
+  phone                  String?
+  claimsPhone            String?
+  provisionPortalUrl     String?
+  headquartersCity       String?
+  headquartersDistrict   String?
+  headquartersAddress    String?
+  description            String?
+  isActive               Boolean                          @default(true)
+  isPubliclyListed       Boolean                          @default(true)
+  isClaimable            Boolean                          @default(true)
+  source                 String                           @default("ALUMAS_CATALOG")
+  lastVerifiedAt         DateTime?
+  organizationId         String?                          @unique
+  directoryInstitutionId String?                          @unique
+  createdAt              DateTime                         @default(now())
+  updatedAt              DateTime                         @default(now()) @updatedAt
+
+  organization           Organization?                    @relation("InsurerOrganization", fields: [organizationId], references: [id], onDelete: SetNull)
+  directoryInstitution   DirectoryInstitution?            @relation("InsurerDirectoryListing", fields: [directoryInstitutionId], references: [id], onDelete: SetNull)
+  products               InsuranceProduct[]
+  networks               InsuranceNetwork[]
+  organizationContracts  OrganizationInsurance[]
+  agreements             InsuranceProviderAgreement[]
+  userPreferences        UserInsurancePreference[]
+
+  @@index([payerKind, isActive, isPubliclyListed])
+  @@index([lifecycleStatus, isActive])
+}
+
+model InsuranceProduct {
+  id                  String                       @id @default(cuid())
+  insuranceProviderId String
+  code                String
+  slug                String
+  name                String
+  productType         InsuranceProductType
+  description         String?
+  requiresPublicSgk   Boolean                      @default(false)
+  status              CatalogLifecycleStatus       @default(ACTIVE)
+  isActive            Boolean                      @default(true)
+  effectiveFrom       DateTime?
+  effectiveUntil      DateTime?
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+
+  insuranceProvider   InsuranceProvider            @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
+  networks            InsuranceNetwork[]
+  agreements          InsuranceProviderAgreement[]
+  userPreferences     UserInsurancePreference[]
+
+  @@unique([insuranceProviderId, code])
+  @@unique([insuranceProviderId, slug])
+  @@index([insuranceProviderId, productType, isActive])
+}
+
+model InsuranceNetwork {
+  id                  String                       @id @default(cuid())
+  insuranceProviderId String
+  productId           String?
+  code                String
+  slug                String
+  name                String
+  tierLabel           String?
+  tierRank            Int                          @default(1)
+  description         String?
+  status              CatalogLifecycleStatus       @default(ACTIVE)
+  isActive            Boolean                      @default(true)
+  effectiveFrom       DateTime?
+  effectiveUntil      DateTime?
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+
+  insuranceProvider   InsuranceProvider            @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
+  product             InsuranceProduct?            @relation(fields: [productId], references: [id], onDelete: SetNull)
+  agreements          InsuranceProviderAgreement[]
+  userPreferences     UserInsurancePreference[]
+
+  @@unique([insuranceProviderId, code])
+  @@unique([insuranceProviderId, slug])
+  @@index([insuranceProviderId, isActive])
+  @@index([productId, isActive])
 }
 
 
@@ -1439,33 +1582,98 @@ model LoginAttempt {
 
 
 model OrganizationInsurance {
-  id                  String            @id @default(cuid())
+  id                  String                       @id @default(cuid())
   organizationId      String
   insuranceProviderId String
-  isActive            Boolean           @default(true)
+  isActive            Boolean                      @default(true)
   note                String?
-  organization        Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  insuranceProvider   InsuranceProvider @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  organization        Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  insuranceProvider   InsuranceProvider            @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
+  agreements          InsuranceProviderAgreement[]
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
 
   @@unique([organizationId, insuranceProviderId])
   @@index([insuranceProviderId, isActive])
 }
 
+model InsuranceProviderAgreement {
+  id                      String                            @id @default(cuid())
+  organizationInsuranceId String?
+  organizationId          String?
+  directoryInstitutionId  String?
+  insuranceProviderId     String
+  productId               String?
+  networkId               String?
+  coverageScope           AgreementCoverageScope            @default(ALL_BRANCHES)
+  verificationStatus      AgreementVerificationStatus       @default(UNVERIFIED)
+  source                  AgreementSource                   @default(PROVIDER_DECLARATION)
+  effectiveFrom           DateTime?
+  expiresAt               DateTime?
+  verifiedAt              DateTime?
+  verifiedByUserId        String?
+  declaredByUserId        String?
+  disputeReason           String?
+  note                    String?
+  isActive                Boolean                           @default(true)
+  createdAt               DateTime                          @default(now())
+  updatedAt               DateTime                          @updatedAt
+
+  organizationInsurance   OrganizationInsurance?            @relation(fields: [organizationInsuranceId], references: [id], onDelete: SetNull)
+  organization            Organization?                     @relation("FacilityInsuranceAgreements", fields: [organizationId], references: [id], onDelete: Cascade)
+  directoryInstitution    DirectoryInstitution?             @relation("DirectoryFacilityInsuranceAgreements", fields: [directoryInstitutionId], references: [id], onDelete: Cascade)
+  insuranceProvider       InsuranceProvider                 @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
+  product                 InsuranceProduct?                 @relation(fields: [productId], references: [id], onDelete: SetNull)
+  network                 InsuranceNetwork?                 @relation(fields: [networkId], references: [id], onDelete: SetNull)
+  specialtyRules          InsuranceAgreementSpecialtyRule[]
+
+  @@index([organizationId, insuranceProviderId, isActive])
+  @@index([directoryInstitutionId, insuranceProviderId, isActive])
+  @@index([insuranceProviderId, verificationStatus, isActive])
+  @@index([productId, networkId, isActive])
+  @@index([expiresAt, isActive])
+}
+
+model InsuranceAgreementSpecialtyRule {
+  id            String                     @id @default(cuid())
+  agreementId   String
+  specialtyCode String
+  serviceCode   String?
+  ruleKind      SpecialtyRuleKind          @default(INCLUDED)
+  copayPercent  Float?
+  note          String?
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
+
+  agreement     InsuranceProviderAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+
+  @@unique([agreementId, specialtyCode, ruleKind])
+  @@index([agreementId, ruleKind])
+  @@index([specialtyCode, ruleKind])
+}
+
 model UserInsurancePreference {
-  id                  String            @id @default(cuid())
+  id                  String                @id @default(cuid())
   userId              String
   insuranceProviderId String
-  isPrimary           Boolean           @default(false)
+  productType         InsuranceProductType?
+  productId           String?
+  networkId           String?
+  isPrimary           Boolean               @default(false)
+  isActiveDiscovery   Boolean               @default(true)
+  includePublicSgk    Boolean               @default(false)
+  isActive            Boolean               @default(true)
   policyLabel         String?
-  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  insuranceProvider   InsuranceProvider @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  insuranceProvider   InsuranceProvider     @relation(fields: [insuranceProviderId], references: [id], onDelete: Cascade)
+  product             InsuranceProduct?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+  network             InsuranceNetwork?     @relation(fields: [networkId], references: [id], onDelete: SetNull)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
 
-  @@unique([userId, insuranceProviderId])
+  @@index([userId, insuranceProviderId])
   @@index([userId, isPrimary])
+  @@index([userId, isActiveDiscovery, isActive])
 }
 
 
@@ -1477,6 +1685,8 @@ enum VerificationDocumentType {
   HEALTH_TOURISM_AUTHORIZATION
   TAX_CERTIFICATE
   TRADE_REGISTRY
+  SEDDK_LICENSE
+  AUTHORIZATION_LETTER
 }
 
 enum VerificationDocumentStatus {
@@ -1567,6 +1777,8 @@ model DirectoryInstitution {
   isActive        Boolean             @default(true)
   organizationId  String?             @unique
   organization    Organization?       @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  insurerProfile  InsuranceProvider?  @relation("InsurerDirectoryListing")
+  insuranceAgreements InsuranceProviderAgreement[] @relation("DirectoryFacilityInsuranceAgreements")
   claims          OrganizationClaim[]
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt

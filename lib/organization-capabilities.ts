@@ -1,11 +1,98 @@
-export type OrganizationCapability = "services" | "doctors" | "departments" | "emergency" | "imaging" | "laboratory" | "stock";
+export type OrganizationCapability =
+  | "services"
+  | "doctors"
+  | "departments"
+  | "emergency"
+  | "imaging"
+  | "laboratory"
+  | "stock"
+  | "appointments"
+  | "providerInsuranceContracts"
+  | "insurerCatalog";
+
+export const HEALTHCARE_FACILITY_TYPES = [
+  "HOSPITAL",
+  "CLINIC",
+  "PHARMACY",
+  "IMAGING_CENTER",
+  "LABORATORY",
+] as const;
+
+export type HealthcareFacilityType = (typeof HEALTHCARE_FACILITY_TYPES)[number];
 
 const CAPABILITIES: Record<string, Record<OrganizationCapability, boolean>> = {
-  HOSPITAL: { services: true, doctors: true, departments: true, emergency: true, imaging: false, laboratory: false, stock: false },
-  CLINIC: { services: true, doctors: true, departments: false, emergency: false, imaging: false, laboratory: false, stock: false },
-  PHARMACY: { services: false, doctors: false, departments: false, emergency: false, imaging: false, laboratory: false, stock: true },
-  IMAGING_CENTER: { services: false, doctors: false, departments: false, emergency: false, imaging: true, laboratory: false, stock: false },
-  LABORATORY: { services: false, doctors: false, departments: false, emergency: false, imaging: false, laboratory: true, stock: false },
+  HOSPITAL: {
+    services: true,
+    doctors: true,
+    departments: true,
+    emergency: true,
+    imaging: false,
+    laboratory: false,
+    stock: false,
+    appointments: true,
+    providerInsuranceContracts: true,
+    insurerCatalog: false,
+  },
+  CLINIC: {
+    services: true,
+    doctors: true,
+    departments: false,
+    emergency: false,
+    imaging: false,
+    laboratory: false,
+    stock: false,
+    appointments: true,
+    providerInsuranceContracts: true,
+    insurerCatalog: false,
+  },
+  PHARMACY: {
+    services: false,
+    doctors: false,
+    departments: false,
+    emergency: false,
+    imaging: false,
+    laboratory: false,
+    stock: true,
+    appointments: false,
+    providerInsuranceContracts: true,
+    insurerCatalog: false,
+  },
+  IMAGING_CENTER: {
+    services: false,
+    doctors: false,
+    departments: false,
+    emergency: false,
+    imaging: true,
+    laboratory: false,
+    stock: false,
+    appointments: true,
+    providerInsuranceContracts: true,
+    insurerCatalog: false,
+  },
+  LABORATORY: {
+    services: false,
+    doctors: false,
+    departments: false,
+    emergency: false,
+    imaging: false,
+    laboratory: true,
+    stock: false,
+    appointments: true,
+    providerInsuranceContracts: true,
+    insurerCatalog: false,
+  },
+  INSURANCE_COMPANY: {
+    services: false,
+    doctors: false,
+    departments: false,
+    emergency: false,
+    imaging: false,
+    laboratory: false,
+    stock: false,
+    appointments: false,
+    providerInsuranceContracts: false,
+    insurerCatalog: true,
+  },
 };
 
 export const CAPABILITY_DENIED: Record<OrganizationCapability, string> = {
@@ -16,6 +103,9 @@ export const CAPABILITY_DENIED: Record<OrganizationCapability, string> = {
   imaging: "Tetkik kataloğu yalnızca görüntüleme merkezlerinde yönetilir.",
   laboratory: "Tahlil kataloğu yalnızca tıbbi laboratuvarlarda yönetilir.",
   stock: "Stok yalnızca eczanelerde kullanılabilir.",
+  appointments: "Tıbbi randevu yalnızca sağlık tesislerinde kullanılabilir.",
+  providerInsuranceContracts: "Sağlık tesisi sigorta kabul beyanı sigorta şirketleri için geçerli değildir.",
+  insurerCatalog: "Sigorta ürün ve ağ yönetimi yalnızca sigorta şirketlerinde kullanılabilir.",
 };
 
 export const CAPABILITY_DENIED_EN: Record<OrganizationCapability, string> = {
@@ -26,7 +116,19 @@ export const CAPABILITY_DENIED_EN: Record<OrganizationCapability, string> = {
   imaging: "Imaging catalogs are managed only for imaging centers.",
   laboratory: "Laboratory catalogs are managed only for medical laboratories.",
   stock: "Stock management is available only for pharmacies.",
+  appointments: "Medical appointments are available only for healthcare facilities.",
+  providerInsuranceContracts: "Healthcare facility insurance acceptance declarations are not applicable to insurance companies.",
+  insurerCatalog: "Insurance product and network catalogs are managed only for insurance companies.",
 };
+
+export function isHealthcareFacilityType(type: string | null | undefined): boolean {
+  const normalized = String(type || "").toUpperCase();
+  return (HEALTHCARE_FACILITY_TYPES as readonly string[]).includes(normalized);
+}
+
+export function isInsuranceCompanyType(type: string | null | undefined): boolean {
+  return String(type || "").toUpperCase() === "INSURANCE_COMPANY";
+}
 
 export function getCapabilityDeniedMessage(
   capability: OrganizationCapability,

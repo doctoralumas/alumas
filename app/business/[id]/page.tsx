@@ -35,12 +35,13 @@ export default async function ManageOrganization({
       doctorInvites: { orderBy: { createdAt: "desc" } },
       verificationDocuments: { orderBy: { createdAt: "desc" } },
       _count: { select: { doctors: true } },
-      insuranceContracts: { include: { insuranceProvider: true } },
+      insuranceContracts: { include: { insuranceProvider: { select: { id: true, name: true, slug: true, website: true, phone: true, description: true, isActive: true } } } },
     },
   });
   if (!org) notFound();
   const globalInsurances = await prisma.insuranceProvider.findMany({
     where: { isActive: true },
+    select: { id: true, name: true, slug: true, website: true, phone: true, description: true, isActive: true, createdAt: true },
     orderBy: { name: "asc" },
   });
   const t = await getTranslations("professional.orgManager");
