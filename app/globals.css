@@ -1062,3 +1062,33 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+
+/* --- ALUMAS Admin v2 Navigation Layout --- */
+.admin-layout-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  background: var(--bg, #f5f7f4);
+}
+
+.admin-mobile-topbar {
+  display: none !important;
+}
+
+.admin-desktop-sidebar {
+  display: flex !important;
+}
+
+@media (max-width: 1023px) {
+  .admin-layout-container {
+    flex-direction: column !important;
+  }
+  .admin-mobile-topbar {
+    display: flex !important;
+    width: 100% !important;
+  }
+  .admin-desktop-sidebar {
+    display: none !important;
+  }
+}

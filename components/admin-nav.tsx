@@ -104,7 +104,6 @@ export default function AdminNav({ adminUser }: AdminNavProps) {
       <div
         className="admin-mobile-topbar"
         style={{
-          display: "none",
           position: "sticky",
           top: 0,
           zIndex: 40,
@@ -118,6 +117,7 @@ export default function AdminNav({ adminUser }: AdminNavProps) {
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(true)}
             aria-label={t("openMenu")}
             style={{
@@ -162,6 +162,7 @@ export default function AdminNav({ adminUser }: AdminNavProps) {
         <div
           role="dialog"
           aria-modal="true"
+          className="admin-mobile-drawer"
           style={{
             position: "fixed",
             inset: 0,
@@ -208,6 +209,7 @@ export default function AdminNav({ adminUser }: AdminNavProps) {
                 )}
               </div>
               <button
+                type="button"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label={t("closeMenu")}
                 style={{
@@ -307,7 +309,6 @@ export default function AdminNav({ adminUser }: AdminNavProps) {
           top: 0,
           background: "#0f172a",
           borderRight: "1px solid #1e293b",
-          display: "flex",
           flexDirection: "column",
           color: "#f8fafc",
           transition: "width 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -494,26 +495,6 @@ export default function AdminNav({ adminUser }: AdminNavProps) {
           </div>
         </div>
       </aside>
-
-      {/* Embedded CSS for responsive switching */}
-      <style jsx global>{`
-        @media (max-width: 1023px) {
-          .admin-desktop-sidebar {
-            display: none !important;
-          }
-          .admin-mobile-topbar {
-            display: flex !important;
-          }
-        }
-        @media (min-width: 1024px) {
-          .admin-desktop-sidebar {
-            display: flex !important;
-          }
-          .admin-mobile-topbar {
-            display: none !important;
-          }
-        }
-      `}</style>
     </>
   );
 }

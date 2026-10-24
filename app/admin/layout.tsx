@@ -8,14 +8,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (u.role !== "ADMIN") redirect("/profile");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        minHeight: "100vh",
-        background: "var(--bg, #f5f7f4)",
-      }}
-    >
+    <div className="admin-layout-container">
       <AdminNav adminUser={{ name: u.name, email: u.email }} />
       <div
         style={{
