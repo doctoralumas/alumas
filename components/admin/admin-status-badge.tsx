@@ -19,25 +19,25 @@ export default function AdminStatusBadge({
     border: "#e2e8f0",
   };
 
-  if (["APPROVED", "VERIFIED", "ACTIVE", "PUBLISHED", "SUCCESS"].includes(normalized)) {
+  if (["APPROVED", "VERIFIED", "ACTIVE", "PUBLISHED", "SUCCESS", "CONFIRMED", "COMPLETED"].includes(normalized)) {
     colors = {
       bg: "#ecfdf5",
       color: "#047857",
       border: "#a7f3d0",
     };
-  } else if (["PENDING", "IN_REVIEW", "WARNING", "REQUESTED"].includes(normalized)) {
+  } else if (["PENDING", "IN_REVIEW", "WARNING", "REQUESTED", "IN_PROGRESS", "NEW"].includes(normalized)) {
     colors = {
       bg: "#fffbeb",
       color: "#b45309",
       border: "#fde68a",
     };
-  } else if (["REJECTED", "SUSPENDED", "FAILED", "REVOKED", "CANCELLED"].includes(normalized)) {
+  } else if (["REJECTED", "SUSPENDED", "FAILED", "REVOKED", "CANCELLED", "CANCELED"].includes(normalized)) {
     colors = {
       bg: "#fef2f2",
       color: "#b91c1c",
       border: "#fecaca",
     };
-  } else if (["INACTIVE", "UNPUBLISHED", "SUPERSEDED", "EXPIRED", "CLOSED"].includes(normalized)) {
+  } else if (["INACTIVE", "UNPUBLISHED", "SUPERSEDED", "EXPIRED", "CLOSED", "RESOLVED"].includes(normalized)) {
     colors = {
       bg: "#f8fafc",
       color: "#64748b",
