@@ -137,9 +137,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         { status: 400 }
       );
     }
-    if (b.role === "INSTITUTION_STAFF" || b.role === "ORGANIZATION" || b.role === "AGENCY") {
+    if (b.role === "INSTITUTION_STAFF") {
       return NextResponse.json(
-        { error: "Kurum / Acente Yetkilisi rolü yalnızca geçerli ve onaylanmış bir kurum veya acente kaydı ile atanabilir." },
+        { error: "Kurum Yetkilisi rolü yalnızca geçerli ve onaylanmış bir kurum kaydı ile atanabilir." },
         { status: 400 }
       );
     }
@@ -325,3 +325,4 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
   return NextResponse.json({ ok: true, message: "Kullanıcı hesabı güvenle silindi." });
 }
+

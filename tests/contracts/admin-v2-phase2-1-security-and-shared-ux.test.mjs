@@ -22,7 +22,7 @@ test("Admin v2 Phase 2.1 — Centralized Admin Authorization", async (t) => {
     assert.equal(isAdminUser({}), false);
   });
 
-  await t.test("All 21 admin API routes import requireAdmin from lib/admin-auth", () => {
+  await t.test("All 23 admin API routes import requireAdmin from lib/admin-auth", () => {
     const adminRoutes = [
       "app/api/admin/agencies/route.ts",
       "app/api/admin/agencies/[id]/route.ts",
@@ -36,6 +36,8 @@ test("Admin v2 Phase 2.1 — Centralized Admin Authorization", async (t) => {
       "app/api/admin/doctors/claims/[id]/route.ts",
       "app/api/admin/doctors/directory/route.ts",
       "app/api/admin/doctors/directory/[id]/route.ts",
+      "app/api/admin/inquiries/route.ts",
+      "app/api/admin/inquiries/[id]/route.ts",
       "app/api/admin/ops/route.ts",
       "app/api/admin/organizations/route.ts",
       "app/api/admin/organizations/[id]/route.ts",
