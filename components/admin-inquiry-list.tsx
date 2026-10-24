@@ -1049,3 +1049,4 @@ export default function AdminInquiryList() {
     </div>
   );
 }
+

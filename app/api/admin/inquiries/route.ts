@@ -85,3 +85,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "İletişim talepleri yüklenemedi." }, { status: 500 });
   }
 }
+

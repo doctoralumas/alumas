@@ -4,16 +4,29 @@ import AdminNav from "@/components/admin-nav";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const u = await currentUser();
-  if (!u) redirect('/login');
-  if (u.role !== "ADMIN") redirect('/profile');
+  if (!u) redirect("/login");
+  if (u.role !== "ADMIN") redirect("/profile");
 
   return (
-    <div className="workspace">
-      <div className="page" style={{ paddingBottom: 0, minHeight: "auto" }}>
-        <AdminNav />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        minHeight: "100vh",
+        background: "var(--bg, #f5f7f4)",
+      }}
+    >
+      <AdminNav adminUser={{ name: u.name, email: u.email }} />
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {children}
       </div>
-      {children}
     </div>
   );
 }
-
