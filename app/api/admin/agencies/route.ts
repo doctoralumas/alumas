@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { approvalBlockReason, withdrawExpiredCredentials } from "@/lib/verification-documents";
 import { audit } from "@/lib/audit";
-
-async function ok() {
-  const u = await currentUser();
-  return u?.role === "ADMIN" ? u : null;
-}
+import { requireAdmin } from "@/lib/admin-auth";
 
 export async function GET(req: Request) {
-  const admin = await ok();
-  if (!admin) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const admin = auth.admin;
 
   await withdrawExpiredCredentials();
 
@@ -45,8 +41,9 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const admin = await ok();
-  if (!admin) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const admin = auth.admin;
 
   const b = await req.json().catch(() => ({}));
   if (!b.id) return NextResponse.json({ error: "id gerekli" }, { status: 400 });
@@ -85,8 +82,9 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const admin = await ok();
-  if (!admin) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const admin = auth.admin;
 
   const url = new URL(req.url);
   const id = url.searchParams.get("id");

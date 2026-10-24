@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 
-async function admin() {
-  const u = await currentUser();
-  return u?.role === "ADMIN" ? u : null;
-}
 
 export async function GET(req: Request) {
-  const u = await admin();
-  if (!u) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const u = auth.user;
 
   const url = new URL(req.url);
   const statusParam = url.searchParams.get("status")?.toUpperCase();
@@ -48,8 +45,9 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const u = await admin();
-  if (!u) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const u = auth.user;
 
   const b = await req.json().catch(() => ({}));
   if (!["organization", "doctor"].includes(b.kind) || !["APPROVED", "REJECTED"].includes(b.status)) {

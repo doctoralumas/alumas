@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
-async function requireAdmin() {
-  const user = await currentUser();
-  if (!user || user.role !== "ADMIN") return null;
-  return user;
-}
 
 export async function GET(req: Request) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const admin = auth.admin;
 
   const url = new URL(req.url);
   const q = url.searchParams.get("q")?.trim() || "";

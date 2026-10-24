@@ -848,6 +848,21 @@
     }
   },
   "admin": {
+    "dialog": {
+      "cancel": "Vazgeç",
+      "confirm": "Onayla",
+      "delete": "Sil",
+      "reject": "Reddet",
+      "approve": "Onayla",
+      "suspend": "Askıya Al",
+      "revoke": "Sahiplenmeyi Geri Al",
+      "reasonLabel": "İşlem Gerekçesi",
+      "reasonPlaceholder": "Lütfen bu idari işlem için açıklama giriniz...",
+      "reasonRequired": "Gerekçe alanı zorunludur.",
+      "minReasonLength": "Gerekçe en az {min} karakter olmalıdır.",
+      "processing": "İşleniyor...",
+      "close": "Kapat"
+    },
     "adminNav": {
       "overview": "Genel Bakış",
       "organizations": "Kurumlar",

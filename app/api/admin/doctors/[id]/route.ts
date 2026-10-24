@@ -1,20 +1,16 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 
-async function requireAdmin() {
-  const user = await currentUser();
-  if (!user || user.role !== "ADMIN") return null;
-  return user;
-}
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const admin = auth.admin;
 
   const { id } = await params;
   const doctor = await prisma.doctor.findUnique({
@@ -56,8 +52,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const admin = auth.admin;
 
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
@@ -115,8 +112,9 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const admin = auth.admin;
 
   const { id } = await params;
   const doctor = await prisma.doctor.findUnique({

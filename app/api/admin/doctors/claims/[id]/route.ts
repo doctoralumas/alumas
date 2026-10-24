@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { approvalBlockReason } from "@/lib/verification-documents";
@@ -9,10 +9,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await currentUser();
-  if (!user || user.role !== "ADMIN") {
-    return NextResponse.json({ ok: false, error: "Yönetici yetkisi gerekli." }, { status: 403 });
-  }
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const user = auth.user;
 
   const { id } = await params;
   const body = await req.json().catch(() => ({}));

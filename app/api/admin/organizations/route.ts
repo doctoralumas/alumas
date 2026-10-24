@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { withdrawExpiredCredentials } from "@/lib/verification-documents";
 import { isOrganizationVerifiedByAlumas } from "@/lib/institution-directory";
 
 export async function GET(req: Request) {
-  const user = await currentUser();
-  if (!user || user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Yönetici hesabı gerekli" }, { status: 403 });
-  }
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const user = auth.user;
   const requested = new URL(req.url).searchParams.get("status") || "";
   const statuses = ["PENDING", "APPROVED", "REJECTED", "SUSPENDED"] as const;
   const status = statuses.find((item) => item === requested);

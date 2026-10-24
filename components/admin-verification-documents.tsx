@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import AdminConfirmDialog from "@/components/admin/admin-confirm-dialog";
 
 export function formatReviewerNote(
   rawNote: string | null | undefined,
@@ -49,16 +51,48 @@ export default function AdminVerificationDocuments({ documents, onChanged }: { d
     SUPERSEDED: tDocs("statusSuperseded"),
   };
 
+  const [confirmRejectId, setConfirmRejectId] = useState<string | null>(null);
+  const [isBusy, setIsBusy] = useState(false);
+  const [actionError, setActionError] = useState("");
+
   async function review(id: string, status: "APPROVED" | "REJECTED") {
-    const note = status === "REJECTED" ? prompt(t("promptReason")) || t("defaultReason") : undefined;
+    if (status === "REJECTED") {
+      setActionError("");
+      setConfirmRejectId(id);
+      return;
+    }
+
     const response = await fetch(`/api/admin/verification-documents/${id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json", "x-locale": locale },
-      body: JSON.stringify({ status, note }),
+      body: JSON.stringify({ status: "APPROVED" }),
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) alert(data.error || t("error"));
     onChanged();
+  }
+
+  async function handleConfirmReject(reason?: string) {
+    if (!confirmRejectId) return;
+    setIsBusy(true);
+    setActionError("");
+    try {
+      const note = reason || t("defaultReason");
+      const response = await fetch(`/api/admin/verification-documents/${confirmRejectId}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json", "x-locale": locale },
+        body: JSON.stringify({ status: "REJECTED", note }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setActionError(data.error || t("error"));
+        return;
+      }
+      setConfirmRejectId(null);
+      onChanged();
+    } finally {
+      setIsBusy(false);
+    }
   }
 
   if (!documents?.length) return <span style={{ color: "var(--text-muted)" }}>{t("empty")}</span>;
@@ -91,6 +125,25 @@ export default function AdminVerificationDocuments({ documents, onChanged }: { d
           )}
         </div>
       ))}
+
+      {confirmRejectId && (
+        <AdminConfirmDialog
+          isOpen={true}
+          onClose={() => {
+            setConfirmRejectId(null);
+            setActionError("");
+          }}
+          onConfirm={handleConfirmReject}
+          title={t("rejectDoc")}
+          description={t("promptReason")}
+          variant="danger"
+          confirmLabel={t("rejectDoc")}
+          showReasonInput={true}
+          reasonPlaceholder={t("defaultReason")}
+          isBusy={isBusy}
+          errorMessage={actionError}
+        />
+      )}
     </div>
   );
 }

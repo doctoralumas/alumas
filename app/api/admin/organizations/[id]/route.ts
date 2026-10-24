@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { approvalBlockReason } from "@/lib/verification-documents";
 import { isOrganizationVerifiedByAlumas, normalizeComparisonKey } from "@/lib/institution-directory";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const u = await currentUser();
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const u = auth.user;
   if (!u || u.role !== "ADMIN") {
     return NextResponse.json({ error: "Yönetici hesabı gerekli" }, { status: 403 });
   }
@@ -185,7 +187,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const u = await currentUser();
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const u = auth.user;
   if (!u || u.role !== "ADMIN") {
     return NextResponse.json({ error: "Yönetici hesabı gerekli" }, { status: 403 });
   }

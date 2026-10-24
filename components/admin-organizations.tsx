@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AdminVerificationDocuments from "@/components/admin-verification-documents";
+import AdminConfirmDialog from "@/components/admin/admin-confirm-dialog";
 import { useTranslations } from "next-intl";
 
 type ClaimInfo = {
@@ -47,6 +48,16 @@ export default function AdminOrganizations() {
     LABORATORY: t("typeLab"),
   };
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    id: string;
+    orgName: string;
+    status: string;
+    title: string;
+    description: string;
+    variant: "danger" | "warning";
+  } | null>(null);
+  const [isBusy, setIsBusy] = useState(false);
+
   async function load() {
     setError("");
     const response = await fetch("/api/admin/organizations");
@@ -74,18 +85,49 @@ export default function AdminOrganizations() {
   }, []);
 
   async function act(id: string, status: string) {
-    const reason =
-      status === "REJECTED" || status === "SUSPENDED"
-        ? prompt(t("promptReason")) || t("defaultReason")
-        : undefined;
+    if (status === "REJECTED" || status === "SUSPENDED") {
+      const org = rows.find((r) => r.id === id);
+      const isSuspension = status === "SUSPENDED";
+      setConfirmDialog({
+        id,
+        orgName: org?.name || "",
+        status,
+        title: isSuspension ? t("suspend") : t("reject"),
+        description: isSuspension
+          ? `${org?.name || ""} kurumunu askıya almak ve yayından kaldırmak üzeresiniz.`
+          : `${org?.name || ""} kurum başvurusunu reddetmek üzeresiniz.`,
+        variant: isSuspension ? "warning" : "danger",
+      });
+      return;
+    }
+
     const response = await fetch(`/api/admin/organizations/${id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ status, reason }),
+      body: JSON.stringify({ status }),
     });
     const data = await response.json().catch(() => ({}));
     await load();
     if (!response.ok) setError(data.error || t("updateError"));
+  }
+
+  async function handleConfirmAction(reason?: string) {
+    if (!confirmDialog) return;
+    setIsBusy(true);
+    try {
+      const finalReason = reason || t("defaultReason");
+      const response = await fetch(`/api/admin/organizations/${confirmDialog.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ status: confirmDialog.status, reason: finalReason }),
+      });
+      const data = await response.json().catch(() => ({}));
+      await load();
+      if (!response.ok) setError(data.error || t("updateError"));
+    } finally {
+      setIsBusy(false);
+      setConfirmDialog(null);
+    }
   }
 
   if (error) return <div className="form-error">{error}</div>;
@@ -232,6 +274,21 @@ export default function AdminOrganizations() {
           </div>
         </div>
       ))}
+
+      {confirmDialog && (
+        <AdminConfirmDialog
+          isOpen={true}
+          onClose={() => setConfirmDialog(null)}
+          onConfirm={handleConfirmAction}
+          title={confirmDialog.title}
+          description={confirmDialog.description}
+          variant={confirmDialog.variant}
+          confirmLabel={confirmDialog.status === "SUSPENDED" ? t("suspend") : t("reject")}
+          showReasonInput={true}
+          reasonPlaceholder={t("promptReason")}
+          isBusy={isBusy}
+        />
+      )}
     </div>
   );
 }

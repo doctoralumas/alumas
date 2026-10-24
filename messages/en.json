@@ -3759,6 +3759,21 @@
     }
   },
   "admin": {
+    "dialog": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "delete": "Delete",
+      "reject": "Reject",
+      "approve": "Approve",
+      "suspend": "Suspend",
+      "revoke": "Revoke Claim",
+      "reasonLabel": "Administrative Reason",
+      "reasonPlaceholder": "Please provide a reason for this administrative action...",
+      "reasonRequired": "Reason is required.",
+      "minReasonLength": "Reason must be at least {min} characters.",
+      "processing": "Processing...",
+      "close": "Close"
+    },
     "adminNav": {
       "overview": "Overview",
       "organizations": "Institutions",

@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
-
-async function admin() {
-  const u = await currentUser();
-  return u?.role === "ADMIN" ? u : null;
-}
+import { requireAdmin } from "@/lib/admin-auth";
 
 export async function GET() {
-  const user = await admin();
-  if (!user) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const user = auth.user;
 
   const [banners, categories, inquiries] = await Promise.all([
     prisma.homeBanner.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }),
@@ -22,8 +18,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const user = await admin();
-  if (!user) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const user = auth.user;
 
   const b = await req.json().catch(() => ({}));
 
@@ -82,8 +79,9 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const user = await admin();
-  if (!user) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const user = auth.user;
 
   const b = await req.json().catch(() => ({}));
 
@@ -150,8 +148,9 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const user = await admin();
-  if (!user) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const user = auth.user;
 
   const url = new URL(req.url);
   const kind = url.searchParams.get("kind");
@@ -160,24 +159,64 @@ export async function DELETE(req: Request) {
   if (!id || !kind) return NextResponse.json({ error: "id ve kind gerekli" }, { status: 400 });
 
   if (kind === "banner") {
+    const banner = await prisma.homeBanner.findUnique({ where: { id } });
+    if (!banner) return NextResponse.json({ error: "Banner bulunamadı" }, { status: 404 });
+
     await prisma.homeBanner.delete({ where: { id } });
     await audit({
       actorUserId: user.id,
       action: "content.banner.deleted",
       entityType: "HomeBanner",
       entityId: id,
+      metadata: { title: banner.title },
       req,
     });
     return NextResponse.json({ ok: true });
   }
 
   if (kind === "category") {
+    const cat = await prisma.contentCategory.findUnique({ where: { id } });
+    if (!cat) return NextResponse.json({ error: "Kategori bulunamadı" }, { status: 404 });
+
+    // Protect core system category from hard deletion
+    if (cat.slug === "saglik-hizmetleri") {
+      return NextResponse.json(
+        {
+          error: "Temel platform kategorileri sistem bütünlüğü nedeniyle silinemez. Bunun yerine kategoriyi pasif duruma getirebilirsiniz.",
+          code: "PROTECTED_SYSTEM_CATEGORY",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check dependent packages and tests referencing category
+    const [packageDeps, labDeps] = await Promise.all([
+      prisma.healthTourismPackage.count({
+        where: { OR: [{ category: cat.slug }, { category: cat.name }] },
+      }),
+      prisma.laboratoryTest.count({
+        where: { OR: [{ category: cat.slug }, { category: cat.name }] },
+      }),
+    ]);
+    const totalDeps = packageDeps + labDeps;
+    if (totalDeps > 0) {
+      return NextResponse.json(
+        {
+          error: `Bu kategoriye bağlı aktif sağlık kayıtları (${totalDeps} paket/test) bulunduğu için silinemez. Bunun yerine kategoriyi pasif duruma getirebilirsiniz.`,
+          code: "HAS_DEPENDENCIES",
+          dependencies: { packages: packageDeps, laboratoryTests: labDeps },
+        },
+        { status: 400 }
+      );
+    }
+
     await prisma.contentCategory.delete({ where: { id } });
     await audit({
       actorUserId: user.id,
       action: "content.category.deleted",
       entityType: "ContentCategory",
       entityId: id,
+      metadata: { name: cat.name, slug: cat.slug },
       req,
     });
     return NextResponse.json({ ok: true });

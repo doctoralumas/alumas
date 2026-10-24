@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import AdminVerificationDocuments, { formatReviewerNote } from "@/components/admin-verification-documents";
+import AdminConfirmDialog from "@/components/admin/admin-confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 
 export default function AdminDoctorList() {
@@ -36,6 +37,21 @@ export default function AdminDoctorList() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [actionConfirmDialog, setActionConfirmDialog] = useState<{
+    type: "DELETE_DOCTOR" | "REVOKE_CLAIM" | "REJECT_CLAIM" | "APPROVE_CLAIM_MISMATCH" | "APPROVE_CLAIM";
+    claim?: any;
+    doctor?: any;
+    title: string;
+    description: string;
+    confirmLabel?: string;
+    variant: "danger" | "warning" | "primary";
+    requireReason?: boolean;
+    showReasonInput?: boolean;
+    reasonLabel?: string;
+    reasonPlaceholder?: string;
+    minReasonLength?: number;
+  } | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
 
   const getReasonCodeLabel = (code: string) => {
     try {
@@ -199,28 +215,18 @@ export default function AdminDoctorList() {
       (doc._count?.reviews || 0);
 
     if (totalDeps > 0) {
-      alert(t("clinicalDependenciesNotice", { count: totalDeps }));
+      setError(t("clinicalDependenciesNotice", { count: totalDeps }));
       return;
     }
 
-    if (!confirm(t("confirmDelete", { name: doc.name }))) return;
-
-    try {
-      const response = await fetch(`/api/admin/doctors/${doc.id}`, {
-        method: "DELETE",
-        headers: { "x-locale": locale },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || t("updateError"));
-      } else {
-        setSuccess(t("deleteSuccess"));
-        await loadAll();
-        setTimeout(() => setSuccess(""), 4000);
-      }
-    } catch {
-      setError(t("updateError"));
-    }
+    setActionConfirmDialog({
+      type: "DELETE_DOCTOR",
+      doctor: doc,
+      title: t("deleteDoctor"),
+      description: t("confirmDelete", { name: doc.name }),
+      confirmLabel: t("deleteDoctor"),
+      variant: "danger",
+    });
   }
 
   async function handleSaveDirectoryDoctor(e: React.FormEvent) {
@@ -267,51 +273,156 @@ export default function AdminDoctorList() {
   }
 
   async function handleClaimAction(claim: any, status: "APPROVED" | "REJECTED" | "REVOKED") {
-    let reason: string | undefined = undefined;
-    let forceIdentityOverride = false;
-    let overrideReason: string | undefined = undefined;
-
     if (status === "REVOKED") {
-      if (!confirm(t("confirmRevoke"))) return;
-      const input = prompt(t("promptRevokeReason"));
-      if (input === null) return;
-      if (input.trim().length < 10) {
-        alert(t("promptRevokeReason"));
-        return;
-      }
-      reason = input.trim();
-    } else if (status === "REJECTED") {
-      const input = prompt(t("promptClaimRejectReason"));
-      if (input === null) return;
-      reason = input.trim() || undefined;
-    } else if (status === "APPROVED") {
-      const isMismatch = claim.identityMatch && !claim.identityMatch.matches;
-      if (isMismatch) {
-        const input = prompt(t("identityMismatchPrompt"));
-        if (input === null) return;
-        if (input.trim().length < 15) {
-          alert(t("overrideReasonMinLength"));
-          return;
-        }
-        forceIdentityOverride = true;
-        overrideReason = input.trim();
-      } else {
-        if (!confirm(t("confirmApprove"))) return;
-      }
+      setActionConfirmDialog({
+        type: "REVOKE_CLAIM",
+        claim,
+        title: t("confirmRevoke"),
+        description: `${claim.claimant?.name || "Kullanıcı"} kullanıcısının hekim profili üzerindeki sahiplenmesini geri almak üzeresiniz. Profil yayından kaldırılacak ve dizin kaydı boşa çıkacaktır.`,
+        confirmLabel: t("confirmRevoke"),
+        variant: "danger",
+        requireReason: true,
+        minReasonLength: 10,
+        reasonLabel: t("promptRevokeReason"),
+        reasonPlaceholder: t("promptRevokeReason"),
+      });
+      return;
     }
 
-    const response = await fetch(`/api/admin/doctors/claims/${claim.id}`, {
-      method: "PATCH",
-      headers: { "content-type": "application/json", "x-locale": locale },
-      body: JSON.stringify({ status, reason, forceIdentityOverride, overrideReason }),
-    });
-    const data = await response.json().catch(() => ({}));
-    await loadAll();
-    if (!response.ok) {
-      setError(data.error || t("updateError"));
-    } else {
-      setSuccess(t("saveSuccess"));
-      setTimeout(() => setSuccess(""), 4000);
+    if (status === "REJECTED") {
+      setActionConfirmDialog({
+        type: "REJECT_CLAIM",
+        claim,
+        title: t("rejectClaim"),
+        description: `${claim.claimant?.name || "Başvuru sahibi"} tarafından yapılan uzman sahiplenme başvurusunu reddetmek üzeresiniz.`,
+        confirmLabel: t("rejectClaim"),
+        variant: "danger",
+        showReasonInput: true,
+        reasonLabel: t("promptClaimRejectReason"),
+        reasonPlaceholder: t("promptClaimRejectReason"),
+      });
+      return;
+    }
+
+    if (status === "APPROVED") {
+      const isMismatch = claim.identityMatch && !claim.identityMatch.matches;
+      if (isMismatch) {
+        setActionConfirmDialog({
+          type: "APPROVE_CLAIM_MISMATCH",
+          claim,
+          title: t("identityMismatchWarning"),
+          description: t("identityMismatchDesc"),
+          confirmLabel: t("forceApprove"),
+          variant: "warning",
+          requireReason: true,
+          minReasonLength: 15,
+          reasonLabel: t("identityMismatchPrompt"),
+          reasonPlaceholder: t("overrideReasonMinLength"),
+        });
+        return;
+      }
+
+      setActionConfirmDialog({
+        type: "APPROVE_CLAIM",
+        claim,
+        title: t("confirmApprove"),
+        description: `${claim.claimant?.name || "Başvuru sahibi"} kullanıcısının ${claim.directoryDoctor?.name || "uzman"} sahiplenme talebini onaylamak üzeresiniz.`,
+        confirmLabel: t("approveClaim"),
+        variant: "primary",
+      });
+      return;
+    }
+  }
+
+  async function handleExecuteActionConfirmDialog(reason?: string) {
+    if (!actionConfirmDialog) return;
+    setActionBusy(true);
+
+    try {
+      if (actionConfirmDialog.type === "DELETE_DOCTOR") {
+        const doc = actionConfirmDialog.doctor;
+        const response = await fetch(`/api/admin/doctors/${doc.id}`, {
+          method: "DELETE",
+          headers: { "x-locale": locale },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          setError(data.error || t("updateError"));
+        } else {
+          setSuccess(t("deleteSuccess"));
+          await loadAll();
+          setTimeout(() => setSuccess(""), 4000);
+        }
+      } else if (actionConfirmDialog.type === "REVOKE_CLAIM") {
+        const claim = actionConfirmDialog.claim;
+        const response = await fetch(`/api/admin/doctors/claims/${claim.id}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json", "x-locale": locale },
+          body: JSON.stringify({ status: "REVOKED", reason }),
+        });
+        const data = await response.json().catch(() => ({}));
+        await loadAll();
+        if (!response.ok) {
+          setError(data.error || t("updateError"));
+        } else {
+          setSuccess(t("saveSuccess"));
+          setTimeout(() => setSuccess(""), 4000);
+        }
+      } else if (actionConfirmDialog.type === "REJECT_CLAIM") {
+        const claim = actionConfirmDialog.claim;
+        const response = await fetch(`/api/admin/doctors/claims/${claim.id}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json", "x-locale": locale },
+          body: JSON.stringify({ status: "REJECTED", reason }),
+        });
+        const data = await response.json().catch(() => ({}));
+        await loadAll();
+        if (!response.ok) {
+          setError(data.error || t("updateError"));
+        } else {
+          setSuccess(t("saveSuccess"));
+          setTimeout(() => setSuccess(""), 4000);
+        }
+      } else if (actionConfirmDialog.type === "APPROVE_CLAIM_MISMATCH") {
+        const claim = actionConfirmDialog.claim;
+        const response = await fetch(`/api/admin/doctors/claims/${claim.id}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json", "x-locale": locale },
+          body: JSON.stringify({
+            status: "APPROVED",
+            forceIdentityOverride: true,
+            overrideReason: reason,
+          }),
+        });
+        const data = await response.json().catch(() => ({}));
+        await loadAll();
+        if (!response.ok) {
+          setError(data.error || t("updateError"));
+        } else {
+          setSuccess(t("saveSuccess"));
+          setTimeout(() => setSuccess(""), 4000);
+        }
+      } else if (actionConfirmDialog.type === "APPROVE_CLAIM") {
+        const claim = actionConfirmDialog.claim;
+        const response = await fetch(`/api/admin/doctors/claims/${claim.id}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json", "x-locale": locale },
+          body: JSON.stringify({ status: "APPROVED" }),
+        });
+        const data = await response.json().catch(() => ({}));
+        await loadAll();
+        if (!response.ok) {
+          setError(data.error || t("updateError"));
+        } else {
+          setSuccess(t("saveSuccess"));
+          setTimeout(() => setSuccess(""), 4000);
+        }
+      }
+    } catch {
+      setError(t("updateError"));
+    } finally {
+      setActionBusy(false);
+      setActionConfirmDialog(null);
     }
   }
 
@@ -1748,6 +1859,27 @@ export default function AdminDoctorList() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* ACCESSIBLE CONFIRMATION & ADMINISTRATIVE REASON DIALOG   */}
+      {/* ======================================================== */}
+      {actionConfirmDialog && (
+        <AdminConfirmDialog
+          isOpen={true}
+          onClose={() => setActionConfirmDialog(null)}
+          onConfirm={handleExecuteActionConfirmDialog}
+          title={actionConfirmDialog.title}
+          description={actionConfirmDialog.description}
+          confirmLabel={actionConfirmDialog.confirmLabel}
+          variant={actionConfirmDialog.variant}
+          requireReason={actionConfirmDialog.requireReason}
+          showReasonInput={actionConfirmDialog.showReasonInput}
+          reasonLabel={actionConfirmDialog.reasonLabel}
+          reasonPlaceholder={actionConfirmDialog.reasonPlaceholder}
+          minReasonLength={actionConfirmDialog.minReasonLength}
+          isBusy={actionBusy}
+        />
       )}
     </div>
   );

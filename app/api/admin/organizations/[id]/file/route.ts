@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { readPrivateFile } from "@/lib/storage";
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const u = await currentUser();
-  if (!u || u.role !== "ADMIN") return NextResponse.json({ error: "Erişim reddedildi" }, { status: 403 });
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const u = auth.user;
   
   const { id } = await params;
   const org = await prisma.organization.findUnique({ where: { id } });

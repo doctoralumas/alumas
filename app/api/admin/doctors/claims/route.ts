@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { evaluateClaimIdentityMatch } from "@/lib/claim-identity-verification";
 
 export async function GET() {
-  const user = await currentUser();
-  if (!user || user.role !== "ADMIN") {
-    return NextResponse.json({ ok: false, error: "Yönetici yetkisi gerekli." }, { status: 403 });
-  }
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+  const user = auth.user;
 
   const claims = await prisma.doctorClaim.findMany({
     include: {
