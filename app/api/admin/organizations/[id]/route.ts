@@ -5,6 +5,14 @@ import { audit } from "@/lib/audit";
 import { approvalBlockReason } from "@/lib/verification-documents";
 import { isOrganizationVerifiedByAlumas, normalizeComparisonKey } from "@/lib/institution-directory";
 import { reconcileClaimedFacilityAgreementsInTx } from "@/lib/insurance-domain";
+import {
+  linkApprovedInsurerOrganization,
+  loadFullInsuranceEcosystemState,
+  readInsuranceOverlayState,
+  recordInsuranceAudit,
+  unlinkInsurerOrganization,
+  writeInsuranceOverlayState,
+} from "@/lib/insurance-ecosystem-store";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
@@ -17,7 +25,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
 
   try {
-    const org = await prisma.organization.findUnique({
+    let org: any = await prisma.organization.findUnique({
       where: { id },
       include: {
         owner: {
@@ -67,6 +75,29 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         },
       },
     });
+
+    if (!org) {
+      const eco = await loadFullInsuranceEcosystemState({ includeHidden: true });
+      const iso = eco.isolatedOrganizations.find((o: any) => o.id === id);
+      if (iso) {
+        org = {
+          ...iso,
+          doctors: [],
+          services: [],
+          _count: {
+            doctors: 0,
+            services: 0,
+            reviews: 0,
+            appointments: 0,
+            stocks: 0,
+            imagingExams: 0,
+            laboratoryTests: 0,
+          },
+          directoryListing: null,
+          claim: null,
+        };
+      }
+    }
 
     if (!org) {
       return NextResponse.json({ error: "Kurum bulunamadı" }, { status: 404 });
@@ -126,12 +157,40 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const b = await req.json().catch(() => ({}));
 
-  const targetOrg = await prisma.organization.findUnique({
+  let targetOrg: any = await prisma.organization.findUnique({
     where: { id },
     include: { verificationDocuments: true },
   });
+  let isIsolatedOrg = false;
+  if (!targetOrg) {
+    const overlay = readInsuranceOverlayState();
+    const iso = overlay.isolatedOrganizations.find((o: any) => o.id === id);
+    if (iso) {
+      targetOrg = iso;
+      isIsolatedOrg = true;
+    }
+  }
   if (!targetOrg) {
     return NextResponse.json({ error: "Kurum bulunamadı" }, { status: 404 });
+  }
+
+  if (isIsolatedOrg && b.action === "APPROVE_ALL_DOCS") {
+    const overlay = readInsuranceOverlayState();
+    overlay.isolatedOrganizations = overlay.isolatedOrganizations.map((o: any) =>
+      o.id === id
+        ? {
+            ...o,
+            verificationDocuments: (o.verificationDocuments || []).map((d: any) => ({
+              ...d,
+              status: "APPROVED",
+              reviewedAt: new Date().toISOString(),
+              reviewedByUserId: u.id,
+            })),
+          }
+        : o
+    );
+    writeInsuranceOverlayState(overlay);
+    return NextResponse.json({ ok: true });
   }
 
   // --- Administrative Field Editing Branch ---
@@ -308,7 +367,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
   }
 
-  const org = await prisma.$transaction(async (tx) => {
+  const org = isIsolatedOrg
+    ? await (async () => {
+        const overlay = readInsuranceOverlayState();
+        let updatedIso: any = null;
+        overlay.isolatedOrganizations = overlay.isolatedOrganizations.map((o: any) => {
+          if (o.id !== id) return o;
+          updatedIso = {
+            ...o,
+            status: b.status,
+            isPublished: approved,
+            verifiedAt: approved ? now.toISOString() : null,
+            publishedAt: approved ? now.toISOString() : null,
+            rejectionReason:
+              b.status === "REJECTED" || b.status === "SUSPENDED"
+                ? String(b.reason || "İşlem nedeni belirtilmedi")
+                : null,
+          };
+          return updatedIso;
+        });
+        writeInsuranceOverlayState(overlay);
+        return updatedIso;
+      })()
+    : await prisma.$transaction(async (tx) => {
     const updatedOrg = await tx.organization.update({
       where: { id },
       data: {
@@ -358,6 +439,35 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return updatedOrg;
   });
 
+  if (targetOrg.type === "INSURANCE_COMPANY") {
+    if (approved) {
+      await linkApprovedInsurerOrganization({
+        organization: {
+          id: org.id,
+          name: org.name,
+          slug: org.slug,
+          city: org.city,
+          district: org.district,
+          address: org.address,
+          phone: org.phone,
+          website: org.website,
+          description: org.description,
+          verifiedAt: org.verifiedAt,
+        },
+        metadata: {
+          targetInsuranceProviderId: targetOrg.claimedInsurerId || null,
+          seddkLicenseRef: targetOrg.seddkLicenseRef || null,
+          tsbMemberCode: targetOrg.tsbMemberCode || null,
+          legalName: targetOrg.legalName || null,
+          claimsPhone: targetOrg.claimsPhone || null,
+          provisionPortalUrl: targetOrg.provisionPortalUrl || null,
+        },
+      });
+    } else if (b.status === "REJECTED" || b.status === "SUSPENDED" || b.status === "PENDING") {
+      await unlinkInsurerOrganization(org.id);
+    }
+  }
+
   const auditAction = claimDirId
     ? approved
       ? "organization.claim.approved"
@@ -366,7 +476,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       : `organization.${String(b.status).toLowerCase()}`
     : `organization.${String(b.status).toLowerCase()}`;
 
-  await audit({
+  await recordInsuranceAudit({
     actorUserId: u.id,
     action: auditAction,
     entityType: "Organization",

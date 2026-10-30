@@ -248,12 +248,13 @@
       "orgClinic": "Klinik",
       "orgPharmacy": "Eczane",
       "orgImaging": "Görüntüleme Merkezi",
-      "orgLab": "Tıbbi Laboratuvar"
+      "orgLab": "Tıbbi Laboratuvar",
+      "orgInsuranceCompany": "Sigorta Kurumu"
     },
     "businessApply": {
       "kicker": "Alumas Business",
       "title": "Kurumsal hesap oluştur veya sahiplen",
-      "subtitle": "Dizindeki mevcut kurumunuzu sahiplenin veya yeni hastane, klinik, eczane, görüntüleme merkezi ya da laboratuvar başvurusu oluşturun.",
+      "subtitle": "Dizindeki mevcut kurumunuzu sahiplenin veya yeni hastane, klinik, eczane, görüntüleme merkezi, laboratuvar ya da sigorta kurumu başvurusu oluşturun.",
       "modeNewInstitution": "Yeni Kurum Başvurusu",
       "modeClaimDirectory": "Dizindeki Kurumu Sahiplen",
       "verificationReviewNotice": "Başvuru veya sahiplenme talebi gönderildiğinde mavi ALUMAS doğrulama rozeti otomatik verilmez. Zorunlu belgeler yönetici tarafından incelenip onaylandıktan sonra kurum profili doğrulanmış olarak yayınlanır.",
@@ -276,6 +277,16 @@
       "tabPharmacy": "Eczane",
       "tabImaging": "Görüntüleme",
       "tabLab": "Laboratuvar",
+      "tabInsuranceCompany": "Sigorta Kurumu",
+      "insurerSectionTitle": "Sigorta Kurumu (SEDDK / TSB) ve Katalog Eşleştirme Bilgileri",
+      "claimCanonicalInsurerLabel": "Mevcut Katalog Sigorta Şirketini Sahiplen (Opsiyonel)",
+      "newInsurerRegistrationOption": "-- Yeni Sigorta Kurumu Kaydı (Katalog Dışı) --",
+      "alreadyClaimedShort": "Sahiplenilmiş",
+      "legalNameLabel": "Resmî Ticaret Unvanı",
+      "seddkLicenseRefLabel": "SEDDK Ruhsat / Sicil No",
+      "tsbMemberCodeLabel": "TSB Üye Kodu",
+      "claimsPhoneLabel": "Hasar & Provizyon Destek Hattı",
+      "provisionPortalUrlLabel": "Kurum Provizyon Portalı URL",
       "nameLabel": "Kurum adı",
       "namePlaceholder": "Örn: Alumas Görüntüleme Merkezi",
       "cityLabel": "Şehir",
@@ -801,7 +812,9 @@
         "FACILITY_LICENSE": "Ruhsat / faaliyet belgesi",
         "HEALTH_TOURISM_AUTHORIZATION": "Sağlık turizmi yetki belgesi",
         "TAX_CERTIFICATE": "Vergi levhası",
-        "TRADE_REGISTRY": "Ticaret sicil belgesi"
+        "TRADE_REGISTRY": "Ticaret sicil belgesi",
+        "SEDDK_LICENSE": "SEDDK Sigortacılık Faaliyet Ruhsatı",
+        "AUTHORIZATION_LETTER": "Kurumsal Temsil / İmza Sirküleri"
       }
     },
     "doctorProfileManager": {
@@ -1065,6 +1078,7 @@
       "typePharmacy": "Eczane",
       "typeImaging": "Görüntüleme Merkezi",
       "typeLab": "Tıbbi Laboratuvar",
+      "typeInsuranceCompany": "Sigorta Kurumu",
       "searchPlaceholder": "Kurum adı, şehir, ilçe, e-posta, telefon veya sahip ara...",
       "filterStatusAll": "Tüm Durumlar",
       "filterStatusPending": "Onay Bekleyenler",

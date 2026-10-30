@@ -193,6 +193,7 @@ CREATE TABLE "InsuranceProviderAgreement" (
   "organizationId" TEXT,
   "directoryInstitutionId" TEXT,
   "insuranceProviderId" TEXT NOT NULL,
+  "productType" "InsuranceProductType",
   "productId" TEXT,
   "networkId" TEXT,
   "coverageScope" "AgreementCoverageScope" NOT NULL DEFAULT 'ALL_BRANCHES',
@@ -217,24 +218,26 @@ CREATE TABLE "InsuranceProviderAgreement" (
   )
 );
 
--- Prevent duplicate agreements for the same (facility, insurer, product, network)
--- across both registered Organizations and external DirectoryInstitutions
+-- Prevent duplicate agreements for the same (facility, insurer, productType, product, network)
+-- across both registered Organizations and external DirectoryInstitutions using NULLS NOT DISTINCT
 CREATE UNIQUE INDEX "InsuranceProviderAgreement_org_insurer_prod_net_key"
   ON "InsuranceProviderAgreement" (
     "organizationId",
     "insuranceProviderId",
-    COALESCE("productId", '__ANY_PRODUCT__'),
-    COALESCE("networkId", '__ANY_NETWORK__')
-  )
+    "productType",
+    "productId",
+    "networkId"
+  ) NULLS NOT DISTINCT
   WHERE "organizationId" IS NOT NULL;
 
 CREATE UNIQUE INDEX "InsuranceProviderAgreement_dir_insurer_prod_net_key"
   ON "InsuranceProviderAgreement" (
     "directoryInstitutionId",
     "insuranceProviderId",
-    COALESCE("productId", '__ANY_PRODUCT__'),
-    COALESCE("networkId", '__ANY_NETWORK__')
-  )
+    "productType",
+    "productId",
+    "networkId"
+  ) NULLS NOT DISTINCT
   WHERE "directoryInstitutionId" IS NOT NULL;
 
 CREATE INDEX "InsuranceProviderAgreement_organizationId_insuranceProvider_idx"
@@ -316,6 +319,7 @@ ALTER TABLE "UserInsurancePreference"
   ADD COLUMN "includePublicSgk" BOOLEAN NOT NULL DEFAULT false,
   ADD COLUMN "isActive" BOOLEAN NOT NULL DEFAULT true;
 
+ALTER TABLE "UserInsurancePreference" DROP CONSTRAINT IF EXISTS "UserInsurancePreference_userId_insuranceProviderId_key";
 DROP INDEX IF EXISTS "UserInsurancePreference_userId_insuranceProviderId_key";
 
 CREATE INDEX "UserInsurancePreference_userId_insuranceProviderId_idx"

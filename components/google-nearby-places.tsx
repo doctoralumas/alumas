@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import InsuranceDiscoveryBar from "@/components/insurance/insurance-discovery-bar";
+import InsuranceEligibilityBadge from "@/components/insurance/insurance-eligibility-badge";
+import { usePatientInsurance } from "@/lib/use-patient-insurance";
+import type { InsuranceDiscoveryEligibilityState } from "@/lib/insurance-domain";
 import {
   Crosshair,
   MapPin,
@@ -17,6 +21,7 @@ import {
   Bed,
   Info,
   MagnifyingGlass,
+  ShieldCheck,
 } from "@phosphor-icons/react";
 
 type Place = {
@@ -31,6 +36,20 @@ type Place = {
   openNow?: boolean | null;
   distanceKm?: number | null;
   typeLabel?: string | null;
+  source?: "alumas_verified" | "alumas_directory" | "google_places" | string;
+  isVerified?: boolean;
+  primaryHref?: string | null;
+  insuranceMatch?: {
+    matched: boolean;
+    confirmed: boolean;
+    eligibilityState: InsuranceDiscoveryEligibilityState;
+    note?: string | null;
+    insuranceProviderId: string;
+    insurerName?: string | null;
+    insurerSlug?: string | null;
+    productType?: string | null;
+    networkId?: string | null;
+  } | null;
 };
 
 const CATEGORY_KEYS = [
@@ -65,6 +84,7 @@ export default function GoogleNearbyPlaces({
   isLoggedIn: boolean;
 }) {
   const t = useTranslations("search.nearby.component");
+  const { insurers, activePreference } = usePatientInsurance({ isLoggedIn });
 
   if (!isLoggedIn) {
     return (
@@ -113,7 +133,9 @@ export default function GoogleNearbyPlaces({
     );
   }
 
-  const initialCat = (CATEGORY_KEYS.includes(initial as CategoryKey) ? initial : "health") as CategoryKey;
+  const initialCat = (
+    CATEGORY_KEYS.includes(initial as CategoryKey) ? initial : "health"
+  ) as CategoryKey;
   const [category, setCategory] = useState<CategoryKey>(initialCat);
   const [ownership, setOwnership] = useState<"all" | "private" | "public">("all");
   const [rows, setRows] = useState<Place[]>([]);
@@ -123,10 +145,25 @@ export default function GoogleNearbyPlaces({
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [showSearchHere, setShowSearchHere] = useState(false);
 
+  const [selectedInsurerId, setSelectedInsurerId] = useState<string>("");
+  const [selectedProductType, setSelectedProductType] = useState<string>("");
+  const [selectedNetworkId, setSelectedNetworkId] = useState<string>("");
+  const [prioritizeInNetwork, setPrioritizeInNetwork] = useState<boolean>(true);
+  const [strictConfirmedOnly, setStrictConfirmedOnly] = useState<boolean>(false);
+  const [manualClear, setManualClear] = useState<boolean>(false);
+
   const [loading, setLoading] = useState(false);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+
+  useEffect(() => {
+    if (!manualClear && !selectedInsurerId && activePreference) {
+      setSelectedInsurerId(activePreference.insuranceProviderId);
+      setSelectedProductType(activePreference.productType || "");
+      setSelectedNetworkId(activePreference.networkId || "");
+    }
+  }, [activePreference, manualClear, selectedInsurerId]);
 
   useEffect(() => {
     try {
@@ -136,13 +173,18 @@ export default function GoogleNearbyPlaces({
         setPos(p);
         setSearchCenter(p);
       }
-    } catch (e) {}
+    } catch {}
   }, []);
 
   async function load(
     p: { lat: number; lng: number } | null = searchCenter || pos,
     c = category,
-    o = ownership
+    o = ownership,
+    insId = selectedInsurerId,
+    prodType = selectedProductType,
+    netId = selectedNetworkId,
+    prio = prioritizeInNetwork,
+    strict = strictConfirmedOnly
   ) {
     if (!p) return;
     setLoading(true);
@@ -151,7 +193,9 @@ export default function GoogleNearbyPlaces({
 
     setSearchCenter(p);
 
-    const cacheKey = `alumas_places_${p.lat.toFixed(3)}_${p.lng.toFixed(3)}_${c}_${o}`;
+    const cacheKey = `alumas_places_${p.lat.toFixed(3)}_${p.lng.toFixed(
+      3
+    )}_${c}_${o}_${insId}_${prodType}_${netId}_${prio ? 1 : 0}_${strict ? 1 : 0}`;
 
     try {
       const cached = sessionStorage.getItem(cacheKey);
@@ -162,18 +206,31 @@ export default function GoogleNearbyPlaces({
         setLoading(false);
         return;
       }
-    } catch (e) {}
+    } catch {}
 
     if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
       setStatus({ type: "api_key_missing" });
     }
 
     try {
-      const r = await fetch(
-        `/api/places/nearby?lat=${p.lat}&lng=${p.lng}&category=${c}&radius=8000${
-          o !== "all" ? "&ownership=" + o : ""
-        }`
-      );
+      const q = new URLSearchParams({
+        lat: String(p.lat),
+        lng: String(p.lng),
+        category: c,
+        radius: "8000",
+      });
+      if (o !== "all") q.set("ownership", o);
+      if (insId) {
+        const insurerObj = insurers.find((i) => i.id === insId || i.slug === insId);
+        q.set("insuranceProviderId", insurerObj?.id || insId);
+        if (insurerObj?.slug) q.set("insuranceSlug", insurerObj.slug);
+        if (prodType) q.set("productType", prodType);
+        if (netId) q.set("networkId", netId);
+        q.set("prioritizeInNetwork", prio ? "1" : "0");
+        if (strict) q.set("strictConfirmedOnly", "1");
+      }
+
+      const r = await fetch(`/api/places/nearby?${q}`);
       const j = await r.json();
       if (!r.ok) {
         setStatus({ type: "error", message: j.error });
@@ -186,8 +243,8 @@ export default function GoogleNearbyPlaces({
       setStatus({ type: "found", count: newRows.length });
       try {
         sessionStorage.setItem(cacheKey, JSON.stringify(newRows));
-      } catch (e) {}
-    } catch (err) {
+      } catch {}
+    } catch {
       setStatus({ type: "error" });
     } finally {
       setLoading(false);
@@ -205,7 +262,7 @@ export default function GoogleNearbyPlaces({
         const p = { lat: x.coords.latitude, lng: x.coords.longitude };
         try {
           sessionStorage.setItem("alumas_nearby_pos", JSON.stringify(p));
-        } catch (e) {}
+        } catch {}
         setPos(p);
         setSearchCenter(p);
         if (mapInstance.current) {
@@ -219,12 +276,40 @@ export default function GoogleNearbyPlaces({
   }
 
   useEffect(() => {
-    if (searchCenter || pos) load(searchCenter || pos, category, ownership);
-  }, [category, ownership]);
+    if (searchCenter || pos) {
+      load(
+        searchCenter || pos,
+        category,
+        ownership,
+        selectedInsurerId,
+        selectedProductType,
+        selectedNetworkId,
+        prioritizeInNetwork,
+        strictConfirmedOnly
+      );
+    }
+  }, [
+    category,
+    ownership,
+    selectedInsurerId,
+    selectedProductType,
+    selectedNetworkId,
+    prioritizeInNetwork,
+    strictConfirmedOnly,
+  ]);
 
   useEffect(() => {
     if (searchCenter && rows.length === 0 && !loading) {
-      load(searchCenter, category, ownership);
+      load(
+        searchCenter,
+        category,
+        ownership,
+        selectedInsurerId,
+        selectedProductType,
+        selectedNetworkId,
+        prioritizeInNetwork,
+        strictConfirmedOnly
+      );
     }
   }, [searchCenter]);
 
@@ -369,8 +454,41 @@ export default function GoogleNearbyPlaces({
     }
   })();
 
+  const activeInsurerName =
+    insurers.find((i) => i.id === selectedInsurerId || i.slug === selectedInsurerId)?.name || null;
+
   return (
     <>
+      {category !== "hotel" && (
+        <InsuranceDiscoveryBar
+          insurers={insurers}
+          selectedInsurerId={selectedInsurerId}
+          selectedProductType={selectedProductType}
+          selectedNetworkId={selectedNetworkId}
+          prioritizeInNetwork={prioritizeInNetwork}
+          strictConfirmedOnly={strictConfirmedOnly}
+          onSelectInsurer={(id) => {
+            setManualClear(!id);
+            setSelectedInsurerId(id);
+            setSelectedNetworkId("");
+          }}
+          onSelectProductType={(pt) => {
+            setSelectedProductType(pt);
+            setSelectedNetworkId("");
+          }}
+          onSelectNetwork={(net) => setSelectedNetworkId(net)}
+          onTogglePrioritize={(next) => setPrioritizeInNetwork(next)}
+          onToggleStrictConfirmed={(next) => setStrictConfirmedOnly(next)}
+          onClearFilter={() => {
+            setManualClear(true);
+            setSelectedInsurerId("");
+            setSelectedProductType("");
+            setSelectedNetworkId("");
+            setStrictConfirmedOnly(false);
+          }}
+        />
+      )}
+
       {/* Category Pills */}
       <div
         style={{
@@ -420,6 +538,7 @@ export default function GoogleNearbyPlaces({
         {/* Left Side: Locate Button + Status */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
           <button
+            data-testid="nearby-locate-button"
             onClick={locate}
             style={{
               padding: "10px 20px",
@@ -436,7 +555,8 @@ export default function GoogleNearbyPlaces({
               boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
             }}
           >
-            <Crosshair size={18} weight="bold" /> {pos ? t("goToMyLocation") : t("findLocation")}
+            <Crosshair size={18} weight="bold" />{" "}
+            {pos ? t("goToMyLocation") : t("findLocation")}
           </button>
           <span style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>
             {statusText}
@@ -580,139 +700,183 @@ export default function GoogleNearbyPlaces({
           marginBottom: "48px",
         }}
       >
-        {rows.map((x) => (
-          <div
-            key={x.id}
-            style={{
-              background: "#fff",
-              borderRadius: "24px",
-              border: "1px solid #e2e8f0",
-              padding: "24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-            }}
-            className="hover-shadow"
-          >
-            <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-              <div
-                style={{
-                  width: "56px",
-                  height: "56px",
-                  borderRadius: "16px",
-                  background: "#f8fafc",
-                  color: "#0f172a",
-                  border: "1px solid #e2e8f0",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {getCategoryIcon(category)}
-              </div>
-              <div style={{ flex: 1 }}>
-                <span
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    color: "#64748b",
-                    marginBottom: "4px",
-                    display: "block",
-                  }}
-                >
-                  {x.typeLabel || t(`categories.${category}`)}
-                </span>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: "17px",
-                    color: "#0f172a",
-                    fontWeight: 700,
-                    lineHeight: "1.3",
-                  }}
-                >
-                  {x.name}
-                </h3>
-              </div>
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>
-                {x.address}
-              </p>
-            </div>
-
+        {rows.map((x) => {
+          const isExternalGoogle = x.source === "google_places" || !x.source;
+          return (
             <div
+              key={x.id}
+              data-testid={`nearby-place-card-${x.id}`}
               style={{
+                background: "#fff",
+                borderRadius: "24px",
+                border:
+                  x.insuranceMatch?.eligibilityState === "CONFIRMED_MATCH"
+                    ? "2px solid #10b981"
+                    : x.isVerified
+                    ? "1px solid #bfdbfe"
+                    : "1px solid #e2e8f0",
+                padding: "24px",
                 display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                flexWrap: "wrap",
-                padding: "12px",
-                background: "#f8fafc",
-                borderRadius: "12px",
+                flexDirection: "column",
+                gap: "16px",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
               }}
+              className="hover-shadow"
             >
-              {x.distanceKm != null && (
-                <div style={{ fontSize: "13px", fontWeight: 600, color: "#0f172a" }}>
-                  {x.distanceKm.toFixed(1)} km
-                </div>
-              )}
-              {x.rating != null && (
+              <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                 <div
                   style={{
+                    width: "56px",
+                    height: "56px",
+                    borderRadius: "16px",
+                    background: "#f8fafc",
+                    color: "#0f172a",
+                    border: "1px solid #e2e8f0",
                     display: "flex",
                     alignItems: "center",
-                    gap: "4px",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    color: "#f59e0b",
+                    justifyContent: "center",
                   }}
                 >
-                  <Star size={16} weight="fill" /> {x.rating.toFixed(1)} (
-                  {x.userRatingCount || 0})
+                  {getCategoryIcon(category)}
                 </div>
-              )}
-              {x.openNow === true && (
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "#16a34a" }}>
-                  {t("openNow")}
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      flexWrap: "wrap",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                        color: "#64748b",
+                      }}
+                    >
+                      {x.typeLabel || t(`categories.${category}`)}
+                    </span>
+                    {x.isVerified && (
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "3px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          color: "#2563eb",
+                          background: "#eff6ff",
+                          padding: "2px 8px",
+                          borderRadius: "100px",
+                        }}
+                      >
+                        <ShieldCheck size={13} weight="fill" /> ALUMAS
+                      </span>
+                    )}
+                  </div>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: "17px",
+                      color: "#0f172a",
+                      fontWeight: 700,
+                      lineHeight: "1.3",
+                    }}
+                  >
+                    {x.name}
+                  </h3>
                 </div>
-              )}
-              {x.openNow === false && (
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "#dc2626" }}>
-                  {t("closedNow")}
-                </div>
-              )}
-            </div>
+              </div>
 
-            {x.mapsUrl && (
-              <a
-                href={x.mapsUrl}
-                target="_blank"
-                rel="noreferrer"
+              {x.insuranceMatch && (
+                <InsuranceEligibilityBadge
+                  eligibilityState={x.insuranceMatch.eligibilityState}
+                  insurerName={x.insuranceMatch.insurerName || activeInsurerName}
+                  productType={x.insuranceMatch.productType || selectedProductType || null}
+                  note={x.insuranceMatch.note}
+                  isExternalGooglePlace={isExternalGoogle}
+                />
+              )}
+
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>
+                  {x.address}
+                </p>
+              </div>
+
+              <div
                 style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: "12px",
-                  background: "#0f172a",
-                  color: "#fff",
-                  textDecoration: "none",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  fontWeight: 600,
-                  fontSize: "14px",
+                  gap: "12px",
+                  flexWrap: "wrap",
+                  padding: "12px",
+                  background: "#f8fafc",
+                  borderRadius: "12px",
                 }}
               >
-                {t("openInGoogleMaps")} <NavigationArrow size={16} weight="bold" />
-              </a>
-            )}
-          </div>
-        ))}
+                {x.distanceKm != null && (
+                  <div style={{ fontSize: "13px", fontWeight: 600, color: "#0f172a" }}>
+                    {x.distanceKm.toFixed(1)} km
+                  </div>
+                )}
+                {x.rating != null && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "#f59e0b",
+                    }}
+                  >
+                    <Star size={16} weight="fill" /> {x.rating.toFixed(1)} (
+                    {x.userRatingCount || 0})
+                  </div>
+                )}
+                {x.openNow === true && (
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#16a34a" }}>
+                    {t("openNow")}
+                  </div>
+                )}
+                {x.openNow === false && (
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#dc2626" }}>
+                    {t("closedNow")}
+                  </div>
+                )}
+              </div>
+
+              {x.mapsUrl && (
+                <a
+                  href={x.mapsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    borderRadius: "12px",
+                    background: "#0f172a",
+                    color: "#fff",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    fontWeight: 600,
+                    fontSize: "14px",
+                  }}
+                >
+                  {t("openInGoogleMaps")} <NavigationArrow size={16} weight="bold" />
+                </a>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {rows.length > 0 && (

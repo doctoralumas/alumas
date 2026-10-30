@@ -13,10 +13,11 @@ import { Buildings } from "@phosphor-icons/react/dist/ssr";
 export default async function Apply({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; claimDirectoryId?: string }>;
+  searchParams: Promise<{ type?: string; claimDirectoryId?: string; claimInsurerSlug?: string }>;
 }) {
-  const { type, claimDirectoryId } = await searchParams;
+  const { type, claimDirectoryId, claimInsurerSlug } = await searchParams;
   const safeClaimId = sanitizeClaimDirectoryId(claimDirectoryId);
+  const safeClaimInsurerSlug = String(claimInsurerSlug || "").trim() || undefined;
   const t = await getTranslations("professional.businessApply");
 
   const targetRecord = safeClaimId
@@ -61,11 +62,14 @@ export default async function Apply({
     PHARMACY: t("tabPharmacy"),
     IMAGING_CENTER: t("tabImaging"),
     LABORATORY: t("tabLab"),
+    INSURANCE_COMPANY: t("tabInsuranceCompany"),
   };
 
   if (!user) {
     const returnPath = safeClaimId
       ? `/business/apply?claimDirectoryId=${encodeURIComponent(safeClaimId)}`
+      : safeClaimInsurerSlug
+      ? `/business/apply?type=INSURANCE_COMPANY&claimInsurerSlug=${encodeURIComponent(safeClaimInsurerSlug)}`
       : type
       ? `/business/apply?type=${encodeURIComponent(type)}`
       : "/business/apply";
@@ -449,8 +453,9 @@ export default async function Apply({
         }}
       >
         <BusinessApplicationForm
-          initialType={claimInstitution?.type || type}
+          initialType={claimInstitution?.type || (safeClaimInsurerSlug ? "INSURANCE_COMPANY" : type)}
           initialClaimDirectoryId={safeClaimId || undefined}
+          initialClaimInsurerSlug={safeClaimInsurerSlug}
           initialClaimInstitution={claimInstitution}
           claimLookupFailed={claimLookupFailed}
           hasExistingOwnedOrgs={hasExistingOwnedOrgs}

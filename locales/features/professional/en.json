@@ -248,12 +248,13 @@
       "orgClinic": "Clinic",
       "orgPharmacy": "Pharmacy",
       "orgImaging": "Imaging Center",
-      "orgLab": "Medical Laboratory"
+      "orgLab": "Medical Laboratory",
+      "orgInsuranceCompany": "Insurance Company"
     },
     "businessApply": {
       "kicker": "Alumas Business",
       "title": "Create or Claim Facility Account",
-      "subtitle": "Claim your existing institution from our healthcare directory or submit a new hospital, clinic, pharmacy, imaging center, or medical laboratory application.",
+      "subtitle": "Claim your existing institution from our healthcare directory or submit a new hospital, clinic, pharmacy, imaging center, medical laboratory, or insurance company application.",
       "modeNewInstitution": "New Institution Application",
       "modeClaimDirectory": "Claim Directory Institution",
       "verificationReviewNotice": "Submitting an application or ownership claim does not automatically grant the blue ALUMAS verification badge. Your institution profile is published as verified only after mandatory documents are reviewed and approved by an administrator.",
@@ -276,6 +277,16 @@
       "tabPharmacy": "Pharmacy",
       "tabImaging": "Imaging",
       "tabLab": "Laboratory",
+      "tabInsuranceCompany": "Insurance Company",
+      "insurerSectionTitle": "Insurance Company (SEDDK / TSB) & Catalog Claim Details",
+      "claimCanonicalInsurerLabel": "Claim Existing Catalog Insurance Provider (Optional)",
+      "newInsurerRegistrationOption": "-- Register New Insurance Company (Not in Catalog) --",
+      "alreadyClaimedShort": "Already Claimed",
+      "legalNameLabel": "Official Corporate Legal Name",
+      "seddkLicenseRefLabel": "SEDDK License Reference",
+      "tsbMemberCodeLabel": "TSB Member Code",
+      "claimsPhoneLabel": "Claims & Provision Hotline",
+      "provisionPortalUrlLabel": "Provider Provision Portal URL",
       "nameLabel": "Facility Name",
       "namePlaceholder": "e.g. Alumas Imaging Center",
       "cityLabel": "City",
@@ -801,7 +812,9 @@
         "FACILITY_LICENSE": "Facility Operating License",
         "HEALTH_TOURISM_AUTHORIZATION": "Health Tourism Authorization Certificate",
         "TAX_CERTIFICATE": "Tax Registration Certificate",
-        "TRADE_REGISTRY": "Trade Registry Gazette"
+        "TRADE_REGISTRY": "Trade Registry Gazette",
+        "SEDDK_LICENSE": "SEDDK Insurance Operating License",
+        "AUTHORIZATION_LETTER": "Corporate Authorization & Signature Circular"
       }
     },
     "doctorProfileManager": {
@@ -1065,6 +1078,7 @@
       "typePharmacy": "Pharmacy",
       "typeImaging": "Imaging Center",
       "typeLab": "Medical Laboratory",
+      "typeInsuranceCompany": "Insurance Company",
       "searchPlaceholder": "Search by facility name, city, district, email, phone, or owner...",
       "filterStatusAll": "All Statuses",
       "filterStatusPending": "Pending Approval",

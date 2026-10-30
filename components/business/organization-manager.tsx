@@ -12,6 +12,7 @@ import {
 } from "@/lib/organization-capabilities";
 import ResultDelivery from "@/components/business/result-delivery";
 import HomeVisitQueue from "@/components/business/home-visit-queue";
+import ProviderAgreementManager from "@/components/business/provider-agreement-manager";
 import VerificationDocumentManager from "@/components/verification-document-manager";
 import {
   MapPin,
@@ -1032,50 +1033,10 @@ export default function OrganizationManager({ org, globalInsurances = [] }: Prop
             <CaretDown size={20} className="premium-chevron" />
           </summary>
           <div className="premium-accordion-content">
-            <form className="responsive-form-grid" onSubmit={addInsurance}>
-              <div className="responsive-form-field">
-                <label>{t("selectInsuranceLabel")}</label>
-                <select 
-                  value={insuranceForm.providerId} 
-                  onChange={(e) => setInsuranceForm({ ...insuranceForm, providerId: e.target.value })}
-                  required
-                >
-                  <option value="">{t("selectInsurancePlaceholder")}</option>
-                  {globalInsurances.map((ins: any) => (
-                    <option key={ins.id} value={ins.id}>{ins.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="responsive-form-field">
-                <label>{t("insuranceNoteLabel")}</label>
-                <input 
-                  placeholder={t("insuranceNotePlaceholder")}
-                  value={insuranceForm.note}
-                  onChange={(e) => setInsuranceForm({ ...insuranceForm, note: e.target.value })}
-                />
-              </div>
-              <div style={{ gridColumn: "1 / -1" }}>
-                <button className="primary" style={{ height: "46px", width: "100%" }}>{t("addInsuranceBtn")}</button>
-              </div>
-            </form>
-
-            {insuranceContracts.length > 0 && (
-              <div className="premium-card-list" style={{ marginTop: "20px" }}>
-                {insuranceContracts.map((contract: any) => (
-                  <div key={contract.insuranceProviderId} className="premium-card-item">
-                    <div>
-                      <b style={{ fontSize: "16px", color: "#0f172a" }}>{contract.insuranceProvider?.name}</b>
-                      {contract.note && <div style={{ color: "#64748b", fontSize: "14px", marginTop: "4px" }}>{contract.note}</div>}
-                    </div>
-                    <div className="premium-card-item-actions">
-                      <button type="button" className="secondary danger" onClick={() => removeInsurance(contract.insuranceProviderId)}>
-                        <Trash size={16} /> {t("cancelContractBtn")}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <ProviderAgreementManager
+              organizationId={org.id}
+              initialInsurers={globalInsurances}
+            />
           </div>
         </details>
       )}

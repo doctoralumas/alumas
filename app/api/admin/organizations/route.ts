@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { withdrawExpiredCredentials } from "@/lib/verification-documents";
 import { isOrganizationVerifiedByAlumas } from "@/lib/institution-directory";
+import { loadFullInsuranceEcosystemState } from "@/lib/insurance-ecosystem-store";
 
 export async function GET(req: Request) {
   const auth = await requireAdmin();
@@ -24,7 +25,14 @@ export async function GET(req: Request) {
     const validStatuses = ["PENDING", "APPROVED", "REJECTED", "SUSPENDED"] as const;
     const status = validStatuses.find((s) => s === requestedStatus);
 
-    const validTypes = ["HOSPITAL", "CLINIC", "PHARMACY", "IMAGING_CENTER", "LABORATORY"] as const;
+    const validTypes = [
+      "HOSPITAL",
+      "CLINIC",
+      "PHARMACY",
+      "IMAGING_CENTER",
+      "LABORATORY",
+      "INSURANCE_COMPANY",
+    ] as const;
     const orgType = validTypes.find((t) => t === requestedType);
 
     const where: any = {};
@@ -206,11 +214,52 @@ export async function GET(req: Request) {
       }
     }
 
-    const enriched = rows.map((row) => ({
-      ...row,
-      isVerified: isOrganizationVerifiedByAlumas(row),
-      claim: claimByOrgId.get(row.id) || null,
-    }));
+    const eco = await loadFullInsuranceEcosystemState({ includeHidden: true });
+    const isoMatching = eco.isolatedOrganizations
+      .filter((o: any) => {
+        if (status && o.status !== status) return false;
+        if (orgType && o.type !== orgType) return false;
+        if (
+          requestedCity &&
+          requestedCity !== "all" &&
+          !String(o.city || "").toLowerCase().includes(requestedCity.toLowerCase())
+        ) {
+          return false;
+        }
+        if (q) {
+          const hay = [o.name, o.city, o.district, o.address, o.email, o.phone]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+          if (!hay.includes(q.toLowerCase())) return false;
+        }
+        return true;
+      })
+      .map((o: any) => ({
+        ...o,
+        _count: o._count || { doctors: 0, services: 0, reviews: 0, appointments: 0 },
+        isVerified: isOrganizationVerifiedByAlumas(o),
+        claim: o.claimedInsurerId
+          ? {
+              isDirectoryClaim: true,
+              directoryInstitutionId: o.claimedInsurerId,
+              directoryInstitutionName: o.legalName || o.name,
+              applicantRoleTitle: o.applicantRoleTitle || null,
+              applicantNote: o.applicantNote || null,
+              reviewedByUserId: null,
+              reviewedAt: null,
+            }
+          : null,
+      }));
+
+    const enriched = [
+      ...isoMatching,
+      ...rows.map((row) => ({
+        ...row,
+        isVerified: isOrganizationVerifiedByAlumas(row),
+        claim: claimByOrgId.get(row.id) || null,
+      })),
+    ];
 
     if (format === "array") {
       return NextResponse.json(enriched);

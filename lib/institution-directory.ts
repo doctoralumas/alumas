@@ -6,6 +6,13 @@ import {
   type DirectoryOrganizationType,
 } from "@/lib/directory-fixtures";
 import { missingRequiredDocuments } from "@/lib/verification-requirements";
+import {
+  evaluateFacilityInsuranceCoverage,
+  filterAndRankByInsuranceDiscovery,
+  type FacilityInsuranceMatchResult,
+  type InsuranceAgreementRecord,
+  type LegacyOrganizationInsuranceRecord,
+} from "@/lib/insurance-domain";
 
 export type VerificationState =
   | "VERIFIED"
@@ -61,6 +68,13 @@ export interface NormalizedDirectoryItem {
   services: NamedOffer[];
   imagingExams: NamedOffer[];
   laboratoryTests: NamedOffer[];
+  insuranceMatch?: (FacilityInsuranceMatchResult & {
+    insuranceProviderId: string;
+    insurerName?: string | null;
+    insurerSlug?: string | null;
+    productType?: string | null;
+    networkId?: string | null;
+  }) | null;
 }
 
 export const ORG_TYPE_MAP: Record<string, DirectoryOrganizationType> = {
@@ -183,6 +197,18 @@ export interface DirectoryBuildOptions {
   lat?: number | null;
   lng?: number | null;
   now?: Date;
+  insuranceProviderId?: string | null;
+  insuranceSlug?: string | null;
+  productType?: string | null;
+  productId?: string | null;
+  networkId?: string | null;
+  specialtyCode?: string | null;
+  strictConfirmedOnly?: boolean;
+  prioritizeInNetwork?: boolean;
+  excludeInsuranceCompanies?: boolean;
+  agreements?: InsuranceAgreementRecord[];
+  legacyContracts?: LegacyOrganizationInsuranceRecord[];
+  insurers?: Array<{ id: string; slug: string; name?: string }>;
 }
 
 /**
@@ -332,15 +358,35 @@ export function buildNormalizedDirectoryItems(
     );
   }
 
-  // 3. Apply filtering (type, city, onDuty, q)
+  // 3. Apply filtering (type, city, onDuty, q, and physical facility isolation)
   const filterType = options.type ? ORG_TYPE_MAP[options.type.toUpperCase()] || null : null;
   const filterCity = options.city ? normalizeTextKey(options.city) : null;
   const filterQ = options.q ? normalizeTextKey(options.q) : null;
   const filterQRaw = options.q ? options.q.trim().toLocaleLowerCase("tr-TR") : null;
   const filterOnDuty = Boolean(options.onDuty);
   const filterUnclaimedOnly = Boolean(options.unclaimedOnly);
+  const shouldExcludeInsurers =
+    options.excludeInsuranceCompanies ?? (filterType !== "INSURANCE_COMPANY");
+
+  // Resolve requested insurer identity for insurance-aware discovery
+  const insurersList = options.insurers || [];
+  let resolvedInsurer: { id: string; slug: string; name?: string } | null = null;
+  if (options.insuranceProviderId) {
+    resolvedInsurer =
+      insurersList.find((i) => i.id === options.insuranceProviderId) || {
+        id: options.insuranceProviderId,
+        slug: options.insuranceSlug || options.insuranceProviderId,
+      };
+  } else if (options.insuranceSlug) {
+    resolvedInsurer =
+      insurersList.find((i) => i.slug === options.insuranceSlug) || {
+        id: options.insuranceSlug,
+        slug: options.insuranceSlug,
+      };
+  }
 
   let filtered = items.filter((item) => {
+    if (shouldExcludeInsurers && item.type === "INSURANCE_COMPANY") return false;
     if (filterUnclaimedOnly && (item.isVerified || !item.canClaim)) return false;
     if (filterType && item.type !== filterType) return false;
     if (filterCity && normalizeTextKey(item.city) !== filterCity) return false;
@@ -365,10 +411,45 @@ export function buildNormalizedDirectoryItems(
     return true;
   });
 
-  // 4. Sorting:
+  // 3b. Evaluate insurance eligibility when an insurer preference/filter is provided
+  if (resolvedInsurer) {
+    const agreements = options.agreements || [];
+    const legacyContracts = options.legacyContracts || [];
+    filtered = filtered.map((item) => {
+      if (item.type === "INSURANCE_COMPANY") {
+        return { ...item, insuranceMatch: null };
+      }
+      const match = evaluateFacilityInsuranceCoverage({
+        organizationId: item.organizationId,
+        directoryInstitutionId: item.directoryId,
+        insuranceProviderId: resolvedInsurer!.id,
+        productType: options.productType,
+        productId: options.productId,
+        networkId: options.networkId,
+        specialtyCode: options.specialtyCode,
+        agreements,
+        legacyContracts,
+        now,
+      });
+      return {
+        ...item,
+        insuranceMatch: {
+          ...match,
+          insuranceProviderId: resolvedInsurer!.id,
+          insurerName: resolvedInsurer!.name || null,
+          insurerSlug: resolvedInsurer!.slug || null,
+          productType: options.productType || null,
+          networkId: options.networkId || null,
+        },
+      };
+    });
+  }
+
+  // 4. Sorting & Optional Strict Insurance Filtering:
   // If user coordinates are provided, sort by distance ascending.
   // Otherwise, sort Verified ALUMAS institutions first (by verifiedAt desc, name asc),
   // followed by external directory institutions (by name asc).
+  // When prioritizeInNetwork or strictConfirmedOnly is active with an insurer, apply insurance-aware ranking/filtering.
   const hasGeo =
     options.lat != null &&
     options.lng != null &&
@@ -386,6 +467,14 @@ export function buildNormalizedDirectoryItems(
         if (tA !== tB) return tB - tA;
       }
       return a.name.localeCompare(b.name, "tr-TR");
+    });
+  }
+
+  if (resolvedInsurer && (options.strictConfirmedOnly || options.prioritizeInNetwork)) {
+    filtered = filterAndRankByInsuranceDiscovery(filtered, {
+      strictConfirmedOnly: Boolean(options.strictConfirmedOnly),
+      prioritizeInNetwork: Boolean(options.prioritizeInNetwork),
+      hasGeo,
     });
   }
 
@@ -638,13 +727,85 @@ export async function findDirectoryInstitutionByIdOrSlug(
   );
 }
 
+export async function loadInsuranceDiscoveryData(): Promise<{
+  insurers: Array<{ id: string; slug: string; name: string }>;
+  agreements: InsuranceAgreementRecord[];
+  legacyContracts: LegacyOrganizationInsuranceRecord[];
+}> {
+  try {
+    const { loadFullInsuranceEcosystemState } = await import("@/lib/insurance-ecosystem-store");
+    const [ecosystem, legacyContracts] = await Promise.all([
+      loadFullInsuranceEcosystemState(),
+      prisma.organizationInsurance
+        .findMany({
+          where: { isActive: true },
+          select: {
+            id: true,
+            organizationId: true,
+            insuranceProviderId: true,
+            isActive: true,
+            note: true,
+          },
+        })
+        .catch(() => []),
+    ]);
+
+    return {
+      insurers: ecosystem.insurers
+        .filter((i) => i.isActive)
+        .map((i) => ({ id: i.id, slug: i.slug, name: i.name })),
+      agreements: ecosystem.agreements.filter((a) => a.isActive) as InsuranceAgreementRecord[],
+      legacyContracts,
+    };
+  } catch {
+    const [insurers, legacyContracts, agreements] = await Promise.all([
+      prisma.insuranceProvider
+        .findMany({
+          where: { isActive: true },
+          select: { id: true, slug: true, name: true },
+        })
+        .catch(() => []),
+      prisma.organizationInsurance
+        .findMany({
+          where: { isActive: true },
+          select: {
+            id: true,
+            organizationId: true,
+            insuranceProviderId: true,
+            isActive: true,
+            note: true,
+          },
+        })
+        .catch(() => []),
+      prisma.insuranceProviderAgreement
+        .findMany({
+          where: { isActive: true },
+          include: {
+            specialtyRules: true,
+            product: { select: { id: true, code: true, slug: true, name: true, productType: true } },
+            network: { select: { id: true, code: true, slug: true, name: true, tierLabel: true } },
+          },
+        })
+        .catch(() => [] as any[]),
+    ]);
+
+    return {
+      insurers,
+      agreements: agreements as InsuranceAgreementRecord[],
+      legacyContracts,
+    };
+  }
+}
+
 /**
  * Full server-side query returning normalized directory items for `/api/organizations`.
  */
 export async function queryNormalizedDirectory(
   options: DirectoryBuildOptions = {}
 ): Promise<NormalizedDirectoryItem[]> {
-  const [directoryRecords, organizations] = await Promise.all([
+  const needsInsurance = Boolean(options.insuranceProviderId || options.insuranceSlug);
+
+  const [directoryRecords, organizations, insuranceData] = await Promise.all([
     loadDirectoryInstitutionRecords(),
     prisma.organization.findMany({
       include: {
@@ -657,7 +818,15 @@ export async function queryNormalizedDirectory(
       },
       orderBy: [{ verifiedAt: "desc" }, { name: "asc" }],
     }),
+    needsInsurance
+      ? loadInsuranceDiscoveryData()
+      : Promise.resolve({ insurers: [], agreements: [], legacyContracts: [] }),
   ]);
 
-  return buildNormalizedDirectoryItems(directoryRecords, organizations, options);
+  return buildNormalizedDirectoryItems(directoryRecords, organizations, {
+    ...options,
+    insurers: options.insurers || insuranceData.insurers,
+    agreements: options.agreements || insuranceData.agreements,
+    legacyContracts: options.legacyContracts || insuranceData.legacyContracts,
+  });
 }

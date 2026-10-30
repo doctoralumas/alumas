@@ -9,6 +9,10 @@ import { currentUser } from "@/lib/auth";
 import { isOrganizationVerifiedByAlumas } from "@/lib/institution-directory";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
 import {
+  findEnrichedInsurer,
+  loadFullInsuranceEcosystemState,
+} from "@/lib/insurance-ecosystem-store";
+import {
   MapPin,
   Phone,
   Globe,
@@ -39,7 +43,7 @@ export default async function OrganizationProfile({
   const tDisc = await getTranslations("discovery");
   const locale = await getLocale();
 
-  const o = await prisma.organization.findFirst({
+  const dbOrg = await prisma.organization.findFirst({
     where: {
       slug,
       status: "APPROVED",
@@ -68,7 +72,42 @@ export default async function OrganizationProfile({
     },
   });
 
+  let o = dbOrg;
+  if (!o) {
+    const eco = await loadFullInsuranceEcosystemState();
+    const isoOrg = eco.isolatedOrganizations.find(
+      (item: any) =>
+        item.slug === slug && item.status === "APPROVED" && item.isPublished !== false
+    );
+    if (isoOrg) {
+      o = {
+        ...isoOrg,
+        services: [],
+        hours: [],
+        departments: [],
+        campaigns: [],
+        emergencyServices: [],
+        doctors: [],
+        imagingExams: [],
+        laboratoryTests: [],
+        stocks: [],
+        reviews: [],
+        insuranceContracts: [],
+      } as unknown as NonNullable<typeof dbOrg>;
+    }
+  }
+
   if (!o) notFound();
+  const isInsurerOrg = o.type === "INSURANCE_COMPANY";
+  const linkedInsurerData = isInsurerOrg
+    ? await (async () => {
+        const eco = await loadFullInsuranceEcosystemState();
+        const byOrg = eco.insurers.find(
+          (ins) => ins.organizationId === o.id || ins.slug === o.slug
+        );
+        return byOrg ? findEnrichedInsurer(byOrg.slug) : null;
+      })()
+    : null;
   const isVerified = isOrganizationVerifiedByAlumas(o);
   const safeWebsite = normalizeOfficialWebsiteUrl(o.website);
   const u = await currentUser();
@@ -315,7 +354,7 @@ export default async function OrganizationProfile({
         </div>
       </div>
 
-      {o.type !== "PHARMACY" && o.doctors.length > 0 && (
+      {!isInsurerOrg && o.type !== "PHARMACY" && o.doctors.length > 0 && (
         <div style={{ marginBottom: "32px" }}>
           <OrganizationBooking organizationId={o.id} />
         </div>
@@ -366,72 +405,127 @@ export default async function OrganizationProfile({
             </div>
           </div>
 
-          <div
-            style={{
-              background: "#ffffff",
-              borderRadius: "24px",
-              border: "1px solid #e2e8f0",
-              overflow: "hidden",
-            }}
-          >
+          {isInsurerOrg && linkedInsurerData && (
             <div
+              data-testid="insurer-org-corporate-card"
               style={{
+                background: "#ffffff",
+                borderRadius: "24px",
+                border: "1px solid #e2e8f0",
                 padding: "24px",
-                borderBottom: "1px solid #e2e8f0",
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
               }}
             >
-              <div style={{ background: "#f8fafc", padding: "10px", borderRadius: "12px" }}>
-                <Clock size={24} color="#64748b" weight="duotone" />
-              </div>
-              <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>
-                {t("workingHours")}
+              <h2 style={{ margin: "0 0 12px", fontSize: "19px", color: "#0f172a" }}>
+                Kurumsal Sigorta Yetki & Lisans Bilgileri
               </h2>
+              <div style={{ display: "grid", gap: "10px", fontSize: "14px", color: "#334155" }}>
+                <div>
+                  <strong>Resmi Ünvan:</strong>{" "}
+                  {linkedInsurerData.insurer.legalName || o.name}
+                </div>
+                <div>
+                  <strong>SEDDK Ruhsat Ref:</strong>{" "}
+                  {linkedInsurerData.insurer.seddkLicenseRef || "—"}
+                </div>
+                <div>
+                  <strong>TSB Üye Kodu:</strong>{" "}
+                  {linkedInsurerData.insurer.tsbMemberCode || "—"}
+                </div>
+                <div>
+                  <strong>Provizyon / Hasar Hattı:</strong>{" "}
+                  {linkedInsurerData.insurer.claimsPhone || o.phone || "—"}
+                </div>
+              </div>
+              <div style={{ marginTop: "16px" }}>
+                <Link
+                  href={`/insurance/${encodeURIComponent(linkedInsurerData.insurer.slug)}`}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "10px 14px",
+                    borderRadius: "10px",
+                    background: "#0d9488",
+                    color: "#ffffff",
+                    fontWeight: 700,
+                    fontSize: "13px",
+                    textDecoration: "none",
+                  }}
+                >
+                  Sigorta Ürünleri, Ağlar & Anlaşmalı Kurumlar Sayfası →
+                </Link>
+              </div>
             </div>
+          )}
+
+          {!isInsurerOrg && (
             <div
               style={{
-                padding: "24px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
+                background: "#ffffff",
+                borderRadius: "24px",
+                border: "1px solid #e2e8f0",
+                overflow: "hidden",
               }}
             >
-              {DAY_KEYS.map((dayKey, i) => {
-                const h = o.hours.find((x) => x.weekday === i);
-                const isClosed = !h || h.isClosed;
-                return (
-                  <div
-                    key={dayKey}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      paddingBottom: "16px",
-                      borderBottom: i !== 6 ? "1px dashed #e2e8f0" : "none",
-                    }}
-                  >
-                    <b style={{ color: isClosed ? "#94a3b8" : "#0f172a", fontWeight: 600 }}>
-                      {t(`days.${dayKey}`)}
-                    </b>
-                    <span
+              <div
+                style={{
+                  padding: "24px",
+                  borderBottom: "1px solid #e2e8f0",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+              >
+                <div style={{ background: "#f8fafc", padding: "10px", borderRadius: "12px" }}>
+                  <Clock size={24} color="#64748b" weight="duotone" />
+                </div>
+                <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>
+                  {t("workingHours")}
+                </h2>
+              </div>
+              <div
+                style={{
+                  padding: "24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                }}
+              >
+                {DAY_KEYS.map((dayKey, i) => {
+                  const h = o.hours.find((x: any) => x.weekday === i);
+                  const isClosed = !h || h.isClosed;
+                  return (
+                    <div
+                      key={dayKey}
                       style={{
-                        background: isClosed ? "#f1f5f9" : "#f0fdf4",
-                        color: isClosed ? "#64748b" : "#16a34a",
-                        padding: "4px 12px",
-                        borderRadius: "100px",
-                        fontSize: "14px",
-                        fontWeight: 600,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        paddingBottom: "16px",
+                        borderBottom: i !== 6 ? "1px dashed #e2e8f0" : "none",
                       }}
                     >
-                      {isClosed ? t("closed") : `${h.opensAt} – ${h.closesAt}`}
-                    </span>
-                  </div>
-                );
-              })}
+                      <b style={{ color: isClosed ? "#94a3b8" : "#0f172a", fontWeight: 600 }}>
+                        {t(`days.${dayKey}`)}
+                      </b>
+                      <span
+                        style={{
+                          background: isClosed ? "#f1f5f9" : "#f0fdf4",
+                          color: isClosed ? "#64748b" : "#16a34a",
+                          padding: "4px 12px",
+                          borderRadius: "100px",
+                          fontSize: "14px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {isClosed ? t("closed") : `${h.opensAt} – ${h.closesAt}`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Pharmacy On Duty Alert */}
           {o.type === "PHARMACY" && o.isOnDuty && (
@@ -920,7 +1014,7 @@ export default async function OrganizationProfile({
       )}
 
       {/* Doctors */}
-      {o.doctors.length > 0 && (
+      {!isInsurerOrg && o.doctors.length > 0 && (
         <div style={{ marginTop: "48px" }}>
           <div
             style={{

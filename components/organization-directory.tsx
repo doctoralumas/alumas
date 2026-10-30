@@ -1,6 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import InteractiveOrganizationMap from "@/components/interactive-organization-map";
+import InsuranceDiscoveryBar from "@/components/insurance/insurance-discovery-bar";
+import InsuranceEligibilityBadge from "@/components/insurance/insurance-eligibility-badge";
+import { usePatientInsurance } from "@/lib/use-patient-insurance";
+import type { InsuranceDiscoveryEligibilityState } from "@/lib/insurance-domain";
 import {
   MagnifyingGlass,
   NavigationArrow,
@@ -28,7 +33,7 @@ type Org = {
   directoryId?: string | null;
   organizationId?: string | null;
   slug: string;
-  type: "HOSPITAL" | "CLINIC" | "PHARMACY" | "IMAGING_CENTER" | "LABORATORY";
+  type: "HOSPITAL" | "CLINIC" | "PHARMACY" | "IMAGING_CENTER" | "LABORATORY" | "INSURANCE_COMPANY";
   name: string;
   city: string;
   district?: string | null;
@@ -42,7 +47,7 @@ type Org = {
   isOnDuty?: boolean;
   onDutyUntil?: string | null;
   isVerified?: boolean;
-  verificationState?: "VERIFIED" | "PENDING_CLAIM" | "UNVERIFIED";
+  verificationState?: "VERIFIED" | "PENDING_CLAIM" | "UNVERIFIED" | "UNREGISTERED";
   navigationMode?: "INTERNAL" | "EXTERNAL" | "NONE";
   primaryHref?: string | null;
   isExternalDestination?: boolean;
@@ -53,10 +58,23 @@ type Org = {
   services?: Named[];
   imagingExams?: Named[];
   laboratoryTests?: Named[];
+  insuranceMatch?: {
+    matched: boolean;
+    confirmed: boolean;
+    eligibilityState: InsuranceDiscoveryEligibilityState;
+    note?: string | null;
+    insuranceProviderId: string;
+    insurerName?: string | null;
+    insurerSlug?: string | null;
+    productType?: string | null;
+    networkId?: string | null;
+  } | null;
 };
 
 export default function OrganizationDirectory({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const t = useTranslations("discovery");
+  const { insurers, activePreference, loading: prefsLoading } = usePatientInsurance({ isLoggedIn });
+
   const labels: Record<string, string> = {
     HOSPITAL: t("typeHospital"),
     CLINIC: t("typeClinic"),
@@ -64,6 +82,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
     IMAGING_CENTER: t("typeImaging"),
     LABORATORY: t("typeLab"),
   };
+
   const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
   const [rows, setRows] = useState<Org[]>([]);
   const [type, setType] = useState("");
@@ -74,7 +93,50 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
   const [geoMsg, setGeoMsg] = useState("");
   const [loading, setLoading] = useState(true);
 
-  async function load(nextPos = pos) {
+  const [selectedInsurerId, setSelectedInsurerId] = useState<string>("");
+  const [selectedProductType, setSelectedProductType] = useState<string>("");
+  const [selectedNetworkId, setSelectedNetworkId] = useState<string>("");
+  const [prioritizeInNetwork, setPrioritizeInNetwork] = useState<boolean>(true);
+  const [strictConfirmedOnly, setStrictConfirmedOnly] = useState<boolean>(false);
+  const [manualClear, setManualClear] = useState<boolean>(false);
+
+  // Hydrate initial insurance query params or active saved preference
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const urlSlug = sp.get("insuranceSlug");
+      const urlId = sp.get("insuranceProviderId");
+      const urlPt = sp.get("productType");
+      const urlNet = sp.get("networkId");
+      const urlStrict = sp.get("strictConfirmedOnly") === "1";
+
+      if (urlId || urlSlug) {
+        const matchedInsurer = insurers.find(
+          (i) => i.id === urlId || i.slug === urlSlug || i.id === urlSlug
+        );
+        setSelectedInsurerId(matchedInsurer?.id || urlId || urlSlug || "");
+        if (urlPt) setSelectedProductType(urlPt);
+        if (urlNet) setSelectedNetworkId(urlNet);
+        if (urlStrict) setStrictConfirmedOnly(true);
+        return;
+      }
+    }
+
+    if (!manualClear && !selectedInsurerId && activePreference) {
+      setSelectedInsurerId(activePreference.insuranceProviderId);
+      setSelectedProductType(activePreference.productType || "");
+      setSelectedNetworkId(activePreference.networkId || "");
+    }
+  }, [activePreference, insurers, manualClear, selectedInsurerId]);
+
+  async function load(
+    nextPos = pos,
+    insId = selectedInsurerId,
+    prodType = selectedProductType,
+    netId = selectedNetworkId,
+    prio = prioritizeInNetwork,
+    strict = strictConfirmedOnly
+  ) {
     setLoading(true);
     const p = new URLSearchParams();
     if (type) p.set("type", type);
@@ -83,6 +145,19 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
     if (nextPos) {
       p.set("lat", String(nextPos.lat));
       p.set("lng", String(nextPos.lng));
+    }
+    if (insId) {
+      const insurerObj = insurers.find((i) => i.id === insId || i.slug === insId);
+      if (insurerObj) {
+        p.set("insuranceProviderId", insurerObj.id);
+        p.set("insuranceSlug", insurerObj.slug);
+      } else {
+        p.set("insuranceProviderId", insId);
+      }
+      if (prodType) p.set("productType", prodType);
+      if (netId) p.set("networkId", netId);
+      p.set("prioritizeInNetwork", prio ? "1" : "0");
+      if (strict) p.set("strictConfirmedOnly", "1");
     }
 
     try {
@@ -96,8 +171,25 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
   }
 
   useEffect(() => {
-    load();
-  }, [type, onDuty]);
+    if (prefsLoading && !selectedInsurerId) return;
+    load(
+      pos,
+      selectedInsurerId,
+      selectedProductType,
+      selectedNetworkId,
+      prioritizeInNetwork,
+      strictConfirmedOnly
+    );
+  }, [
+    type,
+    onDuty,
+    prefsLoading,
+    selectedInsurerId,
+    selectedProductType,
+    selectedNetworkId,
+    prioritizeInNetwork,
+    strictConfirmedOnly,
+  ]);
 
   function nearby() {
     if (!isLoggedIn) {
@@ -138,8 +230,40 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
     }
   };
 
+  const activeInsurerName =
+    insurers.find((i) => i.id === selectedInsurerId || i.slug === selectedInsurerId)?.name || null;
+
   return (
     <>
+      {/* Insurance-Aware Discovery Control Bar */}
+      <InsuranceDiscoveryBar
+        insurers={insurers}
+        selectedInsurerId={selectedInsurerId}
+        selectedProductType={selectedProductType}
+        selectedNetworkId={selectedNetworkId}
+        prioritizeInNetwork={prioritizeInNetwork}
+        strictConfirmedOnly={strictConfirmedOnly}
+        onSelectInsurer={(id) => {
+          setManualClear(!id);
+          setSelectedInsurerId(id);
+          setSelectedNetworkId("");
+        }}
+        onSelectProductType={(pt) => {
+          setSelectedProductType(pt);
+          setSelectedNetworkId("");
+        }}
+        onSelectNetwork={(net) => setSelectedNetworkId(net)}
+        onTogglePrioritize={(next) => setPrioritizeInNetwork(next)}
+        onToggleStrictConfirmed={(next) => setStrictConfirmedOnly(next)}
+        onClearFilter={() => {
+          setManualClear(true);
+          setSelectedInsurerId("");
+          setSelectedProductType("");
+          setSelectedNetworkId("");
+          setStrictConfirmedOnly(false);
+        }}
+      />
+
       {/* Search & Actions */}
       <div
         style={{
@@ -154,7 +278,15 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
           boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)",
         }}
       >
-        <div style={{ flex: 1, minWidth: "250px", position: "relative", display: "flex", alignItems: "center" }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: "250px",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <MagnifyingGlass size={20} color="#94a3b8" style={{ position: "absolute", left: "16px" }} />
           <input
             data-testid="organization-search-input"
@@ -226,7 +358,8 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
             gap: "8px",
           }}
         >
-          <MapTrifold size={20} weight="bold" /> {view === "list" ? t("viewOnMap") : t("backToList")}
+          <MapTrifold size={20} weight="bold" />{" "}
+          {view === "list" ? t("viewOnMap") : t("backToList")}
         </button>
       </div>
 
@@ -247,7 +380,15 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
       )}
 
       {/* Filter Pills */}
-      <div style={{ display: "flex", gap: "12px", marginBottom: "32px", overflowX: "auto", paddingBottom: "8px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          marginBottom: "32px",
+          overflowX: "auto",
+          paddingBottom: "8px",
+        }}
+      >
         {[
           { id: "", label: t("typeAll") },
           { id: "HOSPITAL", label: t("typeHospital") },
@@ -317,8 +458,10 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
         >
           {rows.map((o) => {
             const isVerified = o.isVerified === true;
-            const navMode = o.navigationMode || (isVerified ? "INTERNAL" : o.officialWebsite ? "EXTERNAL" : "NONE");
-            const primaryHref = o.primaryHref ?? (isVerified ? `/organizations/${o.slug}` : o.officialWebsite || null);
+            const navMode =
+              o.navigationMode || (isVerified ? "INTERNAL" : o.officialWebsite ? "EXTERNAL" : "NONE");
+            const primaryHref =
+              o.primaryHref ?? (isVerified ? `/organizations/${o.slug}` : o.officialWebsite || null);
             const style = getOrgStyling(o.type, !!o.isOnDuty && o.type === "PHARMACY");
             const preview =
               (o.type === "IMAGING_CENTER"
@@ -339,7 +482,12 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                 style={{
                   background: "#fff",
                   borderRadius: "24px",
-                  border: isVerified ? "1px solid #dbeafe" : "1px solid #e2e8f0",
+                  border:
+                    o.insuranceMatch?.eligibilityState === "CONFIRMED_MATCH"
+                      ? "2px solid #10b981"
+                      : isVerified
+                      ? "1px solid #dbeafe"
+                      : "1px solid #e2e8f0",
                   overflow: "hidden",
                   display: "flex",
                   flexDirection: "column",
@@ -348,7 +496,14 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                 }}
                 className="hover-shadow"
               >
-                <div style={{ padding: "24px", display: "flex", gap: "16px", borderBottom: "1px solid #f1f5f9" }}>
+                <div
+                  style={{
+                    padding: "24px",
+                    display: "flex",
+                    gap: "16px",
+                    borderBottom: "1px solid #f1f5f9",
+                  }}
+                >
                   <div
                     style={{
                       width: "64px",
@@ -365,7 +520,15 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                     {style.icon}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        marginBottom: "6px",
+                        flexWrap: "wrap",
+                      }}
+                    >
                       <span
                         style={{
                           fontSize: "12px",
@@ -392,7 +555,15 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                         </span>
                       )}
                     </div>
-                    <h3 style={{ margin: 0, fontSize: "18px", color: "#0f172a", fontWeight: 700, lineHeight: "1.4" }}>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "18px",
+                        color: "#0f172a",
+                        fontWeight: 700,
+                        lineHeight: "1.4",
+                      }}
+                    >
                       {navMode === "INTERNAL" && primaryHref ? (
                         <Link href={primaryHref} style={{ color: "inherit", textDecoration: "none" }}>
                           {o.name}
@@ -403,7 +574,13 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                           target="_blank"
                           rel="noopener noreferrer"
                           title={t("externalSiteNotice")}
-                          style={{ color: "inherit", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                          style={{
+                            color: "inherit",
+                            textDecoration: "none",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}
                         >
                           <span>{o.name}</span>
                           <ArrowSquareOut size={16} color="#64748b" />
@@ -425,14 +602,35 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                     background: "#f8fafc",
                   }}
                 >
-                  <div style={{ fontSize: "14px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
+                  {o.insuranceMatch && (
+                    <InsuranceEligibilityBadge
+                      eligibilityState={o.insuranceMatch.eligibilityState}
+                      insurerName={o.insuranceMatch.insurerName || activeInsurerName}
+                      productType={o.insuranceMatch.productType || selectedProductType || null}
+                      note={o.insuranceMatch.note}
+                    />
+                  )}
+
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      color: "#64748b",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
                     <NavigationArrow size={16} /> {o.city}
                     {o.district ? `, ${o.district}` : ""}{" "}
                     {o.distanceKm != null ? `• ${o.distanceKm.toFixed(1)} km` : ""}
                   </div>
-                  <p style={{ margin: 0, fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>{o.address}</p>
+                  <p style={{ margin: 0, fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>
+                    {o.address}
+                  </p>
                   {preview.length > 0 && (
-                    <div style={{ fontSize: "13px", color: "#334155", lineHeight: "1.45" }}>{preview.join(" · ")}</div>
+                    <div style={{ fontSize: "13px", color: "#334155", lineHeight: "1.45" }}>
+                      {preview.join(" · ")}
+                    </div>
                   )}
 
                   <div
@@ -464,7 +662,8 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                             borderRadius: "100px",
                           }}
                         >
-                          <ShieldCheck size={16} weight="fill" color="#2563eb" /> {t("alumasVerified")}
+                          <ShieldCheck size={16} weight="fill" color="#2563eb" />{" "}
+                          {t("alumasVerified")}
                         </div>
                       ) : o.verificationState === "PENDING_CLAIM" ? (
                         <div
@@ -516,7 +715,8 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                             color: "#f59e0b",
                           }}
                         >
-                          <Star size={16} weight="fill" /> {o.rating.toFixed(1)} ({o._count?.reviews || 0})
+                          <Star size={16} weight="fill" /> {o.rating.toFixed(1)} (
+                          {o._count?.reviews || 0})
                         </div>
                       )}
                     </div>
@@ -524,7 +724,9 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                     {!isVerified && o.canClaim && (
                       <Link
                         data-testid="claim-institution-link"
-                        href={`/business/apply?claimDirectoryId=${encodeURIComponent(o.directoryId || o.id)}`}
+                        href={`/business/apply?claimDirectoryId=${encodeURIComponent(
+                          o.directoryId || o.id
+                        )}`}
                         style={{
                           fontSize: "12px",
                           fontWeight: 600,
@@ -601,7 +803,9 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                         target="_blank"
                         rel="noopener noreferrer"
                         title={t("externalSiteNotice")}
-                        aria-label={`${o.name} - ${t("visitOfficialWebsite")} (${t("externalSiteNotice")})`}
+                        aria-label={`${o.name} - ${t("visitOfficialWebsite")} (${t(
+                          "externalSiteNotice"
+                        )})`}
                         style={{
                           flex: 1,
                           padding: "12px",
@@ -652,7 +856,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
             marginBottom: "48px",
           }}
         >
-          <InteractiveOrganizationMap rows={rows} token={token} />
+          <InteractiveOrganizationMap rows={rows as any} token={token} />
         </div>
       )}
     </>

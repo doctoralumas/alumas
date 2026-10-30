@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizeSpecialtyMatch, scoreContextualDoctorMatch } from "@/lib/ai/match-engine";
 import { hoursUntil, isOrganizationOpenNow, isSameLocalDay } from "@/lib/ai/context";
+import { loadInsuranceDiscoveryData } from "@/lib/institution-directory";
+import { evaluateFacilityInsuranceCoverage } from "@/lib/insurance-domain";
 
 function haversine(lat1:number,lon1:number,lat2:number,lon2:number){
   const R=6371,toRad=(d:number)=>d*Math.PI/180;
@@ -16,33 +18,47 @@ export async function POST(req:NextRequest){
   const lat=typeof body.lat==="number"?body.lat:null;
   const lng=typeof body.lng==="number"?body.lng:null;
   const insuranceProviderSlug=typeof body.insuranceProviderSlug==="string"?body.insuranceProviderSlug:null;
+  const insuranceProviderId=typeof body.insuranceProviderId==="string"?body.insuranceProviderId:null;
+  const productType=typeof body.productType==="string"?body.productType:null;
+  const productId=typeof body.productId==="string"?body.productId:null;
+  const networkId=typeof body.networkId==="string"?body.networkId:null;
+  const hasInsuranceQuery=Boolean(insuranceProviderSlug||insuranceProviderId);
   const limit=Math.min(20,Math.max(1,Number(body.limit||8)));
   const now=new Date();
 
-  const doctors=await prisma.doctor.findMany({
-    where:{isVerified:true,isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}}},
-    include:{
-      availabilities:{
-        where:{isActive:true,startsAt:{gte:now}},
-        orderBy:{startsAt:"asc"},
-        take:1
-      },
-      organization:{
-        include:{
-          hours:true,
-          insuranceContracts:{
-            where:{isActive:true},
-            include:{
-              insuranceProvider:{
-                select:{id:true,name:true,slug:true,isActive:true}
+  const [doctors, insuranceData]=await Promise.all([
+    prisma.doctor.findMany({
+      where:{isVerified:true,isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}}},
+      include:{
+        availabilities:{
+          where:{isActive:true,startsAt:{gte:now}},
+          orderBy:{startsAt:"asc"},
+          take:1
+        },
+        organization:{
+          include:{
+            hours:true,
+            insuranceContracts:{
+              where:{isActive:true},
+              include:{
+                insuranceProvider:{
+                  select:{id:true,name:true,slug:true,isActive:true}
+                }
               }
             }
           }
         }
-      }
-    },
-    take:150
-  });
+      },
+      take:150
+    }),
+    hasInsuranceQuery ? loadInsuranceDiscoveryData() : Promise.resolve({ insurers: [], agreements: [], legacyContracts: [] })
+  ]);
+
+  const resolvedInsurerId = hasInsuranceQuery
+    ? (insuranceProviderId ||
+        insuranceData.insurers.find((i) => i.slug === insuranceProviderSlug)?.id ||
+        insuranceProviderSlug)
+    : null;
 
   const ranked=doctors.map(d=>{
     const org=d.organization;
@@ -52,8 +68,32 @@ export async function POST(req:NextRequest){
     }
     const next=d.availabilities[0]?.startsAt ?? null;
     const openNow=org?isOrganizationOpenNow(org.hours,now):null;
-    const insuranceMatch=insuranceProviderSlug
-      ? !!org?.insuranceContracts.some(c=>c.insuranceProvider.slug===insuranceProviderSlug)
+
+    const evalResult =
+      resolvedInsurerId && org
+        ? evaluateFacilityInsuranceCoverage({
+            organizationId: org.id,
+            insuranceProviderId: resolvedInsurerId,
+            productType,
+            productId,
+            networkId,
+            specialtyCode: specialty || d.specialty,
+            agreements: insuranceData.agreements,
+            legacyContracts: insuranceData.legacyContracts,
+            now,
+          })
+        : null;
+
+    const insuranceMatch =
+      evalResult?.eligibilityState === "CONFIRMED_MATCH"
+        ? true
+        : evalResult?.eligibilityState === "CONFIRMED_NON_MATCH"
+        ? false
+        : null;
+    const insuranceEligibilityState = evalResult
+      ? evalResult.eligibilityState
+      : resolvedInsurerId
+      ? "UNKNOWN"
       : null;
 
     const breakdown=scoreContextualDoctorMatch({
@@ -66,6 +106,7 @@ export async function POST(req:NextRequest){
       organizationOpenNow:openNow,
       organizationOnDuty:org?.isOnDuty ?? false,
       insuranceMatch,
+      insuranceEligibilityState,
       rating:d.rating,
       reviewCount:d.reviewCount
     });
@@ -78,6 +119,8 @@ export async function POST(req:NextRequest){
       organizationOpenNow:openNow,
       organizationOnDuty:org?.isOnDuty ?? false,
       insuranceMatch,
+      insuranceEligibilityState,
+      insuranceNote: evalResult?.note ?? null,
       matchScore:breakdown.total,
       why:breakdown.reasons,
       breakdown

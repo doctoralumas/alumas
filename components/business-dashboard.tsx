@@ -53,6 +53,7 @@ export default function BusinessDashboard() {
     PHARMACY: t("orgPharmacy"),
     IMAGING_CENTER: t("orgImaging"),
     LABORATORY: t("orgLab"),
+    INSURANCE_COMPANY: t("orgInsuranceCompany"),
   };
 
   useEffect(() => {

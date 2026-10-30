@@ -161,21 +161,30 @@ function SectionHeader({
 export default function BusinessApplicationForm({
   initialType,
   initialClaimDirectoryId,
+  initialClaimInsurerSlug,
   initialClaimInstitution = null,
   claimLookupFailed = false,
   hasExistingOwnedOrgs = false,
 }: {
   initialType?: string;
   initialClaimDirectoryId?: string;
+  initialClaimInsurerSlug?: string;
   initialClaimInstitution?: ClaimedDirectorySummary | null;
   claimLookupFailed?: boolean;
   hasExistingOwnedOrgs?: boolean;
 }) {
   const t = useTranslations("professional.businessApply");
   const start = ORG_TYPES.includes(
-    String(initialClaimInstitution?.type || initialType || "").toUpperCase() as OrgType
+    String(
+      initialClaimInstitution?.type ||
+        (initialClaimInsurerSlug ? "INSURANCE_COMPANY" : initialType) ||
+        ""
+    ).toUpperCase() as OrgType
   )
-    ? (String(initialClaimInstitution?.type || initialType).toUpperCase() as OrgType)
+    ? (String(
+        initialClaimInstitution?.type ||
+          (initialClaimInsurerSlug ? "INSURANCE_COMPANY" : initialType)
+      ).toUpperCase() as OrgType)
     : "CLINIC";
 
   const [mode, setMode] = useState<"NEW" | "CLAIM">(
@@ -203,9 +212,59 @@ export default function BusinessApplicationForm({
   const [description, setDescription] = useState(initialClaimInstitution?.description || "");
   const [applicantRoleTitle, setApplicantRoleTitle] = useState("");
   const [applicantNote, setApplicantNote] = useState("");
+  const [insurerCatalog, setInsurerCatalog] = useState<any[]>([]);
+  const [claimedInsurerId, setClaimedInsurerId] = useState("");
+  const [legalName, setLegalName] = useState("");
+  const [seddkLicenseRef, setSeddkLicenseRef] = useState("");
+  const [tsbMemberCode, setTsbMemberCode] = useState("");
+  const [claimsPhone, setClaimsPhone] = useState("");
+  const [provisionPortalUrl, setProvisionPortalUrl] = useState("");
   const [msg, setMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  function applyInsurerSelection(ins: any | undefined) {
+    if (!ins) {
+      setClaimedInsurerId("");
+      return;
+    }
+    setClaimedInsurerId(ins.id);
+    setType("INSURANCE_COMPANY");
+    setName(ins.name || "");
+    setLegalName(ins.legalName || ins.name || "");
+    setSeddkLicenseRef(ins.seddkLicenseRef || "");
+    setTsbMemberCode(ins.tsbMemberCode || "");
+    setCity(ins.headquartersCity || "İstanbul");
+    setDistrict(ins.headquartersDistrict || "");
+    setAddress(ins.headquartersAddress || "");
+    setPhone(ins.phone || "");
+    setClaimsPhone(ins.claimsPhone || ins.phone || "");
+    setWebsite(ins.website || "");
+    setProvisionPortalUrl(ins.provisionPortalUrl || ins.website || "");
+    setDescription(ins.description || "");
+  }
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/insurance")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: any[]) => {
+        if (!active || !Array.isArray(list)) return;
+        setInsurerCatalog(list);
+        if (initialClaimInsurerSlug) {
+          const found = list.find(
+            (i) => i.slug === initialClaimInsurerSlug || i.id === initialClaimInsurerSlug
+          );
+          if (found) {
+            applyInsurerSelection(found);
+          }
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [initialClaimInsurerSlug]);
 
   function applyDirectorySelection(option: DirectoryOption | undefined) {
     if (!option) return;
@@ -327,6 +386,7 @@ export default function BusinessApplicationForm({
     ["PHARMACY", t("tabPharmacy")],
     ["IMAGING_CENTER", t("tabImaging")],
     ["LABORATORY", t("tabLab")],
+    ["INSURANCE_COMPANY", t("tabInsuranceCompany")],
   ];
 
   return (
@@ -838,6 +898,148 @@ export default function BusinessApplicationForm({
             />
           </label>
         </div>
+
+        {/* Insurer-Specific Regulatory & Catalogue Claim Section */}
+        {type === "INSURANCE_COMPANY" && (
+          <div
+            data-testid="insurer-application-fields"
+            style={{
+              marginTop: "18px",
+              padding: "18px",
+              borderRadius: "16px",
+              background: "#f0fdfa",
+              border: "1px solid #99f6e4",
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+            }}
+          >
+            <div style={{ fontWeight: 800, fontSize: "14px", color: "#0f766e" }}>
+              {t("insurerSectionTitle")}
+            </div>
+
+            <label style={{ display: "block" }}>
+              <span style={labelSpanStyle}>
+                <span>{t("claimCanonicalInsurerLabel")}</span>
+              </span>
+              <select
+                name="claimedInsurerId"
+                data-testid="claim-canonical-insurer-select"
+                value={claimedInsurerId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (!val) {
+                    setClaimedInsurerId("");
+                    return;
+                  }
+                  const found = insurerCatalog.find((i) => i.id === val);
+                  if (found) applyInsurerSelection(found);
+                }}
+                style={inputStyle}
+              >
+                <option value="">{t("newInsurerRegistrationOption")}</option>
+                {insurerCatalog.map((ins) => (
+                  <option
+                    key={ins.id}
+                    value={ins.id}
+                    disabled={ins.canClaim === false}
+                  >
+                    {ins.name} ({ins.legalName || ins.slug})
+                    {ins.canClaim === false ? ` — ${t("alreadyClaimedShort")}` : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
+                gap: "14px",
+              }}
+            >
+              <label style={{ display: "block" }}>
+                <span style={labelSpanStyle}>
+                  <span>{t("legalNameLabel")} <Req /></span>
+                </span>
+                <input
+                  name="legalName"
+                  data-testid="insurer-legal-name-input"
+                  required={type === "INSURANCE_COMPANY"}
+                  value={legalName}
+                  onChange={(e) => setLegalName(e.target.value)}
+                  placeholder="Örn: Allianz Sigorta A.Ş."
+                  style={inputStyle}
+                />
+              </label>
+
+              <label style={{ display: "block" }}>
+                <span style={labelSpanStyle}>
+                  <span>{t("seddkLicenseRefLabel")} <Req /></span>
+                </span>
+                <input
+                  name="seddkLicenseRef"
+                  data-testid="insurer-seddk-ref-input"
+                  required={type === "INSURANCE_COMPANY"}
+                  value={seddkLicenseRef}
+                  onChange={(e) => setSeddkLicenseRef(e.target.value)}
+                  placeholder="Örn: SEDDK-RUHSAT-2026-001"
+                  style={inputStyle}
+                />
+              </label>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
+                gap: "14px",
+              }}
+            >
+              <label style={{ display: "block" }}>
+                <span style={labelSpanStyle}>
+                  <span>{t("tsbMemberCodeLabel")}</span>
+                </span>
+                <input
+                  name="tsbMemberCode"
+                  data-testid="insurer-tsb-code-input"
+                  value={tsbMemberCode}
+                  onChange={(e) => setTsbMemberCode(e.target.value)}
+                  placeholder="Örn: TSB-001"
+                  style={inputStyle}
+                />
+              </label>
+
+              <label style={{ display: "block" }}>
+                <span style={labelSpanStyle}>
+                  <span>{t("claimsPhoneLabel")}</span>
+                </span>
+                <input
+                  name="claimsPhone"
+                  data-testid="insurer-claims-phone-input"
+                  value={claimsPhone}
+                  onChange={(e) => setClaimsPhone(e.target.value)}
+                  placeholder="Örn: 0850 399 99 99"
+                  style={inputStyle}
+                />
+              </label>
+            </div>
+
+            <label style={{ display: "block" }}>
+              <span style={labelSpanStyle}>
+                <span>{t("provisionPortalUrlLabel")}</span>
+              </span>
+              <input
+                name="provisionPortalUrl"
+                data-testid="insurer-provision-url-input"
+                value={provisionPortalUrl}
+                onChange={(e) => setProvisionPortalUrl(e.target.value)}
+                placeholder="https://..."
+                style={inputStyle}
+              />
+            </label>
+          </div>
+        )}
       </div>
 
       {/* Section 2: Authorized Representative & Contact */}

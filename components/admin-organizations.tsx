@@ -5,6 +5,7 @@ import AdminVerificationDocuments from "@/components/admin-verification-document
 import AdminConfirmDialog from "@/components/admin/admin-confirm-dialog";
 import AdminStatusBadge from "@/components/admin/admin-status-badge";
 import AdminCallout from "@/components/admin/admin-callout";
+import AdminInsuranceEcosystem from "@/components/admin/admin-insurance-ecosystem";
 import { useTranslations } from "next-intl";
 
 type ClaimInfo = {
@@ -62,6 +63,7 @@ type OrgStats = {
 
 export default function AdminOrganizations() {
   const t = useTranslations("admin.organizationsList");
+  const [activeModule, setActiveModule] = useState<"institutions" | "insurance">("institutions");
 
   // Filter & Search States
   const [search, setSearch] = useState("");
@@ -193,6 +195,7 @@ export default function AdminOrganizations() {
     PHARMACY: t("typePharmacy"),
     IMAGING_CENTER: t("typeImaging"),
     LABORATORY: t("typeLab"),
+    INSURANCE_COMPANY: t("typeInsuranceCompany"),
   };
 
   // --- Handlers ---
@@ -403,6 +406,60 @@ export default function AdminOrganizations() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px", width: "100%" }}>
+      {/* Network & Directory Hub Module Switcher */}
+      <div
+        data-testid="admin-network-hub-switcher"
+        style={{
+          display: "flex",
+          gap: "8px",
+          flexWrap: "wrap",
+          padding: "6px",
+          background: "#f1f5f9",
+          borderRadius: "14px",
+          border: "1px solid #e2e8f0",
+          width: "fit-content",
+        }}
+      >
+        <button
+          type="button"
+          data-testid="admin-hub-tab-institutions"
+          onClick={() => setActiveModule("institutions")}
+          style={{
+            padding: "9px 16px",
+            borderRadius: "10px",
+            border: "none",
+            background: activeModule === "institutions" ? "#0f172a" : "transparent",
+            color: activeModule === "institutions" ? "#ffffff" : "#475569",
+            fontWeight: 700,
+            fontSize: "13.5px",
+            cursor: "pointer",
+          }}
+        >
+          Sağlık Kurumları & Sahiplenme Talepleri
+        </button>
+        <button
+          type="button"
+          data-testid="admin-hub-tab-insurance"
+          onClick={() => setActiveModule("insurance")}
+          style={{
+            padding: "9px 16px",
+            borderRadius: "10px",
+            border: "none",
+            background: activeModule === "insurance" ? "#0f766e" : "transparent",
+            color: activeModule === "insurance" ? "#ffffff" : "#0f766e",
+            fontWeight: 800,
+            fontSize: "13.5px",
+            cursor: "pointer",
+          }}
+        >
+          Sigorta Kurumları, Ağlar & Anlaşmalar
+        </button>
+      </div>
+
+      {activeModule === "insurance" ? (
+        <AdminInsuranceEcosystem />
+      ) : (
+        <>
       {/* Messages */}
       {error && (
         <AdminCallout variant="danger" title={t("loadError")}>
@@ -605,6 +662,7 @@ export default function AdminOrganizations() {
           <option value="PHARMACY">{t("typePharmacy")}</option>
           <option value="IMAGING_CENTER">{t("typeImaging")}</option>
           <option value="LABORATORY">{t("typeLab")}</option>
+          <option value="INSURANCE_COMPANY">{t("typeInsuranceCompany")}</option>
         </select>
 
         <input
@@ -1871,6 +1929,8 @@ export default function AdminOrganizations() {
           reasonPlaceholder={confirmDialog.reasonPlaceholder}
           isBusy={isBusy}
         />
+      )}
+        </>
       )}
     </div>
   );

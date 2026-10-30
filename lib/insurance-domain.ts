@@ -1,6 +1,20 @@
 import { isHealthcareFacilityType } from "@/lib/organization-capabilities";
 import { missingRequiredDocuments } from "@/lib/verification-requirements";
-import { normalizeTextKey } from "@/lib/institution-directory";
+
+function normalizeTextKey(value: string | null | undefined): string {
+  return String(value || "")
+    .toLocaleLowerCase("tr-TR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ı/g, "i")
+    .replace(/ğ/g, "g")
+    .replace(/ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/ö/g, "o")
+    .replace(/ç/g, "c")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 export type InsurancePayerKind = "COMMERCIAL_INSURER" | "PUBLIC_PAYER";
 export type InsuranceProviderLifecycleStatus = "ACTIVE" | "DEMO_INTERNAL" | "INACTIVE";
@@ -38,12 +52,14 @@ export type SpecialtyRuleKind = "INCLUDED" | "EXCLUDED";
 export class InsuranceDomainError extends Error {
   public readonly code: string;
   public readonly status: number;
+  public readonly httpStatus: number;
 
   constructor(message: string, code: string = "INSURANCE_DOMAIN_ERROR", status: number = 400) {
     super(message);
     this.name = "InsuranceDomainError";
     this.code = code;
     this.status = status;
+    this.httpStatus = status;
   }
 }
 
@@ -108,6 +124,7 @@ export interface InsuranceAgreementRecord {
   organizationId?: string | null;
   directoryInstitutionId?: string | null;
   insuranceProviderId: string;
+  productType?: InsuranceProductType | null;
   productId?: string | null;
   networkId?: string | null;
   coverageScope: AgreementCoverageScope;
@@ -122,6 +139,8 @@ export interface InsuranceAgreementRecord {
   note?: string | null;
   isActive: boolean;
   specialtyRules?: SpecialtyRuleRecord[];
+  product?: { id?: string; code?: string; slug?: string; name?: string; productType?: InsuranceProductType } | null;
+  network?: { id?: string; code?: string; slug?: string; name?: string; tierLabel?: string | null } | null;
 }
 
 export interface LegacyOrganizationInsuranceRecord {
@@ -355,6 +374,7 @@ function extractRootDomain(urlOrEmail: string | null | undefined): string | null
 
 export interface InsurerVerificationEvaluation {
   canApprove: boolean;
+  isVerifiedInsurer: boolean;
   missingDocuments: Array<{ type: string; label: string }>;
   blockReason: string | null;
   supportingSignals: {
@@ -374,24 +394,32 @@ export interface InsurerVerificationEvaluation {
  */
 export function evaluateInsurerVerification(params: {
   insurer?: CanonicalInsurerRecord | null;
+  organizationStatus?: string | null;
   applicantEmail?: string | null;
   officialWebsite?: string | null;
   tsbMemberCode?: string | null;
   seddkLicenseRef?: string | null;
   documents: Array<{
-    documentType: string;
+    documentType?: string;
+    type?: string;
     status: string;
     expiresAt?: Date | string | null;
   }>;
   locale?: string;
 }): InsurerVerificationEvaluation {
   const locale = params.locale || "tr";
+  const normalizedDocs = (params.documents || []).map((d) => ({
+    documentType: String(d.documentType || d.type || ""),
+    status: d.status,
+    expiresAt: d.expiresAt ? new Date(d.expiresAt) : null,
+  }));
 
   if (params.insurer) {
     const claimEligibility = canClaimInsurer(params.insurer);
     if (!claimEligibility.allowed) {
       return {
         canApprove: false,
+        isVerifiedInsurer: false,
         missingDocuments: [],
         blockReason: claimEligibility.reason || "Bu sigorta kurumu onaylanamaz.",
         supportingSignals: {
@@ -406,7 +434,7 @@ export function evaluateInsurerVerification(params: {
     }
   }
 
-  const missing = missingRequiredDocuments("organization", "INSURANCE_COMPANY", params.documents, locale);
+  const missing = missingRequiredDocuments("organization", "INSURANCE_COMPANY", normalizedDocs, locale);
 
   const applicantDomain = extractRootDomain(params.applicantEmail);
   const websiteDomain = extractRootDomain(params.officialWebsite || params.insurer?.website);
@@ -431,19 +459,26 @@ export function evaluateInsurerVerification(params: {
   );
   const seddkReferenceProvided = Boolean(
     (params.seddkLicenseRef || params.insurer?.seddkLicenseRef || "").trim() ||
-      params.documents.some((d) => d.documentType === "SEDDK_LICENSE" && d.status === "APPROVED")
+      normalizedDocs.some((d) => d.documentType === "SEDDK_LICENSE" && d.status === "APPROVED")
   );
 
   const canApprove = missing.length === 0;
-  const blockReason = canApprove
+  const orgApproved = !params.organizationStatus || params.organizationStatus === "APPROVED";
+  const isVerifiedInsurer = Boolean(params.organizationStatus === "APPROVED" && canApprove);
+
+  const blockReason = canApprove && orgApproved
     ? null
+    : !canApprove
+    ? locale === "en"
+      ? `For insurer approval, authoritative documents must be approved and valid: ${missing
+          .map((m) => m.label)
+          .join(", ")}. Supporting signals (email domain or TSB code) never replace required documents.`
+      : `Sigorta kurumu onayı için zorunlu yetki belgeleri onaylı ve geçerli olmalıdır: ${missing
+          .map((m) => m.label)
+          .join(", ")}. Kurumsal e-posta veya TSB kodu destekleyici sinyaldir; resmi SEDDK ve temsil belgelerinin yerine geçmez.`
     : locale === "en"
-    ? `For insurer approval, authoritative documents must be approved and valid: ${missing
-        .map((m) => m.label)
-        .join(", ")}. Supporting signals (email domain or TSB code) never replace required documents.`
-    : `Sigorta kurumu onayı için zorunlu yetki belgeleri onaylı ve geçerli olmalıdır: ${missing
-        .map((m) => m.label)
-        .join(", ")}. Kurumsal e-posta veya TSB kodu destekleyici sinyaldir; resmi SEDDK ve temsil belgelerinin yerine geçmez.`;
+    ? `Insurance company organization status must be APPROVED (current: ${params.organizationStatus}).`
+    : `Sigorta kurumu hesabı yönetici tarafından onaylanmış (APPROVED) olmalıdır (mevcut: ${params.organizationStatus}).`;
 
   const advisoryNote =
     emailDomainSignal === "CORPORATE_MATCH"
@@ -456,6 +491,7 @@ export function evaluateInsurerVerification(params: {
 
   return {
     canApprove,
+    isVerifiedInsurer,
     missingDocuments: missing.map((m) => ({ type: m.type, label: m.label })),
     blockReason,
     supportingSignals: {
@@ -467,6 +503,31 @@ export function evaluateInsurerVerification(params: {
       advisoryNote,
     },
   };
+}
+
+/**
+ * Checks whether an insurance company organization is verified and allowed to perform
+ * operational actions (managing products, networks, and confirming/declaring agreements).
+ */
+export function canPerformInsurerOperations(params: {
+  organizationStatus?: string | null;
+  status?: string | null;
+  type?: string | null;
+  documents: Array<{
+    documentType?: string;
+    type?: string;
+    status: string;
+    expiresAt?: Date | string | null;
+  }>;
+}): boolean {
+  if (params.type && params.type !== "INSURANCE_COMPANY") return false;
+  const effectiveStatus = params.organizationStatus ?? params.status ?? null;
+  if (effectiveStatus !== "APPROVED") return false;
+  const evalResult = evaluateInsurerVerification({
+    organizationStatus: effectiveStatus,
+    documents: params.documents,
+  });
+  return evalResult.isVerifiedInsurer;
 }
 
 /**
@@ -548,12 +609,13 @@ export function resolveAgreementFacilityTarget(
 
 export function buildAgreementTupleKey(agreement: {
   insuranceProviderId: string;
+  productType?: InsuranceProductType | string | null;
   productId?: string | null;
   networkId?: string | null;
 }): string {
-  return `${agreement.insuranceProviderId}::${agreement.productId || "__ANY_PRODUCT__"}::${
-    agreement.networkId || "__ANY_NETWORK__"
-  }`;
+  return `${agreement.insuranceProviderId}::${agreement.productType || "__ANY_TYPE__"}::${
+    agreement.productId || "__ANY_PRODUCT__"
+  }::${agreement.networkId || "__ANY_NETWORK__"}`;
 }
 
 /**
@@ -733,6 +795,13 @@ export function isAgreementConfirmedAndActive(
   );
 }
 
+export type InsuranceDiscoveryEligibilityState =
+  | "CONFIRMED_MATCH"
+  | "DECLARED_OR_UNVERIFIED"
+  | "PARTIAL_OR_RESTRICTED"
+  | "UNKNOWN"
+  | "CONFIRMED_NON_MATCH";
+
 export interface FacilityInsuranceMatchResult {
   matched: boolean;
   confirmed: boolean;
@@ -743,8 +812,11 @@ export interface FacilityInsuranceMatchResult {
     | "EXPIRED"
     | "DISPUTED"
     | "NO_MATCH";
+  eligibilityState: InsuranceDiscoveryEligibilityState;
   matchedAgreementIds: string[];
   note: string | null;
+  reasonCode: string;
+  coverageScope?: AgreementCoverageScope | null;
 }
 
 /**
@@ -753,15 +825,17 @@ export interface FacilityInsuranceMatchResult {
  *
  * Strictly guarantees:
  * 1. Unverified declarations (`PROVIDER_DECLARED`, `INSURER_DECLARED`, `UNVERIFIED`, or legacy `OrganizationInsurance`)
- *    NEVER count as `confirmed: true`.
+ *    NEVER count as `confirmed: true` or `CONFIRMED_MATCH`.
  * 2. Legacy `OrganizationInsurance` records (e.g. `Lab Test` <-> `Allianz Sigorta`) are NOT treated as
  *    verified coverage for all insurer products/networks.
  * 3. Expired or disputed agreements NEVER count as confirmed or active matches.
+ * 4. External records without verified agreement data (e.g. Google Places) return `UNKNOWN`.
  */
 export function evaluateFacilityInsuranceCoverage(params: {
   organizationId?: string | null;
   directoryInstitutionId?: string | null;
   insuranceProviderId: string;
+  productType?: InsuranceProductType | string | null;
   productId?: string | null;
   networkId?: string | null;
   specialtyCode?: string | null;
@@ -772,6 +846,9 @@ export function evaluateFacilityInsuranceCoverage(params: {
   const now = params.now || new Date();
   const normalizedSpecialty = params.specialtyCode
     ? normalizeTextKey(params.specialtyCode).toUpperCase()
+    : null;
+  const requestedProductType = params.productType
+    ? (String(params.productType).trim().toUpperCase() as InsuranceProductType)
     : null;
 
   // Filter agreements belonging to this exact facility/branch and insurer
@@ -788,21 +865,16 @@ export function evaluateFacilityInsuranceCoverage(params: {
   let sawExpired = false;
   let sawDisputed = false;
   let sawRestrictedScope = false;
+  let sawExplicitExclusion = false;
   let restrictedNote: string | null = null;
+  let restrictedCoverageScope: AgreementCoverageScope | null = null;
   const confirmedIds: string[] = [];
   const unverifiedIds: string[] = [];
   let primaryNote: string | null = null;
+  let primaryCoverageScope: AgreementCoverageScope | null = null;
 
   for (const ag of candidateAgreements) {
     if (!ag.isActive) continue;
-
-    // Product & network filtering
-    if (params.productId && ag.productId && ag.productId !== params.productId) {
-      continue;
-    }
-    if (params.networkId && ag.networkId && ag.networkId !== params.networkId) {
-      continue;
-    }
 
     if (ag.verificationStatus === "DISPUTED") {
       sawDisputed = true;
@@ -810,7 +882,14 @@ export function evaluateFacilityInsuranceCoverage(params: {
     }
 
     if (isAgreementExpired(ag, now)) {
-      sawExpired = true;
+      if (
+        ag.verificationStatus === "ADMIN_VERIFIED" ||
+        ag.verificationStatus === "MUTUALLY_CONFIRMED" ||
+        ag.verificationStatus === "INSURER_DECLARED" ||
+        ag.verificationStatus === "EXPIRED"
+      ) {
+        sawExpired = true;
+      }
       continue;
     }
 
@@ -818,7 +897,36 @@ export function evaluateFacilityInsuranceCoverage(params: {
       continue;
     }
 
-    // Specialty restriction evaluation
+    // ProductType, ProductId & NetworkId filtering
+    const agProductType = ag.productType || ag.product?.productType || null;
+    if (requestedProductType && agProductType && agProductType !== requestedProductType) {
+      sawRestrictedScope = true;
+      restrictedNote =
+        restrictedNote ||
+        ag.note ||
+        `Kurumun bu sigorta ile farklı ürün türünde (${agProductType}) kaydı bulunuyor.`;
+      continue;
+    }
+    if (params.productId && ag.productId && ag.productId !== params.productId) {
+      sawRestrictedScope = true;
+      restrictedNote =
+        restrictedNote || ag.note || "Kurumun bu sigorta ile farklı bir poliçe ürününde anlaşması var.";
+      continue;
+    }
+    if (
+      params.networkId &&
+      ag.networkId &&
+      ag.networkId !== params.networkId &&
+      ag.network?.slug !== params.networkId &&
+      ag.network?.code !== params.networkId
+    ) {
+      sawRestrictedScope = true;
+      restrictedNote =
+        restrictedNote || ag.note || "Kurumun bu sigorta ile farklı bir anlaşmalı kurum ağında kaydı var.";
+      continue;
+    }
+
+    // Specialty & Coverage Scope restriction evaluation
     const rules = ag.specialtyRules || [];
     if (normalizedSpecialty) {
       const isExcluded = rules.some(
@@ -827,8 +935,16 @@ export function evaluateFacilityInsuranceCoverage(params: {
           normalizeTextKey(r.specialtyCode).toUpperCase() === normalizedSpecialty
       );
       if (isExcluded) {
+        const isAuthoritative =
+          ag.verificationStatus === "ADMIN_VERIFIED" ||
+          ag.verificationStatus === "MUTUALLY_CONFIRMED" ||
+          ag.verificationStatus === "INSURER_DECLARED";
         sawRestrictedScope = true;
+        if (isAuthoritative) {
+          sawExplicitExclusion = true;
+        }
         restrictedNote = ag.note || "Aranan branş bu anlaşma kapsamı dışında tutulmuştur.";
+        restrictedCoverageScope = ag.coverageScope;
         continue;
       }
 
@@ -840,9 +956,24 @@ export function evaluateFacilityInsuranceCoverage(params: {
         if (!isIncluded) {
           sawRestrictedScope = true;
           restrictedNote = ag.note || "Anlaşma yalnızca belirli branşlarda geçerlidir.";
+          restrictedCoverageScope = ag.coverageScope;
           continue;
         }
       }
+    } else if (ag.coverageScope !== "ALL_BRANCHES") {
+      // General facility discovery without specialty filter, but agreement is restricted to selected specialties or service types
+      sawRestrictedScope = true;
+      restrictedCoverageScope = ag.coverageScope;
+      restrictedNote =
+        ag.note ||
+        (ag.coverageScope === "SELECTED_SPECIALTIES"
+          ? "Anlaşma yalnızca belirli branşlarda geçerlidir."
+          : ag.coverageScope === "INPATIENT_ONLY"
+          ? "Anlaşma yalnızca yatarak tedavi kapsamında geçerlidir."
+          : ag.coverageScope === "OUTPATIENT_ONLY"
+          ? "Anlaşma yalnızca ayakta tedavi kapsamında geçerlidir."
+          : "Anlaşma yalnızca acil sağlık hizmetleri kapsamında geçerlidir.");
+      continue;
     }
 
     if (
@@ -851,10 +982,12 @@ export function evaluateFacilityInsuranceCoverage(params: {
     ) {
       confirmedIds.push(ag.id);
       if (!primaryNote && ag.note) primaryNote = ag.note;
+      if (!primaryCoverageScope) primaryCoverageScope = ag.coverageScope;
     } else {
       // UNVERIFIED, PROVIDER_DECLARED, INSURER_DECLARED
       unverifiedIds.push(ag.id);
       if (!primaryNote && ag.note) primaryNote = ag.note;
+      if (!primaryCoverageScope) primaryCoverageScope = ag.coverageScope;
     }
   }
 
@@ -863,8 +996,11 @@ export function evaluateFacilityInsuranceCoverage(params: {
       matched: true,
       confirmed: true,
       matchTier: "CONFIRMED",
+      eligibilityState: "CONFIRMED_MATCH",
       matchedAgreementIds: confirmedIds,
       note: primaryNote,
+      reasonCode: "VERIFIED_ACTIVE_AGREEMENT",
+      coverageScope: primaryCoverageScope || "ALL_BRANCHES",
     };
   }
 
@@ -873,8 +1009,11 @@ export function evaluateFacilityInsuranceCoverage(params: {
       matched: true,
       confirmed: false,
       matchTier: "UNVERIFIED_DECLARATION",
+      eligibilityState: "DECLARED_OR_UNVERIFIED",
       matchedAgreementIds: unverifiedIds,
       note: primaryNote,
+      reasonCode: "UNVERIFIED_DECLARATION",
+      coverageScope: primaryCoverageScope || "ALL_BRANCHES",
     };
   }
 
@@ -883,8 +1022,11 @@ export function evaluateFacilityInsuranceCoverage(params: {
       matched: false,
       confirmed: false,
       matchTier: "RESTRICTED_SCOPE",
+      eligibilityState: sawExplicitExclusion ? "CONFIRMED_NON_MATCH" : "PARTIAL_OR_RESTRICTED",
       matchedAgreementIds: [],
       note: restrictedNote,
+      reasonCode: sawExplicitExclusion ? "SPECIALTY_EXPLICITLY_EXCLUDED" : "RESTRICTED_OR_PARTIAL_SCOPE",
+      coverageScope: restrictedCoverageScope,
     };
   }
 
@@ -898,22 +1040,28 @@ export function evaluateFacilityInsuranceCoverage(params: {
         c.insuranceProviderId === params.insuranceProviderId
     );
     if (legacy) {
-      // If caller asked for a specific productId or networkId, a legacy general note cannot satisfy verified product/network coverage
-      if (params.productId || params.networkId) {
+      // If caller asked for a specific productType, productId, or networkId, a legacy general note cannot satisfy verified product/network coverage
+      if (requestedProductType || params.productId || params.networkId) {
         return {
           matched: false,
           confirmed: false,
           matchTier: "RESTRICTED_SCOPE",
+          eligibilityState: "PARTIAL_OR_RESTRICTED",
           matchedAgreementIds: [],
           note: legacy.note || "Poliçe/ağ detayı doğrulanmamış kurum beyanı.",
+          reasonCode: "LEGACY_DECLARATION_WITHOUT_PRODUCT_NETWORK",
+          coverageScope: null,
         };
       }
       return {
         matched: true,
         confirmed: false,
         matchTier: "UNVERIFIED_DECLARATION",
+        eligibilityState: "DECLARED_OR_UNVERIFIED",
         matchedAgreementIds: [legacy.id],
         note: legacy.note ?? null,
+        reasonCode: "LEGACY_UNVERIFIED_DECLARATION",
+        coverageScope: null,
       };
     }
   }
@@ -923,8 +1071,11 @@ export function evaluateFacilityInsuranceCoverage(params: {
       matched: false,
       confirmed: false,
       matchTier: "EXPIRED",
+      eligibilityState: "CONFIRMED_NON_MATCH",
       matchedAgreementIds: [],
       note: "Anlaşma süresi dolmuş.",
+      reasonCode: "AGREEMENT_EXPIRED",
+      coverageScope: null,
     };
   }
 
@@ -933,8 +1084,11 @@ export function evaluateFacilityInsuranceCoverage(params: {
       matched: false,
       confirmed: false,
       matchTier: "DISPUTED",
+      eligibilityState: "CONFIRMED_NON_MATCH",
       matchedAgreementIds: [],
       note: "Anlaşma uyuşmazlık durumunda.",
+      reasonCode: "AGREEMENT_DISPUTED",
+      coverageScope: null,
     };
   }
 
@@ -942,8 +1096,11 @@ export function evaluateFacilityInsuranceCoverage(params: {
     matched: false,
     confirmed: false,
     matchTier: "NO_MATCH",
+    eligibilityState: "UNKNOWN",
     matchedAgreementIds: [],
     note: null,
+    reasonCode: "NO_AGREEMENT_DATA",
+    coverageScope: null,
   };
 }
 
@@ -1196,13 +1353,14 @@ export function validatePatientInsurancePreferenceInput(
     policyLabel = trimmed || null;
   }
 
+  const isPrimary = Boolean(raw.isPrimary);
   return {
     insuranceProviderId,
     productType,
     productId,
     networkId,
-    isPrimary: Boolean(raw.isPrimary),
-    isActiveDiscovery: raw.isActiveDiscovery === undefined ? true : Boolean(raw.isActiveDiscovery),
+    isPrimary,
+    isActiveDiscovery: raw.isActiveDiscovery === undefined ? isPrimary : Boolean(raw.isActiveDiscovery),
     includePublicSgk: Boolean(raw.includePublicSgk),
     policyLabel,
   };
@@ -1230,4 +1388,450 @@ export function assertPreferenceOwnership(
     );
   }
 }
+
+export interface CatalogProductOption {
+  id: string;
+  code: string;
+  slug: string;
+  name: string;
+  productType: InsuranceProductType;
+  requiresPublicSgk: boolean;
+}
+
+export interface CatalogNetworkOption {
+  id: string;
+  code: string;
+  slug: string;
+  name: string;
+  tierLabel: string | null;
+  productType?: InsuranceProductType | null;
+}
+
+export const CANONICAL_INSURER_CATALOG_METADATA: Record<
+  string,
+  {
+    supportedProductTypes: InsuranceProductType[];
+    products: CatalogProductOption[];
+    networks: CatalogNetworkOption[];
+  }
+> = {
+  allianz: {
+    supportedProductTypes: ["TSS", "OSS", "TRAVEL"],
+    products: [
+      {
+        id: "cat-prod-allianz-tss",
+        code: "ALLIANZ_TSS",
+        slug: "allianz-tamamlayici-saglik",
+        name: "Allianz Tamamlayıcı Sağlık Sigortası (TSS)",
+        productType: "TSS",
+        requiresPublicSgk: true,
+      },
+      {
+        id: "cat-prod-allianz-oss",
+        code: "ALLIANZ_OSS",
+        slug: "allianz-moduler-ozel-saglik",
+        name: "Allianz Modüler Özel Sağlık Sigortası (ÖSS)",
+        productType: "OSS",
+        requiresPublicSgk: false,
+      },
+    ],
+    networks: [
+      {
+        id: "cat-net-allianz-mavi",
+        code: "ALLIANZ_MAVI",
+        slug: "allianz-mavi-ag",
+        name: "Mavi Ağ (TSS Geniş Ağ)",
+        tierLabel: "Mavi Ağ",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-allianz-turkuaz",
+        code: "ALLIANZ_TURKUAZ",
+        slug: "allianz-turkuaz-ag",
+        name: "Turkuaz Ağ (TSS)",
+        tierLabel: "Turkuaz Ağ",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-allianz-beyaz",
+        code: "ALLIANZ_BEYAZ",
+        slug: "allianz-beyaz-ag",
+        name: "Beyaz Ağ (ÖSS Tüm Kurumlar)",
+        tierLabel: "Beyaz Ağ",
+        productType: "OSS",
+      },
+      {
+        id: "cat-net-allianz-sari",
+        code: "ALLIANZ_SARI",
+        slug: "allianz-sari-ag",
+        name: "Sarı Ağ (ÖSS Seçkin Kurumlar)",
+        tierLabel: "Sarı Ağ",
+        productType: "OSS",
+      },
+      {
+        id: "cat-net-allianz-yesil",
+        code: "ALLIANZ_YESIL",
+        slug: "allianz-yesil-ag",
+        name: "Yeşil Ağ (ÖSS Ekonomik Ağ)",
+        tierLabel: "Yeşil Ağ",
+        productType: "OSS",
+      },
+    ],
+  },
+  "bupa-acibadem": {
+    supportedProductTypes: ["TSS", "OSS", "FOREIGN_HEALTH"],
+    products: [
+      {
+        id: "cat-prod-bupa-tss",
+        code: "BUPA_TSS",
+        slug: "bupa-acibadem-tamamlayici-saglik",
+        name: "Bupa Acıbadem Tamamlayıcı Sağlık (TSS)",
+        productType: "TSS",
+        requiresPublicSgk: true,
+      },
+      {
+        id: "cat-prod-bupa-oss",
+        code: "BUPA_OSS",
+        slug: "bupa-acibadem-ozel-saglik",
+        name: "Bupa Acıbadem Kişiye Özel Sağlık (ÖSS)",
+        productType: "OSS",
+        requiresPublicSgk: false,
+      },
+    ],
+    networks: [
+      {
+        id: "cat-net-bupa-tss",
+        code: "BUPA_TSS_NET",
+        slug: "bupa-tss-ag",
+        name: "Bupa Acıbadem TSS Ağı",
+        tierLabel: "TSS Ağı",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-bupa-aplus",
+        code: "BUPA_A_PLUS",
+        slug: "bupa-a-plus-ag",
+        name: "A Plus Network (Acıbadem & Tüm Kurumlar)",
+        tierLabel: "A Plus",
+        productType: "OSS",
+      },
+      {
+        id: "cat-net-bupa-a",
+        code: "BUPA_A",
+        slug: "bupa-a-ag",
+        name: "A Network (Geniş Anlaşmalı Ağ)",
+        tierLabel: "A Network",
+        productType: "OSS",
+      },
+    ],
+  },
+  axa: {
+    supportedProductTypes: ["TSS", "OSS", "TRAVEL"],
+    products: [
+      {
+        id: "cat-prod-axa-tss",
+        code: "AXA_TSS",
+        slug: "axa-saglikli-gelecek-tss",
+        name: "AXA Sağlıklı Gelecek TSS",
+        productType: "TSS",
+        requiresPublicSgk: true,
+      },
+      {
+        id: "cat-prod-axa-oss",
+        code: "AXA_OSS",
+        slug: "axa-sagligim-tamam-oss",
+        name: "AXA Özel Sağlık Sigortası (ÖSS)",
+        productType: "OSS",
+        requiresPublicSgk: false,
+      },
+    ],
+    networks: [
+      {
+        id: "cat-net-axa-tss",
+        code: "AXA_TSS_NET",
+        slug: "axa-tss-ag",
+        name: "AXA TSS Anlaşmalı Kurum Ağı",
+        tierLabel: "TSS Ağı",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-axa-elit",
+        code: "AXA_ELIT",
+        slug: "axa-elit-ag",
+        name: "Elit Network (ÖSS Tüm Kurumlar)",
+        tierLabel: "Elit Network",
+        productType: "OSS",
+      },
+      {
+        id: "cat-net-axa-prestij",
+        code: "AXA_PRESTIJ",
+        slug: "axa-prestij-ag",
+        name: "Prestij Network (ÖSS)",
+        tierLabel: "Prestij Network",
+        productType: "OSS",
+      },
+    ],
+  },
+  anadolu: {
+    supportedProductTypes: ["TSS", "OSS", "TRAVEL"],
+    products: [
+      {
+        id: "cat-prod-anadolu-tss",
+        code: "ANADOLU_TSS",
+        slug: "anadolu-tamamlayici-saglik",
+        name: "Anadolu Tamamlayıcı Sağlık Sigortası (TSS)",
+        productType: "TSS",
+        requiresPublicSgk: true,
+      },
+      {
+        id: "cat-prod-anadolu-oss",
+        code: "ANADOLU_OSS",
+        slug: "anadolu-bireysel-saglik",
+        name: "Anadolu Bireysel Özel Sağlık (ÖSS)",
+        productType: "OSS",
+        requiresPublicSgk: false,
+      },
+    ],
+    networks: [
+      {
+        id: "cat-net-anadolu-tss",
+        code: "ANADOLU_TSS_NET",
+        slug: "anadolu-tss-ag",
+        name: "Anadolu TSS Anlaşmalı Ağı",
+        tierLabel: "TSS Ağı",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-anadolu-altin",
+        code: "ANADOLU_ALTIN",
+        slug: "anadolu-altin-ag",
+        name: "Altın Network (ÖSS Geniş Ağ)",
+        tierLabel: "Altın Network",
+        productType: "OSS",
+      },
+      {
+        id: "cat-net-anadolu-gumus",
+        code: "ANADOLU_GUMUS",
+        slug: "anadolu-gumus-ag",
+        name: "Gümüş Network (ÖSS Seçili Ağ)",
+        tierLabel: "Gümüş Network",
+        productType: "OSS",
+      },
+    ],
+  },
+  mapfre: {
+    supportedProductTypes: ["TSS", "OSS"],
+    products: [
+      {
+        id: "cat-prod-mapfre-tss",
+        code: "MAPFRE_TSS",
+        slug: "mapfre-fark-yok-tss",
+        name: "Mapfre Fark Yok Tamamlayıcı Sağlık (TSS)",
+        productType: "TSS",
+        requiresPublicSgk: true,
+      },
+      {
+        id: "cat-prod-mapfre-oss",
+        code: "MAPFRE_OSS",
+        slug: "mapfre-medikonomik-oss",
+        name: "Mapfre Özel Sağlık Sigortası (ÖSS)",
+        productType: "OSS",
+        requiresPublicSgk: false,
+      },
+    ],
+    networks: [
+      {
+        id: "cat-net-mapfre-tss",
+        code: "MAPFRE_TSS_NET",
+        slug: "mapfre-fark-yok-ag",
+        name: "Fark Yok TSS Ağı",
+        tierLabel: "Fark Yok Ağı",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-mapfre-oss",
+        code: "MAPFRE_OSS_NET",
+        slug: "mapfre-genis-oss-ag",
+        name: "Geniş Anlaşmalı ÖSS Ağı",
+        tierLabel: "Geniş Ağ",
+        productType: "OSS",
+      },
+    ],
+  },
+  sompo: {
+    supportedProductTypes: ["TSS", "OSS", "FOREIGN_HEALTH"],
+    products: [
+      {
+        id: "cat-prod-sompo-tss",
+        code: "SOMPO_TSS",
+        slug: "sompo-tamamlayici-saglik",
+        name: "Sompo Tamamlayıcı Sağlık Sigortası (TSS)",
+        productType: "TSS",
+        requiresPublicSgk: true,
+      },
+      {
+        id: "cat-prod-sompo-oss",
+        code: "SOMPO_OSS",
+        slug: "sompo-ozel-saglik",
+        name: "Sompo Özel Sağlık Sigortası (ÖSS)",
+        productType: "OSS",
+        requiresPublicSgk: false,
+      },
+    ],
+    networks: [
+      {
+        id: "cat-net-sompo-tss",
+        code: "SOMPO_TSS_NET",
+        slug: "sompo-tamamlayici-ag",
+        name: "Sompo TSS Anlaşmalı Kurum Ağı",
+        tierLabel: "TSS Ağı",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-sompo-oss",
+        code: "SOMPO_OSS_NET",
+        slug: "sompo-ozel-saglik-ag",
+        name: "Sompo ÖSS Geniş Kurum Ağı",
+        tierLabel: "ÖSS Geniş Ağ",
+        productType: "OSS",
+      },
+    ],
+  },
+  "turkiye-sigorta": {
+    supportedProductTypes: ["TSS", "OSS", "TRAVEL"],
+    products: [
+      {
+        id: "cat-prod-ts-tss",
+        code: "TS_TSS",
+        slug: "turkiye-sigorta-tamamlayici-saglik",
+        name: "Türkiye Sigorta Tamamlayıcı Sağlık (TSS)",
+        productType: "TSS",
+        requiresPublicSgk: true,
+      },
+      {
+        id: "cat-prod-ts-oss",
+        code: "TS_OSS",
+        slug: "turkiye-sigorta-ozel-saglik",
+        name: "Türkiye Sigorta Özel Sağlık (ÖSS)",
+        productType: "OSS",
+        requiresPublicSgk: false,
+      },
+    ],
+    networks: [
+      {
+        id: "cat-net-ts-tss",
+        code: "TS_TSS_NET",
+        slug: "turkiye-sigorta-tss-ag",
+        name: "Türkiye Sigorta TSS Geniş Ağ",
+        tierLabel: "TSS Geniş Ağ",
+        productType: "TSS",
+      },
+      {
+        id: "cat-net-ts-oss",
+        code: "TS_OSS_NET",
+        slug: "turkiye-sigorta-oss-ag",
+        name: "Türkiye Sigorta ÖSS Anlaşmalı Ağ",
+        tierLabel: "ÖSS Ağı",
+        productType: "OSS",
+      },
+    ],
+  },
+};
+
+export function enrichInsurerCatalogWithProductsAndNetworks<
+  T extends {
+    id: string;
+    name: string;
+    slug: string;
+    products?: any[];
+    networks?: any[];
+  }
+>(insurers: T[]) {
+  return insurers.map((insurer) => {
+    const canonical = CANONICAL_INSURER_CATALOG_METADATA[insurer.slug] || {
+      supportedProductTypes: ["TSS", "OSS"] as InsuranceProductType[],
+      products: [],
+      networks: [],
+    };
+    const dbProducts = Array.isArray(insurer.products) && insurer.products.length > 0 ? insurer.products : canonical.products;
+    const dbNetworks = Array.isArray(insurer.networks) && insurer.networks.length > 0 ? insurer.networks : canonical.networks;
+    return {
+      ...insurer,
+      supportedProductTypes: canonical.supportedProductTypes,
+      products: dbProducts,
+      networks: dbNetworks,
+    };
+  });
+}
+
+export function getDiscoveryEligibilityPriorityRank(
+  state: InsuranceDiscoveryEligibilityState | null | undefined
+): number {
+  switch (state) {
+    case "CONFIRMED_MATCH":
+      return 4;
+    case "PARTIAL_OR_RESTRICTED":
+      return 3;
+    case "DECLARED_OR_UNVERIFIED":
+      return 2;
+    case "UNKNOWN":
+      return 1;
+    case "CONFIRMED_NON_MATCH":
+      return 0;
+    default:
+      return 1;
+  }
+}
+
+export function filterAndRankByInsuranceDiscovery<
+  T extends {
+    insuranceMatch?: {
+      eligibilityState: InsuranceDiscoveryEligibilityState;
+      confirmed: boolean;
+      matched: boolean;
+    } | null;
+    distanceKm?: number | null;
+    isVerified?: boolean;
+    verifiedAt?: string | null;
+    name: string;
+  }
+>(
+  items: T[],
+  options: {
+    strictConfirmedOnly?: boolean;
+    prioritizeInNetwork?: boolean;
+    hasGeo?: boolean;
+  } = {}
+): T[] {
+  let result = [...items];
+
+  if (options.strictConfirmedOnly) {
+    result = result.filter(
+      (item) => item.insuranceMatch?.eligibilityState === "CONFIRMED_MATCH"
+    );
+  }
+
+  if (options.prioritizeInNetwork) {
+    result.sort((a, b) => {
+      const rankA = getDiscoveryEligibilityPriorityRank(a.insuranceMatch?.eligibilityState);
+      const rankB = getDiscoveryEligibilityPriorityRank(b.insuranceMatch?.eligibilityState);
+      if (rankA !== rankB) return rankB - rankA;
+
+      if (options.hasGeo) {
+        return (a.distanceKm ?? 99999) - (b.distanceKm ?? 99999);
+      }
+
+      if (a.isVerified !== b.isVerified) return a.isVerified ? -1 : 1;
+      if (a.isVerified && b.isVerified) {
+        const tA = a.verifiedAt ? new Date(a.verifiedAt).getTime() : 0;
+        const tB = b.verifiedAt ? new Date(b.verifiedAt).getTime() : 0;
+        if (tA !== tB) return tB - tA;
+      }
+      return a.name.localeCompare(b.name, "tr-TR");
+    });
+  }
+
+  return result;
+}
+
 

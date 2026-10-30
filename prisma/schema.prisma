@@ -1603,6 +1603,7 @@ model InsuranceProviderAgreement {
   organizationId          String?
   directoryInstitutionId  String?
   insuranceProviderId     String
+  productType             InsuranceProductType?
   productId               String?
   networkId               String?
   coverageScope           AgreementCoverageScope            @default(ALL_BRANCHES)

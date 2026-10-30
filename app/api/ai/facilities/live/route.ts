@@ -2,6 +2,8 @@ import { NextRequest,NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { searchNearbyHealthPlaces } from "@/lib/integrations/google-places";
 import { isOrganizationOpenNow } from "@/lib/ai/context";
+import { loadInsuranceDiscoveryData } from "@/lib/institution-directory";
+import { evaluateFacilityInsuranceCoverage } from "@/lib/insurance-domain";
 
 function haversine(lat1:number,lon1:number,lat2:number,lon2:number){
   const R=6371,toRad=(d:number)=>d*Math.PI/180;
@@ -21,10 +23,20 @@ export async function POST(req:NextRequest){
   const googleType=kind==="pharmacy"?"pharmacy":kind==="doctor"?"doctor":"hospital";
   const skipGoogle=kind==="laboratory"||kind==="imaging";
   const insuranceProviderSlug=typeof body.insuranceProviderSlug==="string"?body.insuranceProviderSlug:null;
+  const insuranceProviderId=typeof body.insuranceProviderId==="string"?body.insuranceProviderId:null;
+  const productType=typeof body.productType==="string"?body.productType:null;
+  const productId=typeof body.productId==="string"?body.productId:null;
+  const networkId=typeof body.networkId==="string"?body.networkId:null;
+  const hasInsuranceQuery=Boolean(insuranceProviderSlug||insuranceProviderId);
 
-  const [local,google]=await Promise.all([
+  const [local,google,insuranceData]=await Promise.all([
     prisma.organization.findMany({
-      where:{status:"APPROVED",isPublished:true,verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},type:orgType as any},
+      where:{
+        status:"APPROVED",
+        isPublished:true,
+        verificationDocuments:{none:{status:"APPROVED",expiresAt:{lt:new Date()}}},
+        type:orgType as any
+      },
       include:{
         hours:true,
         insuranceContracts:{
@@ -39,26 +51,60 @@ export async function POST(req:NextRequest){
       take:100
     }),
     skipGoogle?Promise.resolve([]):searchNearbyHealthPlaces({lat,lng,type:googleType as any,radiusMeters:Number(body.radiusMeters||10000),maxResultCount:20})
-      .catch(()=>[])
+      .catch(()=>[]),
+    hasInsuranceQuery ? loadInsuranceDiscoveryData() : Promise.resolve({ insurers: [], agreements: [], legacyContracts: [] })
   ]);
 
-  const localResults=local.map(o=>{
-    const d=o.latitude!=null&&o.longitude!=null?haversine(lat,lng,o.latitude,o.longitude):null;
-    const insuranceMatch=insuranceProviderSlug
-      ? o.insuranceContracts.some(c=>c.insuranceProvider.slug===insuranceProviderSlug):null;
-    return {
-      source:"alumas",
-      id:o.id,name:o.name,type:o.type,address:o.address,
-      lat:o.latitude,lng:o.longitude,
-      distanceKm:d==null?null:Math.round(d*10)/10,
-      openNow:isOrganizationOpenNow(o.hours),
-      isOnDuty:o.isOnDuty,
-      insuranceMatch,
-      verified:true,
-      score:
-        60+(o.isOnDuty?25:0)+(d!=null?Math.max(0,15-Math.min(15,d)):0)+(insuranceMatch===true?15:0)
-    };
-  });
+  const resolvedInsurerId = hasInsuranceQuery
+    ? (insuranceProviderId ||
+        insuranceData.insurers.find((i) => i.slug === insuranceProviderSlug)?.id ||
+        insuranceProviderSlug)
+    : null;
+
+  const localResults=local
+    .filter((o) => (o.type as string) !== "INSURANCE_COMPANY")
+    .map(o=>{
+      const d=o.latitude!=null&&o.longitude!=null?haversine(lat,lng,o.latitude,o.longitude):null;
+      const evalResult = resolvedInsurerId
+        ? evaluateFacilityInsuranceCoverage({
+            organizationId: o.id,
+            insuranceProviderId: resolvedInsurerId,
+            productType,
+            productId,
+            networkId,
+            agreements: insuranceData.agreements,
+            legacyContracts: insuranceData.legacyContracts,
+          })
+        : null;
+      const insuranceMatch =
+        evalResult?.eligibilityState === "CONFIRMED_MATCH"
+          ? true
+          : evalResult?.eligibilityState === "CONFIRMED_NON_MATCH"
+          ? false
+          : null;
+      const insuranceBoost =
+        evalResult?.eligibilityState === "CONFIRMED_MATCH"
+          ? 20
+          : evalResult?.eligibilityState === "PARTIAL_OR_RESTRICTED"
+          ? 10
+          : evalResult?.eligibilityState === "DECLARED_OR_UNVERIFIED"
+          ? 6
+          : 0;
+      return {
+        source:"alumas",
+        id:o.id,name:o.name,type:o.type,address:o.address,
+        lat:o.latitude,lng:o.longitude,
+        distanceKm:d==null?null:Math.round(d*10)/10,
+        openNow:isOrganizationOpenNow(o.hours),
+        isOnDuty:o.isOnDuty,
+        insuranceMatch,
+        insuranceEligibilityState: evalResult?.eligibilityState ?? null,
+        insuranceNote: evalResult?.note ?? null,
+        verified:true,
+        score:
+          60+(o.isOnDuty?25:0)+(d!=null?Math.max(0,15-Math.min(15,d)):0)+insuranceBoost
+      };
+    });
 
   const googleResults=google.map(p=>{
     const d=p.latitude!=null&&p.longitude!=null?haversine(lat,lng,p.latitude,p.longitude):null;
@@ -70,6 +116,8 @@ export async function POST(req:NextRequest){
       openNow:p.openNow,
       isOnDuty:false,
       insuranceMatch:null,
+      insuranceEligibilityState: resolvedInsurerId ? "UNKNOWN" : null,
+      insuranceNote: null,
       verified:false,
       rating:p.rating,
       userRatingCount:p.userRatingCount,

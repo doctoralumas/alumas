@@ -10,9 +10,15 @@ import {
 } from "@/lib/institution-directory";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
 import {
+  canClaimInsurer,
   evaluateInsurerVerification,
   normalizeInsurerIdentityKey,
 } from "@/lib/insurance-domain";
+import {
+  createIsolatedInsurerApplication,
+  loadFullInsuranceEcosystemState,
+  recordInsuranceAudit,
+} from "@/lib/insurance-ecosystem-store";
 
 const TYPES: Record<
   string,
@@ -58,6 +64,17 @@ export async function GET(req: Request) {
   const lat = rawLat !== null && rawLat !== "" ? Number(rawLat) : null;
   const lng = rawLng !== null && rawLng !== "" ? Number(rawLng) : null;
 
+  const insuranceProviderId = u.searchParams.get("insuranceProviderId") || null;
+  const insuranceSlug = u.searchParams.get("insuranceSlug") || null;
+  const productType = u.searchParams.get("productType") || null;
+  const productId = u.searchParams.get("productId") || null;
+  const networkId = u.searchParams.get("networkId") || null;
+  const specialtyCode = u.searchParams.get("specialtyCode") || null;
+  const strictConfirmedOnly = u.searchParams.get("strictConfirmedOnly") === "1";
+  const prioritizeInNetwork =
+    u.searchParams.get("prioritizeInNetwork") !== "0" &&
+    Boolean(insuranceProviderId || insuranceSlug);
+
   const data = await queryNormalizedDirectory({
     type,
     city,
@@ -66,6 +83,14 @@ export async function GET(req: Request) {
     lat: lat !== null && Number.isFinite(lat) ? lat : null,
     lng: lng !== null && Number.isFinite(lng) ? lng : null,
     unclaimedOnly,
+    insuranceProviderId,
+    insuranceSlug,
+    productType,
+    productId,
+    networkId,
+    specialtyCode,
+    strictConfirmedOnly,
+    prioritizeInNetwork,
   });
 
   return NextResponse.json(data);
@@ -88,6 +113,12 @@ export async function POST(req: Request) {
   const requestedDirId = String(form.get("directoryInstitutionId") || "").trim() || null;
   const applicantRoleTitle = String(form.get("applicantRoleTitle") || "").trim() || null;
   const applicantNote = String(form.get("applicantNote") || "").trim() || null;
+  const claimedInsurerId = String(form.get("claimedInsurerId") || "").trim() || null;
+  const legalName = String(form.get("legalName") || "").trim() || null;
+  const seddkLicenseRef = String(form.get("seddkLicenseRef") || "").trim() || null;
+  const tsbMemberCode = String(form.get("tsbMemberCode") || "").trim() || null;
+  const claimsPhone = String(form.get("claimsPhone") || "").trim() || null;
+  const provisionPortalUrl = String(form.get("provisionPortalUrl") || "").trim() || null;
 
   if (!type || !name || !city || !address || !phone || !email) {
     return NextResponse.json({ error: "Zorunlu alanları doldurun" }, { status: 400 });
@@ -202,6 +233,61 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
+
+      if (!seddkLicenseRef) {
+        return NextResponse.json(
+          {
+            error:
+              "Sigorta şirketi başvurularında SEDDK faaliyet ruhsatı / sicil referans numarası zorunludur.",
+          },
+          { status: 400 }
+        );
+      }
+
+      const eco = await loadFullInsuranceEcosystemState({ includeHidden: true });
+      const matchedCanonical = claimedInsurerId
+        ? eco.insurers.find(
+            (i) => i.id === claimedInsurerId || i.slug === claimedInsurerId
+          )
+        : eco.insurers.find(
+            (i) => normalizeInsurerIdentityKey(i.name) === normalizedInsurerKey
+          );
+
+      if (matchedCanonical) {
+        const claimCheck = canClaimInsurer(matchedCanonical);
+        if (!claimCheck.allowed) {
+          return NextResponse.json(
+            { error: claimCheck.reason || "Bu sigorta kurumu sahiplenilemez." },
+            { status: matchedCanonical.organizationId ? 409 : 400 }
+          );
+        }
+        if (!matchedCanonical.canClaim) {
+          return NextResponse.json(
+            {
+              error:
+                matchedCanonical.claimBlockReason ||
+                "Bu sigorta kurumu için zaten aktif veya incelemede olan bir kurumsal sahiplenme başvurusu bulunuyor.",
+            },
+            { status: 409 }
+          );
+        }
+      }
+
+      const duplicateIso = eco.isolatedOrganizations.find(
+        (o: any) =>
+          o.type === "INSURANCE_COMPANY" &&
+          (o.status === "PENDING" || o.status === "APPROVED") &&
+          normalizeInsurerIdentityKey(o.name) === normalizedInsurerKey
+      );
+      if (duplicateIso) {
+        return NextResponse.json(
+          {
+            error:
+              "Bu sigorta kurumu için zaten doğrulanmış bir kayıt veya incelemede olan bir başvuru bulunuyor.",
+          },
+          { status: 409 }
+        );
+      }
     }
 
     const documents = await documentsFromForm(form, "organization", effectiveType, user.id);
@@ -218,6 +304,72 @@ export async function POST(req: Request) {
     }
 
     const resolvedWebsite = safeWebsite || (targetDir ? normalizeOfficialWebsiteUrl(targetDir.officialWebsite) : null);
+
+    if (
+      effectiveType === "INSURANCE_COMPANY" &&
+      process.env.ALUMAS_ISOLATED_TEST_MODE === "1"
+    ) {
+      const isoOrg = await createIsolatedInsurerApplication({
+        ownerUserId: user.id,
+        ownerUser: { id: user.id, name: user.name, email: user.email, phone: user.phone },
+        name: effectiveName,
+        slug,
+        city: effectiveCity,
+        district,
+        address,
+        phone,
+        email,
+        website: resolvedWebsite,
+        description,
+        applicantRoleTitle,
+        applicantNote,
+        claimedInsurerId,
+        legalName,
+        seddkLicenseRef,
+        tsbMemberCode,
+        claimsPhone,
+        provisionPortalUrl,
+        documents,
+      });
+
+      const insurerEval = evaluateInsurerVerification({
+        applicantEmail: email,
+        officialWebsite: resolvedWebsite,
+        documents: documents.map((d) => ({
+          documentType: d.documentType,
+          status: "PENDING",
+          expiresAt: d.expiresAt,
+        })),
+      });
+
+      await recordInsuranceAudit({
+        actorUserId: user.id,
+        action: claimedInsurerId ? "organization.claim.submit" : "organization.apply",
+        entityType: "Organization",
+        entityId: isoOrg.id,
+        metadata: {
+          type: "INSURANCE_COMPANY",
+          claimedInsurerId,
+          legalName,
+          seddkLicenseRef,
+          tsbMemberCode,
+          claimsPhone,
+          provisionPortalUrl,
+          applicantRoleTitle,
+          supportingSignals: insurerEval.supportingSignals,
+        },
+        req,
+      });
+
+      return NextResponse.json(
+        {
+          ...isoOrg,
+          isVerified: false,
+          verificationState: claimedInsurerId ? "PENDING_CLAIM" : "UNVERIFIED",
+        },
+        { status: 201 }
+      );
+    }
 
     const org = await prisma.$transaction(async (tx) => {
       // Double-check inside transaction that no active claim was concurrently inserted
@@ -338,7 +490,17 @@ export async function POST(req: Request) {
           directoryInstitutionName: targetDir.name,
           applicantRoleTitle,
           applicantNote,
-          ...(insurerEval ? { supportingSignals: insurerEval.supportingSignals } : {}),
+          ...(insurerEval
+            ? {
+                supportingSignals: insurerEval.supportingSignals,
+                claimedInsurerId,
+                legalName,
+                seddkLicenseRef,
+                tsbMemberCode,
+                claimsPhone,
+                provisionPortalUrl,
+              }
+            : {}),
         },
         req,
       });
@@ -351,7 +513,17 @@ export async function POST(req: Request) {
         metadata: {
           type: org.type,
           applicantRoleTitle,
-          ...(insurerEval ? { supportingSignals: insurerEval.supportingSignals } : {}),
+          ...(insurerEval
+            ? {
+                supportingSignals: insurerEval.supportingSignals,
+                claimedInsurerId,
+                legalName,
+                seddkLicenseRef,
+                tsbMemberCode,
+                claimsPhone,
+                provisionPortalUrl,
+              }
+            : {}),
         },
         req,
       });
