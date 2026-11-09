@@ -6,6 +6,34 @@ import osmRecords from "@/data/osm/hospitals.json";
 
 const INDEPENDENT_DATASET_SHA256 = "d6a0bd7d9e433c2912626acc7f2cf334f0c1bb22b9384826104aee7525ab48f0";
 
+/**
+ * Canonical standalone ODbL directory snapshot. This data is compiled independently
+ * of ALUMAS-owned institutions and is the same snapshot served by the export route.
+ * Keep the snapshot available for browsing while the production OSM table is being
+ * brought up to date. Never filter it against the private institution inventory.
+ */
+type OsmDirectoryRow = Pick<ExternalHospital,
+  "sourceId" | "name" | "city" | "district" | "locality" | "address" |
+  "phone" | "website" | "latitude" | "longitude" | "sourceUrl" |
+  "sourceDate" | "licenseUrl">;
+
+const independentDirectoryRows: OsmDirectoryRow[] = osmRecords.map((r) => ({
+  sourceId: r.source_id,
+  name: r.name,
+  city: r.osm_city || null,
+  district: r.osm_district || null,
+  locality: r.osm_locality || null,
+  address: r.address || null,
+  phone: r.phone || null,
+  website: r.website || null,
+  latitude: Number(r.latitude),
+  longitude: Number(r.longitude),
+  sourceUrl: r.source_url,
+  sourceDate: r.source_date,
+  licenseUrl: r.license,
+}));
+
+
 function enabled(): boolean {
   if (process.env.NODE_ENV === "production") return process.env.ALUMAS_OSM_DIRECTORY_ENABLED === "1" && process.env.ALUMAS_OSM_ODBL_DISTRIBUTION_READY === "1";
   return process.env.ALUMAS_OSM_LOCAL_PREVIEW === "1";
@@ -23,7 +51,7 @@ function key(value: string): string {
 }
 
 /** Search the OSM layer independently, without cross-source matching. */
-export function filterOsmHospitalRecords(rows: ExternalHospital[], query: string, city = ""): NormalizedDirectoryItem[] {
+export function filterOsmHospitalRecords(rows: OsmDirectoryRow[], query: string, city = ""): NormalizedDirectoryItem[] {
   const search = key(query);
   return rows.filter((r) => (!search || key([r.name, r.address, r.city, r.district, r.locality].filter(Boolean).join(" ")).includes(search))
     && (!city || (r.city && key(r.city) === key(city))))
@@ -65,9 +93,24 @@ export function independentDatasetMatches(rows: ExternalHospital[]): boolean {
 
 export async function readOsmHospitalPreview(query: string, city = ""): Promise<NormalizedDirectoryItem[]> {
   if (!enabled()) return [];
-  const rows = await prisma.externalHospital.findMany({ orderBy: [{ name: "asc" }, { sourceId: "asc" }] });
-  if (!independentDatasetMatches(rows)) {
-    throw new Error("OSM_INDEPENDENT_DATASET_INCOMPLETE");
+
+  // Use the Supabase OSM table when it exactly matches the independent source.
+  // The older 997-row inventory does not match: do not silently omit 369 records.
+  // Keep the independent, publicly downloadable ODbL snapshot as a read-only
+  // fallback, without inserting anything or comparing with ALUMAS institutions.
+  try {
+    const count = await prisma.externalHospital.count();
+    if (count === independentDirectoryRows.length) {
+      const rows = await prisma.externalHospital.findMany({
+        orderBy: [{ name: "asc" }, { sourceId: "asc" }],
+      });
+      if (independentDatasetMatches(rows)) {
+        return filterOsmHospitalRecords(rows, query, city);
+      }
+    }
+  } catch {
+    // The OSM table may be unavailable during a staged rollout. No DB writes.
   }
-  return filterOsmHospitalRecords(rows, query, city);
+
+  return filterOsmHospitalRecords(independentDirectoryRows, query, city);
 }
