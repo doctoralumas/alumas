@@ -1,10 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { register } from "node:module";
-
-// Keep the production matcher free of Prisma, DB connections and test-only shims.
-register("tsx/esm", import.meta.url);
+// Node 22.18+ natively strips the non-runtime TypeScript syntax in this pure module.
 const {
   hospitalNameKey,
   isDisplayableOsmHospital,
