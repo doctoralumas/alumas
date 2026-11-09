@@ -80,3 +80,20 @@ test("real OSM selection is stable, includes 1,200+ hospitals, and has no self d
   assert.equal(JSON.stringify(records),before, "selection must not mutate source order");
   assert.deepEqual([...uniqueOsmDisplayIds([...records].reverse())].sort(),[...ids].sort());
 });
+
+
+test("curated fixture hospitals align with independent OSM references", () => {
+  const cases = [
+    { name: "Acıbadem Maslak Hastanesi", latitude: 41.1264, longitude: 29.0247, sourceId: "OSM:way/1319843595" },
+    { name: "VKV Amerikan Hastanesi", latitude: 41.0522, longitude: 28.9935, sourceId: "OSM:node/2311684920" },
+    { name: "Memorial Şişli Hastanesi", latitude: 41.0615, longitude: 28.9734, sourceId: "OSM:way/382843570" },
+    { name: "Ankara Bilkent Şehir Hastanesi", latitude: 39.8986, longitude: 32.7565, sourceId: "OSM:way/724710677" },
+  ];
+  for (const { sourceId, ...curated } of cases) {
+    const osm = records.find((item) => item.sourceId === sourceId);
+    assert.ok(osm, sourceId);
+    assert.equal(samePhysicalHospital(curated, osm), true, `Not matched: ${curated.name}`);
+    assert.deepEqual(hideCuratedHospitalDuplicates([osm], [curated]), [],
+      `Curated record must take precedence for ${curated.name}`);
+  }
+});
