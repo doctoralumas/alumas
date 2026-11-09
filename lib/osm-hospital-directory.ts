@@ -52,9 +52,9 @@ function key(value: string): string {
 }
 
 /**
- * A hospital entry needs at least one supporting public detail beyond its name and
- * map pin before it is promoted to the discovery UI. All 1,366 original OSM rows
- * remain intact and downloadable under the ODbL; nothing is deleted from the DB.
+ * Determine which independent OSM hospitals are shown as facility cards.
+ * Identity/annex filtering is display-only: the complete independent ODbL dataset
+ * remains intact and downloadable; no record is deleted from the database.
  */
 const displayOsmIds = uniqueOsmDisplayIds(independentDirectoryRows);
 
