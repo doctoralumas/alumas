@@ -50,10 +50,95 @@ function key(value: string): string {
     .replace(/ı/g, "i").replace(/[^a-z0-9]+/g, " ").trim();
 }
 
+/**
+ * A hospital entry needs at least one supporting public detail beyond its name and
+ * map pin before it is promoted to the discovery UI. All 1,366 original OSM rows
+ * remain intact and downloadable under the ODbL; nothing is deleted from the DB.
+ */
+function supportedHospital(row: OsmDirectoryRow): boolean {
+  const name = key(row.name);
+  if (!name) return false;
+  if (/(^| )eski( |$)/.test(name)) return false;
+  if (/(^| )(acil girisi|acil giris|acil servisi|acil bolumu|kvc girisi|radyasyon onkolojisi|merkez poliklinigi|poliklinikler|poliklinigi|ek binasi|ana binasi)( |$)/.test(name)) return false;
+  if (/(^| )acil$/.test(name)) return false;
+  return Boolean(row.city || row.district || row.locality || row.address || row.phone || row.website);
+}
+
+function facilityTokens(name: string): string[] {
+  return key(name)
+    .split(" ")
+    .filter((token) => token && !["ozel", "hospital", "hastane", "hastanesi", "hastaneleri", "t", "c"].includes(token));
+}
+
+function distanceMetres(a: {latitude: number | null; longitude: number | null}, b: {latitude: number | null; longitude: number | null}): number {
+  if (a.latitude == null || a.longitude == null || b.latitude == null || b.longitude == null) return Infinity;
+  const lat1 = a.latitude * Math.PI / 180, lat2 = b.latitude * Math.PI / 180;
+  const dLat = lat2 - lat1, dLon = (b.longitude - a.longitude) * Math.PI / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 12742000 * Math.asin(Math.sqrt(h));
+}
+
+function sameFacilityName(a: string, b: string, metres: number): boolean {
+  if (metres > 150) return false;
+  const first = key(a), second = key(b);
+  if (first === second && first.length > 7) return true;
+  const firstTokens = facilityTokens(a), secondTokens = facilityTokens(b);
+  if (!firstTokens.length || !secondTokens.length) return false;
+  const aKey = firstTokens.join(" "), bKey = secondTokens.join(" ");
+  if (aKey === bKey && aKey.length > 7) return true;
+  if (metres > 40) return false;
+  const smaller = firstTokens.length <= secondTokens.length ? firstTokens : secondTokens;
+  const larger = smaller === firstTokens ? secondTokens : firstTokens;
+  const overlaps = smaller.filter((token) => larger.includes(token) && token.length >= 4).length;
+  // A generic term (e.g. 'Devlet Hastanesi') cannot establish a match by itself.
+  return overlaps >= 2 && overlaps / larger.length >= 0.65
+    || metres <= 12 && overlaps >= 1 && overlaps === smaller.length
+    && smaller.join("").length >= 6;
+}
+
+function recordQuality(row: OsmDirectoryRow): number {
+  return Number(Boolean(row.website)) * 16 + Number(Boolean(row.address)) * 8
+    + Number(Boolean(row.city)) * 4 + Number(Boolean(row.phone)) * 2
+    + Number(row.sourceId.startsWith("OSM:way/")) + row.name.length / 1000;
+}
+
+/**
+ * Deduplicate only inside the independently sourced OSM layer. Never infer that
+ * two hospitals are the same based on nearby coordinates alone.
+ */
+function independentDisplayIds(rows: OsmDirectoryRow[]): Set<string> {
+  const selected: OsmDirectoryRow[] = [];
+  const sorted = rows.filter(supportedHospital)
+    .sort((a, b) => recordQuality(b) - recordQuality(a) || a.sourceId.localeCompare(b.sourceId));
+  for (const row of sorted) {
+    const repeated = selected.some((existing) => {
+      const metres = distanceMetres(row, existing);
+      return sameFacilityName(row.name, existing.name, metres);
+    });
+    if (!repeated) selected.push(row);
+  }
+  return new Set(selected.map((row) => row.sourceId));
+}
+
+const displayOsmIds = independentDisplayIds(independentDirectoryRows);
+
+/** Display-only suppression, retaining the original independently licensed export. */
+export function removeCuratedHospitalDuplicates(
+  osm: NormalizedDirectoryItem[], curated: NormalizedDirectoryItem[]
+): NormalizedDirectoryItem[] {
+  const existingHospitals = curated.filter((item) => item.type === "HOSPITAL");
+  return osm.filter((osmRow) => !existingHospitals.some((item) => {
+    if (item.city && osmRow.city && key(item.city) !== key(osmRow.city)) return false;
+    const metres = distanceMetres(item, osmRow);
+    return sameFacilityName(item.name, osmRow.name, metres);
+  }));
+}
+
+
 /** Search the OSM layer independently, without cross-source matching. */
 export function filterOsmHospitalRecords(rows: OsmDirectoryRow[], query: string, city = ""): NormalizedDirectoryItem[] {
   const search = key(query);
-  return rows.filter((r) => (!search || key([r.name, r.address, r.city, r.district, r.locality].filter(Boolean).join(" ")).includes(search))
+  return rows.filter((r) => displayOsmIds.has(r.sourceId) && (!search || key([r.name, r.address, r.city, r.district, r.locality].filter(Boolean).join(" ")).includes(search))
     && (!city || (r.city && key(r.city) === key(city))))
     .map((r) => {
       const officialWebsite = normalizeOfficialWebsiteUrl(r.website);
