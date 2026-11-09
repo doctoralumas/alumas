@@ -10,7 +10,7 @@ import {
   calculateDistanceKm,
 } from "@/lib/institution-directory";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
-import { osmPreviewRequestAllowed, readOsmHospitalPreview } from "@/lib/osm-hospital-directory";
+import { osmPreviewRequestAllowed, readOsmHospitalPreview, removeCuratedHospitalDuplicates } from "@/lib/osm-hospital-directory";
 import {
   canClaimInsurer,
   evaluateInsurerVerification,
@@ -110,7 +110,9 @@ export async function GET(req: Request) {
       if (lat !== null && lng !== null) {
         for (const item of osm) if (item.latitude !== null && item.longitude !== null) item.distanceKm = calculateDistanceKm(lat, lng, item.latitude, item.longitude);
       }
-      result = [...data, ...osm];
+      // Prefer an existing ALUMAS institution card if both public data sources
+      // confidently refer to the same physical facility. No records are deleted.
+      result = [...data, ...removeCuratedHospitalDuplicates(osm, data)];
       if (lat !== null && lng !== null) result.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
     } catch {
       osmUnavailable = true;
