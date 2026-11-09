@@ -29,7 +29,7 @@ export function hospitalNameKey(value: string | null | undefined): string {
 
 const GENERIC_NAMES = new Set(["hastane", "hastanesi", "hospital", "devlet hastanesi", "medical center"]);
 const IGNORED_NAME_TOKENS = new Set([
-  "ozel", "hastane", "hastanesi", "hastaneleri", "hospital", "hospitals", "ve", "t", "c",
+  "ozel", "hastane", "hastanesi", "hastaneleri", "hospital", "hospitals", "ve", "t", "c", "vkv",
 ]);
 
 /** Ignore entrances, emergency departments, clinics and annexes, not actual hospitals. */
@@ -77,15 +77,21 @@ export function samePhysicalHospital(a: HospitalIdentity, b: HospitalIdentity): 
       && aAddress.length >= 12 && aAddress === bAddress;
   }
 
-  if (distance > 175) return false;
+  // Map markers may identify a facility entrance or polygon centroid, which can
+  // differ by a few hundred metres. Allow that margin ONLY for exact names or
+  // names that become identical after removing a legal-entity prefix (e.g. VKV).
+  if (distance > 325) return false;
   const aCity = hospitalNameKey(a.city), bCity = hospitalNameKey(b.city);
   if (aCity && bCity && aCity !== bCity && distance > 35) return false;
   if (firstName === secondName && firstName.length >= 8) return true;
 
   const first = identityTokens(a.name), second = identityTokens(b.name);
   if (!first.length || !second.length) return false;
-  if (first.join(" ") === second.join(" ") && first.join("").length >= 6) return true;
-  // Differently named hospitals within a shared campus must remain separate.
+  if (first.join(" ") === second.join(" ") && first.join("").length >= 7
+    && (distance <= 175 || (
+      distance <= 300 && first.length === 1 && first[0].length >= 7
+    ))) return true;
+  // Looser token overlap is only safe within the same small campus footprint.
   if (distance > 45) return false;
   const small = first.length <= second.length ? first : second;
   const large = small === first ? second : first;
