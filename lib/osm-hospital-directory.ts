@@ -31,7 +31,7 @@ const independentDirectoryRows: OsmDirectoryRow[] = osmRecords.map((r) => ({
   sourceUrl: r.source_url,
   sourceDate: r.source_date,
   licenseUrl: r.license,
-}));
+})).sort((a, b) => a.name.localeCompare(b.name, "tr-TR") || a.sourceId.localeCompare(b.sourceId));
 
 
 function enabled(): boolean {
