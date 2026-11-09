@@ -27,17 +27,20 @@ export function filterOsmHospitalRecords(rows: ExternalHospital[], query: string
   const search = key(query);
   return rows.filter((r) => (!search || key([r.name, r.address, r.city, r.district, r.locality].filter(Boolean).join(" ")).includes(search))
     && (!city || (r.city && key(r.city) === key(city))))
-    .map((r) => ({
+    .map((r) => {
+      const officialWebsite = normalizeOfficialWebsiteUrl(r.website);
+      return {
       id: r.sourceId, directoryId: null, organizationId: null,
       slug: r.sourceId.toLowerCase().replace(/[^a-z0-9]+/g, "-"), type: "HOSPITAL" as const,
       name: r.name, city: r.city || "", district: r.district, address: r.address || "", phone: r.phone || "", description: null,
       latitude: r.latitude, longitude: r.longitude, distanceKm: null, rating: null,
       isOnDuty: false, onDutyUntil: null, isVerified: false, verificationState: "UNREGISTERED" as const,
-      verifiedAt: null, navigationMode: "NONE" as const, primaryHref: null, isExternalDestination: false,
-      officialWebsite: null, hasOfficialWebsite: false, canClaim: false, source: "OPENSTREETMAP_ODBL",
-      externalRef: r.sourceId, osmSourceDate: r.sourceDate, osmWebsite: normalizeOfficialWebsiteUrl(r.website), osmLocality: r.locality || "",
+      verifiedAt: null, navigationMode: officialWebsite ? "EXTERNAL" as const : "NONE" as const, primaryHref: officialWebsite, isExternalDestination: Boolean(officialWebsite),
+      officialWebsite, hasOfficialWebsite: Boolean(officialWebsite), canClaim: false, source: "OPENSTREETMAP_ODBL",
+      externalRef: r.sourceId, osmSourceDate: r.sourceDate, osmWebsite: officialWebsite, osmLocality: r.locality || "",
       lastVerifiedAt: null, _count: { doctors: 0, reviews: 0 }, services: [], imagingExams: [], laboratoryTests: [], insuranceMatch: null,
-    }));
+      };
+    });
 }
 
 export function exportOsmRecords(rows: ExternalHospital[]) {
