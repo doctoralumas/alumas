@@ -7,8 +7,10 @@ import {
   loadDirectoryInstitutionRecords,
   normalizeComparisonKey,
   queryNormalizedDirectory,
+  calculateDistanceKm,
 } from "@/lib/institution-directory";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
+import { osmPreviewRequestAllowed, readOsmHospitalPreview, removeCuratedHospitalDuplicates } from "@/lib/osm-hospital-directory";
 import {
   canClaimInsurer,
   evaluateInsurerVerification,
@@ -52,8 +54,8 @@ function slugify(v: string) {
 }
 
 export async function GET(req: Request) {
-  await withdrawExpiredCredentials();
   const u = new URL(req.url);
+  const localPreviewRequest = osmPreviewRequestAllowed(req);
   const type = u.searchParams.get("type");
   const city = u.searchParams.get("city");
   const q = u.searchParams.get("q");
@@ -75,6 +77,13 @@ export async function GET(req: Request) {
     u.searchParams.get("prioritizeInNetwork") !== "0" &&
     Boolean(insuranceProviderId || insuranceSlug);
 
+  const previewAllowed = localPreviewRequest
+    && (!type || type === "HOSPITAL" || type === "HASTANE") && !onDuty && !unclaimedOnly
+    && !insuranceProviderId && !insuranceSlug && !strictConfirmedOnly && !productType && !productId
+    && !networkId && !specialtyCode && ((lat === null && lng === null) || (lat !== null && lng !== null && Number.isFinite(lat) && Number.isFinite(lng)));
+  // Preview is read-only: the regular directory's credential maintenance can write.
+  if (process.env.NODE_ENV === "production" || !previewAllowed) await withdrawExpiredCredentials();
+
   const data = await queryNormalizedDirectory({
     type,
     city,
@@ -93,7 +102,31 @@ export async function GET(req: Request) {
     prioritizeInNetwork,
   });
 
-  return NextResponse.json(data);
+  let result = data;
+  let osmUnavailable = false;
+  if (previewAllowed) {
+    try {
+      const osm = await readOsmHospitalPreview(q || "", city || "");
+      if (lat !== null && lng !== null) {
+        for (const item of osm) if (item.latitude !== null && item.longitude !== null) item.distanceKm = calculateDistanceKm(lat, lng, item.latitude, item.longitude);
+      }
+      // Prefer an existing ALUMAS institution card if both public data sources
+      // confidently refer to the same physical facility. No records are deleted.
+      result = [...data, ...removeCuratedHospitalDuplicates(osm, data)];
+      if (lat !== null && lng !== null) result.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
+    } catch {
+      osmUnavailable = true;
+    }
+  }
+  const responseHeaders: Record<string, string> = osmUnavailable ? { "X-OSM-Preview-Status": "unavailable-or-inventory-changed", "Cache-Control": "no-store" } : {};
+  const rawLimit = u.searchParams.get("limit"), rawOffset = u.searchParams.get("offset");
+  if (rawLimit !== null || rawOffset !== null) {
+    const limit = rawLimit === null ? 50 : Number(rawLimit), offset = rawOffset === null ? 0 : Number(rawOffset);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 200 || !Number.isInteger(offset) || offset < 0)
+      return NextResponse.json({ error: "INVALID_PAGINATION" }, { status: 400 });
+    return NextResponse.json(result.slice(offset, offset + limit), { headers: { ...responseHeaders, "X-Total-Count": String(result.length) } });
+  }
+  return NextResponse.json(result, { headers: responseHeaders });
 }
 
 export async function POST(req: Request) {

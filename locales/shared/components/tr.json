@@ -82,7 +82,8 @@
     "openProfile": "Profili aç",
     "goToWebsite": "Web sitesine git ↗",
     "onDutyPrefix": "Nöbetçi · ",
-    "getDirections": "Yol tarifi ↗"
+    "getDirections": "Yol tarifi ↗",
+    "osmUnverified": "Bilgiler henüz doğrulanmadı."
   },
   "videoConsultation": {
     "preparing": "Hazırlanıyor…",

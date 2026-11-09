@@ -59,6 +59,9 @@ export interface NormalizedDirectoryItem {
   canClaim: boolean;
   // Metadata & Offerings
   source: string;
+  osmSourceDate?: string;
+  osmWebsite?: string | null;
+  osmLocality?: string;
   externalRef: string | null;
   lastVerifiedAt: string | null;
   _count: {
