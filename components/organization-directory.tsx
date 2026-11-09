@@ -52,6 +52,11 @@ type Org = {
   primaryHref?: string | null;
   isExternalDestination?: boolean;
   officialWebsite?: string | null;
+  source?: string;
+  externalRef?: string | null;
+  osmSourceDate?: string;
+  osmWebsite?: string | null;
+  osmLocality?: string;
   hasOfficialWebsite?: boolean;
   canClaim?: boolean;
   _count?: { doctors: number; reviews: number };
@@ -85,6 +90,8 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
 
   const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
   const [rows, setRows] = useState<Org[]>([]);
+  const [resultPage, setResultPage] = useState(0);
+  const [osmUnavailable, setOsmUnavailable] = useState(false);
   const [type, setType] = useState("");
   const [q, setQ] = useState("");
   const [view, setView] = useState<"list" | "map">("list");
@@ -162,7 +169,9 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
 
     try {
       const r = await fetch(`/api/organizations?${p}`);
+      setOsmUnavailable(Boolean(r.headers.get("X-OSM-Preview-Status")));
       setRows(r.ok ? await r.json() : []);
+      setResultPage(0);
     } catch (e) {
       console.error(e);
     } finally {
@@ -447,7 +456,9 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
         </button>
       </div>
 
+      {osmUnavailable && <p role="status" style={{color:"#92400e",marginBottom:"16px"}}>{t("osmUnavailable")}</p>}
       {view === "list" ? (
+        <>
         <div
           style={{
             display: "grid",
@@ -456,7 +467,7 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
             marginBottom: "48px",
           }}
         >
-          {rows.map((o) => {
+          {rows.slice(resultPage * 30, (resultPage + 1) * 30).map((o) => {
             const isVerified = o.isVerified === true;
             const navMode =
               o.navigationMode || (isVerified ? "INTERNAL" : o.officialWebsite ? "EXTERNAL" : "NONE");
@@ -621,12 +632,35 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
                     }}
                   >
                     <NavigationArrow size={16} /> {o.city}
-                    {o.district ? `, ${o.district}` : ""}{" "}
+                    {o.district ? `${o.city ? ", " : ""}${o.district}` : ""}{" "}
+                    {!o.city && !o.district && o.osmLocality ? o.osmLocality : ""}
                     {o.distanceKm != null ? `• ${o.distanceKm.toFixed(1)} km` : ""}
                   </div>
                   <p style={{ margin: 0, fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>
                     {o.address}
                   </p>
+                  {o.source === "OPENSTREETMAP_ODBL" && !o.address && o.latitude != null && o.longitude != null && (
+                    <p style={{ margin: 0, fontSize: "14px", color: "#475569" }}>
+                      {t("osmCoordinates")}: {o.latitude.toFixed(5)}, {o.longitude.toFixed(5)}
+                    </p>
+                  )}
+                  {o.source === "OPENSTREETMAP_ODBL" && (
+                    <p data-testid="osm-data-attribution" style={{ margin: 0, fontSize: "12px", color: "#475569" }}>
+                      {t("osmUnverified")} {t("osmAttribution")}{" "}
+                      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL</a>
+                      {" · "}<a href="/api/osm-hospitals/dataset">{t("osmDataset")}</a>
+                      {o.osmSourceDate ? ` · ${o.osmSourceDate}` : ""}
+                      {o.externalRef && /^OSM:(node|way|relation)\/\d+$/.test(o.externalRef) && (
+                        <> · <a href={`https://www.openstreetmap.org/${o.externalRef.slice(4)}`} target="_blank" rel="noopener noreferrer">{t("osmSourceLink")}</a></>
+                      )}
+                    </p>
+                  )}
+                  {o.source === "OPENSTREETMAP_ODBL" && (o.phone || o.osmWebsite) && (
+                    <p style={{ margin: 0, fontSize: "13px", color: "#475569" }}>
+                      {t("osmContact")} {o.phone || ""}{o.phone && o.osmWebsite ? " · " : ""}
+                      {o.osmWebsite && <a href={o.osmWebsite} target="_blank" rel="noopener noreferrer">{t("osmWebsite")}</a>}
+                    </p>
+                  )}
                   {preview.length > 0 && (
                     <div style={{ fontSize: "13px", color: "#334155", lineHeight: "1.45" }}>
                       {preview.join(" · ")}
@@ -846,6 +880,14 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
             </div>
           )}
         </div>
+        {rows.length > 30 && (
+          <nav aria-label={t("resultPagination")} style={{display:"flex",justifyContent:"center",alignItems:"center",gap:"16px",marginBottom:"32px"}}>
+            <button type="button" disabled={resultPage===0} onClick={() => setResultPage((p) => Math.max(0,p-1))}>{t("previousPage")}</button>
+            <span>{resultPage+1} / {Math.ceil(rows.length/30)}</span>
+            <button type="button" disabled={(resultPage+1)*30>=rows.length} onClick={() => setResultPage((p) => p+1)}>{t("nextPage")}</button>
+          </nav>
+        )}
+        </>
       ) : (
         <div
           style={{

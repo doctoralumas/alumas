@@ -82,7 +82,8 @@
     "openProfile": "View profile",
     "goToWebsite": "Visit website ↗",
     "onDutyPrefix": "On duty · ",
-    "getDirections": "Get directions ↗"
+    "getDirections": "Get directions ↗",
+    "osmUnverified": "Information has not yet been verified."
   },
   "videoConsultation": {
     "preparing": "Preparing…",
