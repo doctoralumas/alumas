@@ -457,6 +457,13 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
       </div>
 
       {osmUnavailable && <p role="status" style={{color:"#92400e",marginBottom:"16px"}}>{t("osmUnavailable")}</p>}
+      {rows.some((o) => o.source === "OPENSTREETMAP_ODBL") && (
+        <p data-testid="osm-directory-attribution" style={{margin:"0 0 16px",fontSize:"12px",color:"#475569"}}>
+          {t("osmAttribution")}{" "}
+          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL</a>
+          {" · "}<a href="/api/osm-hospitals/dataset">{t("osmDataset")}</a>
+        </p>
+      )}
       {view === "list" ? (
         <>
         <div
