@@ -107,26 +107,46 @@ export function independentDatasetMatches(rows: ExternalHospital[]): boolean {
   });
 }
 
-export async function readOsmHospitalPreview(query: string, city = ""): Promise<NormalizedDirectoryItem[]> {
-  if (!enabled()) return [];
+export type OsmInventoryRead = {
+  rows: NormalizedDirectoryItem[];
+  source: "supabase" | "bundled-snapshot" | "disabled";
+  parity: "verified" | "count-mismatch" | "content-mismatch" | "db-unavailable" | "disabled";
+};
 
-  // Use the Supabase OSM table when it exactly matches the independent source.
-  // The older 997-row inventory does not match: do not silently omit 369 records.
-  // Keep the independent, publicly downloadable ODbL snapshot as a read-only
-  // fallback, without inserting anything or comparing with ALUMAS institutions.
+/**
+ * DB-first, read-only lookup. Return a provenance signal so production QA can
+ * confirm we are using the 1,366-row Supabase snapshot and detect silent drift.
+ */
+export async function readOsmHospitalPreviewWithSource(query: string, city = ""): Promise<OsmInventoryRead> {
+  if (!enabled()) return { rows: [], source: "disabled", parity: "disabled" };
+
+  let parity: OsmInventoryRead["parity"] = "db-unavailable";
   try {
     const count = await prisma.externalHospital.count();
-    if (count === independentDirectoryRows.length) {
+    if (count !== independentDirectoryRows.length) {
+      parity = "count-mismatch";
+    } else {
       const rows = await prisma.externalHospital.findMany({
         orderBy: [{ name: "asc" }, { sourceId: "asc" }],
       });
       if (independentDatasetMatches(rows)) {
-        return filterOsmHospitalRecords(rows, query, city);
+        return { rows: filterOsmHospitalRecords(rows, query, city), source: "supabase", parity: "verified" };
       }
+      parity = "content-mismatch";
     }
   } catch {
-    // The OSM table may be unavailable during a staged rollout. No DB writes.
+    // A database error does not silently erase OSM directory coverage.
+    // The standalone ODbL snapshot is byte-identical to its public export.
+    parity = "db-unavailable";
   }
+  return {
+    rows: filterOsmHospitalRecords(independentDirectoryRows, query, city),
+    source: "bundled-snapshot",
+    parity,
+  };
+}
 
-  return filterOsmHospitalRecords(independentDirectoryRows, query, city);
+/** Compatibility adapter for existing callers. */
+export async function readOsmHospitalPreview(query: string, city = ""): Promise<NormalizedDirectoryItem[]> {
+  return (await readOsmHospitalPreviewWithSource(query, city)).rows;
 }
