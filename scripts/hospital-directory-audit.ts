@@ -3,7 +3,7 @@
  * Usage: npm run hospital:audit
  *        npm run hospital:audit -- --with-db
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { PrismaClient } from "@prisma/client";
 import {
   hospitalDistanceMetres,
@@ -99,6 +99,11 @@ const summary: Record<string, unknown> = {
 
 async function main() {
 if (process.argv.includes("--with-db")) {
+  // Next.js loads these automatically, but a standalone tsx script does not.
+  // Existing process environment variables retain precedence.
+  for (const file of [".env", ".env.local"]) {
+    if (existsSync(file)) process.loadEnvFile(file);
+  }
   const db = new PrismaClient();
   try {
     const [external, curated, organizations] = await Promise.all([
