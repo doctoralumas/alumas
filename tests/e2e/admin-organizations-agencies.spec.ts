@@ -188,7 +188,8 @@ test.describe.serial("ALUMAS — Admin Healthcare Organizations & Agencies Manag
     expect(orgEditData.data.type).toBe("CLINIC");
     expect(orgEditData.data.city).toBe("İzmir");
     expect(orgEditData.data.isPublished).toBe(true);
-    expect(orgEditData.data.isOnDuty).toBe(true);
+    // Only pharmacies can be on duty; the API must ignore this for clinics.
+    expect(orgEditData.data.isOnDuty).toBe(false);
 
     // 4.4 Create disposable Agency
     const testAgencySlug = "test-e2e-agency-" + randomBytes(4).toString("hex");
