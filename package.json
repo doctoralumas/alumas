@@ -51,6 +51,7 @@
     "schema:check": "node scripts/schema-check.mjs",
     "i18n:validate": "node scripts/validate-i18n.mjs",
     "i18n:sync": "node scripts/sync-messages.mjs",
+    "hospital:audit": "tsx scripts/hospital-directory-audit.ts",
     "test:contracts": "node --test tests/contracts/*.test.mjs",
     "test:smoke": "node --test tests/smoke/*.test.mjs",
     "test": "npm run i18n:validate && npm run test:contracts && npm run test:smoke",
