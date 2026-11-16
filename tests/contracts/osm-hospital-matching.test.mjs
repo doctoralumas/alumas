@@ -97,3 +97,49 @@ test("curated fixture hospitals align with independent OSM references", () => {
       `Curated record must take precedence for ${curated.name}`);
   }
 });
+
+
+test("Türkiye extract preserves ODbL provenance and passes geographic QA", () => {
+  const seen = new Set();
+  for (const row of raw) {
+    assert.match(row.source_id, /^OSM:(?:node|way|relation)\/\d+$/);
+    assert.equal(row.source_url, `https://www.openstreetmap.org/${row.source_id.slice(4)}`);
+    assert.equal(row.license, "https://www.openstreetmap.org/copyright");
+    assert.ok(!seen.has(row.source_id), `Repeated source ID: ${row.source_id}`);
+    seen.add(row.source_id);
+    const lat = Number(row.latitude), lon = Number(row.longitude);
+    assert.ok(Number.isFinite(lat) && lat >= 35.5 && lat <= 42.5, row.source_id);
+    assert.ok(Number.isFinite(lon) && lon >= 25 && lon <= 45.2, row.source_id);
+    assert.ok(row.name.trim().length >= 3, row.source_id);
+  }
+});
+
+test("hospital subdivisions are not separate hospitals but real specialist hospitals remain", () => {
+  const row = (name) => ({ name, latitude: 41, longitude: 29 });
+  for (const name of [
+    "Bergama Devlet Hastanesi Toplum Ruh Sağlığı Merkezi",
+    "Beykoz Devlet Hastanesi Toplum Ruh Sağlığı Merkezi",
+    "Numune Hastanesi Fatma Kemal Timuçin Kalp Merkezi",
+    "Medikalpak Hastanesi Onkoloji Merkezi",
+    "Edirne Devlet Hastanesi Merkez Ünitesi",
+    "Başkent Üniversitesi Hastanesi Psiko-Sosyal Rehabilitasyon Merkezi",
+  ]) assert.equal(isDisplayableOsmHospital(row(name)), false, name);
+
+  for (const name of [
+    "Darıca Yeni Ağız ve Diş Hastanesi",
+    "Erenköy Fizik Tedavi ve Rehabilitasyon Hastanesi",
+    "İstanbul Fizik Tedavi ve Rehabilitasyon Eğitim ve Araştırma Hastanesi",
+  ]) assert.equal(isDisplayableOsmHospital(row(name)), true, name);
+
+  assert.equal(isDisplayableOsmHospital({ name: "Örnek Hastanesi", latitude: 45, longitude: 29 }), false);
+});
+
+test("display selection has no OSM source duplication or identity-based mutation", () => {
+  const ids = uniqueOsmDisplayIds(records);
+  const chosen = records.filter((r) => ids.has(r.sourceId));
+  assert.equal(new Set(chosen.map((r) => r.sourceId)).size, chosen.length);
+  for (const suppressed of records.filter((r) => isDisplayableOsmHospital(r) && !ids.has(r.sourceId))) {
+    assert.ok(chosen.some((keep) => samePhysicalHospital(keep, suppressed)),
+      `Suppressed without a matching hospital: ${suppressed.name}`);
+  }
+});
