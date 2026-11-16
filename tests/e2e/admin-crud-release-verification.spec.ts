@@ -237,17 +237,30 @@ test.describe.serial("ALUMAS — Admin CRUD & Release Verification Suite", () =>
   // 3. EXTERNAL DIRECTORY DOCTOR CRUD
   // ==================================================================
   test("3. External Directory: Search, Pagination, Edit, and Active Listing Toggle", async ({ request }) => {
-    // 3.1 Search & Pagination
-    const searchRes = await request.get("/api/admin/doctors/directory?q=Bülent&pageSize=10", {
+    // 3.1 Search & Pagination: search a record that is actually in this test DB.
+    // A hard-coded physician name can disappear as directory fixtures change.
+    const initialRes = await request.get("/api/admin/doctors/directory?pageSize=1", {
       headers: { cookie: adminCookie },
     });
+    expect(initialRes.status()).toBe(200);
+    const initialData = await initialRes.json();
+    expect(initialData.items.length).toBeGreaterThanOrEqual(1);
+    const existingName: string = initialData.items[0].name;
+    const searchTerm = existingName.split(/\s+/).filter((token) => token.length >= 4)
+      .sort((left, right) => right.length - left.length)[0] || existingName;
+    const searchRes = await request.get(
+      "/api/admin/doctors/directory?q=" + encodeURIComponent(searchTerm) + "&pageSize=10",
+      { headers: { cookie: adminCookie } }
+    );
     expect(searchRes.status()).toBe(200);
     const searchData = await searchRes.json();
     expect(searchData.ok).toBe(true);
     expect(searchData.total).toBeGreaterThanOrEqual(1);
-    expect(searchData.items.some((item: any) => item.name.includes("Bülent"))).toBe(true);
+    expect(searchData.items.some((item: any) =>
+      item.name.toLocaleLowerCase("tr-TR").includes(searchTerm.toLocaleLowerCase("tr-TR"))
+    )).toBe(true);
     expect(searchData.stats).toBeDefined();
-    expect(searchData.stats.total).toBe(386);
+    expect(searchData.stats.total).toBe(initialData.stats.total);
 
     // 3.2 Edit & Toggle Active on Disposable DirectoryDoctor
     const testDirSlug = `disposable-verify-dir-${Date.now()}`;
