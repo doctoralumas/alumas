@@ -37,13 +37,18 @@ export function isDisplayableOsmHospital(row: HospitalIdentity): boolean {
   const name = hospitalNameKey(row.name);
   if (name.length < 3 || GENERIC_NAMES.has(name)) return false;
   if (/(^| )eski( |$)/.test(name)) return false;
-  if (/(^| )(acil servisi|acil servis|acil girisi|acil giris|acil bolumu|kvc girisi|radyasyon onkolojisi|merkez poliklinigi|poliklinikler|poliklinigi|ek binasi|ana binasi)( |$)/.test(name)) return false;
+  // These are subdivisions of a hospital and must not become another hospital card.
+  // Keep named dental/rehabilitation *hospitals*; exclude only explicit units.
+  if (/(^| )(acil servisi|acil servis|acil girisi|acil giris|acil bolumu|kvc girisi|radyasyon onkolojisi|merkez poliklinigi|poliklinikler|poliklinigi|ek binasi|ana binasi|toplum ruh sagligi merkezi|psiko sosyal rehabilitasyon merkezi|onkoloji merkezi|kalp merkezi|merkez unitesi)( |$)/.test(name)) return false;
   if (/(^| )acil$/.test(name) || /(^| )(ana giris|giris|[a-z]+ binasi|[a-z] blok|ayak sagligi birimi|kan alma birimi)$/.test(name)) return false;
   // Many legitimate OSM hospitals have *only* name, OSM object ID and location.
   // Requiring address, city, website or telephone would silently hide them.
   return row.latitude != null && row.longitude != null
     && Number.isFinite(row.latitude) && Number.isFinite(row.longitude)
-    && Math.abs(row.latitude) <= 90 && Math.abs(row.longitude) <= 180;
+    // The independently extracted source is limited to Türkiye. Reject obviously
+    // mislocated points (the bounds match the ExternalHospital DB constraints).
+    && row.latitude >= 35.5 && row.latitude <= 42.5
+    && row.longitude >= 25 && row.longitude <= 45.2;
 }
 
 export function hospitalDistanceMetres(a: HospitalIdentity, b: HospitalIdentity): number {
