@@ -97,6 +97,7 @@ const summary: Record<string, unknown> = {
   excludedSample: excluded.slice(0, 35).map((row) => ({ id: row.sourceId, name: row.name })),
 };
 
+async function main() {
 if (process.argv.includes("--with-db")) {
   const db = new PrismaClient();
   try {
@@ -169,3 +170,9 @@ summary.issueCount = issues.length;
 summary.issues = issues.slice(0, 100);
 console.log(JSON.stringify(summary, null, 2));
 if (issues.length) process.exitCode = 1;
+}
+
+void main().catch((error: unknown) => {
+  console.error("hospital:audit failed", error);
+  process.exitCode = 1;
+});
