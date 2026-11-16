@@ -456,6 +456,33 @@ export default function OrganizationDirectory({ isLoggedIn = false }: { isLogged
         </button>
       </div>
 
+      {!loading && (
+        <div
+          data-testid="organization-directory-counts"
+          aria-live="polite"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "12px 22px",
+            margin: "-12px 0 20px",
+            color: "#334155",
+            fontWeight: 600,
+            fontSize: "14px",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          <span>{t("orgResultsCount", { count: rows.length })}</span>
+          {!onDuty && (!type || type === "HOSPITAL") && (
+            <span>{t("hospitalResultsCount", { count: rows.filter((o) => o.type === "HOSPITAL").length })}</span>
+          )}
+          {rows.some((o) => o.source === "OPENSTREETMAP_ODBL") && (
+            <span style={{ fontWeight: 400, color: "#64748b" }}>
+              {t("osmResultsCount", { count: rows.filter((o) => o.source === "OPENSTREETMAP_ODBL").length })}
+            </span>
+          )}
+        </div>
+      )}
       {osmUnavailable && <p role="status" style={{color:"#92400e",marginBottom:"16px"}}>{t("osmUnavailable")}</p>}
       {rows.some((o) => o.source === "OPENSTREETMAP_ODBL") && (
         <p data-testid="osm-directory-attribution" style={{margin:"0 0 16px",fontSize:"12px",color:"#475569"}}>
