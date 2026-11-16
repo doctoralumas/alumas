@@ -10,7 +10,7 @@ import {
   calculateDistanceKm,
 } from "@/lib/institution-directory";
 import { normalizeOfficialWebsiteUrl } from "@/lib/external-url";
-import { osmPreviewRequestAllowed, readOsmHospitalPreview, removeCuratedHospitalDuplicates } from "@/lib/osm-hospital-directory";
+import { osmPreviewRequestAllowed, readOsmHospitalPreviewWithSource, removeCuratedHospitalDuplicates } from "@/lib/osm-hospital-directory";
 import {
   canClaimInsurer,
   evaluateInsurerVerification,
@@ -104,9 +104,14 @@ export async function GET(req: Request) {
 
   let result = data;
   let osmUnavailable = false;
+  let osmInventorySource: string | null = null;
+  let osmInventoryParity: string | null = null;
   if (previewAllowed) {
     try {
-      const osm = await readOsmHospitalPreview(q || "", city || "");
+      const inventory = await readOsmHospitalPreviewWithSource(q || "", city || "");
+      osmInventorySource = inventory.source;
+      osmInventoryParity = inventory.parity;
+      const osm = inventory.rows;
       if (lat !== null && lng !== null) {
         for (const item of osm) if (item.latitude !== null && item.longitude !== null) item.distanceKm = calculateDistanceKm(lat, lng, item.latitude, item.longitude);
       }
@@ -118,7 +123,13 @@ export async function GET(req: Request) {
       osmUnavailable = true;
     }
   }
-  const responseHeaders: Record<string, string> = osmUnavailable ? { "X-OSM-Preview-Status": "unavailable-or-inventory-changed", "Cache-Control": "no-store" } : {};
+  const responseHeaders: Record<string, string> = osmUnavailable
+    ? { "X-OSM-Preview-Status": "unavailable", "Cache-Control": "no-store" }
+    : {};
+  if (osmInventorySource && osmInventoryParity) {
+    responseHeaders["X-OSM-Inventory-Source"] = osmInventorySource;
+    responseHeaders["X-OSM-Inventory-Parity"] = osmInventoryParity;
+  }
   const rawLimit = u.searchParams.get("limit"), rawOffset = u.searchParams.get("offset");
   if (rawLimit !== null || rawOffset !== null) {
     const limit = rawLimit === null ? 50 : Number(rawLimit), offset = rawOffset === null ? 0 : Number(rawOffset);
