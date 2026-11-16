@@ -39,10 +39,10 @@ test.describe.serial("Admin Doctors & Management E2E Suite", () => {
     await expect(tabDirectory).toContainText("Directory Specialists", { timeout: 30000 });
     await expect(tabClaims).toContainText("Directory Claim Requests", { timeout: 30000 });
 
-    // Check Registered Specialists: Yiğit Tilaver & Ali Can Aydın exist
-    await expect(page.locator("body")).toContainText("Yiğit Tilaver", { timeout: 15000 });
-    await expect(page.locator("body")).toContainText("Ali Can Aydın");
-    await expect(page.locator("body")).toContainText("Fahri Tunç");
+    // Verify the three doctors seeded for the E2E database
+    await expect(page.locator("body")).toContainText("Selin Arslan", { timeout: 15000 });
+    await expect(page.locator("body")).toContainText("Kerem Demir");
+    await expect(page.locator("body")).toContainText("Aylin Kaya");
 
     // Check action buttons exist
     await expect(page.locator("body")).toContainText("Edit");
@@ -83,9 +83,9 @@ test.describe.serial("Admin Doctors & Management E2E Suite", () => {
     await expect(tabClaims).toContainText("Dizin Sahiplenme Talepleri", { timeout: 30000 });
 
     // Check Registered Specialists in Turkish
-    await expect(page.locator("body")).toContainText("Yiğit Tilaver", { timeout: 15000 });
-    await expect(page.locator("body")).toContainText("Ali Can Aydın");
-    await expect(page.locator("body")).toContainText("Fahri Tunç");
+    await expect(page.locator("body")).toContainText("Selin Arslan", { timeout: 15000 });
+    await expect(page.locator("body")).toContainText("Kerem Demir");
+    await expect(page.locator("body")).toContainText("Aylin Kaya");
 
     // Verify Turkish actions
     await expect(page.locator("body")).toContainText("Düzenle");

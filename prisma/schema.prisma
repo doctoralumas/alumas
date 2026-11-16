@@ -1788,6 +1788,27 @@ model DirectoryInstitution {
   @@index([name])
 }
 
+/// Independently licensed OSM records; no ownership, appointment or insurance relations.
+model ExternalHospital {
+  sourceId             String   @id
+  name                 String
+  city                 String?
+  district             String?
+  locality             String?
+  address              String?
+  phone                String?
+  website              String?
+  latitude             Float
+  longitude            Float
+  sourceUrl            String
+  sourceDate           String
+  licenseUrl           String
+  inventoryFingerprint String
+  createdAt            DateTime @default(now())
+
+  @@index([city, name])
+}
+
 model OrganizationClaim {
   id                     String                  @id @default(cuid())
   directoryInstitutionId String

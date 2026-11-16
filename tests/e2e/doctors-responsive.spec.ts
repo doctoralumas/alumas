@@ -54,16 +54,19 @@ test("Mobile specialty bottom sheet opens, filters and selects without viewport 
   });
   expect(overflowWithModal).toBe(true);
 
-  // Filter inside bottom sheet
-  const searchInput = bottomSheet.locator("input[type='text']");
-  await searchInput.fill("Diş");
-
-  // Options should appear
   const options = bottomSheet.locator("[role='option']");
-  const count = await options.count();
-  expect(count).toBeGreaterThan(0);
+  await expect(options.nth(1)).toBeVisible();
+  const firstSpecialtyLabel = (await options.nth(1).innerText()).split("\n")[0].trim();
 
-  // Click the first specific option (skip the "Tüm Uzmanlıklar" allOption)
+  // Search input is intentionally absent when there are <=5 options in the
+  // E2E seed; when present, assert it filters an actual option.
+  const searchInput = bottomSheet.locator("input[type='text']");
+  if (await searchInput.count()) {
+    await searchInput.fill(firstSpecialtyLabel.slice(0, Math.min(4, firstSpecialtyLabel.length)));
+    await expect(options.nth(1)).toBeVisible();
+  }
+
+  // Select a specific specialty (skip the "Tüm Uzmanlıklar" allOption).
   await options.nth(1).click();
 
   // Bottom sheet should close

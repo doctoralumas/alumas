@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { PrismaClient } from "@prisma/client";
 
 function uniqueEmail() {
   return `e2e-doctor-${Date.now()}-${Math.random().toString(36).slice(2)}@alumas.test`;
@@ -17,6 +18,8 @@ const VIEWPORTS = [
 test.describe.serial("Doctor Onboarding Premium UI/UX & Responsive Suite", () => {
   test.setTimeout(90000);
   let page: Page;
+  const prisma = new PrismaClient();
+  let claimDoctorId = "";
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -32,14 +35,28 @@ test.describe.serial("Doctor Onboarding Premium UI/UX & Responsive Suite", () =>
 
     // Wait for registration redirect
     await expect(page).toHaveURL(/\/profile/, { timeout: 25000 });
+    const fixture = await prisma.directoryDoctor.create({
+      data: {
+        slug: "e2e-bulent-oktay-" + Date.now(),
+        name: "A. Bülent Oktay",
+        title: "Uzm. Dr.",
+        specialty: "Üroloji",
+        city: "Bursa",
+        source: "E2E_TEST_FIXTURE",
+        isActive: true,
+      },
+    });
+    claimDoctorId = fixture.id;
   });
 
   test.afterAll(async () => {
+    if (claimDoctorId) await prisma.directoryDoctor.delete({ where: { id: claimDoctorId } }).catch(() => {});
+    await prisma.$disconnect();
     await page.close();
   });
 
   test("Doctor onboarding has ZERO horizontal overflow across all mobile & desktop viewports (320px–1280px)", async () => {
-    await page.goto("/onboarding/doctor?claimDoctorId=dr-a-bulent-oktay-uroloji-bursa", {
+    await page.goto(`/onboarding/doctor?claimDoctorId=${claimDoctorId}`, {
       waitUntil: "domcontentloaded",
     });
 
@@ -73,7 +90,7 @@ test.describe.serial("Doctor Onboarding Premium UI/UX & Responsive Suite", () =>
 
   test("Selected claim banner renders localized content without raw keys and handles cancellation", async () => {
     await page.setViewportSize({ width: 440, height: 956 });
-    await page.goto("/onboarding/doctor?claimDoctorId=dr-a-bulent-oktay-uroloji-bursa", {
+    await page.goto(`/onboarding/doctor?claimDoctorId=${claimDoctorId}`, {
       waitUntil: "domcontentloaded",
     });
 

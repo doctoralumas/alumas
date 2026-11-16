@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { PrismaClient } from "@prisma/client";
 
 function uniqueEmail() {
   return `e2e-business-${Date.now()}-${Math.random().toString(36).slice(2)}@alumas.test`;
@@ -17,6 +18,8 @@ const VIEWPORTS = [
 test.describe.serial("Business Application Premium UI/UX & Responsive Suite", () => {
   test.setTimeout(90000);
   let page: Page;
+  const prisma = new PrismaClient();
+  let claimDirectoryId = "";
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -32,14 +35,30 @@ test.describe.serial("Business Application Premium UI/UX & Responsive Suite", ()
 
     // Wait for registration redirect to profile
     await expect(page).toHaveURL(/\/profile/, { timeout: 25000 });
+    // E2E database does not contain production curated facilities.
+    const fixture = await prisma.directoryInstitution.create({
+      data: {
+        slug: "e2e-acibadem-maslak-" + Date.now(),
+        name: "Acıbadem Maslak Hastanesi",
+        type: "HOSPITAL",
+        city: "İstanbul",
+        district: "Sarıyer",
+        address: "Darüşşafaka Mah. Büyükdere Cad. No:40 Maslak",
+        source: "E2E_TEST_FIXTURE",
+        isActive: true,
+      },
+    });
+    claimDirectoryId = fixture.id;
   });
 
   test.afterAll(async () => {
+    if (claimDirectoryId) await prisma.directoryInstitution.delete({ where: { id: claimDirectoryId } }).catch(() => {});
+    await prisma.$disconnect();
     await page.close();
   });
 
   test("Business application page has ZERO horizontal overflow across all mobile & desktop viewports (320px–1280px)", async () => {
-    await page.goto("/business/apply?claimDirectoryId=dir-tr-ist-acibadem-maslak", {
+    await page.goto(`/business/apply?claimDirectoryId=${claimDirectoryId}`, {
       waitUntil: "domcontentloaded",
     });
 
@@ -72,7 +91,7 @@ test.describe.serial("Business Application Premium UI/UX & Responsive Suite", ()
 
   test("Segmented mode switching, directory institution claim card, locking and reset behavior", async () => {
     await page.setViewportSize({ width: 440, height: 956 });
-    await page.goto("/business/apply?claimDirectoryId=dir-tr-ist-acibadem-maslak", {
+    await page.goto(`/business/apply?claimDirectoryId=${claimDirectoryId}`, {
       waitUntil: "domcontentloaded",
     });
 

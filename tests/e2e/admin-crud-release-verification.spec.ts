@@ -237,24 +237,13 @@ test.describe.serial("ALUMAS — Admin CRUD & Release Verification Suite", () =>
   // 3. EXTERNAL DIRECTORY DOCTOR CRUD
   // ==================================================================
   test("3. External Directory: Search, Pagination, Edit, and Active Listing Toggle", async ({ request }) => {
-    // 3.1 Search & Pagination
-    const searchRes = await request.get("/api/admin/doctors/directory?q=Bülent&pageSize=10", {
-      headers: { cookie: adminCookie },
-    });
-    expect(searchRes.status()).toBe(200);
-    const searchData = await searchRes.json();
-    expect(searchData.ok).toBe(true);
-    expect(searchData.total).toBeGreaterThanOrEqual(1);
-    expect(searchData.items.some((item: any) => item.name.includes("Bülent"))).toBe(true);
-    expect(searchData.stats).toBeDefined();
-    expect(searchData.stats.total).toBe(386);
-
-    // 3.2 Edit & Toggle Active on Disposable DirectoryDoctor
-    const testDirSlug = `disposable-verify-dir-${Date.now()}`;
-    const disposableDirDoc = await prisma.directoryDoctor.create({
+    // Isolated test data: the E2E database is not expected to contain the live
+    // production directory of 386 specialists.
+    const slug = "disposable-verify-dir-" + Date.now();
+    const record = await prisma.directoryDoctor.create({
       data: {
-        slug: testDirSlug,
-        name: "Dr. Disposable Directory Verification",
+        slug,
+        name: "Dr. E2E Directory Sentinel",
         title: "Uzm. Dr.",
         specialty: "Dermatoloji",
         hospital: "Özel Test Kliniği",
@@ -262,19 +251,29 @@ test.describe.serial("ALUMAS — Admin CRUD & Release Verification Suite", () =>
         phone: "+90 232 555 44 33",
         officialWebsite: "https://example.com/test-verify",
         source: "SRC-TEST-DISPOSABLE",
-        externalRef: `REF-${Date.now()}`,
+        externalRef: "REF-" + Date.now(),
         isActive: true,
       },
     });
 
     try {
-      // Edit directory doctor
-      const editDirRes = await request.patch(`/api/admin/doctors/directory/${disposableDirDoc.id}`, {
+      const searchRes = await request.get(
+        "/api/admin/doctors/directory?q=" + encodeURIComponent("Directory Sentinel") + "&pageSize=10",
+        { headers: { cookie: adminCookie } }
+      );
+      expect(searchRes.status()).toBe(200);
+      const searchData = await searchRes.json();
+      expect(searchData.ok).toBe(true);
+      expect(searchData.total).toBeGreaterThanOrEqual(1);
+      expect(searchData.items.some((item: any) => item.id === record.id)).toBe(true);
+      expect(searchData.stats.total).toBeGreaterThanOrEqual(1);
+
+      const editDirRes = await request.patch("/api/admin/doctors/directory/" + record.id, {
         headers: { cookie: adminCookie },
         data: {
           hospital: "İzmir Dermatoloji Enstitüsü",
           phone: "+90 232 999 88 77",
-          isActive: false, // hide listing
+          isActive: false,
           reason: "Verified audit change for release testing",
         },
       });
@@ -284,25 +283,20 @@ test.describe.serial("ALUMAS — Admin CRUD & Release Verification Suite", () =>
       expect(editDirData.data.hospital).toBe("İzmir Dermatoloji Enstitüsü");
       expect(editDirData.data.isActive).toBe(false);
 
-      // Verify audit log
       const dirAudit = await prisma.auditLog.findFirst({
-        where: { entityId: disposableDirDoc.id, action: "directory_doctor.updated" },
+        where: { entityId: record.id, action: "directory_doctor.updated" },
       });
       expect(dirAudit).not.toBeNull();
 
-      // Restore listing
-      const restoreDirRes = await request.patch(`/api/admin/doctors/directory/${disposableDirDoc.id}`, {
+      const restoreDirRes = await request.patch("/api/admin/doctors/directory/" + record.id, {
         headers: { cookie: adminCookie },
-        data: {
-          isActive: true,
-          reason: "Restoring listing to active",
-        },
+        data: { isActive: true, reason: "Restoring listing to active" },
       });
       expect(restoreDirRes.status()).toBe(200);
       const restoreData = await restoreDirRes.json();
       expect(restoreData.data.isActive).toBe(true);
     } finally {
-      await prisma.directoryDoctor.delete({ where: { id: disposableDirDoc.id } }).catch(() => {});
+      await prisma.directoryDoctor.delete({ where: { id: record.id } }).catch(() => {});
     }
   });
 

@@ -15,6 +15,7 @@ type Org = {
   isVerified?: boolean;
   navigationMode?: "INTERNAL" | "EXTERNAL" | "NONE";
   primaryHref?: string | null;
+  source?: string;
 };
 
 const OSM_RASTER_STYLE: mapboxgl.StyleSpecification = {
@@ -91,10 +92,11 @@ export default function InteractiveOrganizationMap({ rows, token }: { rows: Org[
           ? `<a href="${escapeHtml(o.primaryHref)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("goToWebsite"))}</a>`
           : "";
       const badge = o.isVerified ? " ✓" : "";
+      const osmNotice = o.source === "OPENSTREETMAP_ODBL" ? `<span>${escapeHtml(t("osmUnverified"))} · © OpenStreetMap contributors · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL</a></span>` : "";
       const popup = new mapboxgl.Popup({ offset: 18 }).setHTML(
         `<div class="alumas-map-popup"><b>${escapeHtml(o.name)}${badge}</b><span>${
           o.isOnDuty ? escapeHtml(t("onDutyPrefix")) : ""
-        }${o.distanceKm != null ? o.distanceKm + " km" : ""}</span>${actionLink}<a href="${directions}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("getDirections"))}</a></div>`
+        }${o.distanceKm != null ? o.distanceKm + " km" : ""}</span>${osmNotice}${actionLink}<a href="${directions}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("getDirections"))}</a></div>`
       );
       new mapboxgl.Marker({ color: o.isVerified ? "#2563eb" : "#173f34" })
         .setLngLat([lng, lat])
